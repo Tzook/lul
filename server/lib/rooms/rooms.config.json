@@ -1,0 +1,28 @@
+{
+	"ROUTES": {
+		"JOIN_ROOM": "/room/join/:roomName",
+		"LEAVE_ROOM": "/room/leave/:roomName"
+	},
+	"LOGS": {
+		"JOIN_ROOM_OK": {
+			"MSG": "User '{username}' joined room '{room}'.",
+			"CODE": "ROOM_1",
+			"STATUS": "OK"
+		},
+		"JOIN_ROOM_FAILED_TO_CREATE_ROOM": {
+			"MSG": "Failed to create room '{room}'.",
+			"CODE": "ROOM_2",
+			"STATUS": "SYSTEM_ERROR"
+		},
+		"LEAVE_ROOM_OK": {
+			"MSG": "User '{username}' left room '{room}'.",
+			"CODE": "ROOM_3",
+			"STATUS": "OK"
+		},
+		"LEAVE_ROOM_FAILURE_USER_NOT_IN_ROOM": {
+			"MSG": "User was not found in room '{room}'.",
+			"CODE": "ROOM_4",
+			"STATUS": "BAD_VALUES"
+		}
+	}
+}

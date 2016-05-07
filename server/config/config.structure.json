@@ -1,0 +1,16 @@
+{
+	"templates": ["controller", 
+				  "middleware", 
+				  "model", 
+				  "router", 
+				  "services"],
+	"configs":	 ["config"],
+	"tests":	 ["controller", 
+				  "middleware", 
+				  "model", 
+				  "services"],
+	"mocks":	 ["services",
+				  "data"],
+	"folders": 	 ["master", "user", "socketio", "rooms", "character", "movement"],
+	"skip": 	 { "master": 1 }
+}

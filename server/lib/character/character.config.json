@@ -1,0 +1,35 @@
+{
+	"ROUTES": {
+		"CHARACTER_CREATE": "/character/create"
+	},
+	"LOGS": {
+		"CHARACTER_CREATED_SUCCESSFULLY": {
+			"MSG": "Character has been created successfully.",
+			"CODE": "CHARACTER_1",
+			"STATUS": "OK"
+		},
+		"CHARACTER_UNSUPPORTED_SPRITE": {
+			"MSG": "Parameter '{param}' has an unsupported sprite.",
+			"CODE": "CHARACTER_2",
+			"STATUS": "BAD_REQUEST"
+		},
+		"CHARACTER_NAME_CAUGHT": {
+			"MSG": "The name '{name}' is already being used.",
+			"CODE": "CHARACTER_3",
+			"STATUS": "BAD_VALUES"
+		}
+	},
+	"SPRITES": {
+		"CHAR_CHEST_FEMALE": ["char_chest_female_0"], 
+		"CHAR_CHEST_MALE": ["char_chest_male_0"], 
+		"CHAR_HAIR_FEMALE": ["char_hair_female_0", "char_hair_female_1", "char_hair_female_2", "char_hair_female_3", "char_hair_female_4", "char_hair_female_5", "char_hair_female_6", "char_hair_female_7"], 
+		"CHAR_HAIR_MALE" : ["char_hair_male_0", "char_hair_male_1", "char_hair_male_2", "char_hair_male_3", "char_hair_male_4", "char_hair_male_6", "char_hair_male_7", "char_hair_male_8"], 
+		"CHAR_HANDS": ["char_hands_0", "char_hands_1", "char_hands_2", "char_hands_3", "char_hands_4"], 
+		"CHAR_HEAD": ["char_head_0", "char_head_1"], 
+		"CHAR_LEG": ["char_leg_0", "char_leg_1", "char_leg_2"], 
+		"CHAR_MOUTH": ["hbd_mouth_0", "hbd_mouth_1", "hbd_mouth_2", "hbd_mouth_3", "hbd_mouth_4"], 
+		"CHAR_NOSE": ["hbd_nose_0", "hbd_nose_1", "hbd_nose_2", "hbd_nose_3"], 
+		"CHAR_EYES_MALE": ["hbd_eyes_0", "hbd_eyes_1", "hbd_eyes_2", "hbd_eyes_3", "hbd_eyes_4"], 
+		"CHAR_EYES_FEMALE": ["hbd_eyesf_0", "hbd_eyesf_1", "hbd_eyesf_2", "hbd_eyesf_3"]
+	}
+}

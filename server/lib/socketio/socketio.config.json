@@ -1,0 +1,20 @@
+{
+	"ROUTES": {
+		"BEGIN_CONNECTION": "connection"
+	},
+	"SERVER_GETS": {
+		"DISCONNECT": "disconnect",
+		"YAYA": "yaya",
+		"MSG": "msg"
+	},
+	"CLIENT_GETS": {
+		"CONNECT": "connect",
+		"YOYO": "yoyo",
+		"TY": "ty",
+		"MSG": "msg",
+		"LOGIN": "login"
+	},
+	"LOGS": {
+		
+	}
+} 

@@ -1,0 +1,38 @@
+{
+  "name": "Lel",
+  "version": "0.0.1",
+  "description": "very lel..",
+  "main": "main.js",
+  "dependencies": {
+    "body-parser": "1.15.1",
+    "chalk": "1.1.3",
+    "compression": "1.6.1",
+    "connect-mongo": "1.1.0",
+    "cookie-parser": "1.4.1",
+    "cors": "2.7.1",
+    "express": "4.13.4",
+    "express-session": "1.13.0",
+    "forever": "0.15.1",
+    "md5": "2.1.0",
+    "mongodb": "2.1.18",
+    "mongoose": "4.4.15",
+    "passport": "0.3.2",
+    "passport-local": "1.0.0",
+    "passport.socketio": "3.6.1",
+    "q": "1.4.1",
+    "socket.io": "1.4.6",
+    "underscore": "1.8.3",
+    "winston": "2.2.0"
+  },
+  "engines": {
+    "node": "4.4.4",
+    "npm": "3.8.9"
+  },
+  "license": "MIT",
+  "devDependencies": {
+    "chai": "3.5.0",
+    "gulp": "3.9.1",
+    "gulp-develop-server": "0.5.1",
+    "gulp-mocha": "2.2.0"
+  }
+}

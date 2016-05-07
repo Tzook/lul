@@ -1,0 +1,410 @@
+<html>
+	<head>
+		<link rel="stylesheet" href="//maxcdn.bootstrapcdn.com/bootstrap/3.3.5/css/bootstrap.min.css">
+		<script src="//cdnjs.cloudflare.com/ajax/libs/socket.io/1.3.7/socket.io.js"></script>
+		<script src="//cdnjs.cloudflare.com/ajax/libs/jquery/3.0.0-alpha1/jquery.min.js"></script>
+		<title>lel</title>		
+	</head>
+	<body>
+		<div class="loading" style="opacity: 0"></div>
+		<div class="jumbotron">
+			<h1>~Tzook's private office~</h1>
+			
+			<svg id="playground" style="opacity: 0"></svg>
+			
+			<div class="intro">
+				<div class="group">
+					<input type="text" placeholder="username (1-16)" id="username" class="form-control form-input">
+					<input type="text" placeholder="password (32)" id="password" class="form-control form-input">
+					<button onclick="login()" class="btn btn-lg btn-success user-btn">Login</button>
+					<button onclick="register()" class="btn btn-lg btn-primary user-btn">Register</button>
+					<button onclick="session()" class="btn btn-lg btn-warning user-btn">Session</button>
+					<button onclick="logout()" class="btn btn-lg btn-danger user-btn">Logout</button>
+				</div>
+				<div class="group">
+					<label><input type="radio" name="chG" id="chGenderMale" value="true" class="form-control"> Male</label>
+					<label><input type="radio" name="chG" id="chGenderFemale" value="false" class="form-control"> Female</label>
+					<input type="text" placeholder="Name (1-16)" id="chName" class="form-control form-input">
+					<input type="text" placeholder="Hair color (hex)" id="chHairColor" class="form-control form-input">
+					<input type="text" placeholder="Skin color (hex)" id="chSkin" class="form-control form-input">
+					<select id="chHairSprite" class="form-control form-input"><option value="" class="hidden">Hair sprite</option><option value="char_hair_female_0">char_hair_female_0</option><option value="char_hair_female_1">char_hair_female_1</option><option value="char_hair_female_2">char_hair_female_2</option><option value="char_hair_female_3">char_hair_female_3</option><option value="char_hair_female_4">char_hair_female_4</option><option value="char_hair_female_5">char_hair_female_5</option><option value="char_hair_female_6">char_hair_female_6</option><option value="char_hair_female_7">char_hair_female_7</option><option value="char_hair_male_0">char_hair_male_0</option><option value="char_hair_male_1">char_hair_male_1</option><option value="char_hair_male_2">char_hair_male_2</option><option value="char_hair_male_3">char_hair_male_3</option><option value="char_hair_male_4">char_hair_male_4</option><option value="char_hair_male_6">char_hair_male_6</option><option value="char_hair_male_7">char_hair_male_7</option><option value="char_hair_male_8">char_hair_male_8</option></select>
+					<select id="chEyes" class="form-control form-input"><option value="" class="hidden">Eyes sprite</option><option value="hbd_eyes_0">hbd_eyes_0</option><option value="hbd_eyes_1">hbd_eyes_1</option><option value="hbd_eyes_2">hbd_eyes_2</option><option value="hbd_eyes_3">hbd_eyes_3</option><option value="hbd_eyes_4">hbd_eyes_4</option><option value="hbd_eyesf_0">hbd_eyesf_0</option><option value="hbd_eyesf_1">hbd_eyesf_1</option><option value="hbd_eyesf_2">hbd_eyesf_2</option><option value="hbd_eyesf_3">hbd_eyesf_3</option></select>
+					<select id="chNose" class="form-control form-input"><option value="" class="hidden">Nose sprite</option><option value="hbd_nose_0">hbd_nose_0</option><option value="hbd_nose_1">hbd_nose_1</option><option value="hbd_nose_2">hbd_nose_2</option><option value="hbd_nose_3">hbd_nose_3</option></select>
+					<select id="chMouth" class="form-control form-input"><option value="" class="hidden">Mouth sprite</option><option value="hbd_mouth_0">hbd_mouth_0</option><option value="hbd_mouth_1">hbd_mouth_1</option><option value="hbd_mouth_2">hbd_mouth_2</option><option value="hbd_mouth_3">hbd_mouth_3</option><option value="hbd_mouth_4">hbd_mouth_4</option></select>
+					<button onclick="createCharacter()" class="btn btn-lg btn-success user-btn">Create</button>
+				</div>
+			</div>
+			<div class="group form-inline">
+				<button id="connect" disabled="true" onclick="connect()" class="btn btn-lg btn-info user-btn">Connect to char number: 
+					<input id="chNumber" class="form-control" type="number" max="9" min="0" onclick="event.stopPropagation();"></input>
+				</button>
+				<button onclick="disconnect()" class="btn btn-lg btn-danger user-btn">Disconnect</button>
+			</div>
+			<div id="chat">
+			</div>
+			<input type="text" placeholder="What to send?" id="emit" class="form-control form-input">
+		</div>
+			
+		<script>
+			'use strict';
+			// ============ GENERAL ============ // 
+			function showLoading() {
+				$loading.addClass('loading-shown');				
+			}
+			function hideLoading() {
+				$loading.removeClass('loading-shown');				
+			}
+			
+			function getRandomColor() {
+				return Math.floor(Math.random() * 16777215).toString(16);
+			}
+			
+			function setResult(result) {
+				var $elem = jQuery('<p></p>');
+				if (result.ch) {
+					if (result.d !== undefined) {
+						setCharText(result.ch, result.d);
+						$elem.append(`<b>${result.ch}</b>: `).append(document.createTextNode(result.d));
+					} else {
+						$elem.text(`${result.ch} the fag has logged in!`);
+					}
+				} else {
+					$elem.append(
+						(result.msg ? `msg: "${result.msg}" ` : '') +  
+						(result.error ? `error: "${result.error}"<br>` : '') + 
+						(result.status ? ` status: "${result.status}" ` : '') + 
+						(result.code ? ` code: "${result.code}" ` : '') + 
+						(result.d ? `<br>data: ${JSON.stringify(result.d, null, 4).replace(/\n/g, '<br>')}` : '')
+					);
+					if (result.d && result.d.characters) {
+						characters = result.d.characters;
+						$connect.prop('disabled', false);
+					}
+				}
+				$elem.css('color', getRandomColor()); // random color				
+				$chat.append($elem);
+				$chat.animate({scrollTop: $chat[0].scrollHeight}, 600);
+			}
+			
+			// ============ LOGIN ============ //
+			var $chat = jQuery('#chat');
+			var $loading = jQuery('.loading');
+			var $username = jQuery('#username'),
+				$password = jQuery('#password');
+			function login() {
+				sendPost('/user/login', getUserData());
+			}			
+			function register() {
+				sendPost('/user/register', getUserData());	
+			}
+			function session() {
+				sendGet('/user/session');
+			}
+			function logout() {
+				sendGet('/user/logout');
+			}
+			
+			function getUserData() {
+				return {
+					username: $username.val(),
+					password: $password.val()
+				};
+			}
+			
+			function sendPost(url, data) {
+				send('POST', url, JSON.stringify(data));
+			}
+			
+			function sendGet(url) {
+				send('GET', url);
+			}
+			
+			function send(method, url, data) { 
+				try {
+					showLoading();
+					$.ajax({method, url, data, success, error, dataType: "json", contentType: "application/json"});
+				} catch (e) {
+					console.error(e);
+				}
+				function success (response) {
+					try {
+						setResult({
+							msg: response.msg,
+							code: response.code,
+							d: response.data
+						});
+					} catch (e) {
+						console.error(e);
+					} finally {
+						hideLoading();
+					}
+				}
+				function error (jqResponse, json) {
+					try {
+						var response = JSON.parse(jqResponse.responseText);
+						setResult({
+							error: response.error,
+							code: response.code,
+							status: jqResponse.status
+						});
+						hideLoading();
+					} catch (e) {
+						console.error(e);
+					} finally {
+						hideLoading();
+					}
+				}
+			}
+			
+			// ============ CHARACTER ============ //
+			var characters;
+			var you = '(you didn"t seession or login, how can i know ur name...)';
+			var $ch = {
+				name: jQuery('#chName'),
+				gM: jQuery('#chGenderMale'),
+				gF: jQuery('#chGenderFemale'),
+				hairColor: jQuery('#chHairColor'),
+				skin: jQuery('#chSkin'),
+				hairSprite: jQuery('#chHairSprite'),
+				eyes: jQuery('#chEyes'),
+				mouth: jQuery('#chMouth'),
+				nose: jQuery('#chNose')
+			};
+			
+			function getCharacterData() {
+				var result = {
+					name: $ch.name.val(),
+					hairColor: $ch.hairColor.val(),
+					skin: $ch.skin.val(),
+					hairSprite: $ch.hairSprite.val(),
+					eyes: $ch.eyes.val(),
+					mouth: $ch.mouth.val(),
+					nose: $ch.nose.val()
+				};
+				($ch.gM.prop('checked') || $ch.gF.prop('checked')) && (result.g = $ch.gF.prop('checked'));
+				return result;
+			}
+			
+			function createCharacter() {
+				sendPost('/character/create', getCharacterData());
+			}
+			
+			// ============ SOCKETIO ============ //
+			document.body.addEventListener('keydown', function(e) {
+				if (socket) {
+					switch(e.which) {
+						case 13: emit(); break;
+						case 37: move(-10, 0); e.preventDefault(); break;
+						case 38: move(0, -10); e.preventDefault(); break;
+						case 39: move(10, 0); e.preventDefault(); break;
+						case 40: move(0, 10); e.preventDefault(); break;
+					}
+				}
+			});
+
+			var socket;
+			var $emit = jQuery('#emit');
+			var $connect = jQuery('#connect');
+			var $chNumber = jQuery('#chNumber');
+			var $intro = jQuery('.intro');
+			var toggleIntro;
+			setTimeout(function() {
+				toggleIntro = (function() {
+					var height = $intro.height();
+					return function (toClose) {
+						toClose 
+						? $intro.height(height).animate({height: 0}, 400, function() { $intro.css('display', 'none'); $playground.css('opacity', '1');} )
+						: $intro.css('display', 'block').animate({height: height}, 400, function() { $playground.css('opacity', '0'); });
+					};
+				})();	
+			});
+			
+			function connect() {
+				if (socket) {
+					disconnect();
+				}
+				showLoading();
+				socket = io(location.host, {forceNew: true, query: "ch=" + characters[$chNumber.val()].name});
+				// HANDSHAKE APPROVED
+				socket.on('connect', function() {
+					you = characters[$chNumber.val()];
+					moveChar(characters[$chNumber.val()].name, characters[$chNumber.val()].pos);
+					toggleIntro(true);
+					hideLoading();
+					setResult({msg: 'connected.'});
+				});
+				// HANDSHAKE REJECTED / HAD ERROR
+				socket.on('error', function(error) {
+					setResult({error});
+					disconnect();
+					hideLoading();
+					console.log('error: %o', error);
+				});
+				// CONNECTION TERMINATED
+				socket.on('disconnected', function(d) {
+					removeChar(d.ch);
+				});
+
+				// From here on, we decide the event names. Next milestone..
+				socket.on('yoyo', function(d) {
+					setResult({msg:"got data:", d});
+					for (var i in d.loggedIn) {
+						moveChar(i, d.loggedIn[i]);
+					}
+				});
+				
+				socket.on('msg', function(d) {
+					setResult(d);
+				});
+				
+				socket.on('login', function(d) {
+					moveChar(d.ch, {x: d.x, y: d.y});
+					setResult(d);
+				});
+				
+				
+				socket.on('xy', function(d) {
+					moveChar(d.ch, {x: d.x, y: d.y});
+				});
+			}
+			
+			function move(dX, dY) {
+				you.pos.x += dX;
+				you.pos.y += dY;
+				moveChar(you.name, you.pos);
+				socket.emit('xy', you.pos);
+			}
+			
+			function emit() {
+				socket.emit('msg', {d: $emit.val()});
+				$emit.val('');
+			}
+			
+			function disconnect() {
+				toggleIntro();
+				setResult({msg: "disconnected."});
+				socket.disconnect();
+				socket = undefined;
+			}
+			
+			// ============ PLAYGROUND ============ //
+			var $chars = {};
+			var $playground = jQuery('#playground');
+			
+			function moveChar(name, pos) {
+				if (!$chars[name]) {
+					$chars[name] = {};
+					var color = '#' + getRandomColor();
+					$chars[name].full = jQuery(
+					`<g fill="${color}" id="char-${name}">
+						<circle r="10"></circle>
+						<text x="15" y="4.5" font-weight="bold">${name}</text>
+					</g>`);
+					$chars[name].text = jQuery('<text x="-15" y="-20"></text>');
+					$chars[name].full.append($chars[name].text);
+					$playground.append($chars[name].full);
+					$playground.html($playground.html()); // refresh the svg
+					$chars[name].style = jQuery('<style></style>');
+					document.body.appendChild($chars[name].style[0]);
+				}
+				$chars[name].style.html(`
+					#char-${name} {
+						transform: translate(${pos.x}px, ${pos.y}px);
+					}
+				`);
+			}
+			
+			function setCharText(name, text) {
+				$chars[name].text[0].textContent = text;
+				$playground.html($playground.html()); // refresh the svg
+			}
+			
+			function removeChar(name) {
+				$chars[name].style.html(`
+					#char-${name} {
+						opacity: 0;
+					}
+				`);
+			}
+		</script>
+		<style>
+			.loading {
+				position: absolute;
+				right: 0;
+				left: 0;
+				margin: auto;
+				border-radius: 20px;
+				z-index: 1111;
+				top: 100px;
+				height: 330px;
+				width: 500px;
+				background-position-y: -110px;
+				background-image: url('http://img.ifcdn.com/images/fed3ab2afe051af679b988412f60591c4626240b81c6ceee575d09e4b45f7e82_1.gif');
+				transition: all .2s linear;
+				visibility: hidden;
+				margin-top: -30px;
+			}
+			.loading-shown {
+				margin-top: 0px;
+				opacity: .7 !important;
+				visibility: visible;				
+			}
+			.loading:after {
+				content: "loading...";
+				position: absolute;
+				bottom: 20px;
+				left: 50%;
+				color: rgba(249, 249, 249, 0.9);
+				font-size: 30px;
+				transform: translateX(-50%);
+			}
+			.jumbotron {
+				min-height: 100%;
+				margin-bottom: 0 !important;
+				text-align: center;
+			}
+			.group {
+				margin-bottom: 10px;
+			}
+			.form-input {
+				margin: 0 auto 10px !important;
+				max-width: 280px;
+			}
+			.user-btn {
+				margin: 0 5px;
+			}
+			#chat {
+				border: 1px solid black;
+				width: 500px;
+				margin: 20px auto;
+				min-height: 400px;
+				max-height: 550px;
+				box-shadow: inset 0 0 3px;
+				overflow: scroll;
+				word-wrap: break-word;
+				text-align: left;
+				padding: 10px;
+				background-color: white;
+			}
+			.intro:after {
+				content: "";
+				display: table;
+			}
+			
+			#playground {
+				position: absolute;
+				right: 20;
+				transition: opacity .5s linear;
+				height: 700;
+				width: 400;
+				background-color: antiquewhite;
+				border-radius: 3px;
+				border: 1px solid;
+			}
+			[id^=char-] {
+				transition: all .1s linear;
+			}
+		</style>
+			
+	</body>
+</html>

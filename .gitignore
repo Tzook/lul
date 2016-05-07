@@ -1,0 +1,6 @@
+.DS_Store
+typings
+node_modules
+npm-debug.log
+tsd.json
+server/logs.log
