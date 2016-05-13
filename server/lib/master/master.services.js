@@ -111,6 +111,10 @@ class ServicesBase {
         return this.promiseByCondition(hay.indexOf(needle) !== -1, [], {error, params: {param}});
     }
     
+    isBool(item, error, param) {
+        return this.inArray(item, ["0", "1"], error, param);
+    }
+    
     invalidatesRegex(item, pattern, error, param) {
         return this.promiseByCondition(!pattern.test(item), [], {error, params: {param}});        
     }
