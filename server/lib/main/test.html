@@ -224,7 +224,7 @@
 					disconnect();
 				}
 				showLoading();
-				socket = io(location.host, {forceNew: true, query: "ch=" + characters[$chNumber.val()].name});
+				socket = io(location.host, {forceNew: true, query: "id=" + characters[$chNumber.val()]._id});
 				// HANDSHAKE APPROVED
 				socket.on('connect', function() {
 					you = characters[$chNumber.val()];

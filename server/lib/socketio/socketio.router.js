@@ -47,19 +47,17 @@ class SocketioRouter extends RouterBase {
 		this.logger.info(req, 'logged user successfully');
 		// TODO move to service
 		for (let i in req.user.characters) {
-			if (req.user.characters[i].name === req._query.ch) {
+			if (req.user.characters[i]._id === req._query.id) {
 				req.character = req.user.characters[i];
 				break;
 			}
 		}
 		if (!req.character) {
-			this.logger.error(req, 'no character param OR no such character in user, param was' + req._query.ch);
-			console.log("need to have a valid 'ch' param.");
-			next(new Error("no character param OR no such character in user. Instead, got: " + req._query.ch));
-		} else if (this.map.get(req._query.ch)) {
-			this.logger.error(req, `Users character is already logged in: ${req._query.ch}~`);
-			console.log(`Character ${req._query.ch} is already logged in.`);
-			next(new Error(`Character ${req._query.ch} is already logged in`));
+			this.logger.error(req, 'no character param OR no such character in user, param was' + req._query.id);
+			next(new Error("no character param OR no such character in user. Instead, got: " + req._query.id));
+		} else if (this.map.get(req._query.id)) {
+			this.logger.error(req, `Users character is already logged in: ${req._query.id}~`);
+			next(new Error(`Character ${req._query.id} is already logged in`));
 		} else {
 			console.log('in success');
 			next();

@@ -18,15 +18,7 @@ class CharacterServices extends ServicesBase {
 		return Promise.resolve({
 			name: data.name,
 			looks: {
-				g: data.g,
-				hair: {
-					sprite: data.hairSprite,
-					color: data.hairColor
-				},
-				eyes: data.eyes,
-				nose: data.nose,
-				mouth: data.mouth,
-				skin: data.skin
+				g: data.g
 			}
 		});
 	}

@@ -19,13 +19,7 @@ class CharacterMiddleware extends MiddlewareBase {
 		return this.validateParams(req, res, next, [
 			{param: "name", 	  isType: ["string"], callback: this.services.invalidatesRegex, args: [req.body.name, /[^a-z0-9]/i, this.LOGS.MASTER_INVALID_PARAM_TYPE, 'name']}, 
 			{param: "name", 	  isType: ["string"], callback: this.services.inRange, args: [req.body.name && req.body.name.length, 1, 16, this.LOGS.MASTER_OUT_OF_RANGE, 'name']}, 
-			{param: "g", 		  isType: ["boolean"]},
-			{param: "hairColor",  isType: ["string"], callback: this.services.inRange, args: [req.body.hairColor && req.body.hairColor.length, 6, 6, this.LOGS.MASTER_OUT_OF_RANGE, 'hairColor']},
-			{param: "hairSprite", isType: ["string"], callback: this.services.inArray, args: [req.body.hairSprite, this.SPRITES["CHAR_HAIR_" + (req.body.g ? "FEMALE" : "MALE")], this.LOGS.CHARACTER_UNSUPPORTED_SPRITE, 'hairSprite']},
-			{param: "mouth", 	  isType: ["string"], callback: this.services.inArray, args: [req.body.mouth, this.SPRITES.CHAR_MOUTH, this.LOGS.CHARACTER_UNSUPPORTED_SPRITE, 'mouth']},
-			{param: "nose", 	  isType: ["string"], callback: this.services.inArray, args: [req.body.nose, this.SPRITES.CHAR_NOSE, this.LOGS.CHARACTER_UNSUPPORTED_SPRITE, 'nose']},
-			{param: "eyes", 	  isType: ["string"], callback: this.services.inArray, args: [req.body.eyes, this.SPRITES["CHAR_EYES_" + (req.body.g ? "FEMALE" : "MALE")], this.LOGS.CHARACTER_UNSUPPORTED_SPRITE, 'eyes']},
-			{param: "skin", 	  isType: ["string"], callback: this.services.inRange, args: [req.body.skin && req.body.skin.length, 6, 6, this.LOGS.MASTER_OUT_OF_RANGE, 'skin']}
+			{param: "g", 		  isType: ["boolean"]}
 		]);
 	}
 	
