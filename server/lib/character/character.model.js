@@ -10,7 +10,7 @@ class CharacterModel extends ModelBase {
      */
     init(files, app) {
         let looks = {
-            g: Boolean // 0 male, 1 female
+            g: Boolean
         };
         this.schema = {
             name: String,

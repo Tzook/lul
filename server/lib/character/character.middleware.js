@@ -11,7 +11,6 @@ class CharacterMiddleware extends MiddlewareBase {
      */
     init(files, app) {
 		super.init(files, app);
-		this.SPRITES = files.config.SPRITES;
     }
     
 	

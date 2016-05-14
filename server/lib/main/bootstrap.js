@@ -18,7 +18,7 @@ class Bootstrap {
         });
         app.get('/logs', (req, res) => {
             var logs = fs.readFileSync(`${__dirname}/../../logs.log`, 'utf8');
-            logs = logs.replace(/\n/g, '<br>');
+            logs = logs.split('\n').reverse().join('<br>');
             res.send(logs);
         });
     }
