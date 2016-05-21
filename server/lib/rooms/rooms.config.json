@@ -4,10 +4,13 @@
 		"LEAVE_ROOM": "/room/leave/:roomName"
 	},
 	"SERVER_GETS": {
-		"ENTERED_ROOM": "entered_room"
+		"ENTERED_ROOM": "entered_room",
+		"LEFT_ROOM": "left_room",
+		"DISCONNECT": "disconnect"
 	},
 	"CLIENT_GETS": {
-		"JOIN_ROOM": "actor_join_room"
+		"JOIN_ROOM": "actor_join_room",
+		"LEAVE_ROOM": "actor_leave_room"
 	},
 	"LOGS": {
 		"JOIN_ROOM_OK": {

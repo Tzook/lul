@@ -11,6 +11,21 @@ class RoomsRouter extends SocketioRouterBase {
 		});
 		socket.map.set(socket.character.name, socket);
 	}
+
+	[SERVER_GETS.DISCONNECT](data, socket) {
+		console.log('disconnect');
+		this.userLeftRoom(socket);
+	}
+
+	[SERVER_GETS.LEFT_ROOM](data, socket) {
+		console.log('user left room');
+		this.userLeftRoom(socket);
+	}
+
+	userLeftRoom(socket) {
+		socket.broadcast.emit(this.CLIENT_GETS.LEAVE_ROOM, { character: socket.character});
+		socket.map.delete(socket.character.name);
+	}
 }
 
 module.exports = RoomsRouter;

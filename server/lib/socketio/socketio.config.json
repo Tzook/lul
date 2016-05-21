@@ -3,7 +3,6 @@
 		"BEGIN_CONNECTION": "connection"
 	},
 	"SERVER_GETS": {
-		"DISCONNECT": "disconnect"
 	},
 	"CLIENT_GETS": {
 		"CONNECT": "connect",
