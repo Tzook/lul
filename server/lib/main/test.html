@@ -231,11 +231,12 @@
 				socket = io(location.host, {forceNew: true, query: "id=" + characters[$chNumber.val()]._id});
 				// HANDSHAKE APPROVED
 				socket.on('connect', function() {
-					you = characters[$chNumber.val()];
-					moveChar(characters[$chNumber.val()].name, characters[$chNumber.val()].pos);
 					toggleIntro(true);
 					hideLoading();
 					setResult({msg: 'connected.'});
+					setTimeout(() => {
+						socket.emit("entered_room", "");
+					}, 1000);
 				});
 				// HANDSHAKE REJECTED / HAD ERROR
 				socket.on('error', function(error) {
@@ -250,25 +251,12 @@
 				});
 
 				// From here on, we decide the event names. Next milestone..
-				socket.on('yoyo', function(d) {
+				socket.on('actor_join_room', function(d) {
 					setResult({msg:"got data:", d});
-					for (var i in d.loggedIn) {
-						moveChar(i, d.loggedIn[i]);
-					}
 				});
 
 				socket.on('msg', function(d) {
 					setResult(d);
-				});
-
-				socket.on('login', function(d) {
-					moveChar(d.ch, {x: d.x, y: d.y});
-					setResult(d);
-				});
-
-
-				socket.on('xy', function(d) {
-					moveChar(d.ch, {x: d.x, y: d.y});
 				});
 			}
 

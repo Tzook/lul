@@ -3,6 +3,12 @@
 		"JOIN_ROOM": "/room/join/:roomName",
 		"LEAVE_ROOM": "/room/leave/:roomName"
 	},
+	"SERVER_GETS": {
+		"ENTERED_ROOM": "entered_room"
+	},
+	"CLIENT_GETS": {
+		"JOIN_ROOM": "actor_join_room"
+	},
 	"LOGS": {
 		"JOIN_ROOM_OK": {
 			"MSG": "User '{username}' joined room '{room}'.",

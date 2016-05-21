@@ -83,19 +83,8 @@ class SocketioRouter extends RouterBase {
 				}
 			}
 			console.log('connected');
-			socket.broadcast.emit(this.CLIENT_GETS.LOGIN, { name: socket.character.name});
-			this.map.set(socket.character.name, socket);
+			socket.map = this.map;
 		});
-	}
-
-	[SERVER_GETS.YAYA](data, socket) {
-		console.log('yaya!');
-		socket.emit(this.CLIENT_GETS.TY, { d: 'Thanks brah~!' });
-	}
-
-	[SERVER_GETS.MSG](data, socket) {
-		console.log(data);
-		this.io.emit(this.CLIENT_GETS.MSG, {d: data.d, ch: socket.character.name});
 	}
 
 	[SERVER_GETS.DISCONNECT](data, socket) {

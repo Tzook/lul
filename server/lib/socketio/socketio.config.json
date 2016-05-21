@@ -3,9 +3,7 @@
 		"BEGIN_CONNECTION": "connection"
 	},
 	"SERVER_GETS": {
-		"DISCONNECT": "disconnect",
-		"YAYA": "yaya",
-		"MSG": "msg"
+		"DISCONNECT": "disconnect"
 	},
 	"CLIENT_GETS": {
 		"CONNECT": "connect",
@@ -15,6 +13,6 @@
 		"LOGIN": "login"
 	},
 	"LOGS": {
-		
+
 	}
-} 
+}

@@ -1,16 +1,15 @@
 'use strict';
-let RouterBase = require('../master/master.router.js');
+let SocketioRouterBase = require('../socketio/socketio.router.base.js');
+let SERVER_GETS		 = require('./rooms.config.json').SERVER_GETS;
 
-/**
- * Rooms's router
- */
-class RoomsRouter extends RouterBase {	
-	initRoutes(app) {
-		app.get(this.ROUTES.JOIN_ROOM, this.controller.joinRoom); // room does not exist will create it
-		app.get(this.ROUTES.LEAVE_ROOM, this.middleware.checkIfUserIsInRoom, this.controller.leaveRoom); // room does not exist will return error
-		// NOAM, look at user.router.js to see how to structure the routes, it is much more readable that way.
-		// also, dont forget to use the .bind(this.controller) and .bind(this.middleware)!
-		// when done, delete these comments  
+class RoomsRouter extends SocketioRouterBase {
+	[SERVER_GETS.ENTERED_ROOM](data, socket) {
+		console.log('logged user successfully');
+		socket.broadcast.emit(this.CLIENT_GETS.JOIN_ROOM, { character: socket.character});
+		socket.map.forEach(userSocket => {
+			socket.emit(this.CLIENT_GETS.JOIN_ROOM, {character: userSocket.character});
+		});
+		socket.map.set(socket.character.name, socket);
 	}
 }
 
