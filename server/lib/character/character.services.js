@@ -8,12 +8,27 @@ class CharacterServices extends ServicesBase {
 	saveNewCharacter(user, character) {
 		return new Promise((resolve, reject) => {
 			user.characters.push(new this.Model(character));
-			user.save(e => { // TODO update to es6 promise when mongoose updates to v5
+			user.save(e => {
 				e ? reject(e) : resolve(user);
 			});
 		});
 	}
-	
+
+	deleteCharacter(user, id) {
+		return new Promise((resolve, reject) => {
+			var newArray  = [];
+			for (var i = 0; i < user.characters.length; i++) {
+				if (!user.characters[i]._id.equals(id)) {
+					newArray.push(user.characters[i]);
+				}
+			}
+			user.characters = newArray;
+			user.save(e => {
+				e ? reject(e) : resolve(user);
+			});
+		});
+	}
+
 	convertToFormat(data) {
 		return Promise.resolve({
 			name: data.name,
@@ -33,12 +48,7 @@ class CharacterServices extends ServicesBase {
 			});
 		});
 	}
-	
-    /**
-     * Gets a character from the database by name
-     * @param {String} name
-     * @returns Promise
-     */
+
     getCharacter(name) {
         return this.Q.ninvoke(this.mongoose.model('User'), 'findOne', {'characters.name': name});
     }

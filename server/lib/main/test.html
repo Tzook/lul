@@ -26,6 +26,9 @@
 					<label><input type="radio" name="chG" id="chGenderFemale" value="0" class="form-control"> Female</label>
 					<input type="text" placeholder="Name (1-16)" id="chName" class="form-control form-input">
 					<button onclick="createCharacter()" class="btn btn-lg btn-success user-btn">Create</button>
+					<button id="delete" onclick="deleteCharacter()" class="btn btn-danger user-btn">Delete char number:
+						<input id="deleteCharNumber" class="form-control" type="number" max="9" min="0" onclick="event.stopPropagation();"></input>
+					</button>
 				</div>
 			</div>
 			<div class="group form-inline">
@@ -181,6 +184,13 @@
 
 			function createCharacter() {
 				sendPost('/character/create', getCharacterData());
+			}
+
+			var $delete = jQuery('#delete');
+			var $deleteCharNumber = jQuery('#deleteCharNumber');
+
+			function deleteCharacter() {
+				sendPost('/character/delete', {id: characters[$deleteCharNumber.val()]._id});
 			}
 
 			// ============ SOCKETIO ============ //
