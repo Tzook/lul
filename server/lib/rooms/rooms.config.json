@@ -24,5 +24,8 @@
 			"CODE": "ROOM_4",
 			"STATUS": "BAD_VALUES"
 		}
+	},
+	"ROOM_NAMES": {
+		"DEFAULT_ROOM": "TestingRoom"
 	}
 }

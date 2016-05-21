@@ -3,15 +3,15 @@
 		<link rel="stylesheet" href="//maxcdn.bootstrapcdn.com/bootstrap/3.3.5/css/bootstrap.min.css">
 		<script src="//cdnjs.cloudflare.com/ajax/libs/socket.io/1.3.7/socket.io.js"></script>
 		<script src="//cdnjs.cloudflare.com/ajax/libs/jquery/3.0.0-alpha1/jquery.min.js"></script>
-		<title>lel</title>		
+		<title>lel</title>
 	</head>
 	<body>
 		<div class="loading" style="opacity: 0"></div>
 		<div class="jumbotron">
 			<h1>~Tzook's private office~</h1>
-			
+
 			<svg id="playground" style="opacity: 0"></svg>
-			
+
 			<div class="intro">
 				<div class="group">
 					<input type="text" placeholder="username (1-16)" id="username" class="form-control form-input">
@@ -29,7 +29,7 @@
 				</div>
 			</div>
 			<div class="group form-inline">
-				<button id="connect" disabled="true" onclick="connect()" class="btn btn-lg btn-info user-btn">Connect to char number: 
+				<button id="connect" disabled="true" onclick="connect()" class="btn btn-lg btn-info user-btn">Connect to char number:
 					<input id="chNumber" class="form-control" type="number" max="9" min="0" onclick="event.stopPropagation();"></input>
 				</button>
 				<button onclick="disconnect()" class="btn btn-lg btn-danger user-btn">Disconnect</button>
@@ -38,21 +38,21 @@
 			</div>
 			<input type="text" placeholder="What to send?" id="emit" class="form-control form-input">
 		</div>
-			
+
 		<script>
 			'use strict';
-			// ============ GENERAL ============ // 
+			// ============ GENERAL ============ //
 			function showLoading() {
-				$loading.addClass('loading-shown');				
+				$loading.addClass('loading-shown');
 			}
 			function hideLoading() {
-				$loading.removeClass('loading-shown');				
+				$loading.removeClass('loading-shown');
 			}
-			
+
 			function getRandomColor() {
 				return Math.floor(Math.random() * 16777215).toString(16);
 			}
-			
+
 			function setResult(result) {
 				var $elem = jQuery('<p></p>');
 				if (result.ch) {
@@ -64,10 +64,10 @@
 					}
 				} else {
 					$elem.append(
-						(result.msg ? `msg: "${result.msg}" ` : '') +  
-						(result.error ? `error: "${result.error}"<br>` : '') + 
-						(result.status ? ` status: "${result.status}" ` : '') + 
-						(result.code ? ` code: "${result.code}" ` : '') + 
+						(result.msg ? `msg: "${result.msg}" ` : '') +
+						(result.error ? `error: "${result.error}"<br>` : '') +
+						(result.status ? ` status: "${result.status}" ` : '') +
+						(result.code ? ` code: "${result.code}" ` : '') +
 						(result.d ? `<br>data: ${JSON.stringify(result.d, null, 4).replace(/\n/g, '<br>')}` : '')
 					);
 					if (result.d && result.d.characters) {
@@ -75,11 +75,11 @@
 						$connect.prop('disabled', false);
 					}
 				}
-				$elem.css('color', getRandomColor()); // random color				
+				$elem.css('color', getRandomColor()); // random color
 				$chat.append($elem);
 				$chat.animate({scrollTop: $chat[0].scrollHeight}, 600);
 			}
-			
+
 			// ============ LOGIN ============ //
 			var $chat = jQuery('#chat');
 			var $loading = jQuery('.loading');
@@ -87,9 +87,9 @@
 				$password = jQuery('#password');
 			function login() {
 				sendPost('/user/login', getUserData());
-			}			
+			}
 			function register() {
-				sendPost('/user/register', getUserData());	
+				sendPost('/user/register', getUserData());
 			}
 			function session() {
 				sendGet('/user/session');
@@ -97,23 +97,23 @@
 			function logout() {
 				sendGet('/user/logout');
 			}
-			
+
 			function getUserData() {
 				return {
 					username: $username.val(),
 					password: $password.val()
 				};
 			}
-			
+
 			function sendPost(url, data) {
 				send('POST', url, JSON.stringify(data));
 			}
-			
+
 			function sendGet(url) {
 				send('GET', url);
 			}
-			
-			function send(method, url, data) { 
+
+			function send(method, url, data) {
 				try {
 					showLoading();
 					$.ajax({method, url, data, success, error, dataType: "json", contentType: "application/json"});
@@ -149,7 +149,7 @@
 					}
 				}
 			}
-			
+
 			// ============ CHARACTER ============ //
 			var characters;
 			var you = '(you didn"t seession or login, how can i know ur name...)';
@@ -164,7 +164,7 @@
 				mouth: jQuery('#chMouth'),
 				nose: jQuery('#chNose')
 			};
-			
+
 			function getCharacterData() {
 				var result = {
 					name: $ch.name.val(),
@@ -175,14 +175,14 @@
 					mouth: $ch.mouth.val(),
 					nose: $ch.nose.val()
 				};
-				($ch.gM.prop('checked') || $ch.gF.prop('checked')) && (result.g = $ch.gF.prop('checked'));
+				($ch.gM.prop('checked') || $ch.gF.prop('checked')) && (result.g = ($ch.gM.prop('checked') ? "1" : "0"));
 				return result;
 			}
-			
+
 			function createCharacter() {
 				sendPost('/character/create', getCharacterData());
 			}
-			
+
 			// ============ SOCKETIO ============ //
 			document.body.addEventListener('keydown', function(e) {
 				if (socket) {
@@ -206,13 +206,13 @@
 				toggleIntro = (function() {
 					var height = $intro.height();
 					return function (toClose) {
-						toClose 
+						toClose
 						? $intro.height(height).animate({height: 0}, 400, function() { $intro.css('display', 'none'); $playground.css('opacity', '1');} )
 						: $intro.css('display', 'block').animate({height: height}, 400, function() { $playground.css('opacity', '0'); });
 					};
-				})();	
+				})();
 			});
-			
+
 			function connect() {
 				if (socket) {
 					disconnect();
@@ -246,45 +246,45 @@
 						moveChar(i, d.loggedIn[i]);
 					}
 				});
-				
+
 				socket.on('msg', function(d) {
 					setResult(d);
 				});
-				
+
 				socket.on('login', function(d) {
 					moveChar(d.ch, {x: d.x, y: d.y});
 					setResult(d);
 				});
-				
-				
+
+
 				socket.on('xy', function(d) {
 					moveChar(d.ch, {x: d.x, y: d.y});
 				});
 			}
-			
+
 			function move(dX, dY) {
 				you.pos.x += dX;
 				you.pos.y += dY;
 				moveChar(you.name, you.pos);
 				socket.emit('xy', you.pos);
 			}
-			
+
 			function emit() {
 				socket.emit('msg', {d: $emit.val()});
 				$emit.val('');
 			}
-			
+
 			function disconnect() {
 				toggleIntro();
 				setResult({msg: "disconnected."});
 				socket.disconnect();
 				socket = undefined;
 			}
-			
+
 			// ============ PLAYGROUND ============ //
 			var $chars = {};
 			var $playground = jQuery('#playground');
-			
+
 			function moveChar(name, pos) {
 				if (!$chars[name]) {
 					$chars[name] = {};
@@ -307,12 +307,12 @@
 					}
 				`);
 			}
-			
+
 			function setCharText(name, text) {
 				$chars[name].text[0].textContent = text;
 				$playground.html($playground.html()); // refresh the svg
 			}
-			
+
 			function removeChar(name) {
 				$chars[name].style.html(`
 					#char-${name} {
@@ -341,7 +341,7 @@
 			.loading-shown {
 				margin-top: 0px;
 				opacity: .7 !important;
-				visibility: visible;				
+				visibility: visible;
 			}
 			.loading:after {
 				content: "loading...";
@@ -384,7 +384,7 @@
 				content: "";
 				display: table;
 			}
-			
+
 			#playground {
 				position: absolute;
 				right: 20;
@@ -399,6 +399,6 @@
 				transition: all .1s linear;
 			}
 		</style>
-			
+
 	</body>
 </html>
