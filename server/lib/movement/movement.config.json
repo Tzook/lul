@@ -2,10 +2,10 @@
 	"ROUTES": {
 	},
 	"SERVER_GETS": {
-		"LOCATION": "xy"
+		"MOVEMENT": "movement"
 	},
 	"CLIENT_GETS": {
-		"LOCATION": "xy"
+		"MOVEMENT": "movement"
 	},
 	"LOGS": {
 	}
