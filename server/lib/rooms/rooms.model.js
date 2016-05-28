@@ -11,7 +11,7 @@ class RoomsModel extends ModelBase {
     init(files, app) {
         this.schema = {
             name: String,
-            capacity: {type: Number, defualt: 0},
+            capacity: {type: Number, default: 0},
             users: [this.mongoose.Schema.ObjectId]
         };
         this.addToCharacterSchema = {
