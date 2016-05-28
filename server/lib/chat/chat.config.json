@@ -1,0 +1,12 @@
+{
+	"ROUTES": {
+	},
+	"SERVER_GETS": {
+		"MESSAGE": "message"
+	},
+	"CLIENT_GETS": {
+		"MESSAGE": "message"
+	},
+	"LOGS": {
+	}
+}
