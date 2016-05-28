@@ -1,6 +1,5 @@
 'use strict';
 let ModelBase = require('../master/master.model.js');
-let RoomsConfig = require('../rooms/rooms.config.json');
 
 /**
  * Character's Model
@@ -15,9 +14,9 @@ class CharacterModel extends ModelBase {
         };
         this.schema = {
             name: String,
-            looks,
-            room: {type: String, default: RoomsConfig.ROOM_NAMES.DEFAULT_ROOM}
+            looks
         };
+        this.listenForSchemaAddition('Character');
     }
 
     get priority() {
@@ -27,6 +26,7 @@ class CharacterModel extends ModelBase {
     createModel() {
         this.setModel('Character');
         this.addToSchema('User', {characters: [this.getModel().schema]});
+        this.removeListen('Character');
         return Promise.resolve();
     }
 }
