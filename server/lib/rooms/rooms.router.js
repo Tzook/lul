@@ -5,7 +5,9 @@ let SERVER_GETS		 = require('./rooms.config.json').SERVER_GETS;
 class RoomsRouter extends SocketioRouterBase {
 	[SERVER_GETS.ENTERED_ROOM](data, socket) {
 		console.log('logged user successfully');
-		socket.broadcast.emit(this.CLIENT_GETS.JOIN_ROOM, { character: socket.character});
+		var room = socket.character.room;
+		socket.join(room);
+		socket.broadcast.to(room).emit(this.CLIENT_GETS.JOIN_ROOM, { character: socket.character});
 		socket.map.forEach(userSocket => {
 			socket.emit(this.CLIENT_GETS.JOIN_ROOM, {character: userSocket.character});
 		});
@@ -23,7 +25,7 @@ class RoomsRouter extends SocketioRouterBase {
 	}
 
 	userLeftRoom(socket) {
-		socket.broadcast.emit(this.CLIENT_GETS.LEAVE_ROOM, { character: socket.character});
+		socket.broadcast.to(socket.character.room).emit(this.CLIENT_GETS.LEAVE_ROOM, { character: socket.character});
 		socket.map.delete(socket.character.name);
 	}
 }

@@ -8,7 +8,7 @@ let SERVER_GETS		 = require('./movement.config.json').SERVER_GETS;
 class MovementRouter extends SocketioRouterBase {
 	[SERVER_GETS.MOVEMENT](data, socket) {
 		console.log("Got movement", data);
-		socket.broadcast.emit(this.CLIENT_GETS.MOVEMENT, {
+		socket.broadcast.to(socket.character.room).emit(this.CLIENT_GETS.MOVEMENT, {
 			id: socket.character._id,
 			x: data.x,
 			y: data.y,
