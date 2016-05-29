@@ -17,14 +17,6 @@ class RoomsRouter extends SocketioRouterBase {
 	[SERVER_GETS.DISCONNECT](data, socket) {
 		console.log('disconnect');
 		this.userLeftRoom(socket);
-	}
-
-	[SERVER_GETS.LEFT_ROOM](data, socket) {
-		console.log('user left room');
-		this.userLeftRoom(socket);
-	}
-
-	userLeftRoom(socket) {
 		socket.broadcast.to(socket.character.room).emit(this.CLIENT_GETS.LEAVE_ROOM, { character: socket.character});
 		socket.map.delete(socket.character.name);
 	}

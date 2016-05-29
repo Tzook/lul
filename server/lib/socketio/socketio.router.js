@@ -86,6 +86,15 @@ class SocketioRouter extends RouterBase {
 			socket.map = this.map;
 		});
 	}
+
+	[SERVER_GETS.DISCONNECT](data, socket) {
+		console.log('disconnected from socket');
+		socket.user.save(e => {
+			if (e) {
+				console.error(e);
+			}
+		});
+	}
 }
 
 module.exports = SocketioRouter;
