@@ -3,7 +3,7 @@ import SocketioRouterBase from '../socketio/socketio.router.base';
 let SERVER_GETS		   = require('../../../server/lib/movement/movement.config.json').SERVER_GETS;
 
 export default class MovementRouter extends SocketioRouterBase {
-	[SERVER_GETS.MOVEMENT](data, socket) {
+	[SERVER_GETS.MOVEMENT](data, socket: GameSocket) {
 		console.log("Got movement", data);
 		var position = socket.character.position;
 		position.x = data.x;

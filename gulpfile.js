@@ -22,7 +22,7 @@
 	// WATCH
 	// =====
 	// Run the server unit tests just once, then run the server itself
-	gulp.task("watch", ["server:start"], function() {
+	gulp.task("default", ["server:start"], function() {
 		// watch for config files, and regenerate the big config file on save
 		// gulp.watch(["server/lib/**/*.config.json"], ["server:config"]);
 		// Watch for saving files and restart server

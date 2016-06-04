@@ -2,7 +2,7 @@
 import MasterRouter from '../master/master.router';
 
 export default class SocketioRouterBase extends MasterRouter {
-	protected io;
+	protected io: SocketIO.Namespace;
 	public CLIENT_GETS;
 	public SERVER_GETS;
 
