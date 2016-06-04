@@ -76,6 +76,8 @@ class SocketioRouter extends RouterBase {
 		this.io.on(this.ROUTES.BEGIN_CONNECTION, socket => {
 			socket.user = socket.client.request.user;
 			socket.character = socket.client.request.character;
+			this.map.set(socket.character._id.toString(), socket);
+			this.map.set(socket.id, socket);
 			for (let j in this.routers) {
 				let router = this.routers[j];
 				for (let i in router.SERVER_GETS) {
@@ -94,6 +96,8 @@ class SocketioRouter extends RouterBase {
 				console.error(e);
 			}
 		});
+		this.map.delete(socket.character._id.toString());
+		this.map.delete(socket.id);
 	}
 }
 
