@@ -1,6 +1,6 @@
 'use strict';
 let SocketioRouterBase = require('../socketio/socketio.router.base.js');
-let SERVER_GETS		   = require('./movement.config.json').SERVER_GETS;
+let SERVER_GETS		   = require('../../../server/lib/movement/movement.config.json').SERVER_GETS;
 
 /**
  * Movement's router

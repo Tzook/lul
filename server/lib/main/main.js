@@ -9,11 +9,11 @@ let 	express 		= require('express'),
 		bodyParser		= require('body-parser'),
 		cors			= require('cors'),
 		compression		= require('compression');
-	
+
 // Internal
 let 	Bootstrap 		= require('./bootstrap.js'),
 		Logger			= require('./logger.js'),
-		config			= require('../../config/config.database.json');
+		config			= require('../../../config/config.database.json');
 
 /**
  * Main of the app
@@ -24,16 +24,16 @@ class Main {
 	/**
 	 * Default constructor
 	 */
-	constructor() { 
+	constructor() {
         this.app = express();
     }
-	
+
 	useDb() {
 		//Setting up the db
 		mongoose.connect(config.dbUrl);
 		mongoose.connection.on('error', console.error.bind(console, 'connection error:'));
 	}
-	
+
 	useLogger() {
 		this.app.logger = new Logger();
 		this.app.use((req, res, next) => {
@@ -41,7 +41,7 @@ class Main {
 			next();
 		});
 	}
-	
+
 	/**
 	 * Sets the dependencies of the app
 	 */
@@ -64,7 +64,7 @@ class Main {
 			}
 		});
 	}
-	
+
 	/**
 	 * Listens to the port, and instantiates the routes of the app
 	 */
@@ -73,17 +73,17 @@ class Main {
 		this.app.set('port', (process.env.PORT || 5000));
 		this.app.server = http.createServer(this.app).listen(this.app.get('port'));
 		this.app.socketio = require('socket.io')(this.app.server);
-		
+
 		console.log("\t+*+*+ New server on localhost:" + this.app.get('port') + " +*+*+");
 	}
-	
+
 	attachAppVariables() {
 		this.app.cookieParser = cookieParser;
 		this.app.session = session;
 		this.app.db = mongoose.connection;
 		this.app.mongoStore = new MongoStore({ mongooseConnection: this.app.db});
 	}
-	
+
 	connectToDbAndBootstrap() {
 		this.app.db.once('open', () => {
 			console.log("\t+*+*+ Connected to mongodb! on MongoLab +*+*+");

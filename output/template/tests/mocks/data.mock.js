@@ -1,0 +1,8 @@
+'use strict';
+/**
+ * Template data mock
+ */
+class TemplateDataMock {
+}
+module.exports = TemplateDataMock;
+//# sourceMappingURL=data:application/json;base64,eyJ2ZXJzaW9uIjozLCJmaWxlIjoiZGF0YS5tb2NrLmpzIiwic291cmNlUm9vdCI6IiIsInNvdXJjZXMiOlsiLi4vLi4vLi4vLi4vc2VydmVyL3RlbXBsYXRlL3Rlc3RzL21vY2tzL2RhdGEubW9jay5qcyJdLCJuYW1lcyI6W10sIm1hcHBpbmdzIjoiQUFBQSxZQUFZLENBQUM7QUFDYjs7R0FFRztBQUNIO0FBRUEsQ0FBQztBQUVELE1BQU0sQ0FBQyxPQUFPLEdBQUcsZ0JBQWdCLENBQUMifQ==

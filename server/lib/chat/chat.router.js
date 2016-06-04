@@ -1,6 +1,6 @@
 'use strict';
 let SocketioRouterBase = require('../socketio/socketio.router.base.js');
-let SERVER_GETS		   = require('./chat.config.json').SERVER_GETS;
+let SERVER_GETS		   = require('../../../server/lib/chat/chat.config.json').SERVER_GETS;
 
 /**
  * Chat's router

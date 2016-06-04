@@ -1,7 +1,7 @@
 'use strict';
 let SocketioRouterBase = require('../socketio/socketio.router.base.js');
-let SERVER_GETS		 = require('./rooms.config.json').SERVER_GETS;
-let _		 = require('underscore');
+let SERVER_GETS = require('../../../server/lib/rooms/rooms.config.json').SERVER_GETS;
+let _ = require('underscore');
 
 class RoomsRouter extends SocketioRouterBase {
 	[SERVER_GETS.ENTERED_ROOM](data, socket) {
