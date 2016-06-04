@@ -4,10 +4,10 @@ let SERVER_GETS = require('../../../server/lib/rooms/rooms.config.json').SERVER_
 let _ = require('underscore');
 
 export default class RoomsRouter extends SocketioRouterBase {
-	[SERVER_GETS.ENTERED_ROOM](data, socket) {
+	[SERVER_GETS.ENTERED_ROOM](data, socket: GameSocket) {
 		console.log('logged user successfully');
-		var room = socket.character.room;
-		socket.broadcast.to(room).emit(this.CLIENT_GETS.JOIN_ROOM, { character: socket.character});
+		let room = socket.character.room;
+		socket.broadcast.to(room).emit(this.CLIENT_GETS.JOIN_ROOM, {character: socket.character});
 		let roomClients = this.io.sockets.adapter.rooms[room];
 		if (roomClients) {
 			_.each(roomClients.sockets, (value, socketId) => {
@@ -17,7 +17,7 @@ export default class RoomsRouter extends SocketioRouterBase {
 		socket.join(room);
 	}
 
-	[SERVER_GETS.DISCONNECT](data, socket) {
+	[SERVER_GETS.DISCONNECT](data, socket: GameSocket) {
 		console.log('disconnect');
 		socket.broadcast.to(socket.character.room).emit(this.CLIENT_GETS.LEAVE_ROOM, { character: socket.character});
 	}

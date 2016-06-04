@@ -6,7 +6,7 @@ let SERVER_GETS = require('../../../server/lib/socketio/socketio.config.json').S
 
 export default class SocketioRouter extends SocketioRouterBase {
 	protected routers: SocketioRouterBase[];
-	protected map: Map<string, any>;
+	protected map: Map<string, GameSocket>;
 
 	constructor() {
 		super();
@@ -24,7 +24,7 @@ export default class SocketioRouter extends SocketioRouterBase {
 	}
 
 	initDependencies(mongoStore) {
-		this.io.use((socket, next) => {
+		this.io.use((socket: GameSocket, next: Function) => {
 			this.logger.info(socket.request, 'begin socket');
 			if (socket.request._query.unicorn) {
 				socket.request._query.session_id = socket.request._query.unicorn.split(/s:|\./)[1];
@@ -39,7 +39,7 @@ export default class SocketioRouter extends SocketioRouterBase {
 				fail:         this.onAuthorizeFail.bind(this),
 		}));
 	}
-	onAuthorizeSuccess(req, next) {
+	onAuthorizeSuccess(req, next: Function) {
 		this.logger.info(req, 'logged user successfully');
 		// TODO move to service
 		for (let i in req.user.characters) {
@@ -70,7 +70,7 @@ export default class SocketioRouter extends SocketioRouterBase {
 	}
 
 	initListeners() {
-		this.io.on(this.ROUTES.BEGIN_CONNECTION, socket => {
+		this.io.on(this.ROUTES.BEGIN_CONNECTION, (socket: GameSocket) => {
 			socket.user = socket.client.request.user;
 			socket.character = socket.client.request.character;
 			this.map.set(socket.character._id.toString(), socket);
@@ -86,7 +86,7 @@ export default class SocketioRouter extends SocketioRouterBase {
 		});
 	}
 
-	[SERVER_GETS.DISCONNECT](data, socket) {
+	[SERVER_GETS.DISCONNECT](data, socket: GameSocket) {
 		console.log('disconnected from socket');
 		socket.user.save(e => {
 			if (e) {
