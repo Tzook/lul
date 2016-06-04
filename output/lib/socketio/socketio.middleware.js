@@ -1,9 +1,8 @@
 'use strict';
-let MiddlewareBase = require('../master/master.middleware.js');
-/**
- * Socketio's middleware
- */
-class SocketioMiddleware extends MiddlewareBase {
+const master_middleware_1 = require('../master/master.middleware');
+class SocketioMiddleware extends master_middleware_1.default {
 }
-module.exports = SocketioMiddleware;
-//# sourceMappingURL=data:application/json;base64,eyJ2ZXJzaW9uIjozLCJmaWxlIjoic29ja2V0aW8ubWlkZGxld2FyZS5qcyIsInNvdXJjZVJvb3QiOiIiLCJzb3VyY2VzIjpbIi4uLy4uLy4uL3NlcnZlci9saWIvc29ja2V0aW8vc29ja2V0aW8ubWlkZGxld2FyZS5qcyJdLCJuYW1lcyI6W10sIm1hcHBpbmdzIjoiQUFBQSxZQUFZLENBQUM7QUFDYixJQUFJLGNBQWMsR0FBRyxPQUFPLENBQUMsZ0NBQWdDLENBQUMsQ0FBQztBQUUvRDs7R0FFRztBQUNILGlDQUFpQyxjQUFjO0FBRS9DLENBQUM7QUFFRCxNQUFNLENBQUMsT0FBTyxHQUFHLGtCQUFrQixDQUFDIn0=
+Object.defineProperty(exports, "__esModule", { value: true });
+exports.default = SocketioMiddleware;
+;
+//# sourceMappingURL=data:application/json;base64,eyJ2ZXJzaW9uIjozLCJmaWxlIjoic29ja2V0aW8ubWlkZGxld2FyZS5qcyIsInNvdXJjZVJvb3QiOiIiLCJzb3VyY2VzIjpbIi4uLy4uLy4uL3NlcnZlci9saWIvc29ja2V0aW8vc29ja2V0aW8ubWlkZGxld2FyZS50cyJdLCJuYW1lcyI6W10sIm1hcHBpbmdzIjoiQUFBQSxZQUFZLENBQUM7QUFDYixvQ0FBNkIsNkJBQTZCLENBQUMsQ0FBQTtBQUUzRCxpQ0FBZ0QsMkJBQWdCO0FBRWhFLENBQUM7QUFGRDtvQ0FFQyxDQUFBO0FBQUEsQ0FBQyJ9

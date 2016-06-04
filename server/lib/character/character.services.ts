@@ -1,0 +1,53 @@
+'use strict';
+import MasterServices from '../master/master.services';
+
+export default class CharacterServices extends MasterServices {
+
+	saveNewCharacter(user, character) {
+		return new Promise((resolve, reject) => {
+			user.characters.push(new this.Model(character));
+			user.save(e => {
+				e ? reject(e) : resolve(user);
+			});
+		});
+	}
+
+	deleteCharacter(user, id) {
+		return new Promise((resolve, reject) => {
+			var newArray  = [];
+			for (var i = 0; i < user.characters.length; i++) {
+				if (!user.characters[i]._id.equals(id)) {
+					newArray.push(user.characters[i]);
+				}
+			}
+			user.characters = newArray;
+			user.save(e => {
+				e ? reject(e) : resolve(user);
+			});
+		});
+	}
+
+	convertToFormat(data) {
+		return Promise.resolve({
+			name: data.name,
+			looks: {
+				g: data.g
+			}
+		});
+	}
+	checkIsNameUnique(name, error) {
+		return new Promise((resolve, reject) => {
+			this.getCharacter(name)
+			.then(d => {
+				d ? reject(error) : resolve();
+			})
+			.catch(e => {
+				reject(e);
+			});
+		});
+	}
+
+    getCharacter(name) {
+        return this.Q.ninvoke(this.mongoose.model('User'), 'findOne', {'characters.name': name});
+    }
+};
