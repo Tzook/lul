@@ -1,16 +1,12 @@
 'use strict';
-let ModelBase = require('../master/master.model.js');
-/**
- * Socketio's Model
- */
-class SocketioModel extends ModelBase {
-    /**
-     * Creates the schema of the model
-     */
+const master_model_1 = require('../master/master.model');
+class SocketioModel extends master_model_1.default {
     init(files, app) {
-        this.rooms = [1, 2, 3]; // TODO from config
-        this.users = new Map();
+        // this.rooms = [1, 2, 3]; // TODO from config
+        // this.users = new Map();
     }
 }
-module.exports = SocketioModel;
-//# sourceMappingURL=data:application/json;base64,eyJ2ZXJzaW9uIjozLCJmaWxlIjoic29ja2V0aW8ubW9kZWwuanMiLCJzb3VyY2VSb290IjoiIiwic291cmNlcyI6WyIuLi8uLi8uLi9zZXJ2ZXIvbGliL3NvY2tldGlvL3NvY2tldGlvLm1vZGVsLmpzIl0sIm5hbWVzIjpbXSwibWFwcGluZ3MiOiJBQUFBLFlBQVksQ0FBQztBQUNiLElBQUksU0FBUyxHQUFHLE9BQU8sQ0FBQywyQkFBMkIsQ0FBQyxDQUFDO0FBRXJEOztHQUVHO0FBQ0gsNEJBQTRCLFNBQVM7SUFDakM7O09BRUc7SUFDSCxJQUFJLENBQUMsS0FBSyxFQUFFLEdBQUc7UUFDWCxJQUFJLENBQUMsS0FBSyxHQUFHLENBQUMsQ0FBQyxFQUFFLENBQUMsRUFBRSxDQUFDLENBQUMsQ0FBQyxDQUFDLG1CQUFtQjtRQUMzQyxJQUFJLENBQUMsS0FBSyxHQUFHLElBQUksR0FBRyxFQUFFLENBQUM7SUFDM0IsQ0FBQztBQUNMLENBQUM7QUFFRCxNQUFNLENBQUMsT0FBTyxHQUFHLGFBQWEsQ0FBQyJ9
+Object.defineProperty(exports, "__esModule", { value: true });
+exports.default = SocketioModel;
+;
+//# sourceMappingURL=data:application/json;base64,eyJ2ZXJzaW9uIjozLCJmaWxlIjoic29ja2V0aW8ubW9kZWwuanMiLCJzb3VyY2VSb290IjoiIiwic291cmNlcyI6WyIuLi8uLi8uLi9zZXJ2ZXIvbGliL3NvY2tldGlvL3NvY2tldGlvLm1vZGVsLnRzIl0sIm5hbWVzIjpbXSwibWFwcGluZ3MiOiJBQUFBLFlBQVksQ0FBQztBQUNiLCtCQUF3Qix3QkFBd0IsQ0FBQyxDQUFBO0FBRWpELDRCQUEyQyxzQkFBVztJQUVsRCxJQUFJLENBQUMsS0FBSyxFQUFFLEdBQUc7UUFDWCw4Q0FBOEM7UUFDOUMsMEJBQTBCO0lBQzlCLENBQUM7QUFDTCxDQUFDO0FBTkQ7K0JBTUMsQ0FBQTtBQUFBLENBQUMifQ==

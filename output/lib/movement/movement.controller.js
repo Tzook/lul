@@ -1,9 +1,8 @@
 'use strict';
-let MasterController = require('../master/master.controller.js');
-/**
- * Movement's Controller
- */
-class MovementController extends MasterController {
+const master_controller_1 = require('../master/master.controller');
+class MovementController extends master_controller_1.default {
 }
-module.exports = MovementController;
-//# sourceMappingURL=data:application/json;base64,eyJ2ZXJzaW9uIjozLCJmaWxlIjoibW92ZW1lbnQuY29udHJvbGxlci5qcyIsInNvdXJjZVJvb3QiOiIiLCJzb3VyY2VzIjpbIi4uLy4uLy4uL3NlcnZlci9saWIvbW92ZW1lbnQvbW92ZW1lbnQuY29udHJvbGxlci5qcyJdLCJuYW1lcyI6W10sIm1hcHBpbmdzIjoiQUFBQSxZQUFZLENBQUM7QUFDYixJQUFJLGdCQUFnQixHQUFHLE9BQU8sQ0FBQyxnQ0FBZ0MsQ0FBQyxDQUFDO0FBRWpFOztHQUVHO0FBQ0gsaUNBQWlDLGdCQUFnQjtBQUVqRCxDQUFDO0FBRUQsTUFBTSxDQUFDLE9BQU8sR0FBRyxrQkFBa0IsQ0FBQyJ9
+Object.defineProperty(exports, "__esModule", { value: true });
+exports.default = MovementController;
+;
+//# sourceMappingURL=data:application/json;base64,eyJ2ZXJzaW9uIjozLCJmaWxlIjoibW92ZW1lbnQuY29udHJvbGxlci5qcyIsInNvdXJjZVJvb3QiOiIiLCJzb3VyY2VzIjpbIi4uLy4uLy4uL3NlcnZlci9saWIvbW92ZW1lbnQvbW92ZW1lbnQuY29udHJvbGxlci50cyJdLCJuYW1lcyI6W10sIm1hcHBpbmdzIjoiQUFBQSxZQUFZLENBQUM7QUFDYixvQ0FBNkIsNkJBQTZCLENBQUMsQ0FBQTtBQUUzRCxpQ0FBZ0QsMkJBQWdCO0FBRWhFLENBQUM7QUFGRDtvQ0FFQyxDQUFBO0FBQUEsQ0FBQyJ9
