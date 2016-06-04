@@ -2,7 +2,7 @@
 require('./socketio.fixer.js');
 let passportSocketIo = require('passport.socketio');
 let RouterBase		 = require('../master/master.router.js');
-let SERVER_GETS		 = require('./socketio.config.json').SERVER_GETS;
+let SERVER_GETS		 = require('../../../server/lib/socketio/socketio.config.json').SERVER_GETS;
 
 /**
  * Socketio's router

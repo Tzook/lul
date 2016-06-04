@@ -1,5 +1,5 @@
 'use strict';
-const config = require('./master.config.json');
+const config = require('../../../server/lib/master/master.config.json');
 const STATUS_CODES = config.STATUS_CODES;
 
 /**
@@ -16,7 +16,7 @@ class Response {
             this.LOGS[i] = config.LOGS[i];
         }
     }
-    
+
     /**
      * A wrapper to send error as a response
      * Replaces any tokens in the message with the tokens. does nothing if there aren't
@@ -27,10 +27,10 @@ class Response {
     sendError(res, ERROR, tokens) {
         return this.services.replaceTokens(ERROR.MSG, tokens)
         .then(error => {
-            res.status(STATUS_CODES[ERROR.STATUS]).send({code: ERROR.CODE, error});        
+            res.status(STATUS_CODES[ERROR.STATUS]).send({code: ERROR.CODE, error});
         });
     }
-    
+
     /**
      * A wrapper to send data as a response
      * If there is not data, will send without it

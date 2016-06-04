@@ -1,0 +1,9 @@
+'use strict';
+let main = new (require(`${__dirname}/lib/main/main.js`))();
+main.useDb();
+main.useLogger();
+main.useDependencies();
+main.beginServer();
+main.attachAppVariables();
+main.connectToDbAndBootstrap();
+//# sourceMappingURL=data:application/json;base64,eyJ2ZXJzaW9uIjozLCJmaWxlIjoibWFpbi5qcyIsInNvdXJjZVJvb3QiOiIiLCJzb3VyY2VzIjpbIi4uL3NlcnZlci9tYWluLmpzIl0sIm5hbWVzIjpbXSwibWFwcGluZ3MiOiJBQUFBLFlBQVksQ0FBQztBQUNiLElBQUksSUFBSSxHQUFHLElBQUksQ0FBQyxPQUFPLENBQUMsR0FBRyxTQUFTLG1CQUFtQixDQUFDLENBQUMsRUFBRSxDQUFDO0FBRTVELElBQUksQ0FBQyxLQUFLLEVBQUUsQ0FBQztBQUNiLElBQUksQ0FBQyxTQUFTLEVBQUUsQ0FBQztBQUNqQixJQUFJLENBQUMsZUFBZSxFQUFFLENBQUM7QUFDdkIsSUFBSSxDQUFDLFdBQVcsRUFBRSxDQUFDO0FBQ25CLElBQUksQ0FBQyxrQkFBa0IsRUFBRSxDQUFDO0FBQzFCLElBQUksQ0FBQyx1QkFBdUIsRUFBRSxDQUFDIn0=

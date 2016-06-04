@@ -1,0 +1,47 @@
+'use strict';
+let RouterBase = require('../master/master.router.js');
+let passport = require('passport'), LocalStrategy = require('passport-local').Strategy;
+const sessionTime = 1000 * 60 * 60 * 24 * 30; // 30 days		
+/**
+ * User's router
+ * @exports UserRouter
+ * @property middleware
+ */
+class UserRouter extends RouterBase {
+    /**
+     * Initializes the instance
+     */
+    init(files, app) {
+        this.usePassport(app, app.session, app.mongoStore, files.controller, files.middleware);
+        super.init(files, app);
+    }
+    /**
+     * Initiates the routes of the User package
+     */
+    initRoutes(app) {
+        app.get(this.ROUTES.USER_SESSION, this.middleware.isLoggedIn.bind(this.middleware), this.controller.sendUser.bind(this.controller));
+        app.get(this.ROUTES.USER_LOGOUT, this.middleware.isLoggedIn.bind(this.middleware), this.controller.performLogout.bind(this.controller));
+        app.post(this.ROUTES.USER_LOGIN, this.middleware.isLoggedOut.bind(this.middleware), this.middleware.hasLoginParams.bind(this.middleware), this.middleware.passportLocalAuthenticate.bind(this.middleware), this.controller.performLogin.bind(this.controller), this.controller.sendUser.bind(this.controller));
+        app.post(this.ROUTES.USER_REGISTER, this.middleware.isLoggedOut.bind(this.middleware), this.middleware.hasRegisterParams.bind(this.middleware), this.middleware.isUsernameUnique.bind(this.middleware), this.controller.handleNewUser.bind(this.controller), this.controller.performLogin.bind(this.controller), this.controller.sendUser.bind(this.controller));
+    }
+    /**
+     * Binds everything needed in order to use the passport package
+     */
+    usePassport(app, session, mongoStore, controller, middleware) {
+        // NOTE: in passport's middleware library under file authenticate.js, i changed the callback called on error to send the res too
+        app.dependencies.push((session({
+            name: 'unicorn',
+            secret: 'UnicornsAreAmazingB0ss',
+            store: mongoStore,
+            cookie: { maxAge: sessionTime },
+            saveUninitialized: true,
+            resave: true })));
+        app.use(passport.initialize());
+        app.use(passport.authenticate('session', {}, controller.deserializeError.bind(controller)));
+        passport.use(new LocalStrategy(middleware.authenticateUser.bind(middleware)));
+        passport.serializeUser(controller.serializeUser.bind(controller));
+        passport.deserializeUser(controller.deserializeUser.bind(controller));
+    }
+}
+module.exports = UserRouter;
+//# sourceMappingURL=data:application/json;base64,eyJ2ZXJzaW9uIjozLCJmaWxlIjoidXNlci5yb3V0ZXIuanMiLCJzb3VyY2VSb290IjoiIiwic291cmNlcyI6WyIuLi8uLi8uLi9zZXJ2ZXIvbGliL3VzZXIvdXNlci5yb3V0ZXIuanMiXSwibmFtZXMiOltdLCJtYXBwaW5ncyI6IkFBQUEsWUFBWSxDQUFDO0FBQ2IsSUFBSSxVQUFVLEdBQUksT0FBTyxDQUFDLDRCQUE0QixDQUFDLENBQUM7QUFDeEQsSUFBSSxRQUFRLEdBQVUsT0FBTyxDQUFDLFVBQVUsQ0FBQyxFQUNyQyxhQUFhLEdBQUssT0FBTyxDQUFDLGdCQUFnQixDQUFDLENBQUMsUUFBUSxDQUFDO0FBRXpELE1BQU0sV0FBVyxHQUFHLElBQUksR0FBRyxFQUFFLEdBQUcsRUFBRSxHQUFHLEVBQUUsR0FBRyxFQUFFLENBQUMsQ0FBQyxZQUFZO0FBRTFEOzs7O0dBSUc7QUFDSCx5QkFBeUIsVUFBVTtJQUNsQzs7T0FFRztJQUNILElBQUksQ0FBQyxLQUFLLEVBQUUsR0FBRztRQUNkLElBQUksQ0FBQyxXQUFXLENBQUMsR0FBRyxFQUFFLEdBQUcsQ0FBQyxPQUFPLEVBQUUsR0FBRyxDQUFDLFVBQVUsRUFBRSxLQUFLLENBQUMsVUFBVSxFQUFFLEtBQUssQ0FBQyxVQUFVLENBQUMsQ0FBQztRQUN2RixLQUFLLENBQUMsSUFBSSxDQUFDLEtBQUssRUFBRSxHQUFHLENBQUMsQ0FBQztJQUN4QixDQUFDO0lBRUU7O09BRUE7SUFDSCxVQUFVLENBQUMsR0FBRztRQUNiLEdBQUcsQ0FBQyxHQUFHLENBQUMsSUFBSSxDQUFDLE1BQU0sQ0FBQyxZQUFZLEVBQy9CLElBQUksQ0FBQyxVQUFVLENBQUMsVUFBVSxDQUFDLElBQUksQ0FBQyxJQUFJLENBQUMsVUFBVSxDQUFDLEVBQ2hELElBQUksQ0FBQyxVQUFVLENBQUMsUUFBUSxDQUFDLElBQUksQ0FBQyxJQUFJLENBQUMsVUFBVSxDQUFDLENBQUMsQ0FBQztRQUVqRCxHQUFHLENBQUMsR0FBRyxDQUFDLElBQUksQ0FBQyxNQUFNLENBQUMsV0FBVyxFQUM5QixJQUFJLENBQUMsVUFBVSxDQUFDLFVBQVUsQ0FBQyxJQUFJLENBQUMsSUFBSSxDQUFDLFVBQVUsQ0FBQyxFQUNoRCxJQUFJLENBQUMsVUFBVSxDQUFDLGFBQWEsQ0FBQyxJQUFJLENBQUMsSUFBSSxDQUFDLFVBQVUsQ0FBQyxDQUFDLENBQUM7UUFFdEQsR0FBRyxDQUFDLElBQUksQ0FBQyxJQUFJLENBQUMsTUFBTSxDQUFDLFVBQVUsRUFDOUIsSUFBSSxDQUFDLFVBQVUsQ0FBQyxXQUFXLENBQUMsSUFBSSxDQUFDLElBQUksQ0FBQyxVQUFVLENBQUMsRUFDakQsSUFBSSxDQUFDLFVBQVUsQ0FBQyxjQUFjLENBQUMsSUFBSSxDQUFDLElBQUksQ0FBQyxVQUFVLENBQUMsRUFDcEQsSUFBSSxDQUFDLFVBQVUsQ0FBQyx5QkFBeUIsQ0FBQyxJQUFJLENBQUMsSUFBSSxDQUFDLFVBQVUsQ0FBQyxFQUMvRCxJQUFJLENBQUMsVUFBVSxDQUFDLFlBQVksQ0FBQyxJQUFJLENBQUMsSUFBSSxDQUFDLFVBQVUsQ0FBQyxFQUNsRCxJQUFJLENBQUMsVUFBVSxDQUFDLFFBQVEsQ0FBQyxJQUFJLENBQUMsSUFBSSxDQUFDLFVBQVUsQ0FBQyxDQUFDLENBQUM7UUFFakQsR0FBRyxDQUFDLElBQUksQ0FBQyxJQUFJLENBQUMsTUFBTSxDQUFDLGFBQWEsRUFDakMsSUFBSSxDQUFDLFVBQVUsQ0FBQyxXQUFXLENBQUMsSUFBSSxDQUFDLElBQUksQ0FBQyxVQUFVLENBQUMsRUFDakQsSUFBSSxDQUFDLFVBQVUsQ0FBQyxpQkFBaUIsQ0FBQyxJQUFJLENBQUMsSUFBSSxDQUFDLFVBQVUsQ0FBQyxFQUN2RCxJQUFJLENBQUMsVUFBVSxDQUFDLGdCQUFnQixDQUFDLElBQUksQ0FBQyxJQUFJLENBQUMsVUFBVSxDQUFDLEVBQ3RELElBQUksQ0FBQyxVQUFVLENBQUMsYUFBYSxDQUFDLElBQUksQ0FBQyxJQUFJLENBQUMsVUFBVSxDQUFDLEVBQ25ELElBQUksQ0FBQyxVQUFVLENBQUMsWUFBWSxDQUFDLElBQUksQ0FBQyxJQUFJLENBQUMsVUFBVSxDQUFDLEVBQ2xELElBQUksQ0FBQyxVQUFVLENBQUMsUUFBUSxDQUFDLElBQUksQ0FBQyxJQUFJLENBQUMsVUFBVSxDQUFDLENBQUMsQ0FBQztJQUNsRCxDQUFDO0lBRUQ7O09BRUc7SUFDSCxXQUFXLENBQUMsR0FBRyxFQUFFLE9BQU8sRUFBRSxVQUFVLEVBQUUsVUFBVSxFQUFFLFVBQVU7UUFDM0QsZ0lBQWdJO1FBQ2hJLEdBQUcsQ0FBQyxZQUFZLENBQUMsSUFBSSxDQUFDLENBQUMsT0FBTyxDQUFDO1lBQzdCLElBQUksRUFBRSxTQUFTO1lBQ2YsTUFBTSxFQUFFLHdCQUF3QjtZQUNoQyxLQUFLLEVBQUUsVUFBVTtZQUNqQixNQUFNLEVBQUUsRUFBRSxNQUFNLEVBQUUsV0FBVyxFQUFFO1lBQy9CLGlCQUFpQixFQUFFLElBQUk7WUFDdkIsTUFBTSxFQUFFLElBQUksRUFBRSxDQUFDLENBQUMsQ0FBQyxDQUFDO1FBQ3BCLEdBQUcsQ0FBQyxHQUFHLENBQUMsUUFBUSxDQUFDLFVBQVUsRUFBRSxDQUFDLENBQUM7UUFDL0IsR0FBRyxDQUFDLEdBQUcsQ0FBQyxRQUFRLENBQUMsWUFBWSxDQUFDLFNBQVMsRUFBRSxFQUFFLEVBQUUsVUFBVSxDQUFDLGdCQUFnQixDQUFDLElBQUksQ0FBQyxVQUFVLENBQUMsQ0FBQyxDQUFDLENBQUM7UUFDNUYsUUFBUSxDQUFDLEdBQUcsQ0FBQyxJQUFJLGFBQWEsQ0FBQyxVQUFVLENBQUMsZ0JBQWdCLENBQUMsSUFBSSxDQUFDLFVBQVUsQ0FBQyxDQUFDLENBQUMsQ0FBQztRQUN4RSxRQUFRLENBQUMsYUFBYSxDQUFDLFVBQVUsQ0FBQyxhQUFhLENBQUMsSUFBSSxDQUFDLFVBQVUsQ0FBQyxDQUFDLENBQUM7UUFDbEUsUUFBUSxDQUFDLGVBQWUsQ0FBQyxVQUFVLENBQUMsZUFBZSxDQUFDLElBQUksQ0FBQyxVQUFVLENBQUMsQ0FBQyxDQUFDO0lBQzdFLENBQUM7QUFDRixDQUFDO0FBRUQsTUFBTSxDQUFDLE9BQU8sR0FBRyxVQUFVLENBQUMifQ==

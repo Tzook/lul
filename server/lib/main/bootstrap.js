@@ -1,6 +1,8 @@
 'use strict';
 
 let fs = require('fs');
+let path = require('path');
+
 /**
  *  Bootstrap manager to initiate all packages
  */
@@ -9,25 +11,26 @@ class Bootstrap {
      * Default constructor
      */
     constructor(app) {
+
         this.app = app;
         app.get('/', (req, res) => {
-            res.sendFile(`${__dirname}/test.html`); 
+            res.sendFile(path.resolve(`server/test.html`));
         });
         app.get('/config', (req, res) => {
-            res.send(require('../../config/config.generated.json'));
+            res.send(require('../../../config/config.generated.json'));
         });
         app.get('/logs', (req, res) => {
-            var logs = fs.readFileSync(`${__dirname}/../../logs.log`, 'utf8');
+            var logs = fs.readFileSync(path.resolve(`server/logs.log`), 'utf8');
             logs = logs.split('\n').reverse().join('<br>');
             res.send(logs);
         });
     }
-    
+
     /**
      * Loads the routes structure from the structure.json file
      */
     init(app) {
-        let structure = require('../../config/config.structure.json');
+        let structure = require('../../../config/config.structure.json');
         let models = [];
         let routers = {};
         for (let i = 0; i < structure.folders.length; i++) {
@@ -37,15 +40,15 @@ class Bootstrap {
             let files = {};
             // creates new instances
             for (let j = 0; j < structure.templates.length; j++) {
-                files[structure.templates[j]] = new (require(`../${structure.folders[i]}/${structure.folders[i]}.${structure.templates[j]}.js`))(); 
+                files[structure.templates[j]] = new (require(`../${structure.folders[i]}/${structure.folders[i]}.${structure.templates[j]}.js`))();
             }
             // load config files
             for (let j = 0; j < structure.configs.length; j++) {
-                files[structure.configs[j]] = require(`../${structure.folders[i]}/${structure.folders[i]}.${structure.configs[j]}.json`); 
+                files[structure.configs[j]] = require(`../../../server/lib/${structure.folders[i]}/${structure.folders[i]}.${structure.configs[j]}.json`);
             }
             // initializes all objects
             for (let j = 0; j < structure.templates.length; j++) {
-                files[structure.templates[j]].init(files, app); 
+                files[structure.templates[j]].init(files, app);
             }
             let model = {};
             model.priority = files.model.priority;
@@ -68,7 +71,7 @@ function createModel(models, i) {
     .then(() => {
         createModel(models, i + 1);
         models[i].services.setModel(models[i].model.getModel());
-    }); 
+    });
 }
 
 function initRouterConnections(routers) {
@@ -84,9 +87,9 @@ function initRouterConnections(routers) {
     for (let i in connections) {
         for (let j in connections[i]) {
             routers[i].setConnection(routers[connections[i][j]]);
-        }    
+        }
     }
-    
+
 }
 
 module.exports = Bootstrap;
