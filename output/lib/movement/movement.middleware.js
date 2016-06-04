@@ -1,0 +1,9 @@
+'use strict';
+let MiddlewareBase = require('../master/master.middleware.js');
+/**
+ * Movement's middleware
+ */
+class MovementMiddleware extends MiddlewareBase {
+}
+module.exports = MovementMiddleware;
+//# sourceMappingURL=data:application/json;base64,eyJ2ZXJzaW9uIjozLCJmaWxlIjoibW92ZW1lbnQubWlkZGxld2FyZS5qcyIsInNvdXJjZVJvb3QiOiIiLCJzb3VyY2VzIjpbIi4uLy4uLy4uL3NlcnZlci9saWIvbW92ZW1lbnQvbW92ZW1lbnQubWlkZGxld2FyZS5qcyJdLCJuYW1lcyI6W10sIm1hcHBpbmdzIjoiQUFBQSxZQUFZLENBQUM7QUFDYixJQUFJLGNBQWMsR0FBRyxPQUFPLENBQUMsZ0NBQWdDLENBQUMsQ0FBQztBQUUvRDs7R0FFRztBQUNILGlDQUFpQyxjQUFjO0FBRS9DLENBQUM7QUFFRCxNQUFNLENBQUMsT0FBTyxHQUFHLGtCQUFrQixDQUFDIn0=

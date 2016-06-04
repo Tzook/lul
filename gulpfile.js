@@ -1,23 +1,19 @@
 (function() {
 	var gulp 		= require("gulp"),
-		mocha 		= require("gulp-mocha"),
+	    spawn       = require('child_process').spawn,
 		server 		= require("gulp-develop-server"),
-		buildConfig	= require('./server/buildConfig.js');
-		
-	// Server unit tests
-	gulp.task("server:tests", function () {
-  		return gulp.src('./server/tests/**/*.js')
-				.pipe(mocha());
-	});
-	
+		buildConfig	= require('./server/buildConfig.js'),
+		_ 			= require("underscore");
+
 	// Build config file
 	gulp.task("server:config", buildConfig);
-	
+
 	// Server start
 	gulp.task("server:start", function() {
-	    server.listen({path: './server/main.js'});
+	    spawn('npm', ['start'], {stdio: 'inherit'}); // set the typescript compilation process going
+	    server.listen({path: './output/main.js'});
 	});
-	
+
 	// Server kill
 	gulp.task("server:restart", function() {
 		server.restart();
@@ -26,10 +22,10 @@
 	// WATCH
 	// =====
 	// Run the server unit tests just once, then run the server itself
-	gulp.task("watch", ["server:tests", "server:start"], function() {
+	gulp.task("watch", ["server:start"], function() {
 		// watch for config files, and regenerate the big config file on save
-		gulp.watch(["server/lib/**/*.config.json"], ["server:config"]);
+		// gulp.watch(["server/lib/**/*.config.json"], ["server:config"]);
 		// Watch for saving files and restart server
-		gulp.watch(["server/*.js", "server/**/*.js", "server/**/**/*.js", "server/*.json", "server/**/*.json", "server/**/**/*.json"], ["server:restart"]);
+		gulp.watch(["output/main.js", "server/*.json", "server/**/*.json", "server/**/**/*.json"], ["server:restart"]);
 	});
 })();

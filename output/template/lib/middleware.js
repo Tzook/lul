@@ -1,0 +1,9 @@
+'use strict';
+let MiddlewareBase = require('../master/master.middleware.js');
+/**
+ * Template's middleware
+ */
+class TemplateMiddleware extends MiddlewareBase {
+}
+module.exports = TemplateMiddleware;
+//# sourceMappingURL=data:application/json;base64,eyJ2ZXJzaW9uIjozLCJmaWxlIjoibWlkZGxld2FyZS5qcyIsInNvdXJjZVJvb3QiOiIiLCJzb3VyY2VzIjpbIi4uLy4uLy4uL3NlcnZlci90ZW1wbGF0ZS9saWIvbWlkZGxld2FyZS5qcyJdLCJuYW1lcyI6W10sIm1hcHBpbmdzIjoiQUFBQSxZQUFZLENBQUM7QUFDYixJQUFJLGNBQWMsR0FBRyxPQUFPLENBQUMsZ0NBQWdDLENBQUMsQ0FBQztBQUUvRDs7R0FFRztBQUNILGlDQUFpQyxjQUFjO0FBRS9DLENBQUM7QUFFRCxNQUFNLENBQUMsT0FBTyxHQUFHLGtCQUFrQixDQUFDIn0=
