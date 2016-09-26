@@ -13,7 +13,8 @@ export default class MovementRouter extends SocketioRouterBase {
 			id: socket.character._id,
 			x: data.x,
 			y: data.y,
-			z: data.z
+			z: data.z,
+			angle: data.angle
 		});
 	}
 };
