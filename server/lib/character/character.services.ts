@@ -31,7 +31,10 @@ export default class CharacterServices extends MasterServices {
 		return Promise.resolve({
 			name: data.name,
 			looks: {
-				g: data.g
+				g: data.g,
+				eyes: data.eyes,
+				nose: data.nose,
+				mouth: data.mouth
 			}
 		});
 	}
