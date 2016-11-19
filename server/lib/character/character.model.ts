@@ -5,7 +5,10 @@ export default class CharacterModel extends MasterModel {
 
     init(files, app) {
         let looks = {
-            g: Boolean
+            g: Boolean,
+            eyes: String,
+            nose: String,
+            mouth: String
         };
         this.schema = {
             name: String,
