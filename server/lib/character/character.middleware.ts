@@ -10,7 +10,9 @@ export default class CharacterMiddleware extends MasterMiddleware {
 			{param: "g", 	isType: ["string"], callback: this.services.isBool, args: [req.body.g, this.LOGS.MASTER_INVALID_PARAM_TYPE, 'g']},
 			{param: "eyes", isType: ["string"]},
 			{param: "nose", isType: ["string"]},
-			{param: "mouth",isType: ["string"]}
+			{param: "mouth",isType: ["string"]},
+			{param: "skin", isType: ["string"]},
+			{param: "hair", isType: ["string"]}
 		]);
 	}
 

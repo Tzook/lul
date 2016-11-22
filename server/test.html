@@ -28,6 +28,8 @@
 					<input type="text" placeholder="Eyes" id="chEyes" class="form-control form-input">
 					<input type="text" placeholder="Nose" id="chNose" class="form-control form-input">
 					<input type="text" placeholder="Mouth" id="chMouth" class="form-control form-input">
+					<input type="text" placeholder="Skin" id="chSkin" class="form-control form-input">
+					<input type="text" placeholder="Hair" id="chHair" class="form-control form-input">
 					<button onclick="createCharacter()" class="btn btn-lg btn-success user-btn">Create</button>
 					<button id="delete" onclick="deleteCharacter()" class="btn btn-danger user-btn">Delete char number:
 						<input id="deleteCharNumber" class="form-control" type="number" max="9" min="0" onclick="event.stopPropagation();"></input>
@@ -165,7 +167,7 @@
 				gF: jQuery('#chGenderFemale'),
 				hairColor: jQuery('#chHairColor'),
 				skin: jQuery('#chSkin'),
-				hairSprite: jQuery('#chHairSprite'),
+				hair: jQuery('#chHair'),
 				eyes: jQuery('#chEyes'),
 				mouth: jQuery('#chMouth'),
 				nose: jQuery('#chNose')
@@ -176,7 +178,7 @@
 					name: $ch.name.val(),
 					hairColor: $ch.hairColor.val(),
 					skin: $ch.skin.val(),
-					hairSprite: $ch.hairSprite.val(),
+					hair: $ch.hair.val(),
 					eyes: $ch.eyes.val(),
 					mouth: $ch.mouth.val(),
 					nose: $ch.nose.val()
