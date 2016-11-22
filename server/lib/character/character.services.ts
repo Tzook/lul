@@ -34,7 +34,9 @@ export default class CharacterServices extends MasterServices {
 				g: data.g,
 				eyes: data.eyes,
 				nose: data.nose,
-				mouth: data.mouth
+				mouth: data.mouth,
+				skin: data.skin,
+				hair: data.hair
 			}
 		});
 	}

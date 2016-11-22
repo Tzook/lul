@@ -8,7 +8,9 @@ export default class CharacterModel extends MasterModel {
             g: Boolean,
             eyes: String,
             nose: String,
-            mouth: String
+            mouth: String,
+            skin: String,
+            hair: String
         };
         this.schema = {
             name: String,
