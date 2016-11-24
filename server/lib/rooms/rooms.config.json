@@ -5,6 +5,7 @@
 	},
 	"SERVER_GETS": {
 		"ENTERED_ROOM": "entered_room",
+		"MOVE_ROOM": "move_room",
 		"DISCONNECT": "disconnect"
 	},
 	"CLIENT_GETS": {
@@ -34,6 +35,7 @@
 		}
 	},
 	"ROOM_NAMES": {
-		"DEFAULT_ROOM": "TestingRoom"
+		"DEFAULT_ROOM": "TestingRoom",
+		"NEXT_ROOM": "FapRoom"
 	}
 }
