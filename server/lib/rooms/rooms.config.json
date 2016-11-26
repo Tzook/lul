@@ -37,5 +37,9 @@
 	"ROOM_NAMES": {
 		"DEFAULT_ROOM": "TestingRoom",
 		"NEXT_ROOM": "FapRoom"
+	},
+	"ROOMS_MAP": {
+		"TestingRoom": ["FapRoom"],
+		"FapRoom": ["TestingRoom"]
 	}
 }
