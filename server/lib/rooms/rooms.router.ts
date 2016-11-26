@@ -27,7 +27,7 @@ export default class RoomsRouter extends SocketioRouterBase {
 	private joinRoom(socket: GameSocket) {
 		let room = socket.character.room;
 		socket.broadcast.to(room).emit(this.CLIENT_GETS.JOIN_ROOM, {character: socket.character});
-		let roomClients = this.io.sockets.adapter.rooms[room];
+		let roomClients = (<any>this.io.sockets).adapter.rooms[room];
 		if (roomClients) {
 			_.each(roomClients.sockets, (value, socketId) => {
 				socket.emit(this.CLIENT_GETS.JOIN_ROOM, {character: socket.map.get(socketId).character});

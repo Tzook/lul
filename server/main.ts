@@ -1,4 +1,4 @@
-/// <reference path="../typings/tsd.d.ts" />
+/// <reference path="../main.d.ts" />
 'use strict';
 import Main from './lib/main/main';
 
