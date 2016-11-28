@@ -13,9 +13,10 @@ export default class RoomsRouter extends SocketioRouterBase {
 		console.log('moving user room');
 		if (this.middleware.canEnterRoom(data.room, socket.character.room)) {
 			socket.broadcast.to(socket.character.room).emit(this.CLIENT_GETS.LEAVE_ROOM, { character: socket.character});
-			socket.leave(socket.character.room);
+			let oldRoom = socket.character.room;
+			socket.leave(oldRoom);
 			socket.character.room = data.room;
-			this.joinRoom(socket);
+			this.joinRoom(socket, oldRoom);
 		}
 	}
 
@@ -24,9 +25,9 @@ export default class RoomsRouter extends SocketioRouterBase {
 		socket.broadcast.to(socket.character.room).emit(this.CLIENT_GETS.LEAVE_ROOM, { character: socket.character});
 	}
 
-	private joinRoom(socket: GameSocket) {
+	private joinRoom(socket: GameSocket, oldRoom?: string) {
 		let room = socket.character.room;
-		socket.broadcast.to(room).emit(this.CLIENT_GETS.JOIN_ROOM, {character: socket.character});
+		socket.broadcast.to(room).emit(this.CLIENT_GETS.JOIN_ROOM, {character: socket.character, oldRoom});
 		let roomClients = (<any>this.io.sockets).adapter.rooms[room];
 		if (roomClients) {
 			_.each(roomClients.sockets, (value, socketId) => {
