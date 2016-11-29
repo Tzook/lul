@@ -16,7 +16,7 @@ export default class RoomsRouter extends SocketioRouterBase {
 			let oldRoom = socket.character.room;
 			socket.leave(oldRoom);
 			socket.character.room = data.room;
-			socket.emit(this.CLIENT_GETS.MOVE_ROOM, {room: data.room});
+			socket.emit(this.CLIENT_GETS.MOVE_ROOM, {oldRoom, room: data.room});
 		}
 	}
 
