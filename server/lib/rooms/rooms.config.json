@@ -10,6 +10,7 @@
 	},
 	"CLIENT_GETS": {
 		"JOIN_ROOM": "actor_join_room",
+		"MOVE_ROOM": "actor_move_room",
 		"LEAVE_ROOM": "actor_leave_room"
 	},
 	"LOGS": {
