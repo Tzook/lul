@@ -40,7 +40,7 @@
 		"NEXT_ROOM": "FapRoom"
 	},
 	"ROOMS_MAP": {
-		"TestingRoom": ["FapRoom"],
-		"FapRoom": ["TestingRoom"]
+		"TestingRoom": ["TestingRoom2"],
+		"TestingRoom2": ["TestingRoom"]
 	}
 }
