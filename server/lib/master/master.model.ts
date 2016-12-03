@@ -6,9 +6,11 @@ export default class MasterModel {
     protected mongoose;
     protected model;
     protected schema;
+    protected hasId: boolean;
 
     constructor(mongoose: any) {
         this.mongoose = mongoose || require('mongoose');
+        this.hasId = true;
     }
 
     init(files, app) {
@@ -24,7 +26,7 @@ export default class MasterModel {
         try {
             this.model = this.mongoose.model(name);
         } catch (e) {
-            this.model = this.mongoose.model(name, this.mongoose.Schema(this.schema));
+            this.model = this.mongoose.model(name, this.mongoose.Schema(this.schema, {_id: this.hasId}));
         }
     }
 

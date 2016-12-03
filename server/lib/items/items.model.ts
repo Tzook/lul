@@ -3,6 +3,8 @@ import MasterModel from '../master/master.model';
 
 export default class ItemsModel extends MasterModel {
     init(files, app) {
+        this.hasId = false;
+
         this.schema = {
             name: String,
             icon: String,
@@ -14,7 +16,7 @@ export default class ItemsModel extends MasterModel {
     }
 
     createModel() {
-        this.setModel('Items');
+        this.setModel('Item');
         this.addToSchema('Character', {items: [this.getModel().schema]});
         return Promise.resolve();
     }

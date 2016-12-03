@@ -2,9 +2,17 @@
 	"ROUTES": {
 	},
 	"SERVER_GETS": {
+		"ITEM_PICK": "picked_item",
+		"ITEM_DROP": "dropped_item",
+		"ITEM_MOVE": "moved_item"
 	},
 	"CLIENT_GETS": {
+		"ITEM_PICK": "actor_pick_item",
+		"ITEM_DROP": "drop_item",
+		"ITEM_DISAPPEAR": "item_disappear"
 	},
+	"MAX_ITEMS": 20,
+	"ITEM_DROP_LIFE": 60000,
 	"LOGS": {
 	}
 }

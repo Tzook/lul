@@ -6,13 +6,20 @@ interface Doc {
     save(fn?: (err: any, product: this, numAffected: number) => void): Promise<this>;
 }
 
+
+interface Item extends Doc {
+    name: string;
+    icon: string;
+}
+
 interface Char extends Doc {
     room: string;
     position: {
         x: number;
         y: number;
         z: number;
-    }
+    },
+    items: [Item]
 }
 
 interface User extends Doc {
