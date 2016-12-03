@@ -17,7 +17,6 @@ interface Char extends Doc {
     position: {
         x: number;
         y: number;
-        z: number;
     },
     items: [Item]
 }
