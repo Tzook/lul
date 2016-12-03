@@ -1,7 +1,8 @@
 'use strict';
 import SocketioRouterBase from '../socketio/socketio.router.base';
+import * as _ from 'underscore';
 let SERVER_GETS = require('../../../server/lib/rooms/rooms.config.json').SERVER_GETS;
-let _ = require('underscore');
+
 
 export default class RoomsRouter extends SocketioRouterBase {
 	[SERVER_GETS.ENTERED_ROOM](data, socket: GameSocket) {
@@ -30,7 +31,7 @@ export default class RoomsRouter extends SocketioRouterBase {
 		socket.broadcast.to(room).emit(this.CLIENT_GETS.JOIN_ROOM, {character: socket.character, oldRoom});
 		let roomClients = (<any>this.io.sockets).adapter.rooms[room];
 		if (roomClients) {
-			_.each(roomClients.sockets, (value, socketId) => {
+			_.each(roomClients.sockets, (value, socketId: string) => {
 				socket.emit(this.CLIENT_GETS.JOIN_ROOM, {character: socket.map.get(socketId).character});
 			});
 		}
