@@ -35,10 +35,7 @@
 			"STATUS": "BAD_VALUES"
 		}
 	},
-	"ROOM_NAMES": {
-		"DEFAULT_ROOM": "TestingRoom",
-		"NEXT_ROOM": "FapRoom"
-	},
+	"DEFAULT_ROOM": "TestingRoom",
 	"ROOMS_MAP": {
 		"TestingRoom": ["TestingRoom2"],
 		"TestingRoom2": ["TestingRoom"]
