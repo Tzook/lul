@@ -11,7 +11,7 @@ export default class RoomsModel extends MasterModel {
             users: [this.mongoose.Schema.ObjectId]
         };
         this.addToCharacterSchema = {
-            room: {type: String, default: files.config.ROOM_NAMES.DEFAULT_ROOM}
+            room: {type: String, default: files.config.DEFAULT_ROOM}
         };
     }
 
