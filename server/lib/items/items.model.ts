@@ -1,5 +1,5 @@
-'use strict';
-import MasterModel from '../master/master.model';
+"use strict";
+import MasterModel from "../master/master.model";
 
 export default class ItemsModel extends MasterModel {
     init(files, app) {
@@ -16,8 +16,14 @@ export default class ItemsModel extends MasterModel {
     }
 
     createModel() {
-        this.setModel('Item');
-        this.addToSchema('Character', {items: [this.getModel().schema]});
+        this.setModel("Item");
+        this.addToSchema("Character", {items: [this.getModel().schema]});
+        this.listenForFieldAddition("Character", "items", [
+			new this.model({
+				name: "Sword of Elad",
+				icon: "sword_of_elad"
+			})
+		]);
         return Promise.resolve();
     }
 };

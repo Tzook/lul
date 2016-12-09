@@ -47,12 +47,24 @@ export default class MasterModel {
     }
 
     removeListen(model) {
-        emitter.removeListener(model + "Schema", this.addModelToSchema.bind(this));
+        emitter.removeAllListeners(model + "Schema");
     }
 
     private addModelToSchema(data) {
         for (let i in data) {
             this.schema[i] = data[i];
         }
+    }
+
+    listenForFieldAddition(model: string, field: string, data) {
+        emitter.on(model + "Field", this.addFieldToModel.bind(this, field, data));
+    }
+
+    addFields(obj) {
+        emitter.emit(this.model.modelName + "Field", obj);
+    }
+
+    private addFieldToModel(field, data, obj) {
+        obj[field] = data;
     }
 };
