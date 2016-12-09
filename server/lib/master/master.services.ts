@@ -3,6 +3,7 @@
 export default class MasterServices {
     protected Q;
     protected mongoose;
+    protected model;
     protected Model;
 
     constructor(Q, MD5) {
@@ -10,6 +11,7 @@ export default class MasterServices {
     }
 
 	init(files, app) {
+        this.model = files.model;
 		this.mongoose = files.model.mongoose; // TODO app.mongoose!
 	}
 

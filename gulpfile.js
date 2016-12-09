@@ -26,6 +26,6 @@
 		// watch for config files, and regenerate the big config file on save
 		// gulp.watch(["server/lib/**/*.config.json"], ["server:config"]);
 		// Watch for saving files and restart server
-		gulp.watch(["output/main.js", "server/*.json", "server/**/*.json", "server/**/**/*.json"], ["server:restart"]);
+		gulp.watch(["output/*.js", "output/**/*.js", "server/*.json", "server/**/*.json", "server/**/**/*.json"], ["server:restart"]);
 	});
 })();

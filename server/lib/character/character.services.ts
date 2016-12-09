@@ -5,7 +5,7 @@ export default class CharacterServices extends MasterServices {
 
 	saveNewCharacter(user, character) {
 		return new Promise((resolve, reject) => {
-			user.characters.push(new this.Model(character));
+			user.characters.push(character);
 			user.save(e => {
 				e ? reject(e) : resolve(user);
 			});
@@ -28,7 +28,7 @@ export default class CharacterServices extends MasterServices {
 	}
 
 	convertToFormat(data) {
-		return Promise.resolve({
+		let character: Char = new this.Model({
 			name: data.name,
 			looks: {
 				g: data.g,
@@ -39,6 +39,8 @@ export default class CharacterServices extends MasterServices {
 				hair: data.hair
 			}
 		});
+		this.model.addFields(character);
+		return Promise.resolve(character);
 	}
 	checkIsNameUnique(name, error) {
 		return new Promise((resolve, reject) => {
