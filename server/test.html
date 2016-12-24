@@ -10,7 +10,7 @@
 		<div class="jumbotron">
 			<h1>~Tzook's private office~</h1>
 
-			<svg id="playground" style="opacity: 0"></svg>
+			<!--<svg id="playground" style="opacity: 0"></svg>-->
 
 			<div class="intro">
 				<div class="group">
@@ -276,7 +276,8 @@
 			}
 
 			function emit() {
-				socket.emit('msg', {d: $emit.val()});
+				socket.emit('message', {d: $emit.val()});
+				setResult({msg: "You: " + $emit.val()});
 				$emit.val('');
 			}
 
@@ -385,6 +386,7 @@
 				text-align: left;
 				padding: 10px;
 				background-color: white;
+				white-space: pre-wrap;
 			}
 			.intro:after {
 				content: "";
