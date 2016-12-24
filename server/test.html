@@ -259,7 +259,7 @@
 				socket.on("drop_item", d => setResult({msg: "drop_item", d}))
 				socket.on("item_disappear", d => setResult({msg: "item_disappear", d}))
 
-				socket.on("movement", d => setResult({msg: "movement", d}))
+				socket.on("movement", d => console.log({msg: "movement", d}))
 
 				socket.on("message", d => setResult({msg: "message", d}))
 
