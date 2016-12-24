@@ -14,14 +14,15 @@ export default class ItemsRouter extends SocketioRouterBase {
 
 	[SERVER_GETS.ITEM_PICK](data, socket: GameSocket) {
 		for (var slot = 0; slot < config.MAX_ITEMS; slot++) {
-			if (_.isEmpty(socket.character.items[slot])) {
+			if (!socket.character.items[slot]['name']) {
 				break;
 			}
 		}
 
 		let itemAndRoomId = socket.character.room + "-" + data.item_id;
 		if (slot < config.MAX_ITEMS && this.itemsMap.has(itemAndRoomId)) { // found an empty spot
-			socket.character.items.set(slot, this.itemsMap.get(itemAndRoomId));
+			socket.character.items.set(slot, this.itemsMap.get(itemAndRoomId).item);
+			console.log('picking item', data.item_id);
 			this.itemsMap.delete(itemAndRoomId);
 			this.io.to(socket.character.room).emit(this.CLIENT_GETS.ITEM_PICK, {
 				id: socket.character._id,
@@ -32,7 +33,7 @@ export default class ItemsRouter extends SocketioRouterBase {
 	}
 
 	[SERVER_GETS.ITEM_DROP](data, socket: GameSocket) {
-		if (!_.isEmpty(socket.character.items[data.slot])) {
+		if (socket.character.items[data.slot]['name']) {
 			let item = <Item>socket.character.items[data.slot];
 			let itemId = _.uniqueId();
 			let room = socket.character.room;
@@ -45,12 +46,14 @@ export default class ItemsRouter extends SocketioRouterBase {
 			};
 			this.itemsMap.set(itemAndRoomId, itemData);
 
+			console.log('dropping item', itemData);
 			socket.character.items.set(data.slot, {});
 			this.io.to(room).emit(this.CLIENT_GETS.ITEM_DROP, itemData);
 
 			setTimeout(() => {
 				if (this.itemsMap.has(itemAndRoomId)) {
 					this.itemsMap.delete(itemAndRoomId);
+					console.log('removing item', itemId);
 					this.io.to(room).emit(this.CLIENT_GETS.ITEM_DISAPPEAR, {
 						item_id: itemId
 					});
@@ -65,6 +68,7 @@ export default class ItemsRouter extends SocketioRouterBase {
 			let itemFrom = socket.character.items[data.from];
 			let itemTo = socket.character.items[data.to];
 
+			console.log('moving item from ' + data.from + " to " + data.to, itemFrom, itemTo);
 			socket.character.items.set(data.to, itemFrom);
 			socket.character.items.set(data.from, itemTo);
 		 }
