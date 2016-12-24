@@ -4,7 +4,8 @@
 	"SERVER_GETS": {
 		"ITEM_PICK": "picked_item",
 		"ITEM_DROP": "dropped_item",
-		"ITEM_MOVE": "moved_item"
+		"ITEM_MOVE": "moved_item",
+		"ENTERED_ROOM": "entered_room"
 	},
 	"CLIENT_GETS": {
 		"ITEM_PICK": "actor_pick_item",

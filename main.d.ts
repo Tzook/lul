@@ -12,13 +12,17 @@ interface Item extends Doc {
     icon: string;
 }
 
+interface ItemsArray extends Array<Item|{}> {
+    set: (index: number, obj: Item|{}) => {};
+}
+
 interface Char extends Doc {
     room: string;
     position: {
         x: number;
         y: number;
     },
-    items: [Item|{}]
+    items: ItemsArray
 }
 
 interface User extends Doc {
