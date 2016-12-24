@@ -255,14 +255,17 @@
 					removeChar(d.ch);
 				});
 
-				// From here on, we decide the event names. Next milestone..
-				socket.on('actor_join_room', function(d) {
-					setResult({msg:"got data:", d});
-				});
+				socket.on("actor_pick_item", d => setResult({msg: "actor_pick_item", d}))
+				socket.on("drop_item", d => setResult({msg: "drop_item", d}))
+				socket.on("item_disappear", d => setResult({msg: "item_disappear", d}))
 
-				socket.on('msg', function(d) {
-					setResult(d);
-				});
+				socket.on("movement", d => setResult({msg: "movement", d}))
+
+				socket.on("message", d => setResult({msg: "message", d}))
+
+				socket.on("actor_join_room", d => setResult({msg: "actor_join_room", d}))
+				socket.on("actor_move_room", d => setResult({msg: "actor_move_room", d}))
+				socket.on("actor_leave_room", d => setResult({msg: "actor_leave_room", d}))
 			}
 
 			function move(dX, dY) {
