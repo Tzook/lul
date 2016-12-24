@@ -18,7 +18,7 @@ interface Char extends Doc {
         x: number;
         y: number;
     },
-    items: [Item]
+    items: [Item|{}]
 }
 
 interface User extends Doc {

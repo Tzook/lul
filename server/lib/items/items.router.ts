@@ -5,7 +5,7 @@ let config = require('../../../server/lib/items/items.config.json');
 let SERVER_GETS = config.SERVER_GETS;
 
 export default class ItemsRouter extends SocketioRouterBase {
-	private itemsMap: Map<string, Item>;
+	private itemsMap: Map<string, Item|{}>;
 
 	constructor() {
 		super();
@@ -14,7 +14,7 @@ export default class ItemsRouter extends SocketioRouterBase {
 
 	[SERVER_GETS.ITEM_PICK](data, socket: GameSocket) {
 		for (var slot = 0; slot < config.MAX_ITEMS; slot++) {
-			if (!socket.character.items[slot]) {
+			if (_.isEmpty(socket.character.items[slot])) {
 				break;
 			}
 		}
@@ -32,14 +32,14 @@ export default class ItemsRouter extends SocketioRouterBase {
 	}
 
 	[SERVER_GETS.ITEM_DROP](data, socket: GameSocket) {
-		if (socket.character.items[data.slot]) {
+		if (!_.isEmpty(socket.character.items[data.slot])) {
 			let item = socket.character.items[data.slot];
 			let itemId = _.uniqueId();
 			let room = socket.character.room;
 			let itemAndRoomId = room + "-" + itemId;
 			this.itemsMap.set(itemAndRoomId, item);
 
-			socket.character.items[data.slot] = undefined;
+			socket.character.items[data.slot] = {};
 			this.io.to(room).emit(this.CLIENT_GETS.ITEM_DROP, {
 				x: socket.character.position.x,
 				y: socket.character.position.y,

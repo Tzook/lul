@@ -22,7 +22,7 @@ class ItemsModel extends master_model_1.default {
             })
         ];
         for (var i = 1; i < config.MAX_ITEMS; i++) {
-            items[i] = "";
+            items[i] = {};
         }
         this.listenForFieldAddition("Character", "items", items);
         return Promise.resolve();
