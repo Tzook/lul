@@ -5,7 +5,7 @@ let config = require('../../../server/lib/items/items.config.json');
 let SERVER_GETS = config.SERVER_GETS;
 
 export default class ItemsRouter extends SocketioRouterBase {
-	private itemsMap: Map<string, Item|{}>;
+	private itemsMap: Map<string, {x, y, item_id, item: Item}>;
 
 	constructor() {
 		super();
@@ -21,7 +21,7 @@ export default class ItemsRouter extends SocketioRouterBase {
 
 		let itemAndRoomId = socket.character.room + "-" + data.item_id;
 		if (slot < config.MAX_ITEMS && this.itemsMap.has(itemAndRoomId)) { // found an empty spot
-			socket.character.items[slot] = this.itemsMap.get(itemAndRoomId);
+			socket.character.items.set(slot, this.itemsMap.get(itemAndRoomId));
 			this.itemsMap.delete(itemAndRoomId);
 			this.io.to(socket.character.room).emit(this.CLIENT_GETS.ITEM_PICK, {
 				id: socket.character._id,
@@ -33,19 +33,20 @@ export default class ItemsRouter extends SocketioRouterBase {
 
 	[SERVER_GETS.ITEM_DROP](data, socket: GameSocket) {
 		if (!_.isEmpty(socket.character.items[data.slot])) {
-			let item = socket.character.items[data.slot];
+			let item = <Item>socket.character.items[data.slot];
 			let itemId = _.uniqueId();
 			let room = socket.character.room;
 			let itemAndRoomId = room + "-" + itemId;
-			this.itemsMap.set(itemAndRoomId, item);
-
-			socket.character.items[data.slot] = {};
-			this.io.to(room).emit(this.CLIENT_GETS.ITEM_DROP, {
+			let itemData = {
 				x: socket.character.position.x,
 				y: socket.character.position.y,
 				item_id: itemId,
 				item
-			});
+			};
+			this.itemsMap.set(itemAndRoomId, itemData);
+
+			socket.character.items.set(data.slot, {});
+			this.io.to(room).emit(this.CLIENT_GETS.ITEM_DROP, itemData);
 
 			setTimeout(() => {
 				if (this.itemsMap.has(itemAndRoomId)) {
@@ -61,9 +62,17 @@ export default class ItemsRouter extends SocketioRouterBase {
 	[SERVER_GETS.ITEM_MOVE](data, socket: GameSocket) {
 		if (data.from >= 0 && data.from < config.MAX_ITEMS
 		 	&& data.to >= 0 && data.to < config.MAX_ITEMS) {
-			let temp = socket.character.items[data.from];
-			socket.character.items[data.from] = socket.character.items[data.to];
-			socket.character.items[data.to] = temp;
+			let itemFrom = socket.character.items[data.from];
+			let itemTo = socket.character.items[data.to];
+
+			socket.character.items.set(data.to, itemFrom);
+			socket.character.items.set(data.from, itemTo);
 		 }
+	}
+
+	[SERVER_GETS.ENTERED_ROOM](data, socket: GameSocket) {
+		this.itemsMap.forEach(itemData => {
+			socket.emit(this.CLIENT_GETS.ITEM_DROP, itemData);
+		});
 	}
 };
