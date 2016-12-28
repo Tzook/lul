@@ -10,7 +10,8 @@
 	"CLIENT_GETS": {
 		"ITEM_PICK": "actor_pick_item",
 		"ITEM_DROP": "drop_item",
-		"ITEM_DISAPPEAR": "item_disappear"
+		"ITEM_DISAPPEAR": "item_disappear",
+		"ITEM_MOVED": "actor_move_item"
 	},
 	"MAX_ITEMS": 20,
 	"ITEM_DROP_LIFE": 60000,

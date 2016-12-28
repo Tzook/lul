@@ -71,6 +71,11 @@ export default class ItemsRouter extends SocketioRouterBase {
 			console.log('moving item from ' + data.from + " to " + data.to, itemFrom, itemTo);
 			socket.character.items.set(data.to, itemFrom);
 			socket.character.items.set(data.from, itemTo);
+			socket.emit(this.CLIENT_GETS.ITEM_MOVED, {
+				id: socket.character._id,
+				from: data.from,
+				to: data.to
+			});
 		 }
 	}
 
