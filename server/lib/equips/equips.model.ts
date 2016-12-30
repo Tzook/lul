@@ -1,7 +1,8 @@
 "use strict";
 import MasterModel from "../master/master.model";
 import * as _ from 'underscore';
-import {ITEM_SCHEMA} from "../items/items.model";
+import { ITEM_SCHEMA } from "../items/items.model";
+let EQUIPS = require('../../../server/lib/equips/equips.json');
 
 export const EQUIPS_SCHEMA = {
     head: ITEM_SCHEMA,
@@ -18,6 +19,7 @@ export default class EquipsModel extends MasterModel {
         for (let i in this.schema) {
             this.schema[i] = this.mongoose.Schema.Types.Mixed;
         }
+        (<any>ITEM_SCHEMA).sprites = this.mongoose.Schema.Types.Mixed;
     }
 
     get priority() {
@@ -26,17 +28,18 @@ export default class EquipsModel extends MasterModel {
 
     createModel() {
         this.setModel("Equip");
-        this.addToSchema("Character", {equips: this.getModel().schema});
+        this.addToSchema("Character", { equips: this.getModel().schema });
         let equips = _.clone(EQUIPS_SCHEMA);
         let ItemModel = this.getModel("Item");
         for (let i in equips) {
             equips[i] = new ItemModel({});
         }
-        equips["chest"] = new ItemModel({
+        equips.chest = new ItemModel({
             name: "Chest of Elad",
             icon: "chest_of_elad",
             type: "chest"
         });
+        equips.shoes = new ItemModel(EQUIPS.SHOE.LTHR);
 
         this.listenForFieldAddition("Character", "equips", equips);
         return Promise.resolve();
