@@ -26,7 +26,7 @@ export default class MasterModel {
         try {
             this.model = this.mongoose.model(name);
         } catch (e) {
-            this.model = this.mongoose.model(name, this.mongoose.Schema(this.schema, {_id: this.hasId}));
+            this.model = this.mongoose.model(name, this.mongoose.Schema(this.schema, {_id: this.hasId, minimize: false}));
         }
     }
 
