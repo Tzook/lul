@@ -10,9 +10,18 @@ interface Doc {
 interface Item extends Doc {
     name: string;
     icon: string;
+    type: string;
 }
 
-interface ItemsArray extends Array<Item|{}> {
+interface Equips {
+    head:   Item;
+    chest:  Item;
+    legs:   Item;
+    gloves: Item;
+    shoes:  Item;
+}
+
+interface ItemsArray extends Array<Item> {
     set: (index: number, obj: Item|{}) => {};
 }
 
@@ -22,7 +31,8 @@ interface Char extends Doc {
         x: number;
         y: number;
     },
-    items: ItemsArray
+    items: ItemsArray,
+    equips: Equips
 }
 
 interface User extends Doc {

@@ -1,11 +1,13 @@
 'use strict';
 import SocketioRouterBase from '../socketio/socketio.router.base';
+import ItemsMiddleware from "./items.middleware";
 import * as _ from 'underscore';
 let config = require('../../../server/lib/items/items.config.json');
 let SERVER_GETS = config.SERVER_GETS;
 
 export default class ItemsRouter extends SocketioRouterBase {
 	private itemsMap: Map<string, {x, y, item_id, item: Item}>;
+	protected middleware: ItemsMiddleware;
 
 	constructor() {
 		super();
@@ -13,14 +15,10 @@ export default class ItemsRouter extends SocketioRouterBase {
 	}
 
 	[SERVER_GETS.ITEM_PICK](data, socket: GameSocket) {
-		for (var slot = 0; slot < config.MAX_ITEMS; slot++) {
-			if (!socket.character.items[slot]['name']) {
-				break;
-			}
-		}
+		let slot = this.middleware.getFirstAvailableSlot(socket);
 
 		let itemAndRoomId = socket.character.room + "-" + data.item_id;
-		if (slot < config.MAX_ITEMS && this.itemsMap.has(itemAndRoomId)) { // found an empty spot
+		if (slot >= 0 && this.itemsMap.has(itemAndRoomId)) { // found an empty spot
 			socket.character.items.set(slot, this.itemsMap.get(itemAndRoomId).item);
 			console.log('picking item', data.item_id);
 			this.itemsMap.delete(itemAndRoomId);
@@ -29,11 +27,13 @@ export default class ItemsRouter extends SocketioRouterBase {
 				item_id: data.item_id,
 				slot: slot
 			});
+		} else {
+			console.log("No available slots to pick item", itemAndRoomId);
 		}
 	}
 
 	[SERVER_GETS.ITEM_DROP](data, socket: GameSocket) {
-		if (socket.character.items[data.slot]['name']) {
+		if (this.middleware.hasItem(socket, data.slot)) {
 			let item = <Item>socket.character.items[data.slot];
 			let itemId = _.uniqueId();
 			let room = socket.character.room;
@@ -60,12 +60,14 @@ export default class ItemsRouter extends SocketioRouterBase {
 					});
 				}
 			}, config.ITEM_DROP_LIFE);
+		} else {
+			console.log("trying to drop an item but has no item!", data.slot)
 		}
 	}
 
 	[SERVER_GETS.ITEM_MOVE](data, socket: GameSocket) {
-		if (data.from >= 0 && data.from < config.MAX_ITEMS
-		 	&& data.to >= 0 && data.to < config.MAX_ITEMS) {
+		if (this.middleware.isValidItemSlot(data.from)
+		 	&& this.middleware.isValidItemSlot(data.to)) {
 			let itemFrom = socket.character.items[data.from];
 			let itemTo = socket.character.items[data.to];
 
@@ -77,6 +79,8 @@ export default class ItemsRouter extends SocketioRouterBase {
 				from: data.from,
 				to: data.to
 			});
+		 } else {
+			 console.log("detected invalid slots!", data.from, data.to);
 		 }
 	}
 
