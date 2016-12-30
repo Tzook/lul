@@ -11,6 +11,16 @@
 				  "services"],
 	"mocks":	 ["services",
 				  "data"],
-	"folders": 	 ["master", "user", "socketio", "rooms", "character", "movement", "chat", "items"],
+	"folders": [
+		"master",
+		"user",
+		"socketio",
+		"rooms",
+		"character",
+		"movement",
+		"chat",
+		"items",
+		"equips"
+	],
 	"skip": 	 { "master": 1 }
 }
