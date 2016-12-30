@@ -5,6 +5,7 @@ let config = require('../../../server/lib/items/items.config.json');
 export const ITEM_SCHEMA = {
     name: String,
     icon: String,
+    type: String,
 };
 
 export default class ItemsModel extends MasterModel {
@@ -28,7 +29,7 @@ export default class ItemsModel extends MasterModel {
 			})
 		];
         for (var i = 1; i < config.MAX_ITEMS; i++) {
-            items[i] = {};
+            items[i] = new this.model({});
         }
         this.listenForFieldAddition("Character", "items", items);
         return Promise.resolve();

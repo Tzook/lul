@@ -261,6 +261,10 @@
 				socket.on("item_disappear", d => setResult({msg: "item_disappear", d}))
 				socket.on("actor_move_item", d => setResult({msg: "actor_move_item", d}))
 
+				socket.on("actor_equip_item", d => setResult({msg: "actor_equip_item", d}))
+				socket.on("actor_unequip_item", d => setResult({msg: "actor_unequip_item", d}))
+				socket.on("actor_delete_equip", d => setResult({msg: "actor_delete_equip", d}))
+
 				socket.on("movement", d => console.log({msg: "movement", d}))
 
 				socket.on("message", d => setResult({msg: "message", d}))
