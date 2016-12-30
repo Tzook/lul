@@ -20,6 +20,7 @@ export default class EquipsRouter extends SocketioRouterBase {
 			if (!this.middleware.canWearEquip(item, to)) {
 				console.log("cannot equip since it's not an equip", from, to);
 			} else {
+				console.log("equipping item", from, to);
 				this.middleware.swapEquipAndItem(socket, from, to);
 
 				socket.emit(this.CLIENT_GETS.EQUIP_ITEM, {
@@ -46,6 +47,8 @@ export default class EquipsRouter extends SocketioRouterBase {
 				&& !this.middleware.canWearEquip(item, from)) {
 				console.log("cannot unequip since there's already an item", from, to);
 			} else {
+				console.log("unequipping item", from, to);
+
 				this.middleware.swapEquipAndItem(socket, to, from);
 
 				socket.emit(this.CLIENT_GETS.UNEQUIP_ITEM, {
