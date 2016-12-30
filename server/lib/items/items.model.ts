@@ -2,7 +2,7 @@
 import MasterModel from "../master/master.model";
 let config = require('../../../server/lib/items/items.config.json');
 
-export const ITEM_SCHEMA = {
+export let ITEM_SCHEMA = {
     name: String,
     icon: String,
     type: String,
