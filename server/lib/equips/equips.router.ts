@@ -8,6 +8,12 @@ let SERVER_GETS = config.SERVER_GETS;
 
 export default class EquipsRouter extends SocketioRouterBase {
 	protected middleware: EquipsMiddleware;
+	protected mongoose;
+
+	init(files, app) {
+		super.init(files, app);
+		this.mongoose = files.model.mongoose;
+	}
 
 	[SERVER_GETS.EQUIP_ITEM](data, socket: GameSocket) {
 		let from: number = data.from;
@@ -89,11 +95,26 @@ export default class EquipsRouter extends SocketioRouterBase {
 				console.log("not equipping item, it is not a valid equip", item, itemSlot)
 			}
 		} else {
-			console.log("got invalid data slot", itemSlot);
+			console.log("got invalid data slot for use item", itemSlot);
 		}
 	}
 
 	[SERVER_GETS.DROP_EQUIP](data, socket: GameSocket) {
-		// TODO
+		let slot = data.slot;
+		if (this.middleware.hasEquip(socket, slot)) {
+			let equip = socket.character.equips[slot];
+			console.log("dropping equip", equip);
+
+			this.emitter.emit(itemsConfig.SERVER_GETS.ITEM_DROP, { slot }, socket, equip);
+
+			let ItemsModels = this.mongoose.model("Item");
+			socket.character.equips[slot] = new ItemsModels({});
+			socket.emit(this.CLIENT_GETS.DELETE_EQUIP, {
+				id: socket.character._id,
+				slot
+			});
+		} else {
+			console.log("got invalid data slot for drop equip", slot);
+		}
 	}
 };

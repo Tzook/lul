@@ -32,9 +32,10 @@ export default class ItemsRouter extends SocketioRouterBase {
 		}
 	}
 
-	[SERVER_GETS.ITEM_DROP](data, socket: GameSocket) {
-		if (this.middleware.hasItem(socket, data.slot)) {
-			let item = <Item>socket.character.items[data.slot];
+	[SERVER_GETS.ITEM_DROP](data, socket: GameSocket, item?: Item) {
+		let slot = data.slot;
+		if (item || this.middleware.hasItem(socket, slot)) {
+			item = item || socket.character.items[slot];
 			let itemId = _.uniqueId();
 			let room = socket.character.room;
 			let itemAndRoomId = room + "-" + itemId;
@@ -46,9 +47,11 @@ export default class ItemsRouter extends SocketioRouterBase {
 			};
 			this.itemsMap.set(itemAndRoomId, itemData);
 
-			console.log('dropping item', itemData, 'in slot', data.slot);
-			socket.character.items.set(data.slot, {});
-			socket.emit(this.CLIENT_GETS.ITEM_DELETE, { slot: data.slot });
+			console.log('dropping item', itemData, 'in slot', slot);
+			if (slot >= 0) {
+				socket.character.items.set(slot, {});
+				socket.emit(this.CLIENT_GETS.ITEM_DELETE, { slot });
+			}
 			this.io.to(room).emit(this.CLIENT_GETS.ITEM_DROP, itemData);
 
 			setTimeout(() => {
@@ -61,7 +64,7 @@ export default class ItemsRouter extends SocketioRouterBase {
 				}
 			}, config.ITEM_DROP_LIFE);
 		} else {
-			console.log("trying to drop an item but has no item!", data.slot)
+			console.log("trying to drop an item but has no item!", slot)
 		}
 	}
 

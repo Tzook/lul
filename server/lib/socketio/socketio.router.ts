@@ -1,5 +1,6 @@
 'use strict';
 import SocketioRouterBase from './socketio.router.base';
+import Emitter = require('events');
 require('./socketio.fixer');
 let passportSocketIo = require('passport.socketio');
 let SERVER_GETS = require('../../../server/lib/socketio/socketio.config.json').SERVER_GETS;
@@ -75,10 +76,15 @@ export default class SocketioRouter extends SocketioRouterBase {
 			socket.character = socket.client.request.character;
 			this.map.set(socket.character._id.toString(), socket);
 			this.map.set(socket.id, socket);
+			let emitter = new Emitter.EventEmitter();
 			for (let j in this.routers) {
 				let router = this.routers[j];
+				router.eventEmitter = emitter;
 				for (let i in router.SERVER_GETS) {
-					socket.on(router.SERVER_GETS[i], router[router.SERVER_GETS[i]].bind(router));
+					let serverGets = router.SERVER_GETS[i];
+					let routerFn = router[serverGets].bind(router);
+					socket.on(serverGets, routerFn);
+					emitter.on(serverGets, routerFn);
 				}
 			}
 			console.log('connected');
