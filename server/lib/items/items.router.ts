@@ -46,7 +46,7 @@ export default class ItemsRouter extends SocketioRouterBase {
 			};
 			this.itemsMap.set(itemAndRoomId, itemData);
 
-			console.log('dropping item', itemData);
+			console.log('dropping item', itemData, 'in slot', data.slot);
 			socket.character.items.set(data.slot, {});
 			socket.emit(this.CLIENT_GETS.ITEM_DELETE, { slot: data.slot });
 			this.io.to(room).emit(this.CLIENT_GETS.ITEM_DROP, itemData);
