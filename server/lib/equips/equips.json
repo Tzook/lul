@@ -5,7 +5,7 @@
             "icon": "testingclothing_leatherVest_male_torso",
             "name": "Leather Vest",
             "sprites": {
-                "torso": "testingclothing_leatherVest_male_torso"
+                "chest": "testingclothing_leatherVest_male_torso"
             }
         },
         "ADV": {
