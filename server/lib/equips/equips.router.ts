@@ -29,7 +29,7 @@ export default class EquipsRouter extends SocketioRouterBase {
 				console.log("equipping item", from, to);
 				this.middleware.swapEquipAndItem(socket, from, to);
 
-				socket.emit(this.CLIENT_GETS.EQUIP_ITEM, {
+				this.io.to(socket.character.room).emit(this.CLIENT_GETS.EQUIP_ITEM, {
 					id: socket.character._id,
 					from,
 					to,
@@ -57,7 +57,7 @@ export default class EquipsRouter extends SocketioRouterBase {
 
 				this.middleware.swapEquipAndItem(socket, to, from);
 
-				socket.emit(this.CLIENT_GETS.UNEQUIP_ITEM, {
+				this.io.to(socket.character.room).emit(this.CLIENT_GETS.UNEQUIP_ITEM, {
 					id: socket.character._id,
 					from,
 					to,
@@ -109,7 +109,7 @@ export default class EquipsRouter extends SocketioRouterBase {
 
 			let ItemsModels = this.mongoose.model("Item");
 			socket.character.equips[slot] = new ItemsModels({});
-			socket.emit(this.CLIENT_GETS.DELETE_EQUIP, {
+			this.io.to(socket.character.room).emit(this.CLIENT_GETS.DELETE_EQUIP, {
 				id: socket.character._id,
 				slot
 			});
