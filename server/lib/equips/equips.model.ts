@@ -34,12 +34,6 @@ export default class EquipsModel extends MasterModel {
         for (let i in equips) {
             equips[i] = new ItemModel({});
         }
-        equips.chest = new ItemModel({
-            name: "Chest of Elad",
-            icon: "chest_of_elad",
-            type: "chest"
-        });
-        equips.shoes = new ItemModel(EQUIPS.SHOE.LTHR);
 
         this.listenForFieldAddition("Character", "equips", equips);
         return Promise.resolve();
