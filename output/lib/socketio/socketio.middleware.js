@@ -1,8 +1,8 @@
 'use strict';
-const master_middleware_1 = require('../master/master.middleware');
+const master_middleware_1 = require("../master/master.middleware");
 class SocketioMiddleware extends master_middleware_1.default {
 }
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.default = SocketioMiddleware;
 ;
-//# sourceMappingURL=data:application/json;base64,eyJ2ZXJzaW9uIjozLCJmaWxlIjoic29ja2V0aW8ubWlkZGxld2FyZS5qcyIsInNvdXJjZVJvb3QiOiIiLCJzb3VyY2VzIjpbIi4uLy4uLy4uL3NlcnZlci9saWIvc29ja2V0aW8vc29ja2V0aW8ubWlkZGxld2FyZS50cyJdLCJuYW1lcyI6W10sIm1hcHBpbmdzIjoiQUFBQSxZQUFZLENBQUM7QUFDYixvQ0FBNkIsNkJBQTZCLENBQUMsQ0FBQTtBQUUzRCxpQ0FBZ0QsMkJBQWdCO0FBRWhFLENBQUM7QUFGRDtvQ0FFQyxDQUFBO0FBQUEsQ0FBQyJ9
+//# sourceMappingURL=data:application/json;base64,eyJ2ZXJzaW9uIjozLCJmaWxlIjoic29ja2V0aW8ubWlkZGxld2FyZS5qcyIsInNvdXJjZVJvb3QiOiIiLCJzb3VyY2VzIjpbIi4uLy4uLy4uL3NlcnZlci9saWIvc29ja2V0aW8vc29ja2V0aW8ubWlkZGxld2FyZS50cyJdLCJuYW1lcyI6W10sIm1hcHBpbmdzIjoiQUFBQSxZQUFZLENBQUM7QUFDYixtRUFBMkQ7QUFFM0Qsd0JBQXdDLFNBQVEsMkJBQWdCO0NBRS9EOztBQUZELHFDQUVDO0FBQUEsQ0FBQyJ9
