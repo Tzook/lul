@@ -2,10 +2,14 @@
 	"ROUTES": {
 	},
 	"SERVER_GETS": {
-		"MESSAGE": "message"
+		"SHOUT": "shouted",
+		"CHAT": "chatted",
+		"WHISPER": "whispered"
 	},
 	"CLIENT_GETS": {
-		"MESSAGE": "message"
+		"SHOUT": "shout",
+		"CHAT": "chat",
+		"WHISPER": "whisper"
 	},
 	"LOGS": {
 	}

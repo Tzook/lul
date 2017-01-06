@@ -267,7 +267,7 @@
 
 				socket.on("movement", d => console.log({msg: "movement", d}))
 
-				socket.on("message", d => setResult({msg: "message", d}))
+				socket.on("chat", d => setResult({msg: "chat", d}))
 
 				socket.on("actor_join_room", d => setResult({msg: "actor_join_room", d}))
 				socket.on("actor_move_room", d => setResult({msg: "actor_move_room", d}))
@@ -282,7 +282,7 @@
 			}
 
 			function emit() {
-				socket.emit('message', {d: $emit.val()});
+				socket.emit("chatted", {msg: $emit.val()});
 				setResult({msg: "You: " + $emit.val()});
 				$emit.val('');
 			}
