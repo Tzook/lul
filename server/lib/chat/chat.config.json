@@ -9,7 +9,8 @@
 	"CLIENT_GETS": {
 		"SHOUT": "shout",
 		"CHAT": "chat",
-		"WHISPER": "whisper"
+		"WHISPER": "whisper",
+		"WHISPER_FAIL": "whisper_fail"
 	},
 	"LOGS": {
 	}

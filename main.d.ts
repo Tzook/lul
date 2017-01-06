@@ -27,6 +27,7 @@ interface ItemsArray extends Array<Item> {
 
 interface Char extends Doc {
     room: string;
+    name: string;
     position: {
         x: number;
         y: number;
