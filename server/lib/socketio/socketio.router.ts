@@ -75,6 +75,7 @@ export default class SocketioRouter extends SocketioRouterBase {
 			socket.user = socket.client.request.user;
 			socket.character = socket.client.request.character;
 			this.map.set(socket.character._id.toString(), socket);
+			this.map.set(socket.character.name, socket);
 			this.map.set(socket.id, socket);
 			let emitter = new Emitter.EventEmitter();
 			for (let j in this.routers) {
@@ -100,6 +101,7 @@ export default class SocketioRouter extends SocketioRouterBase {
 			}
 		});
 		this.map.delete(socket.character._id.toString());
+		this.map.delete(socket.character.name);
 		this.map.delete(socket.id);
 	}
 };
