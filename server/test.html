@@ -267,6 +267,8 @@
 
 				socket.on("movement", d => console.log({msg: "movement", d}))
 
+				socket.on("actor_emote", d => setResult({msg: "actor_emote", d}))
+
 				socket.on("chat", d => setResult({msg: "chat", d}))
 				socket.on("whisper", d => setResult({msg: "whisper", d}))
 				socket.on("whisper_fail", d => setResult({msg: "whisper_fail", d}))

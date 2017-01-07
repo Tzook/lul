@@ -20,7 +20,8 @@
 		"movement",
 		"chat",
 		"items",
-		"equips"
+		"equips",
+		"emote"
 	],
 	"skip": 	 { "master": 1 }
 }
