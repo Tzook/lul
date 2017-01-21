@@ -66,5 +66,15 @@
                 "foot": "testingclothing_strapShoes_male_foot"
             }
         }
+    },
+    "WEP": {
+        "ELD": {
+            "type": "weapon",
+            "icon": "sword_of_elad",
+            "name": "Sword of Elad",
+            "sprites": {
+                "weapon": "sword_of_elad"
+            }
+        }
     }
 }
