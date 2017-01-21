@@ -10,6 +10,7 @@ export const EQUIPS_SCHEMA = {
     legs: ITEM_SCHEMA,
     gloves: ITEM_SCHEMA,
     shoes: ITEM_SCHEMA,
+    weapon: ITEM_SCHEMA,
 };
 
 export default class EquipsModel extends MasterModel {

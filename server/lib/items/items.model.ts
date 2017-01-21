@@ -24,10 +24,7 @@ export default class ItemsModel extends MasterModel {
         this.setModel("Item");
         this.addToSchema("Character", {items: [this.getModel().schema]});
         let items = [
-			new this.model({
-				name: "Sword of Elad",
-				icon: "sword_of_elad"
-			}),
+			new this.model(EQUIPS.WEP.ELD),
             new this.model(EQUIPS.CHEST.LTHR),
             new this.model(EQUIPS.CHEST.ADV),
             new this.model(EQUIPS.GLOVE.BLK),
@@ -36,7 +33,7 @@ export default class ItemsModel extends MasterModel {
             new this.model(EQUIPS.SHOE.LTHR),
             new this.model(EQUIPS.SHOE.STRP),
 		];
-        for (var i = 8; i < config.MAX_ITEMS; i++) {
+        for (var i = items.length; i < config.MAX_ITEMS; i++) {
             items[i] = new this.model({});
         }
         this.listenForFieldAddition("Character", "items", items);
