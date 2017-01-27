@@ -1,7 +1,11 @@
 'use strict';
 import MasterRouter from '../master/master.router';
+import CharacterMiddleware from './character.middleware';
+import CharacterController from './character.controller';
 
 export default class CharacterRouter extends MasterRouter {
+	protected middleware: CharacterMiddleware;
+	protected controller: CharacterController;
 
 	initRoutes(app) {
 		app.post(this.ROUTES.CHARACTER_CREATE,

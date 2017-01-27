@@ -39,7 +39,7 @@ export default class CharacterServices extends MasterServices {
 				hair: data.hair
 			}
 		});
-		this.model.addFields(character);
+		this.model.addFields(character, data);
 		return Promise.resolve(character);
 	}
 	checkIsNameUnique(name, error) {

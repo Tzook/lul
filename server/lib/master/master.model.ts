@@ -60,11 +60,11 @@ export default class MasterModel {
         emitter.on(model + "Field", this.addFieldToModel.bind(this, field, data));
     }
 
-    addFields(obj) {
-        emitter.emit(this.model.modelName + "Field", obj);
+    addFields(obj, reqBody) {
+        emitter.emit(this.model.modelName + "Field", obj, reqBody);
     }
 
-    private addFieldToModel(field, data, obj) {
+    protected addFieldToModel(field, data, obj, reqBody) {
         obj[field] = data;
     }
 };
