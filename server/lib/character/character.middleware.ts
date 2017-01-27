@@ -1,7 +1,9 @@
 'use strict';
 import MasterMiddleware from '../master/master.middleware';
+import CharacterServices from './character.services';
 
 export default class CharacterMiddleware extends MasterMiddleware {
+	protected services: CharacterServices;
 
 	validateCreateCharacterParams(req, res, next) {
 		return this.validateParams(req, res, next, [
