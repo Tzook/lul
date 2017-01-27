@@ -21,7 +21,8 @@
 		"chat",
 		"items",
 		"equips",
-		"emote"
+		"emote",
+		"stats"
 	],
 	"skip": 	 { "master": 1 }
 }

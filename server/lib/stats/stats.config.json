@@ -1,0 +1,13 @@
+{
+	"ROUTES": {
+	},
+	"SERVER_GETS": {
+	},
+	"CLIENT_GETS": {
+	},
+	"LOGS": {
+	},
+	"BEGIN_STATS_SUM": 7,
+	"MAG_TO_MP_RATIO": 6,
+	"STR_TO_HP_RATIO": 5
+}
