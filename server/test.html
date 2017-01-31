@@ -276,6 +276,9 @@
 				socket.on("actor_join_room", d => setResult({msg: "actor_join_room", d}))
 				socket.on("actor_move_room", d => setResult({msg: "actor_move_room", d}))
 				socket.on("actor_leave_room", d => setResult({msg: "actor_leave_room", d}))
+
+				socket.on("actor_gain_exp", d => setResult({msg: "actor_gain_exp", d}))
+				socket.on("actor_lvl_up", d => setResult({msg: "actor_lvl_up", d}))
 			}
 
 			function move(dX, dY) {

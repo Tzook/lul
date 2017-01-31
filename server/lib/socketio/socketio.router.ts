@@ -77,20 +77,31 @@ export default class SocketioRouter extends SocketioRouterBase {
 			this.map.set(socket.character._id.toString(), socket);
 			this.map.set(socket.character.name, socket);
 			this.map.set(socket.id, socket);
+
 			let emitter = new Emitter.EventEmitter();
 			for (let j in this.routers) {
 				let router = this.routers[j];
 				router.eventEmitter = emitter;
-				for (let i in router.SERVER_GETS) {
-					let serverGets = router.SERVER_GETS[i];
-					let routerFn = router[serverGets].bind(router);
-					socket.on(serverGets, routerFn);
-					emitter.on(serverGets, routerFn);
-				}
+				this.listenToEvents(router, router.SERVER_GETS, [socket, emitter]);
+				this.listenToEvents(router, router.SERVER_INNER, [emitter]);
 			}
+
 			console.log('connected');
 			socket.map = this.map;
+
+			// TODO remove this
+			sendExpToClient(this.emitter, socket);
 		});
+	}
+
+	private listenToEvents(router: SocketioRouterBase, events: string[], listeners: {on: (string, Function) => {}}[]) {
+		for (let i in events) {
+			let event = events[i];
+			let routerFn = router[event].bind(router);
+			for (let j in listeners) {
+				listeners[j].on(event, routerFn);
+			}
+		}
 	}
 
 	[SERVER_GETS.DISCONNECT](data, socket: GameSocket) {
@@ -105,3 +116,12 @@ export default class SocketioRouter extends SocketioRouterBase {
 		this.map.delete(socket.id);
 	}
 };
+
+function sendExpToClient(emitter, socket: GameSocket) {
+	if (socket.connected) {
+		emitter.emit("gain_exp", { exp: 30 }, socket);
+		setTimeout(function() {
+			sendExpToClient(emitter, socket);
+		}, 5000);
+	}
+}

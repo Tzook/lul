@@ -7,12 +7,14 @@ export default class SocketioRouterBase extends MasterRouter {
 	protected emitter: Emitter.EventEmitter;
 	public CLIENT_GETS;
 	public SERVER_GETS;
+	public SERVER_INNER;
 
 	init(files, app) {
 		super.init(files, app);
 		this.io = app.socketio;
 		this.CLIENT_GETS = files.config.CLIENT_GETS;
-		this.SERVER_GETS = files.config.SERVER_GETS;
+		this.SERVER_GETS = files.config.SERVER_GETS || [];
+		this.SERVER_INNER = files.config.SERVER_INNER || [];
 	}
 
 	set eventEmitter(emitter) {
