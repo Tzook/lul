@@ -21,6 +21,22 @@ interface Equips {
     shoes:  Item;
 }
 
+interface Stats {
+    str: number,
+    mag: number,
+    dex: number,
+    lvl: number,
+    exp: number,
+    hp: {
+        now: number,
+        total: number,
+    },
+    mp: {
+        now: number,
+        total: number,
+    },
+}
+
 interface ItemsArray extends Array<Item> {
     set: (index: number, obj: Item|{}) => {};
 }
@@ -33,7 +49,8 @@ interface Char extends Doc {
         y: number;
     },
     items: ItemsArray,
-    equips: Equips
+    equips: Equips,
+    stats: Stats,
 }
 
 interface User extends Doc {

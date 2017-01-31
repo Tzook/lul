@@ -1,9 +1,14 @@
 {
 	"ROUTES": {
 	},
+	"SERVER_INNER": {
+		"GAIN_EXP": "gain_exp"
+	},
 	"SERVER_GETS": {
 	},
 	"CLIENT_GETS": {
+		"GAIN_EXP": "actor_gain_exp",
+		"LEVEL_UP": "actor_lvl_up"
 	},
 	"LOGS": {
 	},
