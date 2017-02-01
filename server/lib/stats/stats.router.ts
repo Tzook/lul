@@ -1,6 +1,7 @@
 'use strict';
 import SocketioRouterBase from '../socketio/socketio.router.base';
 import StatsController from './stats.controller';
+import * as _ from 'underscore';
 let config = require('../../../server/lib/stats/stats.config.json');
 
 export default class StatsRouter extends SocketioRouterBase {
@@ -26,4 +27,20 @@ export default class StatsRouter extends SocketioRouterBase {
             });
         }
     }
+
+	[config.SERVER_GETS.TAKE_DMG](data, socket: GameSocket) {
+		let from = data.from;
+        if (from && config.DMG[from]) {
+            let dmg = _.random(config.DMG[from] - config.DMG_RANDOM_RANGE, config.DMG[from] + config.DMG_RANDOM_RANGE);
+            socket.character.stats.hp.now = Math.max(0, socket.character.stats.hp.now - dmg);
+            this.io.to(socket.character.room).emit(this.CLIENT_GETS.TAKE_DMG, {
+                id: socket.character._id,
+                dmg,
+                hp: socket.character.stats.hp.now
+            });
+            console.log("Taking damage", socket.character.name, dmg, socket.character.stats.hp.now);
+        } else {
+            console.log("Tried to take dmg but invalid params", from);
+        }
+	}
 };
