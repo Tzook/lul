@@ -20,5 +20,19 @@ export default class StatsServices extends MasterServices {
         // see http://tibia.wikia.com/wiki/Experience_Formula
         return (50 / 3) * (a * a * a - 6 * a * a + 17 * a - 12);
     }
+
+    public lvlUp(stats: Stats) {
+        stats.lvl++;
+
+        let str, dex, mag;
+        str = dex = mag = config.LEVEL_UP_STAT_BONUS;
+        stats.str += str;
+        stats.dex += dex;
+        stats.mag += mag;
+        stats.hp.now = stats.hp.total = stats.hp.total + this.strToHp(str);
+        stats.mp.now = stats.mp.total = stats.mp.total + this.magToMp(mag);
+
+        console.log("Level up", stats);
+    }
 };
 StatsServices.prototype.getExp = <any>_.memoize(StatsServices.prototype.getExp);
