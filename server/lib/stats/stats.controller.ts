@@ -12,8 +12,7 @@ export default class StatsController extends MasterController {
         let expNeededToLevel = this.services.getExp(character.stats.lvl);
         if (character.stats.exp >= expNeededToLevel) {
             character.stats.exp -= expNeededToLevel;
-            character.stats.lvl++;
-            console.log("Level up", character.stats.lvl);
+            this.services.lvlUp(character.stats);
 
             // if the char passed the exp, put his exp to 1 below the needed
             expNeededToLevel = this.services.getExp(character.stats.lvl);
