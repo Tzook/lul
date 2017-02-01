@@ -5,15 +5,22 @@
 		"GAIN_EXP": "gain_exp"
 	},
 	"SERVER_GETS": {
+		"TAKE_DMG": "took_dmg"
 	},
 	"CLIENT_GETS": {
 		"GAIN_EXP": "actor_gain_exp",
-		"LEVEL_UP": "actor_lvl_up"
+		"LEVEL_UP": "actor_lvl_up",
+		"TAKE_DMG": "actor_take_dmg"
 	},
 	"LOGS": {
 	},
 	"BEGIN_STATS_SUM": 7,
 	"MAG_TO_MP_RATIO": 6,
 	"STR_TO_HP_RATIO": 5,
-	"LEVEL_UP_STAT_BONUS": 1
+	"LEVEL_UP_STAT_BONUS": 1,
+	"DMG_RANDOM_RANGE": 2,
+	"DMG": {
+		"spike": 10,
+		"fall": 15
+	}
 }
