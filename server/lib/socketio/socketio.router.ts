@@ -118,10 +118,10 @@ export default class SocketioRouter extends SocketioRouterBase {
 };
 
 function sendExpToClient(emitter, socket: GameSocket) {
-	if (socket.connected) {
-		emitter.emit("gain_exp", { exp: 30 }, socket);
-		setTimeout(function() {
+	setTimeout(function() {
+		if (socket.connected) {
+			emitter.emit("gain_exp", { exp: 30 }, socket);
 			sendExpToClient(emitter, socket);
-		}, 5000);
-	}
+		}
+	}, 5000);
 }
