@@ -17,6 +17,10 @@ export default class SocketioRouterBase extends MasterRouter {
 		this.SERVER_INNER = files.config.SERVER_INNER || [];
 	}
 
+	public onConnected(socket: GameSocket) {
+
+	}
+
 	set eventEmitter(emitter) {
 		this.emitter = emitter;
 	}

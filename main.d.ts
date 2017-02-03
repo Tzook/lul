@@ -30,10 +30,12 @@ interface Stats {
     hp: {
         now: number,
         total: number,
+        regen: Number,
     },
     mp: {
         now: number,
         total: number,
+        regen: Number,
     },
 }
 

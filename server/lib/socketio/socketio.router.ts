@@ -89,8 +89,10 @@ export default class SocketioRouter extends SocketioRouterBase {
 			console.log('connected');
 			socket.map = this.map;
 
-			// TODO remove this
-			sendExpToClient(this.emitter, socket);
+			for (let j in this.routers) {
+				let router = this.routers[j];
+				router.onConnected(socket);
+			}
 		});
 	}
 
@@ -116,12 +118,3 @@ export default class SocketioRouter extends SocketioRouterBase {
 		this.map.delete(socket.id);
 	}
 };
-
-function sendExpToClient(emitter, socket: GameSocket) {
-	setTimeout(function() {
-		if (socket.connected) {
-			emitter.emit("gain_exp", { exp: 30 }, socket);
-			sendExpToClient(emitter, socket);
-		}
-	}, 5000);
-}
