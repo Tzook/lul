@@ -22,4 +22,14 @@ export default class StatsController extends MasterController {
             }
         }
     }
+
+    public addHp(character: Char, hp: number) {
+        character.stats.hp.now = Math.min(character.stats.hp.now + hp, character.stats.hp.total);
+        console.log("Adding hp to char", hp, character.stats.hp.now, character.name);
+    }
+
+    public addMp(character: Char, mp: number) {
+        character.stats.mp.now = Math.min(character.stats.mp.now + mp, character.stats.mp.total);
+        console.log("Adding mp to char", mp, character.stats.mp.now, character.name);
+    }
 };

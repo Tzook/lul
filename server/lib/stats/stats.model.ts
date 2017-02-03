@@ -7,6 +7,7 @@ let config = require('../../../server/lib/stats/stats.config.json');
 const BAR_SCHEMA = {
     now: Number,
     total: Number,
+    regen: Number,
 }
 
 const STATS_SCHEMA = {
@@ -61,6 +62,8 @@ export default class StatsModel extends MasterModel {
         }
         data.hp.now = data.hp.total = this.services.strToHp(data.str);
         data.mp.now = data.mp.total = this.services.magToMp(data.mag);
+        data.hp.regen = config.BEGIN_HP_REGEN;
+        data.mp.regen = config.BEGIN_MP_REGEN
 
         obj[field] = data;
         console.log("adding stats for character", data);
