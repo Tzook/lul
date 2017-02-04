@@ -22,7 +22,9 @@ export default class RoomsRouter extends SocketioRouterBase {
 	[SERVER_GETS.MOVE_ROOM](data, socket: GameSocket) {
 		console.log('moving user room');
 		if (this.middleware.canEnterRoom(data.room, socket.character.room)) {
-			socket.broadcast.to(socket.character.room).emit(this.CLIENT_GETS.LEAVE_ROOM, { character: socket.character});
+			socket.broadcast.to(socket.character.room).emit(this.CLIENT_GETS.LEAVE_ROOM, {
+				 id: socket.character._id
+			});
 			let oldRoom = socket.character.room;
 			socket.leave(oldRoom);
 			socket.character.room = data.room;
@@ -31,7 +33,9 @@ export default class RoomsRouter extends SocketioRouterBase {
 	}
 
 	[SERVER_GETS.DISCONNECT](data, socket: GameSocket) {
-		console.log('disconnect');
-		socket.broadcast.to(socket.character.room).emit(this.CLIENT_GETS.LEAVE_ROOM, { character: socket.character});
+		console.log('disconnect from room');
+		socket.broadcast.to(socket.character.room).emit(this.CLIENT_GETS.LEAVE_ROOM, {
+			 id: socket.character._id
+		});
 	}
 };
