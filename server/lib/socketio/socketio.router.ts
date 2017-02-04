@@ -43,9 +43,7 @@ export default class SocketioRouter extends SocketioRouterBase {
 	onAuthorizeSuccess(req, next: Function) {
 		this.logger.info(req, 'logged user successfully');
 		// TODO move to service
-		for (let i in req.user.characters) {
-			console.log(req.user.characters[i]);
-			console.log(req.user.characters[i]._id);
+		for (let i = 0; i < req.user.characters.length; i++) {
 			if (req.user.characters[i]._id.equals(req._query.id)) {
 				req.character = req.user.characters[i];
 				break;
