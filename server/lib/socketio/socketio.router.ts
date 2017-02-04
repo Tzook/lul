@@ -44,11 +44,14 @@ export default class SocketioRouter extends SocketioRouterBase {
 		this.logger.info(req, 'logged user successfully');
 		// TODO move to service
 		for (let i in req.user.characters) {
+			console.log(req.user.characters[i]);
+			console.log(req.user.characters[i]._id);
 			if (req.user.characters[i]._id.equals(req._query.id)) {
 				req.character = req.user.characters[i];
 				break;
 			}
 		}
+		console.log("broken");
 		if (!req.character) {
 			this.logger.error(req, 'no character param OR no such character in user, param was' + req._query.id);
 			next(new Error("no character param OR no such character in user. Instead, got: " + req._query.id));
