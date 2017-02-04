@@ -1,12 +1,79 @@
 'use strict';
 const master_controller_1 = require("../master/master.controller");
+const _ = require("underscore");
+let config = require('../../../server/lib/rooms/rooms.config.json');
 class RoomsController extends master_controller_1.default {
-    joinRoom(req, res) {
+    constructor() {
+        super();
+        this.roomKeys = new Map();
+        this.roomBitches = new Map();
     }
-    leaveRoom(req, res) {
+    setIo(io) {
+        this.io = io;
+    }
+    socketJoinRoom(socket) {
+        let room = socket.character.room;
+        socket.join(room);
+        let roomObject = socket.adapter.rooms[room];
+        if (roomObject.length === 1) {
+            this.setNewBitch(socket, room);
+        }
+        if (roomObject.length === 2) {
+            this.askForBitch(room);
+        }
+    }
+    socketLeaveRoom(socket, room) {
+        socket.bitch = false;
+        this.roomBitches.delete(room);
+        console.log("stopping bitch: %s, room: %s", socket.character.name, room);
+        let roomObject = socket.adapter.rooms[room];
+        if (roomObject && roomObject.length) {
+            let socketId = Object.keys(roomObject.sockets)[0];
+            let newBitch = socket.map.get(socketId);
+            this.setNewBitch(newBitch, room);
+        }
+    }
+    askForBitch(room) {
+        setTimeout(() => {
+            if (this.io.sockets.adapter.rooms[room].length > 1) {
+                let key = _.uniqueId();
+                this.roomKeys.set(room, key);
+                console.log("asking bitch please. key %s, room:", key, room);
+                this.io.to(room).emit(config.CLIENT_GETS.BITCH_PLEASE, {
+                    key
+                });
+                this.askForBitch(room);
+            }
+        }, config.BITCH_INTERVAL);
+    }
+    newBitchRequest(socket, key) {
+        let room = socket.character.room;
+        let roomKey = this.roomKeys.get(room);
+        if (key == roomKey) {
+            this.roomKeys.delete(room);
+            let oldBitch = this.roomBitches.get(room);
+            if (oldBitch === socket) {
+                console.log("Same bitch in the room.");
+            }
+            else {
+                oldBitch.bitch = false;
+                oldBitch.emit(config.CLIENT_GETS.BITCH_CHOOSE, {
+                    is_bitch: false
+                });
+                this.setNewBitch(socket, room);
+            }
+        }
+    }
+    setNewBitch(socket, room) {
+        console.log("new bitch: %s, room: %s", socket.character.name, room);
+        socket.bitch = true;
+        this.roomBitches.set(room, socket);
+        socket.emit(config.CLIENT_GETS.BITCH_CHOOSE, {
+            is_bitch: true
+        });
     }
 }
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.default = RoomsController;
 ;
-//# sourceMappingURL=data:application/json;base64,eyJ2ZXJzaW9uIjozLCJmaWxlIjoicm9vbXMuY29udHJvbGxlci5qcyIsInNvdXJjZVJvb3QiOiIiLCJzb3VyY2VzIjpbIi4uLy4uLy4uL3NlcnZlci9saWIvcm9vbXMvcm9vbXMuY29udHJvbGxlci50cyJdLCJuYW1lcyI6W10sIm1hcHBpbmdzIjoiQUFBQSxZQUFZLENBQUM7QUFDYixtRUFBMkQ7QUFFM0QscUJBQXFDLFNBQVEsMkJBQWdCO0lBQzVELFFBQVEsQ0FBRSxHQUFHLEVBQUUsR0FBRztJQUVsQixDQUFDO0lBRUQsU0FBUyxDQUFFLEdBQUcsRUFBRSxHQUFHO0lBRW5CLENBQUM7Q0FDRDs7QUFSRCxrQ0FRQztBQUFBLENBQUMifQ==
+//# sourceMappingURL=data:application/json;base64,eyJ2ZXJzaW9uIjozLCJmaWxlIjoicm9vbXMuY29udHJvbGxlci5qcyIsInNvdXJjZVJvb3QiOiIiLCJzb3VyY2VzIjpbIi4uLy4uLy4uL3NlcnZlci9saWIvcm9vbXMvcm9vbXMuY29udHJvbGxlci50cyJdLCJuYW1lcyI6W10sIm1hcHBpbmdzIjoiQUFBQSxZQUFZLENBQUM7QUFDYixtRUFBMkQ7QUFDM0QsZ0NBQWdDO0FBQ2hDLElBQUksTUFBTSxHQUFHLE9BQU8sQ0FBQyw2Q0FBNkMsQ0FBQyxDQUFDO0FBRXBFLHFCQUFxQyxTQUFRLDJCQUFnQjtJQUs1RDtRQUNDLEtBQUssRUFBRSxDQUFDO1FBSkQsYUFBUSxHQUF3QixJQUFJLEdBQUcsRUFBRSxDQUFDO1FBQzFDLGdCQUFXLEdBQTRCLElBQUksR0FBRyxFQUFFLENBQUM7SUFJekQsQ0FBQztJQUVNLEtBQUssQ0FBQyxFQUFFO1FBQ2QsSUFBSSxDQUFDLEVBQUUsR0FBRyxFQUFFLENBQUM7SUFDZCxDQUFDO0lBRU0sY0FBYyxDQUFDLE1BQWtCO1FBQ3ZDLElBQUksSUFBSSxHQUFHLE1BQU0sQ0FBQyxTQUFTLENBQUMsSUFBSSxDQUFDO1FBQ2pDLE1BQU0sQ0FBQyxJQUFJLENBQUMsSUFBSSxDQUFDLENBQUM7UUFDbEIsSUFBSSxVQUFVLEdBQUcsTUFBTSxDQUFDLE9BQU8sQ0FBQyxLQUFLLENBQUMsSUFBSSxDQUFDLENBQUM7UUFDNUMsRUFBRSxDQUFDLENBQUMsVUFBVSxDQUFDLE1BQU0sS0FBSyxDQUFDLENBQUMsQ0FBQyxDQUFDO1lBQzdCLElBQUksQ0FBQyxXQUFXLENBQUMsTUFBTSxFQUFFLElBQUksQ0FBQyxDQUFDO1FBQ2hDLENBQUM7UUFDRCxFQUFFLENBQUMsQ0FBQyxVQUFVLENBQUMsTUFBTSxLQUFLLENBQUMsQ0FBQyxDQUFDLENBQUM7WUFDN0IsSUFBSSxDQUFDLFdBQVcsQ0FBQyxJQUFJLENBQUMsQ0FBQztRQUN4QixDQUFDO0lBQ0YsQ0FBQztJQUVNLGVBQWUsQ0FBQyxNQUFrQixFQUFFLElBQVk7UUFDdEQsTUFBTSxDQUFD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

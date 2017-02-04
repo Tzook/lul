@@ -6,12 +6,15 @@
 	"SERVER_GETS": {
 		"ENTERED_ROOM": "entered_room",
 		"MOVE_ROOM": "moved_room",
+		"BITCH_PLEASE": "bitch_please",
 		"DISCONNECT": "disconnect"
 	},
 	"CLIENT_GETS": {
 		"JOIN_ROOM": "actor_join_room",
 		"MOVE_ROOM": "actor_move_room",
-		"LEAVE_ROOM": "actor_leave_room"
+		"LEAVE_ROOM": "actor_leave_room",
+		"BITCH_PLEASE": "bitch_please",
+		"BITCH_CHOOSE": "actor_bitch"
 	},
 	"LOGS": {
 		"JOIN_ROOM_OK": {
@@ -39,5 +42,6 @@
 	"ROOMS_MAP": {
 		"TestingRoom": ["TestingRoom2"],
 		"TestingRoom2": ["TestingRoom"]
-	}
+	},
+	"BITCH_INTERVAL": 10000
 }

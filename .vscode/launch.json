@@ -8,6 +8,7 @@
 			"name": "Launch main.js",
 			// Type of configuration. Possible values: "node", "mono".
 			"type": "node",
+			"request": "launch",
 			// Workspace relative or absolute path to the program.
 			"program": "${workspaceRoot}/output/main.js",
 			// Automatically stop program after launch.

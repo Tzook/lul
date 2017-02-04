@@ -66,6 +66,5 @@ export default class StatsModel extends MasterModel {
         data.mp.regen = config.BEGIN_MP_REGEN
 
         obj[field] = data;
-        console.log("adding stats for character", data);
     }
 };
