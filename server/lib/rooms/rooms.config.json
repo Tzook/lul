@@ -5,7 +5,7 @@
 	},
 	"SERVER_GETS": {
 		"ENTERED_ROOM": "entered_room",
-		"MOVE_ROOM": "move_room",
+		"MOVE_ROOM": "moved_room",
 		"DISCONNECT": "disconnect"
 	},
 	"CLIENT_GETS": {
