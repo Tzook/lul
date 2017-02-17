@@ -284,6 +284,12 @@
 				// socket.on("actor_gain_mp", d => setResult({msg: "actor_gain_mp", d}))
 				socket.on("actor_lvl_up", d => setResult({msg: "actor_lvl_up", d}))
 				socket.on("actor_take_dmg", d => setResult({msg: "actor_take_dmg", d}))
+
+				socket.on("actor_load_attack", d => setResult({msg: "actor_load_attack", d}))
+				socket.on("actor_perform_attack", d => setResult({msg: "actor_perform_attack", d}))
+
+
+
 			}
 
 			function move(dX, dY) {

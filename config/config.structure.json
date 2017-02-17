@@ -22,7 +22,8 @@
 		"items",
 		"equips",
 		"emote",
-		"stats"
+		"stats",
+		"combat"
 	],
 	"skip": 	 { "master": 1 }
 }

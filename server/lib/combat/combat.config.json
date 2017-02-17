@@ -1,0 +1,14 @@
+{
+	"ROUTES": {
+	},
+	"SERVER_GETS": {
+		"LOAD_ATTACK": "loaded_attack",
+		"PERFORM_ATTACK": "performed_attack"
+	},
+	"CLIENT_GETS": {
+		"LOAD_ATTACK": "actor_load_attack",
+		"PERFORM_ATTACK": "actor_perform_attack"
+	},
+	"LOGS": {
+	}
+}
