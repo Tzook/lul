@@ -49,7 +49,6 @@ export default class SocketioRouter extends SocketioRouterBase {
 				break;
 			}
 		}
-		console.log("broken");
 		if (!req.character) {
 			this.logger.error(req, 'no character param OR no such character in user, param was' + req._query.id);
 			next(new Error("no character param OR no such character in user. Instead, got: " + req._query.id));
@@ -57,7 +56,6 @@ export default class SocketioRouter extends SocketioRouterBase {
 			this.logger.error(req, `Users character is already logged in: ${req._query.id}~`);
 			next(new Error(`Character ${req._query.id} is already logged in`));
 		} else {
-			console.log('in success');
 			next();
 		}
 	}
@@ -87,7 +85,7 @@ export default class SocketioRouter extends SocketioRouterBase {
 				this.listenToEvents(router, router.SERVER_INNER, [emitter]);
 			}
 
-			console.log('connected');
+			console.log('connected', socket.character.name);
 			socket.map = this.map;
 
 			for (let j in this.routers) {
@@ -108,7 +106,7 @@ export default class SocketioRouter extends SocketioRouterBase {
 	}
 
 	[SERVER_GETS.DISCONNECT](data, socket: GameSocket) {
-		console.log('disconnected from socket');
+		console.log('disconnected', socket.character.name);
 		socket.user.save(e => {
 			if (e) {
 				console.error(e);

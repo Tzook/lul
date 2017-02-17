@@ -1,0 +1,25 @@
+'use strict';
+const socketio_router_base_1 = require("../socketio/socketio.router.base");
+let SERVER_GETS = require('../../../server/lib/combat/combat.config.json').SERVER_GETS;
+class CombatRouter extends socketio_router_base_1.default {
+    [SERVER_GETS.LOAD_ATTACK](data, socket) {
+        console.log("loading attack", socket.character.name);
+        socket.broadcast.to(socket.character.room).emit(this.CLIENT_GETS.LOAD_ATTACK, {
+            id: socket.character._id,
+            ability: socket.character.stats.primaryAbility
+        });
+    }
+    [SERVER_GETS.PERFORM_ATTACK](data, socket) {
+        let load = this.middleware.getValidLoad(data.load);
+        console.log("performing attack", socket.character.name, data, load);
+        socket.broadcast.to(socket.character.room).emit(this.CLIENT_GETS.PERFORM_ATTACK, {
+            id: socket.character._id,
+            ability: socket.character.stats.primaryAbility,
+            load
+        });
+    }
+}
+Object.defineProperty(exports, "__esModule", { value: true });
+exports.default = CombatRouter;
+;
+//# sourceMappingURL=data:application/json;base64,eyJ2ZXJzaW9uIjozLCJmaWxlIjoiY29tYmF0LnJvdXRlci5qcyIsInNvdXJjZVJvb3QiOiIiLCJzb3VyY2VzIjpbIi4uLy4uLy4uL3NlcnZlci9saWIvY29tYmF0L2NvbWJhdC5yb3V0ZXIudHMiXSwibmFtZXMiOltdLCJtYXBwaW5ncyI6IkFBQUEsWUFBWSxDQUFDO0FBQ2IsMkVBQWtFO0FBRWxFLElBQUksV0FBVyxHQUFPLE9BQU8sQ0FBQywrQ0FBK0MsQ0FBQyxDQUFDLFdBQVcsQ0FBQztBQUUzRixrQkFBa0MsU0FBUSw4QkFBa0I7SUFHM0QsQ0FBQyxXQUFXLENBQUMsV0FBVyxDQUFDLENBQUMsSUFBSSxFQUFFLE1BQWtCO1FBQ2pELE9BQU8sQ0FBQyxHQUFHLENBQUMsZ0JBQWdCLEVBQUUsTUFBTSxDQUFDLFNBQVMsQ0FBQyxJQUFJLENBQUMsQ0FBQztRQUNyRCxNQUFNLENBQUMsU0FBUyxDQUFDLEVBQUUsQ0FBQyxNQUFNLENBQUMsU0FBUyxDQUFDLElBQUksQ0FBQyxDQUFDLElBQUksQ0FBQyxJQUFJLENBQUMsV0FBVyxDQUFDLFdBQVcsRUFBRTtZQUM3RSxFQUFFLEVBQUUsTUFBTSxDQUFDLFNBQVMsQ0FBQyxHQUFHO1lBQ3hCLE9BQU8sRUFBRSxNQUFNLENBQUMsU0FBUyxDQUFDLEtBQUssQ0FBQyxjQUFjO1NBQzlDLENBQUMsQ0FBQztJQUNKLENBQUM7SUFFRCxDQUFDLFdBQVcsQ0FBQyxjQUFjLENBQUMsQ0FBQyxJQUFJLEVBQUUsTUFBa0I7UUFDcEQsSUFBSSxJQUFJLEdBQUcsSUFBSSxDQUFDLFVBQVUsQ0FBQyxZQUFZLENBQUMsSUFBSSxDQUFDLElBQUksQ0FBQyxDQUFDO1FBQ25ELE9BQU8sQ0FBQyxHQUFHLENBQUMsbUJBQW1CLEVBQUUsTUFBTSxDQUFDLFNBQVMsQ0FBQyxJQUFJLEVBQUUsSUFBSSxFQUFFLElBQUksQ0FBQyxDQUFDO1FBQ3BFLE1BQU0sQ0FBQyxTQUFTLENBQUMsRUFBRSxDQUFDLE1BQU0sQ0FBQyxTQUFTLENBQUMsSUFBSSxDQUFDLENBQUMsSUFBSSxDQUFDLElBQUksQ0FBQyxXQUFXLENBQUMsY0FBYyxFQUFFO1lBQ2hGLEVBQUUsRUFBRSxNQUFNLENBQUMsU0FBUyxDQUFDLEdBQUc7WUFDeEIsT0FBTyxFQUFFLE1BQU0sQ0FBQyxTQUFTLENBQUMsS0FBSyxDQUFDLGNBQWM7WUFDOUMsSUFBSTtTQUNKLENBQUMsQ0FBQztJQUNKLENBQUM7Q0FDRDs7QUFwQkQsK0JBb0JDO0FBQUEsQ0FBQyJ9

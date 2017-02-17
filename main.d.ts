@@ -30,13 +30,15 @@ interface Stats {
     hp: {
         now: number,
         total: number,
-        regen: Number,
+        regen: number,
     },
     mp: {
         now: number,
         total: number,
-        regen: Number,
+        regen: number,
     },
+    abilities: string[],
+    primaryAbility: string,
 }
 
 interface ItemsArray extends Array<Item> {
