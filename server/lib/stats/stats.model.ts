@@ -18,6 +18,8 @@ const STATS_SCHEMA = {
     exp: 0,
     hp: {},
     mp: {},
+    abilities: config.BEGIN_ABILITIES,
+    primaryAbility: config.ABILITY_MEELE
 }
 
 export default class StatsModel extends MasterModel {
@@ -27,14 +29,26 @@ export default class StatsModel extends MasterModel {
         this.services = files.services;
         this.hasId = false;
         this.schema = _.clone(STATS_SCHEMA);
+
         for (let i in this.schema) {
-            if (typeof this.schema[i] === "number") {
-                this.schema[i] = Number;
+            this.schema[i] = this.getSchemaType(this.schema[i]);
+        }
+    }
+
+    private getSchemaType(schema) {
+        let type;
+        if (typeof schema === "number") {
+            type = Number;
+        } else if (typeof schema === "string") {
+            type = String;
+        } else {
+            if (Array.isArray(schema)) {
+                type = [String];
             } else {
-                this.schema[i] = BAR_SCHEMA;
+                type = BAR_SCHEMA;
             }
         }
-
+        return type;
     }
 
     get priority() {
