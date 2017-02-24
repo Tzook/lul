@@ -4,3 +4,4 @@ node_modules
 npm-debug.log
 tsd.json
 server/logs.log
+config/config.database.json
