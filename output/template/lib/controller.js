@@ -1,9 +1,0 @@
-'use strict';
-let MasterController = require('../master/master.controller.js');
-/**
- * Template's Controller
- */
-class TemplateController extends MasterController {
-}
-module.exports = TemplateController;
-//# sourceMappingURL=data:application/json;base64,eyJ2ZXJzaW9uIjozLCJmaWxlIjoiY29udHJvbGxlci5qcyIsInNvdXJjZVJvb3QiOiIiLCJzb3VyY2VzIjpbIi4uLy4uLy4uL3NlcnZlci90ZW1wbGF0ZS9saWIvY29udHJvbGxlci5qcyJdLCJuYW1lcyI6W10sIm1hcHBpbmdzIjoiQUFBQSxZQUFZLENBQUM7QUFDYixJQUFJLGdCQUFnQixHQUFHLE9BQU8sQ0FBQyxnQ0FBZ0MsQ0FBQyxDQUFDO0FBRWpFOztHQUVHO0FBQ0gsd0JBQXlCLFNBQVEsZ0JBQWdCO0NBRWhEO0FBRUQsTUFBTSxDQUFDLE9BQU8sR0FBRyxrQkFBa0IsQ0FBQyJ9
