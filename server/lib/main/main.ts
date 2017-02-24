@@ -22,7 +22,7 @@ export default class Main {
     }
 
 	useDb() {
-		mongoose.connect(process.env.dbUrl ? process.env.dbUrl : require('../../../config/config.database.json').dbUrl);
+		mongoose.connect(process.env.dbUrl ? process.env.dbUrl : require('../../../config/.env.json').dbUrl);
 		mongoose.connection.on('error', console.error.bind(console, 'connection error:'));
 	}
 
