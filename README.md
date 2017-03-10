@@ -1,3 +1,2 @@
-# A server for the best game eva!!
-## Written in NodeJS in TypeScript.
-## The client is in another repo.
+# A server for an MMORPG (Massive Multiplayer Online Role-Playing Game).
+## Written in Node.JS and Socket.io in TypeScript.
