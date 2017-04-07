@@ -1,14 +1,20 @@
 {
-	"ROUTES": {
-	},
+	"ROUTES": {},
 	"SERVER_GETS": {
 		"LOAD_ATTACK": "loaded_attack",
-		"PERFORM_ATTACK": "performed_attack"
+		"PERFORM_ATTACK": "performed_attack",
+		"TAKE_DMG": "took_dmg"
 	},
 	"CLIENT_GETS": {
 		"LOAD_ATTACK": "actor_load_attack",
-		"PERFORM_ATTACK": "actor_perform_attack"
+		"PERFORM_ATTACK": "actor_perform_attack",
+		"TAKE_DMG": "actor_take_dmg"
 	},
-	"LOGS": {
+	"LOGS": {},
+	"DMG_RANDOM_RANGE": 2,
+	"MIN_DMG_TAKEN": 1,
+	"DMG": {
+		"spike": 10,
+		"fall": 15
 	}
 }
