@@ -7,14 +7,12 @@
 		"GAIN_MP": "gain_mp"
 	},
 	"SERVER_GETS": {
-		"TAKE_DMG": "took_dmg"
 	},
 	"CLIENT_GETS": {
 		"GAIN_EXP": "actor_gain_exp",
 		"GAIN_HP": "actor_gain_hp",
 		"GAIN_MP": "actor_gain_mp",
-		"LEVEL_UP": "actor_lvl_up",
-		"TAKE_DMG": "actor_take_dmg"
+		"LEVEL_UP": "actor_lvl_up"
 	},
 	"LOGS": {
 	},
@@ -26,10 +24,5 @@
 	"ABILITY_MEELE": "melee",
 	"MAG_TO_MP_RATIO": 6,
 	"STR_TO_HP_RATIO": 5,
-	"LEVEL_UP_STAT_BONUS": 1,
-	"DMG_RANDOM_RANGE": 2,
-	"DMG": {
-		"spike": 10,
-		"fall": 15
-	}
+	"LEVEL_UP_STAT_BONUS": 1
 }
