@@ -2,12 +2,13 @@
 import MasterController from '../master/master.controller';
 import * as _ from 'underscore';
 import RoomsServices from "./rooms.services";
+import { ROOM_SCHEMA } from "./rooms.model";
 let config = require('../../../server/lib/rooms/rooms.config.json');
 
 export default class RoomsController extends MasterController {
 	protected services: RoomsServices;
 	private io: SocketIO.Namespace;
-	private roomKeys: Map<string, string> = new Map();
+	private roomBitchKeys: Map<string, string> = new Map();
 	private roomBitches: Map<string, GameSocket> = new Map();
 
 	constructor() {
@@ -47,7 +48,7 @@ export default class RoomsController extends MasterController {
 		setTimeout(() => {
             if ((<any>this.io.sockets).adapter.rooms[room].length > 1) {
 				let key = _.uniqueId();
-				this.roomKeys.set(room, key);
+				this.roomBitchKeys.set(room, key);
 				console.log("asking bitch please. key %s, room:", key, room);
 				this.io.to(room).emit(config.CLIENT_GETS.BITCH_PLEASE, {
 					key
@@ -59,9 +60,9 @@ export default class RoomsController extends MasterController {
 
 	public newBitchRequest(socket: GameSocket, key: string) {
 		let room = socket.character.room;
-		let roomKey = this.roomKeys.get(room);
+		let roomKey = this.roomBitchKeys.get(room);
 		if (key == roomKey) {
-			this.roomKeys.delete(room);
+			this.roomBitchKeys.delete(room);
 			let oldBitch = this.roomBitches.get(room);
 			if (oldBitch === socket) {
 				console.log("Same bitch in the room.");
@@ -93,4 +94,18 @@ export default class RoomsController extends MasterController {
 				this.sendError(res, this.LOGS.MASTER_INTERNAL_ERROR, {e, fn: "generateRoom", file: "rooms.controller.js"});
 			});
     }
+
+	public warmRoomInfo(): void {
+		let getRooms = () => {
+			this.services.getRooms()
+				.catch(e => {
+					console.error("Had an error getting rooms from the db!");
+					throw e;
+				});
+		};
+
+		getRooms();
+
+		setInterval(getRooms, config.ROOMS_REFRESH_INTERVAL);
+	}
 };

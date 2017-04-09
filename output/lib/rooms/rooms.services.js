@@ -2,29 +2,51 @@
 Object.defineProperty(exports, "__esModule", { value: true });
 const master_services_1 = require("../master/master.services");
 class RoomsServices extends master_services_1.default {
+    constructor() {
+        super(...arguments);
+        this.roomInfo = new Map();
+    }
     generateRoom(scene) {
         console.log("Generating room from scene:", scene);
         let name = scene.name;
-        let portals = (scene.Portals || []).map(portal => ({
-            target: portal.TargetLevel,
-            x: portal.PositionX,
-            y: portal.PositionY
-        }));
-        let spawns = (scene.Spawners || []).map(spawner => ({
-            mob: spawner.MonsterKey,
-            cap: spawner.SpawnCap,
-            interval: spawner.RespawnTime,
-            x: spawner.PositionX,
-            y: spawner.PositionY
-        }));
-        let room = new this.Model({
+        let portals = {};
+        (scene.Portals || []).forEach(portal => {
+            portals[portal.TargetLevel] = {
+                x: portal.PositionX,
+                y: portal.PositionY
+            };
+        });
+        let spawns = {};
+        (scene.Spawners || []).forEach(spawner => {
+            spawns[spawner.MonsterKey] = {
+                cap: spawner.SpawnCap,
+                interval: spawner.RespawnTime,
+                x: spawner.PositionX,
+                y: spawner.PositionY
+            };
+        });
+        let room = {
             name,
             portals,
-            spawns,
+            spawns
+        };
+        let roomModel = new this.Model(room);
+        return this.Model.findOneAndUpdate({ name }, roomModel, { new: true, upsert: true });
+    }
+    getRooms() {
+        return this.Model.find({}).lean()
+            .then((docs) => {
+            docs.forEach(doc => {
+                this.roomInfo.set(doc.name, doc);
+            });
+            console.log("got rooms");
+            return this.roomInfo;
         });
-        return this.Model.findOneAndUpdate({ name }, room, { new: true, upsert: true });
+    }
+    getRoomInfo(room) {
+        return this.roomInfo.get(room);
     }
 }
 exports.default = RoomsServices;
 ;
-//# sourceMappingURL=data:application/json;base64,eyJ2ZXJzaW9uIjozLCJmaWxlIjoicm9vbXMuc2VydmljZXMuanMiLCJzb3VyY2VSb290IjoiIiwic291cmNlcyI6WyIuLi8uLi8uLi9zZXJ2ZXIvbGliL3Jvb21zL3Jvb21zLnNlcnZpY2VzLnRzIl0sIm5hbWVzIjpbXSwibWFwcGluZ3MiOiJBQUFBLFlBQVksQ0FBQzs7QUFDYiwrREFBdUQ7QUFFdkQsbUJBQW1DLFNBQVEseUJBQWM7SUFDakQsWUFBWSxDQUFFLEtBQUs7UUFDekIsT0FBTyxDQUFDLEdBQUcsQ0FBQyw2QkFBNkIsRUFBRSxLQUFLLENBQUMsQ0FBQztRQUNsRCxJQUFJLElBQUksR0FBRyxLQUFLLENBQUMsSUFBSSxDQUFDO1FBQ3RCLElBQUksT0FBTyxHQUFHLENBQUMsS0FBSyxDQUFDLE9BQU8sSUFBSSxFQUFFLENBQUMsQ0FBQyxHQUFHLENBQUMsTUFBTSxJQUFJLENBQUM7WUFDbEQsTUFBTSxFQUFFLE1BQU0sQ0FBQyxXQUFXO1lBQzFCLENBQUMsRUFBRSxNQUFNLENBQUMsU0FBUztZQUNuQixDQUFDLEVBQUUsTUFBTSxDQUFDLFNBQVM7U0FDbkIsQ0FBQyxDQUFDLENBQUM7UUFDSixJQUFJLE1BQU0sR0FBRyxDQUFDLEtBQUssQ0FBQyxRQUFRLElBQUksRUFBRSxDQUFDLENBQUMsR0FBRyxDQUFDLE9BQU8sSUFBSSxDQUFDO1lBQ25ELEdBQUcsRUFBRSxPQUFPLENBQUMsVUFBVTtZQUN2QixHQUFHLEVBQUUsT0FBTyxDQUFDLFFBQVE7WUFDckIsUUFBUSxFQUFFLE9BQU8sQ0FBQyxXQUFXO1lBQzdCLENBQUMsRUFBRSxPQUFPLENBQUMsU0FBUztZQUNwQixDQUFDLEVBQUUsT0FBTyxDQUFDLFNBQVM7U0FDcEIsQ0FBQyxDQUFDLENBQUM7UUFDSixJQUFJLElBQUksR0FBRyxJQUFJLElBQUksQ0FBQyxLQUFLLENBQUM7WUFDekIsSUFBSTtZQUNKLE9BQU87WUFDUCxNQUFNO1NBQ04sQ0FBQyxDQUFDO1FBRUgsTUFBTSxDQUFDLElBQUksQ0FBQyxLQUFLLENBQUMsZ0JBQWdCLENBQUMsRUFBQyxJQUFJLEVBQUMsRUFBRSxJQUFJLEVBQUUsRUFBQyxHQUFHLEVBQUUsSUFBSSxFQUFFLE1BQU0sRUFBRSxJQUFJLEVBQUMsQ0FBQyxDQUFDO0lBQzdFLENBQUM7Q0FDRDtBQXhCRCxnQ0F3QkM7QUFBQSxDQUFDIn0=
+//# sourceMappingURL=data:application/json;base64,eyJ2ZXJzaW9uIjozLCJmaWxlIjoicm9vbXMuc2VydmljZXMuanMiLCJzb3VyY2VSb290IjoiIiwic291cmNlcyI6WyIuLi8uLi8uLi9zZXJ2ZXIvbGliL3Jvb21zL3Jvb21zLnNlcnZpY2VzLnRzIl0sIm5hbWVzIjpbXSwibWFwcGluZ3MiOiJBQUFBLFlBQVksQ0FBQzs7QUFDYiwrREFBdUQ7QUFHdkQsbUJBQW1DLFNBQVEseUJBQWM7SUFBekQ7O1FBQ1MsYUFBUSxHQUE2QixJQUFJLEdBQUcsRUFBRSxDQUFDO0lBNkN4RCxDQUFDO0lBM0NPLFlBQVksQ0FBRSxLQUFLO1FBQ3pCLE9BQU8sQ0FBQyxHQUFHLENBQUMsNkJBQTZCLEVBQUUsS0FBSyxDQUFDLENBQUM7UUFDbEQsSUFBSSxJQUFJLEdBQUcsS0FBSyxDQUFDLElBQUksQ0FBQztRQUN0QixJQUFJLE9BQU8sR0FBRyxFQUFFLENBQUM7UUFDakIsQ0FBQyxLQUFLLENBQUMsT0FBTyxJQUFJLEVBQUUsQ0FBQyxDQUFDLE9BQU8sQ0FBQyxNQUFNO1lBQ25DLE9BQU8sQ0FBQyxNQUFNLENBQUMsV0FBVyxDQUFDLEdBQUc7Z0JBQzdCLENBQUMsRUFBRSxNQUFNLENBQUMsU0FBUztnQkFDbkIsQ0FBQyxFQUFFLE1BQU0sQ0FBQyxTQUFTO2FBQ25CLENBQUM7UUFDSCxDQUFDLENBQUMsQ0FBQztRQUNILElBQUksTUFBTSxHQUFHLEVBQUUsQ0FBQztRQUNoQixDQUFDLEtBQUssQ0FBQyxRQUFRLElBQUksRUFBRSxDQUFDLENBQUMsT0FBTyxDQUFDLE9BQU87WUFDckMsTUFBTSxDQUFDLE9BQU8sQ0FBQyxVQUFVLENBQUMsR0FBRztnQkFDNUIsR0FBRyxFQUFFLE9BQU8sQ0FBQyxRQUFRO2dCQUNyQixRQUFRLEVBQUUsT0FBTyxDQUFDLFdBQVc7Z0JBQzdCLENBQUMsRUFBRSxPQUFPLENBQUMsU0FBUztnQkFDcEIsQ0FBQyxFQUFFLE9BQU8sQ0FBQyxTQUFTO2FBQ3BCLENBQUM7UUFDSCxDQUFDLENBQUMsQ0FBQztRQUNILElBQUksSUFBSSxHQUFnQjtZQUN2QixJQUFJO1lBQ0osT0FBTztZQUNQLE1BQU07U0FDTixDQUFBO1FBQ0QsSUFBSSxTQUFTLEdBQUcsSUFBSSxJQUFJLENBQUMsS0FBSyxDQUFDLElBQUksQ0FBQyxDQUFDO1FBRXJDLE1BQU0sQ0FBQyxJQUFJLENBQUMsS0FBSyxDQUFDLGdCQUFnQixDQUFDLEVBQUMsSUFBSSxFQUFDLEVBQUUsU0FBUyxFQUFFLEVBQUMsR0FBRyxFQUFFLElBQUksRUFBRSxNQUFNLEVBQUUsSUFBSSxFQUFDLENBQUMsQ0FBQztJQUNsRixDQUFDO0lBRU0sUUFBUTtRQUNkLE1BQU0sQ0FBQyxJQUFJLENBQUMsS0FBSyxDQUFDLElBQUksQ0FBQyxFQUFFLENBQUMsQ0FBQyxJQUFJLEVBQUU7YUFDL0IsSUFBSSxDQUFDLENBQUMsSUFBbUI7WUFDekIsSUFBSSxDQUFDLE9BQU8sQ0FBQyxHQUFHO2dCQUNmLElBQUksQ0FBQyxRQUFRLENBQUMsR0FBRyxDQUFDLEdBQUcsQ0FBQyxJQUFJLEVBQUUsR0FBRyxDQUFDLENBQUM7WUFDbEMsQ0FBQyxDQUFDLENBQUM7WUFDSCxPQUFPLENBQUMsR0FBRyxDQUFDLFdBQVcsQ0FBQyxDQUFDO1lBQ3pCLE1BQU0sQ0FBQyxJQUFJLENBQUMsUUFBUSxDQUFDO1FBQ3RCLENBQUMsQ0FBQyxDQUFDO0lBQ0wsQ0FBQztJQUVNLFdBQVcsQ0FBQyxJQUFZO1FBQzlCLE1BQU0sQ0FBQyxJQUFJLENBQUMsUUFBUSxDQUFDLEdBQUcsQ0FBQyxJQUFJLENBQUMsQ0FBQztJQUNoQyxDQUFDO0NBQ0Q7QUE5Q0QsZ0NBOENDO0FBQUEsQ0FBQyJ9

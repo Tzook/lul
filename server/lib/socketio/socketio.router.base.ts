@@ -10,8 +10,8 @@ export default class SocketioRouterBase extends MasterRouter {
 	public SERVER_INNER;
 
 	init(files, app) {
-		super.init(files, app);
 		this.io = app.socketio;
+		super.init(files, app);
 		this.CLIENT_GETS = files.config.CLIENT_GETS;
 		this.SERVER_GETS = files.config.SERVER_GETS || [];
 		this.SERVER_INNER = files.config.SERVER_INNER || [];

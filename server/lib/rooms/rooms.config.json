@@ -23,9 +23,6 @@
 		}
 	},
 	"DEFAULT_ROOM": "TestingRoom",
-	"ROOMS_MAP": {
-		"TestingRoom": ["TestingRoom2"],
-		"TestingRoom2": ["TestingRoom"]
-	},
-	"BITCH_INTERVAL": 10000
+	"BITCH_INTERVAL": 10000,
+	"ROOMS_REFRESH_INTERVAL": 600000
 }

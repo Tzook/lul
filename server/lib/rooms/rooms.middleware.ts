@@ -1,11 +1,13 @@
 'use strict';
 import MasterMiddleware from '../master/master.middleware';
+import RoomsServices from "./rooms.services";
 let ROOMS_MAP = require('../../../server/lib/rooms/rooms.config.json').ROOMS_MAP;
 
 export default class RoomsMiddleware extends MasterMiddleware {
+	protected services: RoomsServices;
 
-    public canEnterRoom(wantedRoom: string, currentRoom: string) {
-        return ROOMS_MAP[currentRoom].indexOf(wantedRoom) !== -1;
+    public canEnterRoom(wantedRoom: string, currentRoom: string): boolean {
+		return !!this.services.getRoomInfo(currentRoom).portals[wantedRoom];
     }
 
     public validateHasSercetKey(req, res, next) {

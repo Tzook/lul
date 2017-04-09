@@ -7,10 +7,12 @@ export default class MasterModel {
     protected model;
     protected schema;
     protected hasId: boolean;
+    protected strict: boolean;
 
     constructor(mongoose: any) {
         this.mongoose = mongoose || require('mongoose');
         this.hasId = true;
+        this.strict = true;
     }
 
     init(files, app) {
@@ -18,7 +20,6 @@ export default class MasterModel {
     }
 
     createModel() {
-        // inherit me!
         return Promise.resolve();
     }
 
@@ -26,7 +27,7 @@ export default class MasterModel {
         try {
             this.model = this.mongoose.model(name);
         } catch (e) {
-            this.model = this.mongoose.model(name, this.mongoose.Schema(this.schema, {_id: this.hasId, minimize: false}));
+            this.model = this.mongoose.model(name, this.mongoose.Schema(this.schema, {_id: this.hasId, minimize: false, strict: this.strict}));
         }
     }
 
