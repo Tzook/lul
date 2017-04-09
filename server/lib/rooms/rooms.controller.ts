@@ -1,9 +1,11 @@
 'use strict';
 import MasterController from '../master/master.controller';
 import * as _ from 'underscore';
+import RoomsServices from "./rooms.services";
 let config = require('../../../server/lib/rooms/rooms.config.json');
 
 export default class RoomsController extends MasterController {
+	protected services: RoomsServices;
 	private io: SocketIO.Namespace;
 	private roomKeys: Map<string, string> = new Map();
 	private roomBitches: Map<string, GameSocket> = new Map();
@@ -81,4 +83,14 @@ export default class RoomsController extends MasterController {
 			is_bitch: true
 		});
 	}
+
+	public generateRoom(req, res, next) {
+        this.services.generateRoom(req.body.scene)
+			.then(d => {
+				this.sendData(res, this.LOGS.GENERATE_ROOM, d);
+			})
+			.catch(e => {
+				this.sendError(res, this.LOGS.MASTER_INTERNAL_ERROR, {e, fn: "generateRoom", file: "rooms.controller.js"});
+			});
+    }
 };

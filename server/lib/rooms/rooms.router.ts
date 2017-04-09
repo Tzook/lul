@@ -2,9 +2,11 @@
 import SocketioRouterBase from '../socketio/socketio.router.base';
 import * as _ from 'underscore';
 import RoomsController from './rooms.controller';
+import RoomsMiddleware from "./rooms.middleware";
 let SERVER_GETS = require('../../../server/lib/rooms/rooms.config.json').SERVER_GETS;
 
 export default class RoomsRouter extends SocketioRouterBase {
+	protected middleware: RoomsMiddleware;
 	protected controller: RoomsController;
 
 	public onConnected(socket: GameSocket) {
@@ -53,5 +55,11 @@ export default class RoomsRouter extends SocketioRouterBase {
 		let key = data.key;
 		console.log('bitch please received from %s with key %s', socket.character.name, key);
 		this.controller.newBitchRequest(socket, key);
+	}
+
+	initRoutes(app) {
+		app.post(this.ROUTES.GENERATE,
+			this.middleware.validateHasSercetKey.bind(this.middleware),
+			this.controller.generateRoom.bind(this.controller));
 	}
 };

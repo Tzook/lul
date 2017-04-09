@@ -5,11 +5,27 @@ export default class RoomsModel extends MasterModel {
     private addToCharacterSchema;
 
     init(files, app) {
+        let portal = this.mongoose.Schema({
+            target: String,
+            x: Number,
+            y: Number,
+        }, {_id: false});
+
+        let spawn = this.mongoose.Schema({
+            mob: String,
+            cap: Number,
+            interval: Number,
+            x: Number,
+            y: Number,
+        }, {_id: false});
+
         this.schema = {
             name: String,
-            capacity: {type: Number, default: 0},
-            users: [this.mongoose.Schema.ObjectId]
+            portals: [portal],
+            spawns: [spawn]
         };
+        this.hasId = false;
+
         this.addToCharacterSchema = {
             room: {type: String, default: files.config.DEFAULT_ROOM}
         };

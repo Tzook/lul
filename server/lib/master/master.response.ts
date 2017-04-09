@@ -17,6 +17,7 @@ export default class Response {
     sendError(res, ERROR, tokens?) {
         return this.services.replaceTokens(ERROR.MSG, tokens)
         .then(error => {
+            console.error("Sending an error:", error);
             res.status(STATUS_CODES[ERROR.STATUS]).send({code: ERROR.CODE, error});
         });
     }
@@ -24,6 +25,7 @@ export default class Response {
     sendData(res, SUCCESS, data?) {
         let body:any = {code: SUCCESS.CODE, msg: SUCCESS.MSG};
         data && (body.data = data);
+        console.info("Sending body", body);
         res.status(STATUS_CODES[SUCCESS.STATUS]).send(body);
     }
 };
