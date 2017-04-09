@@ -61,7 +61,7 @@ export default class SocketioRouter extends SocketioRouterBase {
 	}
 	onAuthorizeFail(req, message, error, next) {
 		this.logger.error(req, 'Error occured trying to connect to user: ' + message);
-		console.log('in failure');
+		console.log('in failure', message);
 		next(new Error("Error occured trying to connect to user: " + message));
 	}
 

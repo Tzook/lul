@@ -74,9 +74,8 @@ export default class Main {
 	connectToDbAndBootstrap() {
 		this.app.db.once('open', () => {
 			console.log("\t+*+*+ Connected to mongodb! on MongoLab +*+*+");
+			let bootstrap = new Bootstrap(this.app);
+			bootstrap.init(this.app);
 		});
-		// TODO move it inside the db.once
-		let bootstrap = new Bootstrap(this.app);
-		bootstrap.init(this.app);
 	}
 };
