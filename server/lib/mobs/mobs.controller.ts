@@ -6,13 +6,13 @@ let config = require('../../../server/lib/mobs/mobs.config.json');
 export default class MobsController extends MasterController {
 	protected services: MobsServices;
 
-	public generateMob(req, res, next) {
-        this.services.generateMob(req.body.mob)
+	public generateMobs(req, res, next) {
+        this.services.generateMobs(req.body.mobs)
 			.then(d => {
 				this.sendData(res, this.LOGS.GENERATE_MOB, d);
 			})
 			.catch(e => {
-				this.sendError(res, this.LOGS.MASTER_INTERNAL_ERROR, {e, fn: "generateMob", file: "mobs.controller.js"});
+				this.sendError(res, this.LOGS.MASTER_INTERNAL_ERROR, {e, fn: "generateMobs", file: "mobs.controller.js"});
 			});
     }
 

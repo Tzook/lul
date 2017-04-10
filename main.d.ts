@@ -96,5 +96,6 @@ interface MOB_SCHEMA {
     name: string, // the display name of the mob
     hp: number,
     lvl: number,
-    dmg: number,
+    minDmg: number,
+    maxDmg: number,
 }

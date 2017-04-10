@@ -7,7 +7,8 @@ const MOB_SCHEMA = {
     name: String,
     hp: Number,
     lvl: Number,
-    dmg: Number,
+    minDmg: Number,
+    maxDmg: Number,
 };
 
 export default class MobsModel extends MasterModel {
@@ -17,7 +18,6 @@ export default class MobsModel extends MasterModel {
         this.controller = files.controller;
 
         this.schema = Object.assign({}, MOB_SCHEMA);
-        this.hasId = false;
     }
 
     createModel() {
