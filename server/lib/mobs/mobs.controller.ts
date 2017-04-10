@@ -33,9 +33,9 @@ export default class MobsController extends MasterController {
 			spawns: []
 		};
 		roomInfo.spawns.forEach(spawnInfo => {
-			let spawn = Object.assign({}, spawnInfo);
+			let spawn: SPAWN_INSTANCE = Object.assign({}, spawnInfo);
 			
-			let mobsInSpawn: MOB_INSTANCE[] = [];
+			let mobsInSpawn: Map<string, MOB_INSTANCE> = new Map();
 			this.spawnMobs(spawn, mobsInSpawn, roomInfo.name);
 			spawn.mobs = mobsInSpawn;
 			roomMobs.spawns.push(spawn);
@@ -43,17 +43,17 @@ export default class MobsController extends MasterController {
 		this.roomsMobs.set(roomInfo.name, roomMobs);
 	}
 
-	protected spawnMobs(spawnInfo: SPAWN_SCHEMA, mobsInSpawn: any[], room: string) {
-		let mobsToSpawn = spawnInfo.cap - mobsInSpawn.length;
-
+	protected spawnMobs(spawnInfo: SPAWN_INSTANCE, mobsInSpawn: Map<string, MOB_INSTANCE>, room: string) {
+		let mobsToSpawn = spawnInfo.cap - mobsInSpawn.size;
+		console.log("spawning %d mobs", mobsToSpawn);
 		for (let i = 0; i < mobsToSpawn; i++) {
 			let mob = this.spawnMob(spawnInfo, room);
 			mob.spawn = spawnInfo; // useful for when we delete the mob
-			mobsInSpawn.push(mob);
+			mobsInSpawn.set(mob.id, mob);
 		}
 	}
 
-	protected spawnMob(spawnInfo: SPAWN_SCHEMA, room: string): MOB_INSTANCE {
+	protected spawnMob(spawnInfo: SPAWN_INSTANCE, room: string): MOB_INSTANCE {
 		let mob: MOB_INSTANCE = this.services.getMobInfo(spawnInfo.mobId);
 		mob.id = _.uniqueId();
 		mob.x = spawnInfo.x;
@@ -69,8 +69,8 @@ export default class MobsController extends MasterController {
 			id: mob.id,
 			x: mob.x,
 			y: mob.y,
-			mob_key: mob.mobId,
-			mob_hp: mob.hp,
+			key: mob.mobId,
+			hp: mob.hp,
 		});
 	}
 
@@ -91,6 +91,30 @@ export default class MobsController extends MasterController {
 			x,
 			y,
 		});
+	}
+
+	public hurtMob(id: string, dmg: number): MOB_INSTANCE {
+		let mob = this.mobById.get(id);
+		mob.hp = Math.max(0, mob.hp - dmg);
+		return mob;
+	}
+
+	public despawnMob(mob: MOB_INSTANCE, room: string) {
+		console.log("despawning mob", mob.id);
+		this.io.to(room).emit(CLIENT_GETS.MOB_DIE, {
+			mob_id: mob.id,
+		});
+		// remove mob references
+		mob.spawn.mobs.delete(mob.id);
+		this.mobById.delete(mob.id);
+
+		if (mob.spawn.cap == mob.spawn.mobs.size + 1) {
+			// if it's the first mob that we kill, set a timer to respawn
+			console.log("setting interval to respawn", mob.id);
+			setInterval(() => {
+				this.spawnMobs(mob.spawn, mob.spawn.mobs, room);
+			}, mob.spawn.interval * 1000);
+		}
 	}
 
 	// HTTP functions

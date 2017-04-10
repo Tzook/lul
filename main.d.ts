@@ -79,8 +79,11 @@ interface SPAWN_SCHEMA {
     interval: number,
     x: number,
     y: number,
-    mobs?: MOB_SCHEMA[], // mobs spawned in the spawn
 }
+interface SPAWN_INSTANCE extends SPAWN_SCHEMA {
+    mobs?: Map<string, MOB_INSTANCE>, // mobs spawned in the spawn
+}
+
 interface ROOM_SCHEMA {
     name: string,
     portals: {
@@ -103,9 +106,9 @@ interface MOB_INSTANCE extends MOB_SCHEMA {
     id?: string, // a unique id for this specific mob
     x?: number,
     y?: number,
-    spawn?: SPAWN_SCHEMA,
+    spawn?: SPAWN_INSTANCE,
 }
 
 interface ROOM_MOBS {
-    spawns: SPAWN_SCHEMA[],
+    spawns: SPAWN_INSTANCE[],
 }
