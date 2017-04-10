@@ -14,7 +14,7 @@ export default class RoomsModel extends MasterModel {
             portals: this.mongoose.Schema.Types.Mixed,
             spawns: this.mongoose.Schema.Types.Mixed
         };
-        this.hasId = false;
+        this.hasId = false; // it actually has an id but saved only in the db
         this.strict = false;
 
         this.addToCharacterSchema = {
