@@ -27,4 +27,13 @@ export default class MasterMiddleware extends Response {
 			this.sendError(res, this.LOGS.MASTER_NOT_LOGGED_IN);
 		}
 	}
+
+	public validateHasSercetKey(req, res, next) {
+		let pass = process.env.secretKey ? process.env.secretKey : require('../../../config/.env.json').secretKey;
+		if (pass && req.body.pass === pass) {
+			next();
+		} else {
+			this.sendError(res, this.LOGS.MASTER_INVALID_PARAM_TYPE, { param: 'pass' })
+		}
+	}
 };

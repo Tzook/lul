@@ -2,28 +2,6 @@
 import MasterModel from '../master/master.model';
 import RoomsController from "./rooms.controller";
 
-interface PORTAL_SCHEMA {
-    x: number,
-    y: number,
-};
-
-interface SPAWN_SCHEMA {
-    cap: number,
-    interval: number,
-    x: number,
-    y: number,
-};
-
-export interface ROOM_SCHEMA {
-    name: string,
-    portals: {
-        [targetPortal: string]: PORTAL_SCHEMA
-    },
-    spawns: {
-        [mobId: string]: SPAWN_SCHEMA
-    },
-};
-
 export default class RoomsModel extends MasterModel {
     private addToCharacterSchema;
 	protected controller: RoomsController;
@@ -44,15 +22,11 @@ export default class RoomsModel extends MasterModel {
         };
     }
 
-    get priority() {
-        return 20;
-    }
-
     createModel() {
         this.setModel('Rooms');
         this.addToSchema('Character', this.addToCharacterSchema);
 
-		setTimeout(() => this.controller.warmRoomInfo()); // timeout so the Model can be set
+		setTimeout(() => this.controller.warmRoomsInfo()); // timeout so the Model can be set
         return Promise.resolve();
     }
 };

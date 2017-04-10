@@ -17,7 +17,7 @@
 	},
 	"LOGS": {
 		"GENERATE_ROOM": {
-			"MSG": "Generated successfully.",
+			"MSG": "Generated room successfully.",
 			"CODE": "ROOM_1",
 			"STATUS": "OK"
 		}

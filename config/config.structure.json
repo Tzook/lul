@@ -5,12 +5,6 @@
 				  "router",
 				  "services"],
 	"configs":	 ["config"],
-	"tests":	 ["controller",
-				  "middleware",
-				  "model",
-				  "services"],
-	"mocks":	 ["services",
-				  "data"],
 	"folders": [
 		"master",
 		"user",
@@ -21,6 +15,7 @@
 		"chat",
 		"items",
 		"equips",
+		"mobs",
 		"emote",
 		"stats",
 		"combat"
