@@ -1,11 +1,85 @@
 'use strict';
 import MasterController from '../master/master.controller';
-import MobsServices from "./mobs.services";
-let config = require('../../../server/lib/mobs/mobs.config.json');
+import MobsServices from './mobs.services';
+import * as _ from 'underscore';
+let CLIENT_GETS = require('../../../server/lib/mobs/mobs.config.json').CLIENT_GETS;
 
 export default class MobsController extends MasterController {
 	protected services: MobsServices;
+	private roomsMobs: Map<string, ROOM_MOBS> = new Map();
+	private mobById: Map<string, MOB_INSTANCE> = new Map();
+	private io: SocketIO.Namespace;
 
+	constructor() {
+		super();
+	}
+
+	public setIo(io) {
+		this.io = io;
+	}
+
+	// Socket functions
+	// =================
+	public hasRoom(room: string) {
+		return this.roomsMobs.has(room);
+	}
+
+	public startSpawningMobs(roomInfo: ROOM_SCHEMA) {
+		let roomMobs: ROOM_MOBS = {
+			spawns: []
+		};
+		roomInfo.spawns.forEach(spawnInfo => {
+			let spawn = Object.assign({}, spawnInfo);
+			
+			let mobsInSpawn: MOB_INSTANCE[] = [];
+			this.spawnMobs(spawn, mobsInSpawn, roomInfo.name);
+			spawn.mobs = mobsInSpawn;
+			roomMobs.spawns.push(spawn);
+		});
+		this.roomsMobs.set(roomInfo.name, roomMobs);
+	}
+
+	protected spawnMobs(spawnInfo: SPAWN_SCHEMA, mobsInSpawn: any[], room: string) {
+		let mobsToSpawn = spawnInfo.cap - mobsInSpawn.length;
+
+		for (let i = 0; i < mobsToSpawn; i++) {
+			let mob = this.spawnMob(spawnInfo, room);
+			mob.spawn = spawnInfo; // useful for when we delete the mob
+			mobsInSpawn.push(mob);
+		}
+	}
+
+	protected spawnMob(spawnInfo: SPAWN_SCHEMA, room: string): MOB_INSTANCE {
+		let mob: MOB_INSTANCE = this.services.getMobInfo(spawnInfo.mobId);
+		mob.id = _.uniqueId();
+		mob.x = spawnInfo.x;
+		mob.y = spawnInfo.y;
+
+		this.mobById.set(mob.id, mob);
+		this.notifyAboutMob(mob, this.io.to(room));
+		return mob;
+	}
+
+	protected notifyAboutMob(mob: MOB_INSTANCE, to: SocketIO.Namespace|SocketIO.Socket) {
+		to.emit(CLIENT_GETS.MOB_SPAWN, {
+			id: mob.id,
+			x: mob.x,
+			y: mob.y,
+			mob_key: mob.mobId,
+			mob_hp: mob.hp,
+		});
+	}
+
+	public notifyAboutMobs(socket: GameSocket) {
+		this.roomsMobs.get(socket.character.room).spawns.forEach(spawn => {
+			spawn.mobs.forEach(mob => {
+				this.notifyAboutMob(mob, socket);
+			});
+		});
+	}
+
+	// HTTP functions
+	// =================
 	public generateMobs(req, res, next) {
         this.services.generateMobs(req.body.mobs)
 			.then(d => {
@@ -17,19 +91,10 @@ export default class MobsController extends MasterController {
     }
 
 	public warmMobsInfo(): void {
-		let getMobs = () => {
-			return this.services.getMobs()
-				.catch(e => {
-					console.error("Had an error getting mobs from the db!");
-					throw e;
-				});
-		};
-
-		getMobs()
-			.then(d => {
-				
+		this.services.getMobs()
+			.catch(e => {
+				console.error("Had an error getting mobs from the db!");
+				throw e;
 			});
-
-		setInterval(getMobs, config.MOBS_REFRESH_INTERVAL);
 	}
 };

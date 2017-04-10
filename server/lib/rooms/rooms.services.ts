@@ -14,14 +14,15 @@ export default class RoomsServices extends MasterServices {
 				y: portal.PositionY
 			};
 		});
-		let spawns = {};
+		let spawns = [];
 		(scene.Spawners || []).forEach(spawner => {
-			spawns[spawner.MonsterKey] = {
+			spawns.push({
+				mobId: spawner.MonsterKey,
 				cap: spawner.SpawnCap,
 				interval: spawner.RespawnTime,
 				x: spawner.PositionX,
 				y: spawner.PositionY
-			};
+			});
 		});
 		let room: ROOM_SCHEMA = {
 			name,

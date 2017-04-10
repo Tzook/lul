@@ -22,6 +22,10 @@ export default class RoomsModel extends MasterModel {
         };
     }
 
+    get priority() {
+        return 20;
+    }
+
     createModel() {
         this.setModel('Rooms');
         this.addToSchema('Character', this.addToCharacterSchema);
