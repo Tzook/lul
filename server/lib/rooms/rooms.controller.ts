@@ -2,7 +2,6 @@
 import MasterController from '../master/master.controller';
 import * as _ from 'underscore';
 import RoomsServices from "./rooms.services";
-import { ROOM_SCHEMA } from "./rooms.model";
 let config = require('../../../server/lib/rooms/rooms.config.json');
 
 export default class RoomsController extends MasterController {
@@ -95,7 +94,7 @@ export default class RoomsController extends MasterController {
 			});
     }
 
-	public warmRoomInfo(): void {
+	public warmRoomsInfo(): void {
 		let getRooms = () => {
 			this.services.getRooms()
 				.catch(e => {

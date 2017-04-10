@@ -68,3 +68,33 @@ interface GameSocket extends SocketIO.Socket {
     map: Map<string, GameSocket>;
     bitch: Boolean;
 }
+
+// rooms
+interface PORTAL_SCHEMA {
+    x: number,
+    y: number,
+}
+interface SPAWN_SCHEMA {
+    cap: number,
+    interval: number,
+    x: number,
+    y: number,
+}
+interface ROOM_SCHEMA {
+    name: string,
+    portals: {
+        [targetPortal: string]: PORTAL_SCHEMA
+    },
+    spawns: {
+        [mobId: string]: SPAWN_SCHEMA
+    },
+}
+
+// mobs
+interface MOB_SCHEMA {
+    mobId: string, // a unique id for this type of mobs
+    name: string, // the display name of the mob
+    hp: number,
+    lvl: number,
+    dmg: number,
+}

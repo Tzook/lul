@@ -1,0 +1,17 @@
+{
+	"ROUTES": {
+		"GENERATE": "/mob/generate"
+	},
+	"SERVER_GETS": {
+	},
+	"CLIENT_GETS": {
+	},
+	"LOGS": {
+		"GENERATE_MOB": {
+			"MSG": "Generated mob successfully.",
+			"CODE": "MOB_1",
+			"STATUS": "OK"
+		}
+	},
+	"MOBS_REFRESH_INTERVAL": 600000
+}

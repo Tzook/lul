@@ -1,9 +1,8 @@
 'use strict';
 import MasterServices from '../master/master.services';
-import { ROOM_SCHEMA } from "./rooms.model";
 
 export default class RoomsServices extends MasterServices {
-	private roomInfo: Map<string, ROOM_SCHEMA> = new Map();
+	private roomsInfo: Map<string, ROOM_SCHEMA> = new Map();
 
 	public generateRoom (scene): Promise<any> {
 		console.log("Generating room from scene:", scene);
@@ -38,14 +37,14 @@ export default class RoomsServices extends MasterServices {
 		return this.Model.find({}).lean()
 			.then((docs: ROOM_SCHEMA[]) => {
 				docs.forEach(doc => {
-					this.roomInfo.set(doc.name, doc);
+					this.roomsInfo.set(doc.name, doc);
 				});
 				console.log("got rooms");
-				return this.roomInfo;
+				return this.roomsInfo;
 			});
 	}
 
 	public getRoomInfo(room: string): ROOM_SCHEMA|undefined {
-		return this.roomInfo.get(room);
+		return this.roomsInfo.get(room);
 	}
 };
