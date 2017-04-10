@@ -1,7 +1,6 @@
 'use strict';
 import SocketioRouterBase from '../socketio/socketio.router.base';
 import CombatMiddleware from './combat.middleware';
-import * as _ from 'underscore';
 let config = require('../../../server/lib/combat/combat.config.json');
 
 export default class CombatRouter extends SocketioRouterBase {

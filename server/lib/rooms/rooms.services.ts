@@ -31,7 +31,8 @@ export default class RoomsServices extends MasterServices {
 		}
 		let roomModel = new this.Model(room);
 		
-		return this.Model.findOneAndUpdate({name}, roomModel, {new: true, upsert: true});
+		let updatedDocPromise = this.Model.findOneAndUpdate({name}, roomModel, {new: true, upsert: true});
+		return <any>updatedDocPromise;
 	}
 
 	public getRooms(): Promise<Map<string, ROOM_SCHEMA>> {

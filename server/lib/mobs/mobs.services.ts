@@ -25,7 +25,7 @@ export default class MobsServices extends MasterServices {
 			mobModels.push(mobModel);
 		});
 
-		return this.Model.remove()
+		return this.Model.remove({})
 			.then(d => this.Model.create(mobModels));
 	}
 

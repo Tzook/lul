@@ -3,7 +3,7 @@ let Socket = require('socket.io/lib/socket');
 let emit = require('events').EventEmitter.prototype.emit;
 
 // Small fix on the onevent, to make the socket be sent as an exrta parameter on events
-Socket.prototype.onevent = function(packet){
+Socket.prototype.onevent = function(this: any, packet) {
   var args = packet.data || ['error']; // ADDED 'error'
   args.push(this); // ADDED THIS LINE
 
@@ -15,7 +15,7 @@ Socket.prototype.onevent = function(packet){
 };
 
 // socket as a parameter for disconnect event too
-Socket.prototype.onclose = function(reason){
+Socket.prototype.onclose = function(this: any, reason) {
   if (!this.connected) {
     return this;
   }
