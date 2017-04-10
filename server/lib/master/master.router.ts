@@ -22,7 +22,4 @@ export default class MasterRouter {
 	get connection() {
 		return undefined;
 	}
-	setConnection(con) {
-		// TODO inherit
-	}
 };

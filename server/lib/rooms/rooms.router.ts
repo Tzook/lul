@@ -3,6 +3,7 @@ import SocketioRouterBase from '../socketio/socketio.router.base';
 import * as _ from 'underscore';
 import RoomsController from './rooms.controller';
 import RoomsMiddleware from "./rooms.middleware";
+import MasterRouter from "../master/master.router";
 let SERVER_GETS = require('../../../server/lib/rooms/rooms.config.json').SERVER_GETS;
 
 export default class RoomsRouter extends SocketioRouterBase {

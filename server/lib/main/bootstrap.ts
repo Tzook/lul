@@ -1,3 +1,5 @@
+import MasterRouter from "../master/master.router";
+
 'use strict';
 
 let fs = require('fs');
@@ -23,63 +25,54 @@ export default class Bootstrap {
 
     init(app) {
         let structure = require('../../../config/config.structure.json');
-        let models = [];
         let routers = {};
+        var filesGroups = [];
         for (let i = 0; i < structure.folders.length; i++) {
             if (structure.skip[structure.folders[i]]) { // There are classes that we do not want to instantiate, like Master - everything inherits from it
                 continue;
             }
-            let files:any = {};
-            // creates new instances
-            for (let j = 0; j < structure.templates.length; j++) {
-                let path = `../${structure.folders[i]}/${structure.folders[i]}.${structure.templates[j]}.js`;
-                files[structure.templates[j]] = new (require(path).default)();
-            }
-            // load config files
-            for (let j = 0; j < structure.configs.length; j++) {
-                files[structure.configs[j]] = require(`../../../server/lib/${structure.folders[i]}/${structure.folders[i]}.${structure.configs[j]}.json`);
-            }
-            // initializes all objects
-            for (let j = 0; j < structure.templates.length; j++) {
-                files[structure.templates[j]].init(files, app);
-            }
-            let model:any = {};
-            model.priority = files.model.priority;
-            model.model = files.model;
-            model.services = files.services;
-            models.push(model);
+            let files: any = createFiles(structure, i);
+            files.routers = routers;
+            
+            filesGroups.push(files);
             routers[structure.folders[i]] = files.router;
         }
-        models.sort((a, b) => b.priority - a.priority);
-        createModel(models, 0);
-        initRouterConnections(routers);
+        initObjects(structure.templates, filesGroups, app);
+        
+        filesGroups.sort((a, b) => b.model.priority - a.model.priority);
+        createModel(filesGroups, 0);
     }
 };
 
-function createModel(models, i) {
-    if (i === models.length) {
-        return;
+function createFiles(structure, i) {
+    let files = {};
+    // creates new instances
+    for (let j = 0; j < structure.templates.length; j++) {
+        let path = `../${structure.folders[i]}/${structure.folders[i]}.${structure.templates[j]}.js`;
+        files[structure.templates[j]] = new (require(path).default)();
     }
-    models[i].model.createModel()
-    .then(() => {
-        createModel(models, i + 1);
-        models[i].services.setModel(models[i].model.getModel());
-    });
+    // load config files
+    for (let j = 0; j < structure.configs.length; j++) {
+        files[structure.configs[j]] = require(`../../../server/lib/${structure.folders[i]}/${structure.folders[i]}.${structure.configs[j]}.json`);
+    }
+    return files;
 }
 
-function initRouterConnections(routers) {
-    let connections = {};
-    // push any connection (another router) to the array if there are
-    for (let i in routers) {
-        if (routers[i].connection) {
-            connections[routers[i].connection] = connections[routers[i].connection] || [];
-            connections[routers[i].connection].push(i);
-        }
+function createModel(filesGroups: any[], i) {
+    if (i === filesGroups.length) {
+        return;
     }
-    // set the connections
-    for (let i in connections) {
-        for (let j in connections[i]) {
-            routers[i].setConnection(routers[connections[i][j]]);
-        }
-    }
-};
+    filesGroups[i].model.createModel()
+        .then(() => {
+            createModel(filesGroups, i + 1);
+            filesGroups[i].services.setModel(filesGroups[i].model.getModel());
+        });
+}
+
+function initObjects(templates, objectsToInit, app) {
+    objectsToInit.forEach(objToInit => {
+        templates.forEach(template => {
+            objToInit[template].init(objToInit, app);
+        });
+    });
+}
