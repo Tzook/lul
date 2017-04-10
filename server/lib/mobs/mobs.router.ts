@@ -38,10 +38,18 @@ export default class MobsRouter extends SocketioRouterBase {
 	}
 
 	[SERVER_GETS.MOB_TAKE_DMG](data, socket: GameSocket) {
-		// TODO
+		if (this.controller.hasMob(data.mob_id)) {
+
+		} else {
+			console.error("Got 'mob taking damage' but mob doesn't exist!", data.mob_id);
+		}
 	}
 
 	[SERVER_GETS.MOB_MOVE](data, socket: GameSocket) {
-		// TODO
+		if (this.controller.hasMob(data.mob_id)) {
+			this.controller.moveMob(data.mob_id, data.x, data.y, socket);
+		} else {
+			console.error("Got a mob movement but mob doesn't exist!", data.mob_id);
+		}
 	}
 };
