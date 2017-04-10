@@ -24,6 +24,10 @@ export default class MobsController extends MasterController {
 		return this.roomsMobs.has(room);
 	}
 
+	public hasMob(id: string) {
+		return this.mobById.has(id);
+	}
+
 	public startSpawningMobs(roomInfo: ROOM_SCHEMA) {
 		let roomMobs: ROOM_MOBS = {
 			spawns: []
@@ -75,6 +79,17 @@ export default class MobsController extends MasterController {
 			spawn.mobs.forEach(mob => {
 				this.notifyAboutMob(mob, socket);
 			});
+		});
+	}
+
+	public moveMob(id: string, x: number, y: number, socket: GameSocket) {
+		let mob = this.mobById.get(id);
+		mob.x = x;
+		mob.y = y;
+		socket.broadcast.to(socket.character.room).emit(CLIENT_GETS.MOB_MOVE, {
+			mob_id: id, 
+			x,
+			y,
 		});
 	}
 
