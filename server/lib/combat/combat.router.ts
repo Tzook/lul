@@ -24,23 +24,4 @@ export default class CombatRouter extends SocketioRouterBase {
 			load
 		});
 	}
-
-	[config.SERVER_GETS.TAKE_DMG](data, socket: GameSocket) {
-		let absoluteDmg: number = config.DMG[data.from];
-        if (absoluteDmg) {
-			// randomize the dmg
-            let dmg = _.random(absoluteDmg - config.DMG_RANDOM_RANGE, absoluteDmg + config.DMG_RANDOM_RANGE);
-			// make sure that after randomizing, dmg doesn't get negative
-			dmg = Math.max(config.MIN_DMG_TAKEN, dmg); 
-            socket.character.stats.hp.now = Math.max(0, socket.character.stats.hp.now - dmg);
-            this.io.to(socket.character.room).emit(this.CLIENT_GETS.TAKE_DMG, {
-                id: socket.character._id,
-                dmg,
-                hp: socket.character.stats.hp.now
-            });
-            console.log("Taking damage", socket.character.name, dmg, socket.character.stats.hp.now);
-        } else {
-            console.log("Tried to take dmg but invalid params", data.from);
-        }
-	}
 };

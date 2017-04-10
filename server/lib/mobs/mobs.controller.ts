@@ -99,6 +99,18 @@ export default class MobsController extends MasterController {
 		return mob;
 	}
 
+	public hurtChar(id: string, socket: GameSocket) {
+		let mob = this.mobById.get(id);
+		let dmg = _.random(mob.minDmg, mob.maxDmg);
+		socket.character.stats.hp.now = Math.max(0, socket.character.stats.hp.now - dmg);
+		this.io.to(socket.character.room).emit(CLIENT_GETS.TAKE_DMG, {
+			id: socket.character._id,
+			dmg,
+			hp: socket.character.stats.hp.now
+		});
+		console.log("Taking damage", socket.character.name, dmg, socket.character.stats.hp.now);
+	}
+
 	public despawnMob(mob: MOB_INSTANCE, room: string) {
 		console.log("despawning mob", mob.id);
 		this.io.to(room).emit(CLIENT_GETS.MOB_DIE, {
