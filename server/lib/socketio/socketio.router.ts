@@ -1,6 +1,7 @@
 'use strict';
 import SocketioRouterBase from './socketio.router.base';
 import Emitter = require('events');
+import MasterRouter from "../master/master.router";
 require('./socketio.fixer');
 let passportSocketIo = require('passport.socketio');
 let SERVER_GETS = require('../../../server/lib/socketio/socketio.config.json').SERVER_GETS;
@@ -20,8 +21,17 @@ export default class SocketioRouter extends SocketioRouterBase {
 	 */
 	init(files, app) {
 		super.init(files, app);
+		this.mapRouters(files.routers);
 		this.initDependencies(app.mongoStore);
 		this.initListeners();
+	}
+
+	private mapRouters(routers: MasterRouter[]) {
+		for (let i in routers) {
+			if (routers[i].connection === "socketio") {
+				this.routers.push(<SocketioRouterBase>routers[i]);
+			}
+		}
 	}
 
 	initDependencies(mongoStore) {
@@ -63,10 +73,6 @@ export default class SocketioRouter extends SocketioRouterBase {
 		this.logger.error(req, 'Error occured trying to connect to user: ' + message);
 		console.log('in failure', message);
 		next(new Error("Error occured trying to connect to user: " + message));
-	}
-
-	setConnection(router) {
-		this.routers.push(router);
 	}
 
 	initListeners() {

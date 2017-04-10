@@ -3,8 +3,14 @@
 		"GENERATE": "/mob/generate"
 	},
 	"SERVER_GETS": {
+		"MOB_TAKE_DMG": "mob_took_dmg",
+		"MOB_MOVE": "mob_moved"
 	},
 	"CLIENT_GETS": {
+		"MOB_SPAWN": "mob_spawn",
+		"MOB_DIE": "mob_die",
+		"MOB_TAKE_DMG": "mob_take_dmg",
+		"MOB_MOVE": "mob_move"
 	},
 	"LOGS": {
 		"GENERATE_MOB": {

@@ -18,14 +18,17 @@ export default class MobsController extends MasterController {
 
 	public warmMobsInfo(): void {
 		let getMobs = () => {
-			this.services.getMobs()
+			return this.services.getMobs()
 				.catch(e => {
 					console.error("Had an error getting mobs from the db!");
 					throw e;
 				});
 		};
 
-		getMobs();
+		getMobs()
+			.then(d => {
+				
+			});
 
 		setInterval(getMobs, config.MOBS_REFRESH_INTERVAL);
 	}
