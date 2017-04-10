@@ -39,17 +39,31 @@ export default class MobsRouter extends SocketioRouterBase {
 
 	[SERVER_GETS.MOB_TAKE_DMG](data, socket: GameSocket) {
 		if (this.controller.hasMob(data.mob_id)) {
-
+			// damage is hardcoded 10 for now. TODO: calculate the damage
+			let dmg = 10;
+			let mob = this.controller.hurtMob(data.mob_id, dmg);
+			this.io.to(socket.character.room).emit(this.CLIENT_GETS.MOB_TAKE_DMG, {
+				mob_id: mob.id,
+				dmg,
+				hp: mob.hp,
+			});
+			if (mob.hp === 0) {
+				this.controller.despawnMob(mob, socket.character.room);
+				// TODO gain exp
+				// TODO mob drops
+			}
 		} else {
 			console.error("Got 'mob taking damage' but mob doesn't exist!", data.mob_id);
 		}
 	}
 
 	[SERVER_GETS.MOB_MOVE](data, socket: GameSocket) {
-		if (this.controller.hasMob(data.mob_id)) {
-			this.controller.moveMob(data.mob_id, data.x, data.y, socket);
-		} else {
+		if (!socket.bitch) {
+			console.error("Trying to move mob but character %s is not a bitch", socket.character.name);
+		} else if (!this.controller.hasMob(data.mob_id)) {
 			console.error("Got a mob movement but mob doesn't exist!", data.mob_id);
+		} else {
+			this.controller.moveMob(data.mob_id, data.x, data.y, socket);
 		}
 	}
 };
