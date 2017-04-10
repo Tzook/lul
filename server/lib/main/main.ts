@@ -39,7 +39,7 @@ export default class Main {
 		// Run all async - they don't need to run after each other.
 		// To add a dependency to run with them, simply push it to the dependencies array
 		this.app.dependencies = [
-			compression({lever: 1}),
+			compression({level: 1}),
 			cookieParser(),
 			bodyParser.json(),
 			cors()

@@ -2,7 +2,6 @@
 import MasterModel from "../master/master.model";
 import * as _ from 'underscore';
 import { ITEM_SCHEMA } from "../items/items.model";
-let EQUIPS = require('../../../server/lib/equips/equips.json');
 
 export const EQUIPS_SCHEMA = {
     head: ITEM_SCHEMA,

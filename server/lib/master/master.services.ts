@@ -1,42 +1,28 @@
-'use strict';
+import * as mongoose from "mongoose";
+import * as Q from "q";
+import MasterModel from "./master.model";
 
 export default class MasterServices {
     protected Q;
-    protected mongoose;
-    protected model;
-    protected Model;
+    protected mongoose: typeof mongoose;
+    protected model: MasterModel;
+    protected Model: mongoose.Model<any>;
 
-    constructor(Q, MD5) {
-        this.Q = Q || require('q');
+    constructor() {
+        this.Q = Q;
     }
 
 	init(files, app) {
         this.model = files.model;
-		this.mongoose = files.model.mongoose; // TODO app.mongoose!
+		this.mongoose = files.model.mongoose;
 	}
 
     setModel(Model) {
 		this.Model = Model;
     }
 
-    promiseByCondition(cond, d, e) {
+    private promiseByCondition(cond, d, e) {
         return cond ? Promise.resolve(d) : Promise.reject(e);
-    }
-
-    hasFields(obj, fields, error) {
-        for (let i in fields) {
-            if (!obj[fields[i].param]) {
-                return Promise.reject({error, params: {param: fields[i].param}});
-            }
-        }
-        return Promise.resolve(obj);
-    }
-
-    copyFields(src, dst, fields) {
-        for (let i in fields) {
-            dst[fields[i]] = src[fields[i]];
-        }
-        return Promise.resolve(dst);
     }
 
     isNotEmpty(d, e) {

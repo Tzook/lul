@@ -1,16 +1,17 @@
 'use strict';
 import Emitter = require('events');
+import * as mongoose from "mongoose";
 let emitter = new Emitter.EventEmitter();
 
 export default class MasterModel {
-    protected mongoose;
+    protected mongoose: typeof mongoose;
     protected model;
     protected schema;
     protected hasId: boolean;
     protected strict: boolean;
 
-    constructor(mongoose: any) {
-        this.mongoose = mongoose || require('mongoose');
+    constructor() {
+        this.mongoose = mongoose;
         this.hasId = true;
         this.strict = true;
     }
@@ -27,7 +28,7 @@ export default class MasterModel {
         try {
             this.model = this.mongoose.model(name);
         } catch (e) {
-            this.model = this.mongoose.model(name, this.mongoose.Schema(this.schema, {_id: this.hasId, minimize: false, strict: this.strict}));
+            this.model = this.mongoose.model(name, new this.mongoose.Schema(this.schema, {_id: this.hasId, minimize: false, strict: this.strict}));
         }
     }
 
