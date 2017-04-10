@@ -16,11 +16,27 @@ export default class MobsRouter extends SocketioRouterBase {
 	}
 	
 	initRoutes(app) {
+		this.controller.setIo(this.io);
+
 		app.post(this.ROUTES.GENERATE,
 			this.middleware.validateHasSercetKey.bind(this.middleware),
 			this.controller.generateMobs.bind(this.controller));
 	}
-	
+
+	[SERVER_GETS.ENTERED_ROOM](data, socket: GameSocket) {
+		if (!this.controller.hasRoom(socket.character.room)) {
+			// we must spawn new mobs
+			let roomInfo = this.roomsRouter.getRoomInfo(socket.character.room);
+			if (!roomInfo) {
+				console.error("No room info! cannot spawn any mobs.");
+				return;
+			}
+			this.controller.startSpawningMobs(roomInfo);
+		} else {
+			this.controller.notifyAboutMobs(socket);
+		}
+	}
+
 	[SERVER_GETS.MOB_TAKE_DMG](data, socket: GameSocket) {
 		// TODO
 	}

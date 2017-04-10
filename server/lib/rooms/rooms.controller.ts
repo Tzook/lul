@@ -95,16 +95,10 @@ export default class RoomsController extends MasterController {
     }
 
 	public warmRoomsInfo(): void {
-		let getRooms = () => {
-			return this.services.getRooms()
-				.catch(e => {
-					console.error("Had an error getting rooms from the db!");
-					throw e;
-				});
-		};
-
-		getRooms();
-
-		setInterval(getRooms, config.ROOMS_REFRESH_INTERVAL);
+		this.services.getRooms()
+			.catch(e => {
+				console.error("Had an error getting rooms from the db!");
+				throw e;
+			});
 	}
 };

@@ -4,11 +4,18 @@ import * as _ from 'underscore';
 import RoomsController from './rooms.controller';
 import RoomsMiddleware from "./rooms.middleware";
 import MasterRouter from "../master/master.router";
+import RoomsServices from "./rooms.services";
 let SERVER_GETS = require('../../../server/lib/rooms/rooms.config.json').SERVER_GETS;
 
 export default class RoomsRouter extends SocketioRouterBase {
 	protected middleware: RoomsMiddleware;
 	protected controller: RoomsController;
+	protected services: RoomsServices;
+
+	init(files, app) {
+		this.services = files.services;
+		super.init(files, app);
+	}
 
 	initRoutes(app) {
 		this.controller.setIo(this.io);
@@ -16,6 +23,10 @@ export default class RoomsRouter extends SocketioRouterBase {
 		app.post(this.ROUTES.GENERATE,
 			this.middleware.validateHasSercetKey.bind(this.middleware),
 			this.controller.generateRoom.bind(this.controller));
+	}
+
+	public getRoomInfo(room: string): ROOM_SCHEMA|undefined {
+		return this.services.getRoomInfo(room);
 	}
 
 	[SERVER_GETS.ENTERED_ROOM](data, socket: GameSocket) {

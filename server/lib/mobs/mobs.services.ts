@@ -40,7 +40,7 @@ export default class MobsServices extends MasterServices {
 			});
 	}
 
-	public getMobInfo(mobId: string): MOB_SCHEMA|{} {
+	public getMobInfo(mobId: string): MOB_SCHEMA {
 		// always return a copy of the mob, so it can be modified freely
 		return Object.assign({}, this.mobsInfo.get(mobId));
 	}

@@ -6,7 +6,6 @@ interface Doc {
     save(fn?: (err: any, product: this, numAffected: number) => void): Promise<this>;
 }
 
-
 interface Item extends Doc {
     name: string;
     icon: string;
@@ -75,19 +74,19 @@ interface PORTAL_SCHEMA {
     y: number,
 }
 interface SPAWN_SCHEMA {
+    mobId: string,
     cap: number,
     interval: number,
     x: number,
     y: number,
+    mobs?: MOB_SCHEMA[], // mobs spawned in the spawn
 }
 interface ROOM_SCHEMA {
     name: string,
     portals: {
         [targetPortal: string]: PORTAL_SCHEMA
     },
-    spawns: {
-        [mobId: string]: SPAWN_SCHEMA
-    },
+    spawns: SPAWN_SCHEMA[],
 }
 
 // mobs
@@ -98,4 +97,15 @@ interface MOB_SCHEMA {
     lvl: number,
     minDmg: number,
     maxDmg: number,
+}
+
+interface MOB_INSTANCE extends MOB_SCHEMA {
+    id?: string, // a unique id for this specific mob
+    x?: number,
+    y?: number,
+    spawn?: SPAWN_SCHEMA,
+}
+
+interface ROOM_MOBS {
+    spawns: SPAWN_SCHEMA[],
 }

@@ -287,8 +287,11 @@
 
 				socket.on("actor_load_attack", d => setResult({msg: "actor_load_attack", d}))
 				socket.on("actor_perform_attack", d => setResult({msg: "actor_perform_attack", d}))
-
-
+				
+				socket.on("mob_spawn", d => setResult({msg: "mob_spawn", d}));
+				socket.on("mob_die", d => setResult({msg: "mob_die", d}));
+				socket.on("mob_take_dmg", d => setResult({msg: "mob_take_dmg", d}));
+				socket.on("mob_move", d => setResult({msg: "mob_move", d}));
 
 			}
 
