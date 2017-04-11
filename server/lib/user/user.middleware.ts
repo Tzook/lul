@@ -13,8 +13,8 @@ export default class UserMiddleware extends MasterMiddleware {
 
 	hasRegisterParams(req, res, next) {
 		return this.validateParams(req, res, next, [
-			{param: "username", isType: ["string"], callback: this.services.inRange, args: [("" + req.body.username).length, 1, 16, this.LOGS.MASTER_OUT_OF_RANGE, 'username']},
-			{param: "password", isType: ["string"], callback: this.services.inRange, args: [req.body.password.length, 32, 32, this.LOGS.MASTER_OUT_OF_RANGE, 'password']}
+			{param: "username", isType: ["string"], callback: this.services.inRange, args: [("" + (req.body.username || "")).length, 1, 16, this.LOGS.MASTER_OUT_OF_RANGE, 'username']},
+			{param: "password", isType: ["string"], callback: this.services.inRange, args: [(req.body.password || "").length, 32, 32, this.LOGS.MASTER_OUT_OF_RANGE, 'password']}
 		]);
 	}
 
