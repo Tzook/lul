@@ -16,6 +16,7 @@
   },
   "compileOnSave": false,
   "exclude": [
+    "tests",
     "gulpfile.js",
     "node_modules",
     "output"

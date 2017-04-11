@@ -1,0 +1,23 @@
+{
+  "name": "lel-automations",
+  "version": "0.0.1",
+  "description": "very lel..",
+  "main": "main.js",
+  "scripts": {
+    "test": "protractor output/conf.js",
+    "start": "npm run tsc:w",
+    "tsc": "tsc",
+    "tsc:w": "tsc -w"
+  },
+  "engines": {
+    "node": "6.9.5",
+    "npm": "4.0.2"
+  },
+  "license": "MIT",
+  "devDependencies": {
+    "@types/jasmine": "2.5.47",
+    "@types/jasminewd2": "2.0.2",
+    "protractor": "5.1.1",
+    "typescript": "2.2.2"
+  }
+}

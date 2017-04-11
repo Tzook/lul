@@ -6,8 +6,7 @@
   "scripts": {
     "start": "npm run tsc:w",
     "tsc": "tsc",
-    "tsc:w": "tsc -w",
-    "typings": "typings"
+    "tsc:w": "tsc -w"
   },
   "dependencies": {
     "body-parser": "1.17.1",
