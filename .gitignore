@@ -2,6 +2,7 @@
 .vscode
 typings
 node_modules
+tests/node_modules
 npm-debug.log
 tsd.json
 server/logs.log
