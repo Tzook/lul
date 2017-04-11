@@ -4,10 +4,10 @@
   "description": "very lel..",
   "main": "main.js",
   "scripts": {
-    "test": "protractor output/conf.js",
-    "start": "npm run tsc:w",
-    "tsc": "tsc",
-    "tsc:w": "tsc -w"
+    "webdriver-watch": "./node_modules/protractor/bin/webdriver-manager update && ./node_modules/protractor/bin/webdriver-manager start",
+    "typescript-watch": "tsc -w",
+    "start": "npm-run-all -p -r webdriver-watch typescript-watch",
+    "test": "protractor output/conf.js"
   },
   "engines": {
     "node": "6.9.5",
@@ -17,6 +17,7 @@
   "devDependencies": {
     "@types/jasmine": "2.5.47",
     "@types/jasminewd2": "2.0.2",
+    "npm-run-all": "4.0.2",
     "protractor": "5.1.1",
     "typescript": "2.2.2"
   }
