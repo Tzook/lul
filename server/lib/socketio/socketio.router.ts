@@ -60,25 +60,29 @@ export default class SocketioRouter extends SocketioRouterBase {
 			}
 		}
 		if (!req.character) {
-			this.logger.error(req, 'no character param OR no such character in user, param was' + req._query.id);
-			next(new Error("no character param OR no such character in user. Instead, got: " + req._query.id));
-		} else if (this.map.get(req._query.id)) {
-			this.logger.error(req, `Users character is already logged in: ${req._query.id}~`);
-			next(new Error(`Character ${req._query.id} is already logged in`));
+			console.error('no character param OR no such character in user, param was' + req._query.id);
+			next({});
+		} else if (this.map.has(req._query.id)) {
+			console.error(`Users character is already logged in: ${req._query.id}~`);
+			next({});
 		} else {
 			next();
 		}
 	}
 	onAuthorizeFail(req, message, error, next) {
-		this.logger.error(req, 'Error occured trying to connect to user: ' + message);
-		console.log('in failure', message);
-		next(new Error("Error occured trying to connect to user: " + message));
+		console.error('Error occured trying to connect to user: ' + message);
+		next({});
 	}
 
 	initListeners() {
 		this.io.on(this.ROUTES.BEGIN_CONNECTION, (socket: GameSocket) => {
 			socket.user = socket.client.request.user;
 			socket.character = socket.client.request.character;
+			if (this.map.has(socket.character._id.toString())) {
+				// character already connected! must disconnect
+				socket.disconnect();
+				return;
+			}
 			this.map.set(socket.character._id.toString(), socket);
 			this.map.set(socket.character.name, socket);
 			this.map.set(socket.id, socket);
