@@ -17,6 +17,7 @@ export default class MobsServices extends MasterServices {
 				name: mob.name,
 				hp: mob.hp,
 				lvl: mob.level,
+				exp: mob.exp,
 				minDmg: mob.minDMG,
 				maxDmg: mob.maxDMG,
 			};
