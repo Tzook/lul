@@ -1,6 +1,7 @@
 'use strict';
 import MasterRouter from '../master/master.router';
 import Emitter = require('events');
+let config = require('../../../server/lib/socketio/socketio.config.json');
 
 export default class SocketioRouterBase extends MasterRouter {
 	protected io: SocketIO.Namespace;
@@ -27,5 +28,19 @@ export default class SocketioRouterBase extends MasterRouter {
 
 	get connection() {
 		return 'socketio';
+	}
+
+	protected sendError(data: any, socket: GameSocket, error: string) {
+		let event = "";
+		try {
+			// grab event from stack trace
+			event = (new Error()).stack.match(/at (\S+)/g)[1].slice(3).split('.')[1];
+		} catch (e) {}
+		console.error("Sending error to socket %s:", socket.character.name, error, data, event);
+		socket.emit(config.CLIENT_GETS.EVENT_ERROR, {
+			error,
+			data,
+			event
+		});
 	}
 };

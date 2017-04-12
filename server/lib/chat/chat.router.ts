@@ -22,10 +22,7 @@ export default class ChatRouter extends SocketioRouterBase {
 	[SERVER_GETS.WHISPER](data, socket: GameSocket) {
 		let targetSocket = socket.map.get(data.to);
 		if (!targetSocket) {
-			console.error("Failed to find socket for whisper!", data);
-			socket.emit(this.CLIENT_GETS.WHISPER_FAIL, {
-				name: data.to
-			})
+			this.sendError(data, socket, "Failed to find socket for whisper");
 		} else {
 			console.log("Emitting whisper", data);
 			targetSocket.emit(this.CLIENT_GETS.WHISPER, {

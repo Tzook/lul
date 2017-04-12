@@ -258,6 +258,8 @@
 				socket.on('disconnected', function(d) {
 					removeChar(d.ch);
 				});
+				
+				socket.on("event_error", d => setResult({msg: "event_error", d}))
 
 				socket.on("actor_pick_item", d => setResult({msg: "actor_pick_item", d}))
 				socket.on("actor_delete_item", d => setResult({msg: "actor_delete_item", d}))
