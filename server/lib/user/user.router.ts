@@ -1,11 +1,15 @@
 'use strict';
 import MasterRouter from '../master/master.router';
+import UserController from "./user.controller";
+import UserMiddleware from "./user.middleware";
 let passport        = require('passport'),
     LocalStrategy   = require('passport-local').Strategy;
 
 const sessionTime = 1000 * 60 * 60 * 24 * 30; // 30 days
 
 export default class UserRouter extends MasterRouter {
+	protected controller: UserController;
+	protected middleware: UserMiddleware;
 
 	init(files, app) {
 		this.usePassport(app, app.session, app.mongoStore, files.controller, files.middleware);
@@ -19,7 +23,8 @@ export default class UserRouter extends MasterRouter {
 
 		app.get(this.ROUTES.USER_LOGOUT,
 			this.middleware.isLoggedIn.bind(this.middleware),
-			this.controller.performLogout.bind(this.controller));
+			this.controller.performLogout.bind(this.controller),
+			this.controller.sendLogout.bind(this.controller));
 
 		app.post(this.ROUTES.USER_LOGIN,
 			this.middleware.isLoggedOut.bind(this.middleware),
@@ -35,6 +40,12 @@ export default class UserRouter extends MasterRouter {
 			this.controller.handleNewUser.bind(this.controller),
 			this.controller.performLogin.bind(this.controller),
 			this.controller.sendUser.bind(this.controller));
+
+		app.post(this.ROUTES.USER_DELETE,
+			this.middleware.isLoggedIn.bind(this.middleware),
+			this.controller.deleteUser.bind(this.controller),
+			this.controller.performLogout.bind(this.controller),
+			this.controller.sendDeleted.bind(this.controller));
 	}
 
 	usePassport(app, session, mongoStore, controller, middleware) {
