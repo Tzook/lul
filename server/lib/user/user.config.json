@@ -1,5 +1,6 @@
 {
 	"ROUTES": {
+		"USER_DELETE": "/user/delete",
 		"USER_LOGIN": "/user/login",
 		"USER_LOGOUT": "/user/logout",
 		"USER_REGISTER": "/user/register",
@@ -45,6 +46,11 @@
 			"MSG": "Invalid password.",
 			"CODE": "USER_8",
 			"STATUS": "BAD_VALUES"
+		},
+		"USER_DELETED": {
+			"MSG": "User successfully deleted.",
+			"CODE": "USER_9",
+			"STATUS": "OK"
 		}
 	}
 }

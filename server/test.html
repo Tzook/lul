@@ -20,6 +20,7 @@
 					<button onclick="register()" id="register" class="btn btn-lg btn-primary user-btn">Register</button>
 					<button onclick="session()" id="session" class="btn btn-lg btn-warning user-btn">Session</button>
 					<button onclick="logout()" id="logout" class="btn btn-lg btn-danger user-btn">Logout</button>
+					<button onclick="deleteUser()" id="deleteUser" class="btn btn-lg btn-danger user-btn">Delete</button>
 				</div>
 				<div class="group">
 					<label><input type="radio" name="chG" id="chGenderMale" value="1" class="form-control"> Male</label>
@@ -104,6 +105,9 @@
 			}
 			function logout() {
 				sendGet('/user/logout');
+			}
+			function deleteUser() {
+				sendPost('/user/delete', {});
 			}
 
 			function getUserData() {
