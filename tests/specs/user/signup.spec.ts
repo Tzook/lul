@@ -48,7 +48,7 @@ describe('signup', () => {
         });
     });
 
-    fdescribe('success', () => {
+    describe('success', () => {
         it('should create a new user when logged out and has a valid username and password, and log it in automatically', () => {
             browser.executeScript(`sendPost('/user/register', {username: 'uncaughtTestName', password: '12345678123456781234567812345678'});`);
             expectText("Registered and then logged in successfully.");
