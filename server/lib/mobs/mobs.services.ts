@@ -33,7 +33,7 @@ export default class MobsServices extends MasterServices {
 		return this.Model.find({}).lean()
 			.then((docs: MOB_SCHEMA[]) => {
 				docs.forEach(doc => {
-					this.mobsInfo.set(doc.name, doc);
+					this.mobsInfo.set(doc.mobId, doc);
 				});
 				console.log("got mobs");
 				return this.mobsInfo;
