@@ -43,6 +43,7 @@ export default class MobsRouter extends SocketioRouterBase {
 			let dmg = 10;
 			let mob = this.controller.hurtMob(data.mob_id, dmg);
 			this.io.to(socket.character.room).emit(this.CLIENT_GETS.MOB_TAKE_DMG, {
+				id: socket.character._id,
 				mob_id: mob.id,
 				dmg,
 				hp: mob.hp,
