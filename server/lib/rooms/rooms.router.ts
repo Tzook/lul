@@ -54,6 +54,8 @@ export default class RoomsRouter extends SocketioRouterBase {
 			socket.emit(this.CLIENT_GETS.MOVE_ROOM, {from: oldRoom, to: data.room});
 
 			this.controller.socketLeaveRoom(socket, oldRoom);
+		} else {
+			this.sendError(data, socket, "Character is not allowed to move to the given room");
 		}
 	}
 

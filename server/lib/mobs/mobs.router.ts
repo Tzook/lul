@@ -27,11 +27,11 @@ export default class MobsRouter extends SocketioRouterBase {
 		if (!this.controller.hasRoom(socket.character.room)) {
 			// we must spawn new mobs
 			let roomInfo = this.roomsRouter.getRoomInfo(socket.character.room);
-			if (!roomInfo) {
-				console.error("No room info! cannot spawn any mobs.");
-				return;
+			if (roomInfo) {
+				this.controller.startSpawningMobs(roomInfo);
+			} else {
+				this.sendError({charRoom: socket.character.room}, socket, "No room info! cannot spawn any mobs.");
 			}
-			this.controller.startSpawningMobs(roomInfo);
 		} else {
 			this.controller.notifyAboutMobs(socket);
 		}
@@ -54,15 +54,15 @@ export default class MobsRouter extends SocketioRouterBase {
 				// TODO mob drops
 			}
 		} else {
-			console.error("Got 'mob taking damage' but mob doesn't exist!", data.mob_id);
+			this.sendError(data, socket, "Mob doesn't exist!");
 		}
 	}
 
 	[SERVER_GETS.MOB_MOVE](data, socket: GameSocket) {
 		if (!socket.bitch) {
-			console.error("Trying to move mob but character %s is not a bitch", socket.character.name);
+			this.sendError(data, socket, "Character is not bitch!");
 		} else if (!this.controller.hasMob(data.mob_id)) {
-			console.error("Got a mob movement but mob doesn't exist!", data.mob_id);
+			this.sendError(data, socket, "Mob doesn't exist!");
 		} else {
 			this.controller.moveMob(data.mob_id, data.x, data.y, socket);
 		}
@@ -72,7 +72,7 @@ export default class MobsRouter extends SocketioRouterBase {
 		if (this.controller.hasMob(data.mob_id)) {
 			this.controller.hurtChar(data.mob_id, socket);
 		} else {
-			console.error("Got 'actor taking damage' but mob doesn't exist!", data.mob_id);
+			this.sendError(data, socket, "Mob doesn't exist!");
 		}
 	}
 };

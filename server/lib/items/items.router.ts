@@ -28,7 +28,7 @@ export default class ItemsRouter extends SocketioRouterBase {
 				slot: slot
 			});
 		} else {
-			console.log("No available slots to pick item", itemAndRoomId);
+			this.sendError(data, socket, "No available slots to pick item");
 		}
 	}
 
@@ -64,7 +64,7 @@ export default class ItemsRouter extends SocketioRouterBase {
 				}
 			}, config.ITEM_DROP_LIFE);
 		} else {
-			console.log("trying to drop an item but has no item!", slot)
+			this.sendError(data, socket, "Trying to drop an item but nothing's there!");
 		}
 	}
 
@@ -82,9 +82,9 @@ export default class ItemsRouter extends SocketioRouterBase {
 				from: data.from,
 				to: data.to
 			});
-		 } else {
-			 console.log("detected invalid slots!", data.from, data.to);
-		 }
+		} else {
+			this.sendError(data, socket, "Invalid slots!");
+		}
 	}
 
 	[SERVER_GETS.ENTERED_ROOM](data, socket: GameSocket) {

@@ -6,7 +6,9 @@
 		"DISCONNECT": "disconnect"
 	},
 	"CLIENT_GETS": {
-		"CONNECT": "connect"
+		"CONNECT": "connect",
+		"ERROR": "error",
+		"EVENT_ERROR": "event_error"
 	},
 	"LOGS": {
 

@@ -23,7 +23,7 @@ export default class EquipsRouter extends SocketioRouterBase {
 
 			let item = socket.character.items[from];
 			if (!this.middleware.canWearEquip(item, to)) {
-				console.log("cannot equip since it's not an equip", from, to);
+				this.sendError(data, socket, "Item cannot be equipped there");
 			} else {
 				console.log("equipping item", from, to);
 				this.middleware.swapEquipAndItem(socket, from, to);
@@ -36,7 +36,7 @@ export default class EquipsRouter extends SocketioRouterBase {
 				});
 			}
 		} else {
-			console.log("detected invalid slots for equipping item", data.from, data.to);
+			this.sendError(data, socket, "Invalid slots!");
 		}
 	}
 
@@ -50,7 +50,7 @@ export default class EquipsRouter extends SocketioRouterBase {
 			let item = socket.character.items[to];
 			if (this.middleware.hasItem(socket, to)
 				&& !this.middleware.canWearEquip(item, from)) {
-				console.log("cannot unequip since there's already an item", from, to);
+				this.sendError(data, socket, "Cannot unequip to slot!");
 			} else {
 				console.log("unequipping item", from, to);
 
@@ -63,9 +63,8 @@ export default class EquipsRouter extends SocketioRouterBase {
 					equipped_item: socket.character.equips[from],
 				});
 			}
-
 		} else {
-			console.log("detected invalid slots for unequipping item", data.from, data.to);
+			this.sendError(data, socket, "Invalid slots!");
 		}
 	}
 
@@ -77,7 +76,7 @@ export default class EquipsRouter extends SocketioRouterBase {
 				to: slot
 			}, socket);
 		} else {
-			console.log("cannot unequip item, no available item slots", data.slot);
+			this.sendError(data, socket, "Cannot unequip to slot!");
 		}
 	}
 
@@ -91,10 +90,10 @@ export default class EquipsRouter extends SocketioRouterBase {
 					to: item.type
 				}, socket);
 			} else {
-				console.log("not equipping item, it is not a valid equip", item, itemSlot)
+				this.sendError(data, socket, "Item not equipable!");
 			}
 		} else {
-			console.log("got invalid data slot for use item", itemSlot);
+			this.sendError(data, socket, "Invalid slot!");
 		}
 	}
 
@@ -113,7 +112,7 @@ export default class EquipsRouter extends SocketioRouterBase {
 				slot
 			});
 		} else {
-			console.log("got invalid data slot for drop equip", slot);
+			this.sendError(data, socket, "Invalid slot!");
 		}
 	}
 };
