@@ -123,7 +123,7 @@ export default class MobsController extends MasterController {
 		if (mob.spawn.cap == mob.spawn.mobs.size + 1) {
 			// if it's the first mob that we kill, set a timer to respawn
 			console.log("setting interval to respawn", mob.id);
-			setInterval(() => {
+			setTimeout(() => {
 				this.spawnMobs(mob.spawn, mob.spawn.mobs, room);
 			}, mob.spawn.interval * 1000);
 		}
