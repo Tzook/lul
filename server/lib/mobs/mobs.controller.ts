@@ -66,7 +66,7 @@ export default class MobsController extends MasterController {
 
 	protected notifyAboutMob(mob: MOB_INSTANCE, to: SocketIO.Namespace|SocketIO.Socket) {
 		to.emit(CLIENT_GETS.MOB_SPAWN, {
-			id: mob.id,
+			mob_id: mob.id,
 			x: mob.x,
 			y: mob.y,
 			key: mob.mobId,
