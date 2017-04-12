@@ -57,7 +57,6 @@ export default class StatsRouter extends SocketioRouterBase {
     private regenInterval(socket: GameSocket) {
         setTimeout(() => {
             if (socket.connected) {
-                this.emitter.emit(config.SERVER_INNER.GAIN_EXP, { exp: 30 }, socket);
                 this.emitter.emit(config.SERVER_INNER.GAIN_HP, { hp: socket.character.stats.hp.regen }, socket);
                 this.emitter.emit(config.SERVER_INNER.GAIN_MP, { mp: socket.character.stats.mp.regen }, socket);
                 this.regenInterval(socket);

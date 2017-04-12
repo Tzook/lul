@@ -4,6 +4,7 @@ import MobsMiddleware from "./mobs.middleware";
 import MobsController from "./mobs.controller";
 import RoomsRouter from "../rooms/rooms.router";
 let SERVER_GETS		   = require('../../../server/lib/mobs/mobs.config.json').SERVER_GETS;
+let statsConfig = require('../../../server/lib/stats/stats.config.json');
 
 export default class MobsRouter extends SocketioRouterBase {
 	protected middleware: MobsMiddleware;
@@ -50,7 +51,8 @@ export default class MobsRouter extends SocketioRouterBase {
 			});
 			if (mob.hp === 0) {
 				this.controller.despawnMob(mob, socket.character.room);
-				// TODO gain exp
+				let exp = mob.exp || 10; // hardcoded until handled in the client
+				this.emitter.emit(statsConfig.SERVER_INNER.GAIN_EXP, { exp }, socket);
 				// TODO mob drops
 			}
 		} else {
