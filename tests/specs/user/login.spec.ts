@@ -1,5 +1,6 @@
 import { browser } from "protractor/built";
-import { raiseBrowser, expectText, login, logout } from "../common";
+import { raiseBrowser, expectText } from "../common";
+import { login, logout } from "./user.common";
 
 describe('login', () => {
     raiseBrowser();
