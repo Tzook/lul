@@ -23,5 +23,5 @@
 		}
 	},
 	"DEFAULT_ROOM": "TestingRoom",
-	"BITCH_INTERVAL": 10000
+	"BITCH_INTERVAL": 30000
 }

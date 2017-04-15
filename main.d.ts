@@ -50,6 +50,8 @@ interface Char extends Doc {
     position: {
         x: number;
         y: number;
+        z: number;
+        climbing: boolean, 
     },
     items: ItemsArray,
     equips: Equips,

@@ -1,12 +1,14 @@
 {
-	"ROUTES": {
-	},
+	"ROUTES": {},
+	"LOGS": {},
 	"SERVER_GETS": {
-		"MOVEMENT": "movement"
+		"MOVEMENT": "movement",
+		"START_CLIMB": "started_climbing",
+		"STOP_CLIMB": "stopped_climbing"
 	},
 	"CLIENT_GETS": {
-		"MOVEMENT": "movement"
-	},
-	"LOGS": {
+		"MOVEMENT": "movement",
+		"START_CLIMB": "actor_start_climbing",
+		"STOP_CLIMB": "actor_stop_climbing"
 	}
 }

@@ -9,7 +9,8 @@ export default class MovementModel extends MasterModel {
             position: {
                 x: {type: Number, default: 0},
                 y: {type: Number, default: 0},
-                z: {type: Number, default: 0}
+                z: {type: Number, default: 0},
+                climbing: {type: Boolean, default: false}
             }
         };
     }
