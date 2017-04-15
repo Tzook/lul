@@ -31,8 +31,8 @@
 					<input type="text" placeholder="Mouth" id="chMouth" class="form-control form-input">
 					<input type="text" placeholder="Skin" id="chSkin" class="form-control form-input">
 					<input type="text" placeholder="Hair" id="chHair" class="form-control form-input">
-					<button onclick="createCharacter()" class="btn btn-lg btn-success user-btn">Create</button>
-					<button id="delete" onclick="deleteCharacter()" class="btn btn-danger user-btn">Delete char number:
+					<button onclick="createCharacterFromData()" class="btn btn-lg btn-success user-btn">Create</button>
+					<button id="delete" onclick="deleteCharacterFromData()" class="btn btn-danger user-btn">Delete char number:
 						<input id="deleteCharNumber" class="form-control" type="number" max="9" min="0" onclick="event.stopPropagation();"></input>
 					</button>
 				</div>
@@ -117,15 +117,15 @@
 				};
 			}
 
-			function sendPost(url, data) {
-				send('POST', url, JSON.stringify(data));
+			function sendPost(url, data, cb) {
+				send('POST', url, JSON.stringify(data), cb);
 			}
 
-			function sendGet(url) {
-				send('GET', url);
+			function sendGet(url, cb) {
+				send('GET', url, cb);
 			}
 
-			function send(method, url, data) {
+			function send(method, url, data, cb) {
 				try {
 					showLoading();
 					$.ajax({method, url, data, success, error, dataType: "json", contentType: "application/json"});
@@ -134,6 +134,7 @@
 				}
 				function success (response) {
 					try {
+						if (cb) cb(response.code, response.data);
 						setResult({
 							msg: response.msg,
 							code: response.code,
@@ -164,7 +165,7 @@
 
 			// ============ CHARACTER ============ //
 			var characters;
-			var you = '(you didn"t seession or login, how can i know ur name...)';
+			var you = '(you didn"t session or login, how can i know ur name...)';
 			var $ch = {
 				name: jQuery('#chName'),
 				gM: jQuery('#chGenderMale'),
@@ -191,15 +192,32 @@
 				return result;
 			}
 
-			function createCharacter() {
-				sendPost('/character/create', getCharacterData());
+			function createCharacterFromData() {
+				createCharacter(getCharacterData());
+			}
+
+			function createCharacter(charData) {
+				sendPost('/character/create', charData, (code, data) => {
+					if (code === "CHARACTER_1") {
+						characters = data;
+					}
+				});
 			}
 
 			var $delete = jQuery('#delete');
 			var $deleteCharNumber = jQuery('#deleteCharNumber');
 
-			function deleteCharacter() {
-				sendPost('/character/delete', {id: characters[$deleteCharNumber.val()]._id});
+			function deleteCharacterFromData() {
+				let val = $deleteCharNumber.val();
+				deleteCharacter({id: characters[val]._id});
+			}
+
+			function deleteCharacter(deleteData) {
+				sendPost('/character/delete', deleteData, (code, data) => {
+					if (code === "CHARACTER_2") {
+						characters = data;
+					}
+				});
 			}
 
 			// ============ SOCKETIO ============ //
