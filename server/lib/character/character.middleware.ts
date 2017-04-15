@@ -1,9 +1,18 @@
 'use strict';
 import MasterMiddleware from '../master/master.middleware';
 import CharacterServices from './character.services';
+let config = require('../../../server/lib/character/character.config.json');
 
 export default class CharacterMiddleware extends MasterMiddleware {
 	protected services: CharacterServices;
+
+	public validHasFewCharacters(req, res, next) {
+		if (req.user.characters.length < config.MAX_CHARACTERS) {
+			next();
+		} else {
+			this.sendError(res, this.LOGS.MAX_CHARACTERS)
+		}
+	}
 
 	validateCreateCharacterParams(req, res, next) {
 		return this.validateParams(req, res, next, [

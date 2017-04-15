@@ -10,6 +10,7 @@ export default class CharacterRouter extends MasterRouter {
 	initRoutes(app) {
 		app.post(this.ROUTES.CHARACTER_CREATE,
 			this.middleware.isLoggedIn.bind(this.middleware),
+			this.middleware.validHasFewCharacters.bind(this.middleware),
 			this.middleware.validateCreateCharacterParams.bind(this.middleware),
 			this.middleware.convertToFormatAndCheckNameUniqueness.bind(this.middleware),
 			this.controller.handleNewCharacter.bind(this.controller));

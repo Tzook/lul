@@ -23,6 +23,12 @@
 			"MSG": "The character id does not exist in the user.",
 			"CODE": "CHARACTER_4",
 			"STATUS": "BAD_VALUES"
+		},
+		"MAX_CHARACTERS": {
+			"MSG": "The user already has the maximum amount of characters available.",
+			"CODE": "CHARACTER_5",
+			"STATUS": "UNAUTHORIZED"
 		}
-	}
+	},
+	"MAX_CHARACTERS": 8
 }
