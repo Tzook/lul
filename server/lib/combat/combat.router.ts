@@ -16,6 +16,7 @@ export default class CombatRouter extends SocketioRouterBase {
 
 	[config.SERVER_GETS.PERFORM_ATTACK](data, socket: GameSocket) {
 		let load = this.middleware.getValidLoad(data.load);
+		socket.lastAttackLoad = load;
 		console.log("performing attack", socket.character.name, data, load);
 		socket.broadcast.to(socket.character.room).emit(this.CLIENT_GETS.PERFORM_ATTACK, {
 			id: socket.character._id,

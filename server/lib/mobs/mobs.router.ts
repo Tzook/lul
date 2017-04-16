@@ -40,13 +40,14 @@ export default class MobsRouter extends SocketioRouterBase {
 
 	[SERVER_GETS.MOB_TAKE_DMG](data, socket: GameSocket) {
 		if (this.controller.hasMob(data.mob_id)) {
-			// damage is hardcoded 10 for now. TODO: calculate the damage
-			let dmg = 10;
+			let load = socket.lastAttackLoad || 0;
+			let dmg = this.controller.calculateDamage(socket, load);
 			let mob = this.controller.hurtMob(data.mob_id, dmg);
 			this.io.to(socket.character.room).emit(this.CLIENT_GETS.MOB_TAKE_DMG, {
 				id: socket.character._id,
 				mob_id: mob.id,
 				dmg,
+				load,
 				hp: mob.hp,
 			});
 			if (mob.hp === 0) {

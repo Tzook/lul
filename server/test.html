@@ -289,7 +289,6 @@
 				socket.on("actor_unequip_item", d => setResult({msg: "actor_unequip_item", d}))
 				socket.on("actor_delete_equip", d => setResult({msg: "actor_delete_equip", d}))
 
-				socket.on("movement", d => console.log({msg: "movement", d}))
 				socket.on("actor_start_climbing", d => setResult({msg: "actor_start_climbing", d}))
 				socket.on("actor_stop_climbing", d => setResult({msg: "actor_stop_climbing", d}))
 

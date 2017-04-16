@@ -93,16 +93,25 @@ export default class MobsController extends MasterController {
 		});
 	}
 
+	public calculateDamage(socket: GameSocket, load: number): number {
+		let baseDmg = socket.character.stats.str; // currently hardcoded str. once we have abilities, will choose based on main stat
+		let bonusDmg = load * baseDmg / 100;
+		let maxDmg = baseDmg + bonusDmg;
+		let minDmg = maxDmg / 2;
+		let dmg = this.services.getDamageRange(minDmg, maxDmg);
+		return dmg;
+	}
+
 	public hurtMob(id: string, dmg: number): MOB_INSTANCE {
 		let mob = this.mobById.get(id);
-		mob.hp = Math.max(0, mob.hp - dmg);
+		mob.hp = this.services.getHpAfterDamage(mob.hp, dmg);
 		return mob;
 	}
 
 	public hurtChar(id: string, socket: GameSocket) {
 		let mob = this.mobById.get(id);
-		let dmg = _.random(mob.minDmg, mob.maxDmg);
-		socket.character.stats.hp.now = Math.max(0, socket.character.stats.hp.now - dmg);
+		let dmg = this.services.getDamageRange(mob.minDmg, mob.maxDmg);
+		socket.character.stats.hp.now = this.services.getHpAfterDamage(socket.character.stats.hp.now, dmg);
 		this.io.to(socket.character.room).emit(CLIENT_GETS.TAKE_DMG, {
 			id: socket.character._id,
 			dmg,

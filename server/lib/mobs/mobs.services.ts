@@ -1,5 +1,6 @@
 'use strict';
 import MasterServices from '../master/master.services';
+import * as _ from "underscore";
 
 export default class MobsServices extends MasterServices {
 	private mobsInfo: Map<string, MOB_SCHEMA> = new Map();
@@ -44,5 +45,13 @@ export default class MobsServices extends MasterServices {
 	public getMobInfo(mobId: string): MOB_SCHEMA {
 		// always return a copy of the mob, so it can be modified freely
 		return Object.assign({}, this.mobsInfo.get(mobId));
+	}
+
+	public getDamageRange(min: number, max: number): number {
+		return _.random(Math.floor(min) || 1, Math.floor(max));
+	}
+
+	public getHpAfterDamage(hp: number, dmg: number): number {
+		return Math.max(0, Math.floor(hp - dmg));
 	}
 };
