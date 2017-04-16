@@ -1,6 +1,6 @@
 import { browser } from "protractor/built";
 import { raiseBrowser, expectText } from "../common";
-import { login, logout, deleteUser, register } from "./user.common";
+import { login, logout, deleteUser, register, TEST_USERNAME_UNCAUGHT, TEST_PASSWORD, TEST_USERNAME } from "./user.common";
 
 describe('signup', () => {
     raiseBrowser();
@@ -22,29 +22,29 @@ describe('signup', () => {
         });
 
         it('should not allow registering without a password', () => {
-            browser.executeScript(`sendPost('/user/register', {username: 'uncaughtTestName'});`);
+            browser.executeScript(`sendPost('/user/register', {username: '${TEST_USERNAME_UNCAUGHT}'});`);
             expectText("Parameter 'password' is required.");
         });
 
         it('should not allow registering with a password that is not a string', () => {
-            browser.executeScript(`sendPost('/user/register', {username: 'uncaughtTestName', password: {}});`);
+            browser.executeScript(`sendPost('/user/register', {username: '${TEST_USERNAME_UNCAUGHT}', password: {}});`);
             expectText("Parameter 'password' is required.");
         });
 
         it('should not allow registering with a password that is not 32 characters long', () => {
-            browser.executeScript(`sendPost('/user/register', {username: 'uncaughtTestName', password: 'tooshort'});`);
+            browser.executeScript(`sendPost('/user/register', {username: '${TEST_USERNAME_UNCAUGHT}', password: 'tooshort'});`);
             expectText("parameter 'password' is out of range.");
         });
 
         it('should not allow registering with a user already logged in', () => {
             login();
-            browser.executeScript(`sendPost('/user/register', {username: 'uncaughtTestName', password: '12345678123456781234567812345678'});`);
+            browser.executeScript(`sendPost('/user/register', {username: '${TEST_USERNAME_UNCAUGHT}', password: '${TEST_PASSWORD}'});`);
             expectText("Cannot do this request with a user already logged in.");
             logout();
         });
 
         it('should not allow registering a username that is already taken', () => {
-            browser.executeScript(`sendPost('/user/register', {username: 'test', password: '12345678123456781234567812345678'});`);
+            browser.executeScript(`sendPost('/user/register', {username: '${TEST_USERNAME}', password: '${TEST_PASSWORD}'});`);
             expectText("Username 'test' is already being used.");
         });
     });

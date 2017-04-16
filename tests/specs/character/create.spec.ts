@@ -1,5 +1,5 @@
 import { raiseBrowser, expectText } from "../common";
-import { deleteChar, createChar, createCharParams } from "./character.common";
+import { deleteChar, createChar, CREATE_CHAR_PARAMS, TEST_CHAR_NAME_UNCAUGHT, TEST_CHAR_NAME, TEST_MAX_CHARS_USERNAME } from "./character.common";
 import { login, logout } from "../user/user.common";
 import { browser } from "protractor/built";
 
@@ -28,17 +28,24 @@ describe('create character', () => {
 
         it('should not allow creating a char when one of the options is missing', () => {
             login();
-            browser.executeScript(`createCharacter({name: "uncaughtTestName"})`);
+            browser.executeScript(`createCharacter({name: "${TEST_CHAR_NAME_UNCAUGHT}"})`);
             expectText("Parameter 'g' is required.");
             logout();
         });
 
         it('should not allow creating a char when name is already caught', () => {
             login();
-            let charParams = Object.assign({}, createCharParams);
-            charParams.name = "test";
+            let charParams = Object.assign({}, CREATE_CHAR_PARAMS);
+            charParams.name = TEST_CHAR_NAME;
             browser.executeScript(`createCharacter(${JSON.stringify(charParams)})`);
             expectText("The name 'test' is already being used.");
+            logout();
+        });
+
+        it('should not allow creating a char when user already has 8 chars', () => {
+            login(TEST_MAX_CHARS_USERNAME);
+            browser.executeScript(`createCharacter(${JSON.stringify(CREATE_CHAR_PARAMS)})`);
+            expectText("The user already has the maximum amount of characters available.");
             logout();
         });
     });
