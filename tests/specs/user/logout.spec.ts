@@ -1,10 +1,10 @@
-import { raiseBrowser, expectText } from "../common";
-import { login, logout } from "./user.common";
+import { expectText } from "../common";
+import { login, logout, runAllTestsWithoutUser } from "./user.common";
 import { browser } from "protractor/built";
 
 describe('logout', () => {
-    raiseBrowser();
-
+    runAllTestsWithoutUser();
+    
     describe('failure', () => {
         it('should not allow logout when user is not logged in', () => {
             browser.executeScript(`logout()`);

@@ -1,10 +1,10 @@
-import { raiseBrowser, expectText } from "../common";
-import { deleteUser, register } from "./user.common";
+import { expectText } from "../common";
+import { deleteUser, register, runAllTestsWithoutUser } from "./user.common";
 import { browser } from "protractor/built";
 
 describe('delete user', () => {
-    raiseBrowser();
-
+    runAllTestsWithoutUser();
+    
     describe('failure', () => {
         it('should not allow deleting when user is not logged in', () => {
             browser.executeScript(`deleteUser()`);

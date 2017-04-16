@@ -50,6 +50,7 @@
 
 		<script>
 			'use strict';
+
 			// ============ GENERAL ============ //
 			function showLoading() {
 				$loading.addClass('loading-shown');
@@ -88,6 +89,10 @@
 				$chat.append($elem);
 				$chat.animate({scrollTop: $chat[0].scrollHeight}, 300);
 			}
+
+			function clearResults () {
+				$chat.html("");
+			};
 
 			// ============ LOGIN ============ //
 			var $chat = jQuery('#chat');
