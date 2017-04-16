@@ -63,7 +63,7 @@ export default class MobsRouter extends SocketioRouterBase {
 
 	[SERVER_GETS.MOB_MOVE](data, socket: GameSocket) {
 		if (!socket.bitch) {
-			this.sendError(data, socket, "Character is not bitch!");
+			this.sendError(data, socket, "Character is not bitch!", false);
 		} else if (!this.controller.hasMob(data.mob_id)) {
 			this.sendError(data, socket, "Mob doesn't exist!");
 		} else {
