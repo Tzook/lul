@@ -8,6 +8,9 @@ export default class MovementRouter extends SocketioRouterBase {
 		position.x = data.x;
 		position.y = data.y;
 		position.z = data.z;
+		if (data.z == "-1") {
+			console.log("movement", data, socket.character.name);
+		}
 		socket.broadcast.to(socket.character.room).emit(this.CLIENT_GETS.MOVEMENT, {
 			id: socket.character._id,
 			x: data.x,

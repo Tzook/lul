@@ -7,7 +7,7 @@ export const TEST_PASSWORD = '12345678123456781234567812345678';
 
 export function login(username = TEST_USERNAME, chosenBrowser = browser) {
     chosenBrowser.executeScript(`sendPost('/user/login', {username: '${username}', password: '${TEST_PASSWORD}'});`);
-    expectText("Logged in successfully.");
+    expectText("Logged in successfully.", chosenBrowser);
 }
 
 export function logout(chosenBrowser = browser) {

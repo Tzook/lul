@@ -1,4 +1,4 @@
-import { browser, ExpectedConditions, $ } from "protractor/built";
+import { browser, ProtractorBrowser } from "protractor/built";
 import { login } from "./user/user.common";
 
 const WAIT_TIME = 5000;
@@ -8,6 +8,7 @@ export function raiseBrowser() {
     beforeAll(() => {
         browser.waitForAngularEnabled(false);
         browser.get(URL);
+        browser.executeScript('window.test = true;');
         login();
     });
 
@@ -16,21 +17,50 @@ export function raiseBrowser() {
     });
 };
 
-// export function raiseTwoBrowsers() {
-//     // see https://github.com/angular/protractor/blob/master/spec/interaction/interaction_spec.js
-//     let newBrowser: {browser2?: ProtractorBrowser} = {};
+export function raiseBrowser2() {
+    // see https://github.com/angular/protractor/blob/master/spec/interaction/interaction_spec.js
+    let newBrowser: {instance?: ProtractorBrowser} = {};
 
-//     beforeEach(() => {
-//         newBrowser.browser2 = browser.forkNewDriverInstance(true, true, true);
-//         newBrowser.browser2.ignoreSynchronization = true;
-//         newBrowser.browser2.waitForAngularEnabled(false);
-//     });
+    beforeAll(() => {
+        newBrowser.instance = browser.forkNewDriverInstance();
+        newBrowser.instance.waitForAngularEnabled(false);
+        newBrowser.instance.get(URL);
+        newBrowser.instance.executeScript('window.test = true;');
+        login(undefined, newBrowser.instance);
+    });
 
-//     // afterEach(done => newBrowser.browser2.quit().then(() => done()));
+    afterAll(done => newBrowser.instance.quit().then(() => done()));
 
-//     return newBrowser;
-// }
+    return newBrowser;
+}
 
-export function expectText(text) {
-    browser.wait(ExpectedConditions.textToBePresentInElement($("#chat"), text), WAIT_TIME);
+export function expectText(text, chosenBrowser = browser) {
+    chosenBrowser.wait(chosenBrowser.ExpectedConditions.textToBePresentInElement(chosenBrowser.$("#chat"), text), WAIT_TIME);
+}
+
+export function connectChar(charId, chosenBrowser = browser) {
+    // IMPORTANT - Protractor has a bug that waiting for angular boolean in forked browsers is ignored.
+    // IMPORTANT - I have changed Protractor's NPM package runner.js initProperties' waitForAngularEnabled to false.
+    // IMPORTANT - This will possibly be fixed sometime soon, until then it's a small fix
+    //
+    // TODO move this to socketio folder when it is created
+    chosenBrowser.executeScript(`connect(${charId});`);
+    expectText(`"connected."`, chosenBrowser);
+}
+
+export function disconnect(chosenBrowser = browser) {
+    chosenBrowser.executeScript(`disconnect();`);
+    expectText(`"disconnected."`, chosenBrowser);
+}
+
+export function connectChars(newBrowser) {
+    beforeAll(() => {
+        connectChar(0);
+        connectChar(1, newBrowser.instance);
+    });
+
+    afterAll(() => {
+        disconnect();
+        // disconnect(newBrowser.instance); not needed because we quit the 2nd browser for now
+    });
 }

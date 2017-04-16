@@ -1,5 +1,5 @@
 import { expectText } from "../common";
-import { deleteChar, createChar } from "./character.common";
+import { deleteChar, createChar, TEST_CHAR_ID } from "./character.common";
 import { register, deleteUser, runAllTestsWithoutUser } from "../user/user.common";
 import { browser } from "protractor/built";
 
@@ -15,7 +15,7 @@ describe('delete character', () => {
 
             it('should not allow deleting a char when id belongs to a character of another user', () => {
                 register();
-                browser.executeScript(`deleteCharacter({id: '58f1d663d1656c7a428c7c23'})`);
+                browser.executeScript(`deleteCharacter({id: '${TEST_CHAR_ID}'})`);
                 expectText("The character id does not exist in the user.");
                 deleteUser();
             });

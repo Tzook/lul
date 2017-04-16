@@ -38,7 +38,7 @@
 				</div>
 			</div>
 			<div class="group form-inline">
-				<button id="connect" disabled="true" onclick="connect()" class="btn btn-lg btn-info user-btn">Connect to char number:
+				<button id="connect" disabled="true" onclick="connectClicked()" class="btn btn-lg btn-info user-btn">Connect to char number:
 					<input id="chNumber" class="form-control" type="number" max="9" min="0" onclick="event.stopPropagation();"></input>
 				</button>
 				<button onclick="disconnect()" class="btn btn-lg btn-danger user-btn">Disconnect</button>
@@ -87,7 +87,7 @@
 				}
 				$elem.css('color', getRandomColor()); // random color
 				$chat.append($elem);
-				$chat.animate({scrollTop: $chat[0].scrollHeight}, 300);
+				$chat.animate({scrollTop: $chat[0].scrollHeight}, window.test ? 0 : 300);
 			}
 
 			function clearResults () {
@@ -255,20 +255,22 @@
 				})();
 			});
 
-			function connect() {
+			function connectClicked() {
+				connect($chNumber.val());
+			}
+
+			function connect(index) {
 				if (socket) {
 					disconnect();
 				}
 				showLoading();
-				socket = io(location.host, {forceNew: true, query: "id=" + characters[$chNumber.val()]._id});
+				socket = io(location.host, {forceNew: true, query: "id=" + characters[index]._id});
 				// HANDSHAKE APPROVED
 				socket.on('connect', function() {
 					toggleIntro(true);
 					hideLoading();
 					setResult({msg: 'connected.'});
-					setTimeout(() => {
-						socket.emit("entered_room", "");
-					}, 1000);
+					socket.emit("entered_room", "");
 				});
 				// HANDSHAKE REJECTED / HAD ERROR
 				socket.on('error', function(error) {
@@ -283,6 +285,7 @@
 				});
 				
 				socket.on("event_error", d => setResult({msg: "event_error", d}))
+				socket.on("movement", d => d.z == "-1" && setResult({msg: "movement", d})) // only if it's -z then it means we are in a test
 
 				socket.on("actor_pick_item", d => setResult({msg: "actor_pick_item", d}))
 				socket.on("actor_delete_item", d => setResult({msg: "actor_delete_item", d}))
