@@ -11,7 +11,10 @@
             "name": "Launch Program",
             "program": "${workspaceRoot}/output/main.js",
             "sourceMaps": true,
-            "outFiles": []
+            "outFiles": [],
+            "env": {
+                "NODE_ENV": "development"
+            }
         },
         {
             "type": "node",
