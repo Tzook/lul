@@ -32,12 +32,25 @@ export default class ItemsRouter extends SocketioRouterBase {
 		}
 	}
 
-	[SERVER_GETS.ITEM_DROP](data, socket: GameSocket, item?: Item) {
+	[SERVER_GETS.ITEM_DROP](data, socket: GameSocket) {
 		let slot = data.slot;
-		if (item || this.middleware.hasItem(socket, slot)) {
-			item = item || socket.character.items[slot];
+		if (this.middleware.hasItem(socket, slot)) {
+			let item = socket.character.items[slot];
+			console.log("dropping item", item);
+			this.emitter.emit(config.SERVER_INNER.ITEMS_DROP, {}, socket, [item]);
+			socket.character.items.set(slot, {});
+			socket.emit(this.CLIENT_GETS.ITEM_DELETE, { slot });
+		} else {
+			this.sendError(data, socket, "Trying to drop an item but nothing's there!");
+		}
+	}
+
+	[config.SERVER_INNER.ITEMS_DROP](data, socket: GameSocket, items: Item[]) {
+		let room = socket.character.room;
+		let itemsData = [];
+		
+		items.forEach(item => {
 			let itemId = _.uniqueId();
-			let room = socket.character.room;
 			let itemAndRoomId = room + "-" + itemId;
 			let itemData = {
 				x: socket.character.position.x,
@@ -46,13 +59,7 @@ export default class ItemsRouter extends SocketioRouterBase {
 				item
 			};
 			this.itemsMap.set(itemAndRoomId, itemData);
-
-			console.log('dropping item', itemData, 'in slot', slot);
-			if (slot >= 0) {
-				socket.character.items.set(slot, {});
-				socket.emit(this.CLIENT_GETS.ITEM_DELETE, { slot });
-			}
-			this.io.to(room).emit(this.CLIENT_GETS.ITEM_DROP, itemData);
+			itemsData[itemsData.length] = itemData;
 
 			setTimeout(() => {
 				if (this.itemsMap.has(itemAndRoomId)) {
@@ -63,9 +70,9 @@ export default class ItemsRouter extends SocketioRouterBase {
 					});
 				}
 			}, config.ITEM_DROP_LIFE);
-		} else {
-			this.sendError(data, socket, "Trying to drop an item but nothing's there!");
-		}
+		});
+		
+		this.io.to(room).emit(this.CLIENT_GETS.ITEM_DROP, itemsData);
 	}
 
 	[SERVER_GETS.ITEM_MOVE](data, socket: GameSocket) {

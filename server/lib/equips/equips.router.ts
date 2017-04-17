@@ -103,7 +103,7 @@ export default class EquipsRouter extends SocketioRouterBase {
 			let equip = socket.character.equips[slot];
 			console.log("dropping equip", equip);
 
-			this.emitter.emit(itemsConfig.SERVER_GETS.ITEM_DROP, { slot }, socket, equip);
+			this.emitter.emit(itemsConfig.SERVER_INNER.ITEMS_DROP, { }, socket, [equip]);
 
 			let ItemsModels = this.mongoose.model("Item");
 			socket.character.equips[slot] = new ItemsModels({});

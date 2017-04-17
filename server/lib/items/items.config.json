@@ -1,5 +1,8 @@
 {
-	"ROUTES": {
+	"ROUTES": {},
+	"LOGS": {},
+	"SERVER_INNER": {
+		"ITEMS_DROP": "dropped_items"
 	},
 	"SERVER_GETS": {
 		"ITEM_PICK": "picked_item",
@@ -15,7 +18,5 @@
 		"ITEM_MOVED": "actor_move_item"
 	},
 	"MAX_ITEMS": 20,
-	"ITEM_DROP_LIFE": 60000,
-	"LOGS": {
-	}
+	"ITEM_DROP_LIFE": 60000
 }

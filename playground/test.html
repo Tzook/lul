@@ -310,8 +310,8 @@
 					var height = $intro.height();
 					return function (toClose) {
 						toClose
-						? $intro.height(height).animate({height: 0}, 400, function() { $intro.css('display', 'none'); $playground.css('opacity', '1');} )
-						: $intro.css('display', 'block').animate({height: height}, 400, function() { $playground.css('opacity', '0'); });
+						? $intro.height(height).animate({height: 0}, 400, function() { $intro.css('display', 'none');} )
+						: $intro.css('display', 'block').animate({height: height}, 400);
 					};
 				})();
 			});
