@@ -36,7 +36,6 @@ export default class SocketioRouter extends SocketioRouterBase {
 
 	initDependencies(mongoStore) {
 		this.io.use((socket: GameSocket, next: Function) => {
-			this.logger.info(socket.request, 'begin socket');
 			if (socket.request._query.unicorn) {
 				socket.request._query.session_id = socket.request._query.unicorn.split(/s:|\./)[1];
 			}
@@ -51,8 +50,6 @@ export default class SocketioRouter extends SocketioRouterBase {
 		}));
 	}
 	onAuthorizeSuccess(req, next: Function) {
-		this.logger.info(req, 'logged user successfully');
-		// TODO move to service
 		for (let i = 0; i < req.user.characters.length; i++) {
 			if (req.user.characters[i]._id.equals(req._query.id)) {
 				req.character = req.user.characters[i];

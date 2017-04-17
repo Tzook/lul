@@ -19,6 +19,7 @@
     "tests",
     "gulpfile.js",
     "node_modules",
-    "output"
+    "output",
+    "playground"
   ]
 }
