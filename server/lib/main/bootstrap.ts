@@ -7,7 +7,10 @@ export default class Bootstrap {
     constructor(app) {
         this.app = app;
         app.get('/', (req, res) => {
-            res.sendFile(path.resolve(`server/test.html`));
+            res.sendFile(path.resolve(`playground/test.html`));
+        });
+        app.get('/assets.html', (req, res) => {
+            res.sendFile(path.resolve(`playground/assets.html`));
         });
         app.get('/config', (req, res) => {
             res.send(require('../../../config/config.generated.json'));

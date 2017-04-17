@@ -1,0 +1,413 @@
+<html>
+	<head>
+		<link rel="import" href="assets.html">
+		<style>
+			.loading {
+				position: absolute;
+				right: 0;
+				left: 0;
+				margin: auto;
+				border-radius: 20px;
+				z-index: 1111;
+				top: 100px;
+				height: 330px;
+				width: 500px;
+				background-position-y: -110px;
+					
+				transition: all .2s linear;
+				visibility: hidden;
+				margin-top: -30px;
+			}
+			.loading-shown {
+				margin-top: 0px;
+				opacity: .7 !important;
+				visibility: visible;
+			}
+			.loading:after {
+				content: "loading...";
+				position: absolute;
+				bottom: 20px;
+				left: 50%;
+				color: rgba(249, 249, 249, 0.9);
+				font-size: 30px;
+				transform: translateX(-50%);
+			}
+			.jumbotron {
+				min-height: 100%;
+				margin-bottom: 0 !important;
+				text-align: center;
+			}
+			.group {
+				margin-bottom: 10px;
+			}
+			.form-input {
+				margin: 0 auto 10px !important;
+				max-width: 280px;
+			}
+			.user-btn {
+				margin: 0 5px;
+			}
+			#chat {
+				border: 1px solid black;
+				width: 500px;
+				margin: 20px auto;
+				min-height: 400px;
+				max-height: 550px;
+				box-shadow: inset 0 0 3px;
+				overflow: scroll;
+				word-wrap: break-word;
+				text-align: left;
+				padding: 10px;
+				background-color: white;
+				white-space: pre-wrap;
+			}
+			.intro:after {
+				content: "";
+				display: table;
+			}
+		</style>
+		<title>lel</title>
+	</head>
+	<body>
+		<div class="loading" style="opacity: 0"></div>
+		<div class="jumbotron">
+			<h1>~Tzook's private office~</h1>
+
+			<div class="intro">
+				<div class="group">
+					<input type="text" placeholder="username (1-16)" id="username" class="form-control form-input">
+					<input type="text" placeholder="password (32)" id="password" class="form-control form-input">
+					<button onclick="login()" id="login" class="btn btn-lg btn-success user-btn">Login</button>
+					<button onclick="register()" id="register" class="btn btn-lg btn-primary user-btn">Register</button>
+					<button onclick="session()" id="session" class="btn btn-lg btn-warning user-btn">Session</button>
+					<button onclick="logout()" id="logout" class="btn btn-lg btn-danger user-btn">Logout</button>
+					<button onclick="deleteUser()" id="deleteUser" class="btn btn-lg btn-danger user-btn">Delete</button>
+				</div>
+				<div class="group">
+					<label><input type="radio" name="chG" id="chGenderMale" value="1" class="form-control"> Male</label>
+					<label><input type="radio" name="chG" id="chGenderFemale" value="0" class="form-control"> Female</label>
+					<input type="text" placeholder="Name (1-16)" id="chName" class="form-control form-input">
+					<input type="text" placeholder="Eyes" id="chEyes" class="form-control form-input">
+					<input type="text" placeholder="Nose" id="chNose" class="form-control form-input">
+					<input type="text" placeholder="Mouth" id="chMouth" class="form-control form-input">
+					<input type="text" placeholder="Skin" id="chSkin" class="form-control form-input">
+					<input type="text" placeholder="Hair" id="chHair" class="form-control form-input">
+					<button onclick="createCharacterFromData()" class="btn btn-lg btn-success user-btn">Create</button>
+					<button id="delete" onclick="deleteCharacterFromData()" class="btn btn-danger user-btn">Delete char number:
+						<input id="deleteCharNumber" class="form-control" type="number" max="9" min="0" onclick="event.stopPropagation();"></input>
+					</button>
+				</div>
+			</div>
+			<div class="group form-inline">
+				<button id="connect" disabled="true" onclick="connectClicked()" class="btn btn-lg btn-info user-btn">Connect to char number:
+					<input id="chNumber" class="form-control" type="number" max="9" min="0" onclick="event.stopPropagation();"></input>
+				</button>
+				<button onclick="disconnect()" class="btn btn-lg btn-danger user-btn">Disconnect</button>
+			</div>
+			<div id="chat">
+			</div>
+			<input type="text" placeholder="What to send?" id="emit" class="form-control form-input">
+		</div>
+
+		<script>
+			'use strict';
+
+			// ============ GENERAL ============ //
+			function showLoading() {
+				$loading.addClass('loading-shown');
+			}
+			function hideLoading() {
+				$loading.removeClass('loading-shown');
+			}
+
+			function getRandomColor() {
+				return Math.floor(Math.random() * 16777215).toString(16);
+			}
+
+			function setResult(result) {
+				var $elem = jQuery('<p></p>');
+				if (result.ch) {
+					if (result.d !== undefined) {
+						setCharText(result.ch, result.d);
+						$elem.append(`<b>${result.ch}</b>: `).append(document.createTextNode(result.d));
+					} else {
+						$elem.text(`${result.ch} the fag has logged in!`);
+					}
+				} else {
+					$elem.append(
+						(result.msg ? `msg: "${result.msg}" ` : '') +
+						(result.error ? `error: "${result.error}"<br>` : '') +
+						(result.status ? ` status: "${result.status}" ` : '') +
+						(result.code ? ` code: "${result.code}" ` : '') +
+						(result.d ? `<br>data: ${JSON.stringify(result.d, null, 4).replace(/\n/g, '<br>')}` : '')
+					);
+					if (result.d && result.d.characters) {
+						characters = result.d.characters;
+						$connect.prop('disabled', false);
+					}
+				}
+				$elem.css('color', getRandomColor()); // random color
+				$chat.append($elem);
+				$chat.animate({scrollTop: $chat[0].scrollHeight}, window.test ? 0 : 300);
+			}
+
+			function clearResults () {
+				$chat.html("");
+			};
+
+			// ============ LOGIN ============ //
+			var $chat = jQuery('#chat');
+			var $loading = jQuery('.loading');
+			var $username = jQuery('#username'),
+				$password = jQuery('#password');
+			function login() {
+				sendPost('/user/login', getUserData());
+			}
+			function register() {
+				sendPost('/user/register', getUserData());
+			}
+			function session() {
+				sendGet('/user/session');
+			}
+			function logout() {
+				sendGet('/user/logout');
+			}
+			function deleteUser() {
+				sendPost('/user/delete', {});
+			}
+
+			function getUserData() {
+				return {
+					username: $username.val(),
+					password: md5($password.val())
+				};
+			}
+
+			function sendPost(url, data, cb) {
+				send('POST', url, JSON.stringify(data), cb);
+			}
+
+			function sendGet(url, cb) {
+				send('GET', url, cb);
+			}
+
+			function send(method, url, data, cb) {
+				try {
+					showLoading();
+					$.ajax({method, url, data, success, error, dataType: "json", contentType: "application/json"});
+				} catch (e) {
+					console.error(e);
+				}
+				function success (response) {
+					try {
+						if (cb) cb(response.code, response.data);
+						setResult({
+							msg: response.msg,
+							code: response.code,
+							d: response.data
+						});
+					} catch (e) {
+						console.error(e);
+					} finally {
+						hideLoading();
+					}
+				}
+				function error (jqResponse, json) {
+					try {
+						var response = JSON.parse(jqResponse.responseText);
+						setResult({
+							error: response.error,
+							code: response.code,
+							status: jqResponse.status
+						});
+						hideLoading();
+					} catch (e) {
+						console.error(e);
+					} finally {
+						hideLoading();
+					}
+				}
+			}
+
+			// ============ CHARACTER ============ //
+			var characters;
+			var you = '(you didn"t session or login, how can i know ur name...)';
+			var $ch = {
+				name: jQuery('#chName'),
+				gM: jQuery('#chGenderMale'),
+				gF: jQuery('#chGenderFemale'),
+				hairColor: jQuery('#chHairColor'),
+				skin: jQuery('#chSkin'),
+				hair: jQuery('#chHair'),
+				eyes: jQuery('#chEyes'),
+				mouth: jQuery('#chMouth'),
+				nose: jQuery('#chNose')
+			};
+
+			function getCharacterData() {
+				var result = {
+					name: $ch.name.val(),
+					hairColor: $ch.hairColor.val(),
+					skin: $ch.skin.val(),
+					hair: $ch.hair.val(),
+					eyes: $ch.eyes.val(),
+					mouth: $ch.mouth.val(),
+					nose: $ch.nose.val()
+				};
+				($ch.gM.prop('checked') || $ch.gF.prop('checked')) && (result.g = ($ch.gM.prop('checked') ? "1" : "0"));
+				return result;
+			}
+
+			function createCharacterFromData() {
+				createCharacter(getCharacterData());
+			}
+
+			function createCharacter(charData) {
+				sendPost('/character/create', charData, (code, data) => {
+					if (code === "CHARACTER_1") {
+						characters = data;
+					}
+				});
+			}
+
+			var $delete = jQuery('#delete');
+			var $deleteCharNumber = jQuery('#deleteCharNumber');
+
+			function deleteCharacterFromData() {
+				let val = $deleteCharNumber.val();
+				deleteCharacter({id: characters[val]._id});
+			}
+
+			function deleteCharacter(deleteData) {
+				sendPost('/character/delete', deleteData, (code, data) => {
+					if (code === "CHARACTER_2") {
+						characters = data;
+					}
+				});
+			}
+
+			// ============ SOCKETIO ============ //
+			document.body.addEventListener('keydown', function(e) {
+				if (socket) {
+					switch(e.which) {
+						case 13: emit(); break;
+						case 37: move(-10, 0); e.preventDefault(); break;
+						case 38: move(0, -10); e.preventDefault(); break;
+						case 39: move(10, 0); e.preventDefault(); break;
+						case 40: move(0, 10); e.preventDefault(); break;
+					}
+				}
+			});
+
+			var socket;
+			var $emit = jQuery('#emit');
+			var $connect = jQuery('#connect');
+			var $chNumber = jQuery('#chNumber');
+			var $intro = jQuery('.intro');
+			var toggleIntro;
+			setTimeout(function() {
+				toggleIntro = (function() {
+					var height = $intro.height();
+					return function (toClose) {
+						toClose
+						? $intro.height(height).animate({height: 0}, 400, function() { $intro.css('display', 'none'); $playground.css('opacity', '1');} )
+						: $intro.css('display', 'block').animate({height: height}, 400, function() { $playground.css('opacity', '0'); });
+					};
+				})();
+			});
+
+			function connectClicked() {
+				connect($chNumber.val());
+			}
+
+			function connect(index) {
+				if (socket) {
+					disconnect();
+				}
+				showLoading();
+				socket = io(location.host, {forceNew: true, query: "id=" + characters[index]._id});
+				// HANDSHAKE APPROVED
+				socket.on('connect', function() {
+					toggleIntro(true);
+					hideLoading();
+					setResult({msg: 'connected.'});
+					socket.emit("entered_room", "");
+				});
+				// HANDSHAKE REJECTED / HAD ERROR
+				socket.on('error', function(error) {
+					setResult({error});
+					disconnect();
+					hideLoading();
+					console.log('error: %o', error);
+				});
+				// CONNECTION TERMINATED
+				socket.on('disconnected', function(d) {
+					removeChar(d.ch);
+				});
+				
+				socket.on("event_error", d => setResult({msg: "event_error", d}))
+				socket.on("movement", d => d.z == "-1" && setResult({msg: "movement", d})) // only if it's -z then it means we are in a test
+
+				socket.on("actor_pick_item", d => setResult({msg: "actor_pick_item", d}))
+				socket.on("actor_delete_item", d => setResult({msg: "actor_delete_item", d}))
+				socket.on("drop_item", d => setResult({msg: "drop_item", d}))
+				socket.on("item_disappear", d => setResult({msg: "item_disappear", d}))
+				socket.on("actor_move_item", d => setResult({msg: "actor_move_item", d}))
+
+				socket.on("actor_equip_item", d => setResult({msg: "actor_equip_item", d}))
+				socket.on("actor_unequip_item", d => setResult({msg: "actor_unequip_item", d}))
+				socket.on("actor_delete_equip", d => setResult({msg: "actor_delete_equip", d}))
+
+				socket.on("actor_start_climbing", d => setResult({msg: "actor_start_climbing", d}))
+				socket.on("actor_stop_climbing", d => setResult({msg: "actor_stop_climbing", d}))
+
+				socket.on("actor_emote", d => setResult({msg: "actor_emote", d}))
+
+				socket.on("chat", d => setResult({msg: "chat", d}))
+				socket.on("whisper", d => setResult({msg: "whisper", d}))
+				socket.on("whisper_fail", d => setResult({msg: "whisper_fail", d}))
+
+				socket.on("actor_join_room", d => setResult({msg: "actor_join_room", d}))
+				socket.on("actor_move_room", d => setResult({msg: "actor_move_room", d}))
+				socket.on("actor_leave_room", d => setResult({msg: "actor_leave_room", d}))
+				socket.on("bitch_please", d => setResult({msg: "bitch_please", d}))
+				socket.on("actor_bitch", d => setResult({msg: "actor_bitch", d}))
+
+				// socket.on("actor_gain_exp", d => setResult({msg: "actor_gain_exp", d}))
+				// socket.on("actor_gain_hp", d => setResult({msg: "actor_gain_hp", d}))
+				// socket.on("actor_gain_mp", d => setResult({msg: "actor_gain_mp", d}))
+				socket.on("actor_lvl_up", d => setResult({msg: "actor_lvl_up", d}))
+				socket.on("actor_take_dmg", d => setResult({msg: "actor_take_dmg", d}))
+
+				socket.on("actor_load_attack", d => setResult({msg: "actor_load_attack", d}))
+				socket.on("actor_perform_attack", d => setResult({msg: "actor_perform_attack", d}))
+				
+				socket.on("mob_spawn", d => setResult({msg: "mob_spawn", d}));
+				socket.on("mob_die", d => setResult({msg: "mob_die", d}));
+				socket.on("mob_take_dmg", d => setResult({msg: "mob_take_dmg", d}));
+				socket.on("mob_move", d => setResult({msg: "mob_move", d}));
+
+			}
+
+			function move(dX, dY) {
+				you.pos.x += dX;
+				you.pos.y += dY;
+				moveChar(you.name, you.pos);
+				socket.emit('xy', you.pos);
+			}
+
+			function emit() {
+				socket.emit("chatted", {msg: $emit.val()});
+				setResult({msg: "You: " + $emit.val()});
+				$emit.val('');
+			}
+
+			function disconnect() {
+				toggleIntro();
+				setResult({msg: "disconnected."});
+				socket.disconnect();
+				socket = undefined;
+			}
+		</script>
+	</body>
+</html>
