@@ -13,7 +13,7 @@
 	"CLIENT_GETS": {
 		"ITEM_PICK": "actor_pick_item",
 		"ITEM_DELETE": "actor_delete_item",
-		"ITEM_DROP": "drop_item",
+		"ITEM_DROP": "drop_items",
 		"ITEM_DISAPPEAR": "item_disappear",
 		"ITEM_MOVED": "actor_move_item"
 	},
