@@ -3,54 +3,41 @@ const built_1 = require("protractor/built");
 const user_common_1 = require("./user/user.common");
 const WAIT_TIME = 5000;
 const URL = 'http://localhost:5000/';
-function raiseBrowser() {
+function raiseBrowser(b = { instance: built_1.browser }) {
     beforeAll(() => {
-        built_1.browser.waitForAngularEnabled(false);
-        built_1.browser.get(URL);
-        built_1.browser.executeScript('window.test = true;');
-        user_common_1.login();
-    });
-    afterEach(() => {
-        built_1.browser.executeScript(`clearResults();`);
+        b.instance.waitForAngularEnabled(false);
+        b.instance.get(URL);
+        b.instance.executeScript('window.test = true;');
+        user_common_1.login(undefined, b.instance);
     });
 }
 exports.raiseBrowser = raiseBrowser;
 ;
+exports.newBrowser = {};
 function raiseBrowser2() {
-    let newBrowser = {};
-    beforeAll(() => {
-        newBrowser.instance = built_1.browser.forkNewDriverInstance();
-        newBrowser.instance.waitForAngularEnabled(false);
-        newBrowser.instance.get(URL);
-        newBrowser.instance.executeScript('window.test = true;');
-        user_common_1.login(undefined, newBrowser.instance);
-    });
-    afterAll(done => newBrowser.instance.quit().then(() => done()));
-    return newBrowser;
+    beforeAll(() => exports.newBrowser.instance = built_1.browser.forkNewDriverInstance());
+    raiseBrowser(exports.newBrowser);
 }
 exports.raiseBrowser2 = raiseBrowser2;
-function expectText(text, chosenBrowser = built_1.browser) {
-    chosenBrowser.wait(chosenBrowser.ExpectedConditions.textToBePresentInElement(chosenBrowser.$("#chat"), text), WAIT_TIME);
+function clearLogs(b = built_1.browser) {
+    b.executeScript(`clearResults();`);
+}
+exports.clearLogs = clearLogs;
+function expectText(text, b = built_1.browser, clear = true) {
+    b.wait(b.ExpectedConditions.textToBePresentInElement(b.$("#chat"), text), WAIT_TIME);
+    clear && clearLogs(b);
 }
 exports.expectText = expectText;
-function connectChar(charId, chosenBrowser = built_1.browser) {
-    chosenBrowser.executeScript(`connect(${charId});`);
-    expectText(`"connected."`, chosenBrowser);
+function connectChar(charId, b = built_1.browser) {
+    b.executeScript(`connect(${charId});`);
+    expectText(`"connected."`, b);
 }
 exports.connectChar = connectChar;
-function disconnect(chosenBrowser = built_1.browser) {
-    chosenBrowser.executeScript(`disconnect();`);
-    expectText(`"disconnected."`, chosenBrowser);
-}
-exports.disconnect = disconnect;
-function connectChars(newBrowser) {
+function connectChars() {
     beforeAll(() => {
         connectChar(0);
-        connectChar(1, newBrowser.instance);
-    });
-    afterAll(() => {
-        disconnect();
+        connectChar(1, exports.newBrowser.instance);
     });
 }
 exports.connectChars = connectChars;
-//# sourceMappingURL=data:application/json;base64,eyJ2ZXJzaW9uIjozLCJmaWxlIjoiY29tbW9uLmpzIiwic291cmNlUm9vdCI6IiIsInNvdXJjZXMiOlsiLi4vLi4vc3BlY3MvY29tbW9uLnRzIl0sIm5hbWVzIjpbXSwibWFwcGluZ3MiOiI7QUFBQSw0Q0FBOEQ7QUFDOUQsb0RBQTJDO0FBRTNDLE1BQU0sU0FBUyxHQUFHLElBQUksQ0FBQztBQUN2QixNQUFNLEdBQUcsR0FBRyx3QkFBd0IsQ0FBQztBQUVyQztJQUNJLFNBQVMsQ0FBQztRQUNOLGVBQU8sQ0FBQyxxQkFBcUIsQ0FBQyxLQUFLLENBQUMsQ0FBQztRQUNyQyxlQUFPLENBQUMsR0FBRyxDQUFDLEdBQUcsQ0FBQyxDQUFDO1FBQ2pCLGVBQU8sQ0FBQyxhQUFhLENBQUMscUJBQXFCLENBQUMsQ0FBQztRQUM3QyxtQkFBSyxFQUFFLENBQUM7SUFDWixDQUFDLENBQUMsQ0FBQztJQUVILFNBQVMsQ0FBQztRQUNOLGVBQU8sQ0FBQyxhQUFhLENBQUMsaUJBQWlCLENBQUMsQ0FBQztJQUM3QyxDQUFDLENBQUMsQ0FBQztBQUNQLENBQUM7QUFYRCxvQ0FXQztBQUFBLENBQUM7QUFFRjtJQUVJLElBQUksVUFBVSxHQUFtQyxFQUFFLENBQUM7SUFFcEQsU0FBUyxDQUFDO1FBQ04sVUFBVSxDQUFDLFFBQVEsR0FBRyxlQUFPLENBQUMscUJBQXFCLEVBQUUsQ0FBQztRQUN0RCxVQUFVLENBQUMsUUFBUSxDQUFDLHFCQUFxQixDQUFDLEtBQUssQ0FBQyxDQUFDO1FBQ2pELFVBQVUsQ0FBQyxRQUFRLENBQUMsR0FBRyxDQUFDLEdBQUcsQ0FBQyxDQUFDO1FBQzdCLFVBQVUsQ0FBQyxRQUFRLENBQUMsYUFBYSxDQUFDLHFCQUFxQixDQUFDLENBQUM7UUFDekQsbUJBQUssQ0FBQyxTQUFTLEVBQUUsVUFBVSxDQUFDLFFBQVEsQ0FBQyxDQUFDO0lBQzFDLENBQUMsQ0FBQyxDQUFDO0lBRUgsUUFBUSxDQUFDLElBQUksSUFBSSxVQUFVLENBQUMsUUFBUSxDQUFDLElBQUksRUFBRSxDQUFDLElBQUksQ0FBQyxNQUFNLElBQUksRUFBRSxDQUFDLENBQUMsQ0FBQztJQUVoRSxNQUFNLENBQUMsVUFBVSxDQUFDO0FBQ3RCLENBQUM7QUFmRCxzQ0FlQztBQUVELG9CQUEyQixJQUFJLEVBQUUsYUFBYSxHQUFHLGVBQU87SUFDcEQsYUFBYSxDQUFDLElBQUksQ0FBQyxhQUFhLENBQUMsa0JBQWtCLENBQUMsd0JBQXdCLENBQUMsYUFBYSxDQUFDLENBQUMsQ0FBQyxPQUFPLENBQUMsRUFBRSxJQUFJLENBQUMsRUFBRSxTQUFTLENBQUMsQ0FBQztBQUM3SCxDQUFDO0FBRkQsZ0NBRUM7QUFFRCxxQkFBNEIsTUFBTSxFQUFFLGFBQWEsR0FBRyxlQUFPO0lBTXZELGFBQWEsQ0FBQyxhQUFhLENBQUMsV0FBVyxNQUFNLElBQUksQ0FBQyxDQUFDO0lBQ25ELFVBQVUsQ0FBQyxjQUFjLEVBQUUsYUFBYSxDQUFDLENBQUM7QUFDOUMsQ0FBQztBQVJELGtDQVFDO0FBRUQsb0JBQTJCLGFBQWEsR0FBRyxlQUFPO0lBQzlDLGFBQWEsQ0FBQyxhQUFhLENBQUMsZUFBZSxDQUFDLENBQUM7SUFDN0MsVUFBVSxDQUFDLGlCQUFpQixFQUFFLGFBQWEsQ0FBQyxDQUFDO0FBQ2pELENBQUM7QUFIRCxnQ0FHQztBQUVELHNCQUE2QixVQUFVO0lBQ25DLFNBQVMsQ0FBQztRQUNOLFdBQVcsQ0FBQyxDQUFDLENBQUMsQ0FBQztRQUNmLFdBQVcsQ0FBQyxDQUFDLEVBQUUsVUFBVSxDQUFDLFFBQVEsQ0FBQyxDQUFDO0lBQ3hDLENBQUMsQ0FBQyxDQUFDO0lBRUgsUUFBUSxDQUFDO1FBQ0wsVUFBVSxFQUFFLENBQUM7SUFFakIsQ0FBQyxDQUFDLENBQUM7QUFDUCxDQUFDO0FBVkQsb0NBVUMifQ==
+//# sourceMappingURL=data:application/json;base64,eyJ2ZXJzaW9uIjozLCJmaWxlIjoiY29tbW9uLmpzIiwic291cmNlUm9vdCI6IiIsInNvdXJjZXMiOlsiLi4vLi4vc3BlY3MvY29tbW9uLnRzIl0sIm5hbWVzIjpbXSwibWFwcGluZ3MiOiI7QUFBQSw0Q0FBOEQ7QUFDOUQsb0RBQTJDO0FBRTNDLE1BQU0sU0FBUyxHQUFHLElBQUksQ0FBQztBQUN2QixNQUFNLEdBQUcsR0FBRyx3QkFBd0IsQ0FBQztBQUVyQyxzQkFBNkIsQ0FBQyxHQUFHLEVBQUMsUUFBUSxFQUFFLGVBQU8sRUFBQztJQUNoRCxTQUFTLENBQUM7UUFDTixDQUFDLENBQUMsUUFBUSxDQUFDLHFCQUFxQixDQUFDLEtBQUssQ0FBQyxDQUFDO1FBQ3hDLENBQUMsQ0FBQyxRQUFRLENBQUMsR0FBRyxDQUFDLEdBQUcsQ0FBQyxDQUFDO1FBQ3BCLENBQUMsQ0FBQyxRQUFRLENBQUMsYUFBYSxDQUFDLHFCQUFxQixDQUFDLENBQUM7UUFDaEQsbUJBQUssQ0FBQyxTQUFTLEVBQUUsQ0FBQyxDQUFDLFFBQVEsQ0FBQyxDQUFDO0lBQ2pDLENBQUMsQ0FBQyxDQUFDO0FBQ1AsQ0FBQztBQVBELG9DQU9DO0FBQUEsQ0FBQztBQUVXLFFBQUEsVUFBVSxHQUFtQyxFQUFFLENBQUM7QUFFN0Q7SUFFSSxTQUFTLENBQUMsTUFBTSxrQkFBVSxDQUFDLFFBQVEsR0FBRyxlQUFPLENBQUMscUJBQXFCLEVBQUUsQ0FBQyxDQUFDO0lBQ3ZFLFlBQVksQ0FBQyxrQkFBaUIsQ0FBQyxDQUFDO0FBQ3BDLENBQUM7QUFKRCxzQ0FJQztBQUVELG1CQUEwQixDQUFDLEdBQUcsZUFBTztJQUNqQyxDQUFDLENBQUMsYUFBYSxDQUFDLGlCQUFpQixDQUFDLENBQUM7QUFDdkMsQ0FBQztBQUZELDhCQUVDO0FBR0Qsb0JBQTJCLElBQUksRUFBRSxDQUFDLEdBQUcsZUFBTyxFQUFFLEtBQUssR0FBRyxJQUFJO0lBQ3RELENBQUMsQ0FBQyxJQUFJLENBQUMsQ0FBQyxDQUFDLGtCQUFrQixDQUFDLHdCQUF3QixDQUFDLENBQUMsQ0FBQyxDQUFDLENBQUMsT0FBTyxDQUFDLEVBQUUsSUFBSSxDQUFDLEVBQUUsU0FBUyxDQUFDLENBQUM7SUFDckYsS0FBSyxJQUFJLFNBQVMsQ0FBQyxDQUFDLENBQUMsQ0FBQztBQUMxQixDQUFDO0FBSEQsZ0NBR0M7QUFFRCxxQkFBNEIsTUFBTSxFQUFFLENBQUMsR0FBRyxlQUFPO0lBSTNDLENBQUMsQ0FBQyxhQUFhLENBQUMsV0FBVyxNQUFNLElBQUksQ0FBQyxDQUFDO0lBQ3ZDLFVBQVUsQ0FBQyxjQUFjLEVBQUUsQ0FBQyxDQUFDLENBQUM7QUFDbEMsQ0FBQztBQU5ELGtDQU1DO0FBRUQ7SUFDSSxTQUFTLENBQUM7UUFDTixXQUFXLENBQUMsQ0FBQyxDQUFDLENBQUM7UUFDZixXQUFXLENBQUMsQ0FBQyxFQUFFLGtCQUFVLENBQUMsUUFBUSxDQUFDLENBQUM7SUFDeEMsQ0FBQyxDQUFDLENBQUM7QUFDUCxDQUFDO0FBTEQsb0NBS0MifQ==
