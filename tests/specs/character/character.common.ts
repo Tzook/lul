@@ -14,7 +14,7 @@ export function createChar(params = CREATE_CHAR_PARAMS) {
     expectText("Character has been created successfully.");
 }
 
-export function deleteChar(index = 2) {
+export function deleteChar(index = 1) {
     browser.executeScript(`deleteCharacter({id: characters[${index}]._id});`);
     expectText("Character has been deleted successfully.");
 }

@@ -12,7 +12,7 @@ function createChar(params = exports.CREATE_CHAR_PARAMS) {
     common_1.expectText("Character has been created successfully.");
 }
 exports.createChar = createChar;
-function deleteChar(index = 2) {
+function deleteChar(index = 1) {
     built_1.browser.executeScript(`deleteCharacter({id: characters[${index}]._id});`);
     common_1.expectText("Character has been deleted successfully.");
 }
