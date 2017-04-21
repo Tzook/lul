@@ -6,14 +6,12 @@ export default class Bootstrap {
     constructor(app) {
         this.app = app;
 
-        if (process.env.NODE_ENV === 'development') {
-            this.app.get('/', (req, res) => {
-                res.sendFile(path.resolve(`playground/test.html`));
-            });
-            this.app.get('/assets.html', (req, res) => {
-                res.sendFile(path.resolve(`playground/assets.html`));
-            });
-        }
+        this.app.get('/', (req, res) => {
+            res.sendFile(path.resolve(`playground/test.html`));
+        });
+        this.app.get('/assets.html', (req, res) => {
+            res.sendFile(path.resolve(`playground/assets.html`));
+        });
     }
 
     public init() {

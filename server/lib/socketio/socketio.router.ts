@@ -3,11 +3,13 @@ import SocketioRouterBase from './socketio.router.base';
 import Emitter = require('events');
 import MasterRouter from "../master/master.router";
 import * as Heroku from 'heroku-client';
+import SocketioMiddleware from './socketio.middleware';
 require('./socketio.fixer');
 let passportSocketIo = require('passport.socketio');
 let SERVER_GETS = require('../../../server/lib/socketio/socketio.config.json').SERVER_GETS;
 
 export default class SocketioRouter extends SocketioRouterBase {
+	protected middleware: SocketioMiddleware;
 	protected routers: SocketioRouterBase[];
 	protected map: Map<string, GameSocket>;
 
@@ -25,9 +27,7 @@ export default class SocketioRouter extends SocketioRouterBase {
 		this.mapRouters(files.routers);
 		this.initDependencies(app.mongoStore);
 		this.initListeners();
-		if (process.env.NODE_ENV !== 'development') {
-			this.restartServerEvent(app);
-		}
+		this.restartServerEvent(app);
 	}
 
 	private mapRouters(routers: MasterRouter[]) {
@@ -132,24 +132,20 @@ export default class SocketioRouter extends SocketioRouterBase {
 	}
 
 	private restartServerEvent(app) {
-		let heroku = new Heroku({ token: process.env.HEROKU_API_TOKEN });
+		let token = process.env.herokuAuth ? process.env.herokuAuth : require('../../../config/.env.json').herokuAuth;
+		let heroku = new Heroku({ token });
 		
-		console.log("Trying to restart server!", process.env.HEROKU_API_TOKEN);
-		heroku.get('lul')
-			.then(lul => {
-				app.post(this.ROUTES.RESTART, 
-					this.middleware.validateHasSercetKey.bind(this.middleware),
-					(req, res) => {
-						res.send('Restarting server.');
-						console.log("In request!");
-						console.log(lul);
-						console.log(lul.dynos());
-						lul.dynos().restartAll();
-					}
-				);
-			})
-			.catch(e => {
-				console.error("Had an error getting lul:", e);
-			});
+		app.post(this.ROUTES.RESTART, 
+			this.middleware.validateHasSercetKey.bind(this.middleware),
+			(req, res) => {
+				heroku.delete('/apps/lul/dynos')
+					.then(apps => {
+						console.log("Restarting dynos");
+						res.send({data: 'Restarting server.'});	
+					})
+					.catch(e => {
+						console.error("Had an error restarting lul:", e);
+					});
+		});
 	}
 };
