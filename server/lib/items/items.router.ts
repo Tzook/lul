@@ -16,6 +16,14 @@ export default class ItemsRouter extends SocketioRouterBase {
 		this.itemsMap = new Map();
 	}
 
+	initRoutes(app) {
+		this.controller.setIo(this.io);
+
+		app.post(this.ROUTES.GENERATE,
+			this.middleware.validateHasSercetKey.bind(this.middleware),
+			this.controller.generateItems.bind(this.controller));
+	}
+
 	[SERVER_GETS.ITEM_PICK](data, socket: GameSocket) {
 		let slot = this.middleware.getFirstAvailableSlot(socket);
 

@@ -3,19 +3,18 @@ import MasterServices from '../master/master.services';
 import * as _ from "underscore";
 
 export default class MobsServices extends MasterServices {
-	private mobsInfo: Map<string, MOB_SCHEMA> = new Map();
+	private mobsInfo: Map<string, MOB_MODEL> = new Map();
 
 	public generateMobs(mobs: any[]): Promise<any> {
-		console.log("Generating mob from data:", mobs);
+		console.log("Generating mobs from data:", mobs);
 		
 		let mobModels = [];
 
 		(mobs || []).forEach(mob => {
 			let mobId = mob.key;
 
-			let mobSchema: MOB_SCHEMA = {
+			let mobSchema: MOB_MODEL = {
 				mobId,
-				name: mob.name,
 				hp: mob.hp,
 				lvl: mob.level,
 				exp: mob.exp,
@@ -31,9 +30,9 @@ export default class MobsServices extends MasterServices {
 			.then(d => this.Model.create(mobModels));
 	}
 
-	public getMobs(): Promise<Map<string, MOB_SCHEMA>> {
+	public getMobs(): Promise<Map<string, MOB_MODEL>> {
 		return this.Model.find({}).lean()
-			.then((docs: MOB_SCHEMA[]) => {
+			.then((docs: MOB_MODEL[]) => {
 				docs.forEach(doc => {
 					this.mobsInfo.set(doc.mobId, doc);
 				});
@@ -42,7 +41,7 @@ export default class MobsServices extends MasterServices {
 			});
 	}
 
-	public getMobInfo(mobId: string): MOB_SCHEMA {
+	public getMobInfo(mobId: string): MOB_MODEL {
 		// always return a copy of the mob, so it can be modified freely
 		return Object.assign({}, this.mobsInfo.get(mobId));
 	}

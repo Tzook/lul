@@ -1,6 +1,14 @@
 {
-	"ROUTES": {},
-	"LOGS": {},
+	"ROUTES": {
+		"GENERATE": "/items/generate"
+	},
+	"LOGS": {
+		"GENERATE_ITEMS": {
+			"MSG": "Generated items successfully.",
+			"CODE": "ITEM_1",
+			"STATUS": "OK"
+		}
+	},
 	"SERVER_INNER": {
 		"ITEMS_DROP": "dropped_items"
 	},

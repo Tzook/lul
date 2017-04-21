@@ -24,7 +24,7 @@ export default class RoomsRouter extends SocketioRouterBase {
 			this.controller.generateRoom.bind(this.controller));
 	}
 
-	public getRoomInfo(room: string): ROOM_SCHEMA|undefined {
+	public getRoomInfo(room: string): ROOM_MODEL|undefined {
 		return this.services.getRoomInfo(room);
 	}
 

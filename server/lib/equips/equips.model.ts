@@ -19,7 +19,6 @@ export default class EquipsModel extends MasterModel {
         for (let i in this.schema) {
             this.schema[i] = this.mongoose.Schema.Types.Mixed;
         }
-        (<any>ITEM_SCHEMA).sprites = this.mongoose.Schema.Types.Mixed;
     }
 
     get priority() {

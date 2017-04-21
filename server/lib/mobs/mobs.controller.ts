@@ -28,7 +28,7 @@ export default class MobsController extends MasterController {
 		return this.mobById.has(id);
 	}
 
-	public startSpawningMobs(roomInfo: ROOM_SCHEMA) {
+	public startSpawningMobs(roomInfo: ROOM_MODEL) {
 		let roomMobs: ROOM_MOBS = {
 			spawns: []
 		};

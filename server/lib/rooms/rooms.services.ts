@@ -2,7 +2,7 @@
 import MasterServices from '../master/master.services';
 
 export default class RoomsServices extends MasterServices {
-	private roomsInfo: Map<string, ROOM_SCHEMA> = new Map();
+	private roomsInfo: Map<string, ROOM_MODEL> = new Map();
 
 	public generateRoom (scene): Promise<any> {
 		console.log("Generating room from scene:", scene);
@@ -24,7 +24,7 @@ export default class RoomsServices extends MasterServices {
 				y: spawner.PositionY
 			});
 		});
-		let room: ROOM_SCHEMA = {
+		let room: ROOM_MODEL = {
 			name,
 			portals,
 			spawns
@@ -35,9 +35,9 @@ export default class RoomsServices extends MasterServices {
 		return <any>updatedDocPromise;
 	}
 
-	public getRooms(): Promise<Map<string, ROOM_SCHEMA>> {
+	public getRooms(): Promise<Map<string, ROOM_MODEL>> {
 		return this.Model.find({}).lean()
-			.then((docs: ROOM_SCHEMA[]) => {
+			.then((docs: ROOM_MODEL[]) => {
 				docs.forEach(doc => {
 					this.roomsInfo.set(doc.name, doc);
 				});
@@ -46,7 +46,7 @@ export default class RoomsServices extends MasterServices {
 			});
 	}
 
-	public getRoomInfo(room: string): ROOM_SCHEMA|undefined {
+	public getRoomInfo(room: string): ROOM_MODEL|undefined {
 		return this.roomsInfo.get(room);
 	}
 };

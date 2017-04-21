@@ -71,34 +71,39 @@ interface GameSocket extends SocketIO.Socket {
     lastAttackLoad: number;
 }
 
+// items
+interface ITEM_SCHEMA {
+    key: string,
+    type: string,
+}
+
 // rooms
-interface PORTAL_SCHEMA {
+interface PORTAL_MODEL {
     x: number,
     y: number,
 }
-interface SPAWN_SCHEMA {
+interface SPAWN_MODEL {
     mobId: string,
     cap: number,
     interval: number,
     x: number,
     y: number,
 }
-interface SPAWN_INSTANCE extends SPAWN_SCHEMA {
+interface SPAWN_INSTANCE extends SPAWN_MODEL {
     mobs?: Map<string, MOB_INSTANCE>, // mobs spawned in the spawn
 }
 
-interface ROOM_SCHEMA {
+interface ROOM_MODEL {
     name: string,
     portals: {
-        [targetPortal: string]: PORTAL_SCHEMA
+        [targetPortal: string]: PORTAL_MODEL
     },
-    spawns: SPAWN_SCHEMA[],
+    spawns: SPAWN_MODEL[],
 }
 
 // mobs
-interface MOB_SCHEMA {
+interface MOB_MODEL {
     mobId: string, // a unique id for this type of mobs
-    name: string, // the display name of the mob
     hp: number,
     lvl: number,
     exp: number,
@@ -106,7 +111,7 @@ interface MOB_SCHEMA {
     maxDmg: number,
 }
 
-interface MOB_INSTANCE extends MOB_SCHEMA {
+interface MOB_INSTANCE extends MOB_MODEL {
     id?: string, // a unique id for this specific mob
     x?: number,
     y?: number,
