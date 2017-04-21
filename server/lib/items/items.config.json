@@ -8,14 +8,16 @@
 		"ITEM_PICK": "picked_item",
 		"ITEM_DROP": "dropped_item",
 		"ITEM_MOVE": "moved_item",
-		"ENTERED_ROOM": "entered_room"
+		"ENTERED_ROOM": "entered_room",
+		"ITEMS_LOCATIONS": "items_locations"
 	},
 	"CLIENT_GETS": {
 		"ITEM_PICK": "actor_pick_item",
 		"ITEM_DELETE": "actor_delete_item",
-		"ITEM_DROP": "drop_items",
+		"ITEMS_DROP": "drop_items",
 		"ITEM_DISAPPEAR": "item_disappear",
-		"ITEM_MOVED": "actor_move_item"
+		"ITEM_MOVED": "actor_move_item",
+		"ITEMS_LOCATIONS": "items_locations"
 	},
 	"MAX_ITEMS": 20,
 	"ITEM_DROP_LIFE": 60000
