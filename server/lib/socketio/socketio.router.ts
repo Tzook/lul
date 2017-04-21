@@ -2,6 +2,7 @@
 import SocketioRouterBase from './socketio.router.base';
 import Emitter = require('events');
 import MasterRouter from "../master/master.router";
+import * as Heroku from 'heroku-client';
 require('./socketio.fixer');
 let passportSocketIo = require('passport.socketio');
 let SERVER_GETS = require('../../../server/lib/socketio/socketio.config.json').SERVER_GETS;
@@ -24,6 +25,9 @@ export default class SocketioRouter extends SocketioRouterBase {
 		this.mapRouters(files.routers);
 		this.initDependencies(app.mongoStore);
 		this.initListeners();
+		if (process.env.NODE_ENV !== 'development') {
+			this.restartServerEvent(app);
+		}
 	}
 
 	private mapRouters(routers: MasterRouter[]) {
@@ -125,5 +129,27 @@ export default class SocketioRouter extends SocketioRouterBase {
 		this.map.delete(socket.user._id.toString());
 		this.map.delete(socket.character.name);
 		this.map.delete(socket.id);
+	}
+
+	private restartServerEvent(app) {
+		let heroku = new Heroku({ token: process.env.HEROKU_API_TOKEN });
+		
+		console.log("Trying to restart server!", process.env.HEROKU_API_TOKEN);
+		heroku.get('lul')
+			.then(lul => {
+				app.post(this.ROUTES.RESTART, 
+					this.middleware.validateHasSercetKey.bind(this.middleware),
+					(req, res) => {
+						res.send('Restarting server.');
+						console.log("In request!");
+						console.log(lul);
+						console.log(lul.dynos());
+						lul.dynos().restartAll();
+					}
+				);
+			})
+			.catch(e => {
+				console.error("Had an error getting lul:", e);
+			});
 	}
 };

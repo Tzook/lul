@@ -1,6 +1,7 @@
 {
 	"ROUTES": {
-		"BEGIN_CONNECTION": "connection"
+		"BEGIN_CONNECTION": "connection",
+		"RESTART": "/restart"
 	},
 	"SERVER_GETS": {
 		"DISCONNECT": "disconnect"
