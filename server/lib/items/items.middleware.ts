@@ -21,7 +21,7 @@ export default class ItemsMiddleware extends MasterMiddleware {
         return this.isItem(socket.character.items[slot]);
     }
 
-    isItem(item: Item) {
-        return !!item.name;
+    isItem(item: ITEM_MODEL) {
+        return !!item.type;
     }
 };

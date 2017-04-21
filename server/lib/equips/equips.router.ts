@@ -2,7 +2,7 @@
 import SocketioRouterBase from '../socketio/socketio.router.base';
 import EquipsMiddleware from './equips.middleware';
 let config = require('../../../server/lib/equips/equips.config.json');
-let itemsConfig = require('../../../server/lib/items/items.config.json');
+let dropsConfig = require('../../../server/lib/drops/drops.config.json');
 let SERVER_GETS = config.SERVER_GETS;
 
 export default class EquipsRouter extends SocketioRouterBase {
@@ -103,7 +103,7 @@ export default class EquipsRouter extends SocketioRouterBase {
 			let equip = socket.character.equips[slot];
 			console.log("dropping equip", equip);
 
-			this.emitter.emit(itemsConfig.SERVER_INNER.ITEMS_DROP, { }, socket, [equip]);
+			this.emitter.emit(dropsConfig.SERVER_INNER.ITEMS_DROP, { }, socket, [equip]);
 
 			let ItemsModels = this.mongoose.model("Item");
 			socket.character.equips[slot] = new ItemsModels({});

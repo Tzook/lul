@@ -7,7 +7,7 @@ export default class EquipsMiddleware extends ItemsMiddleware {
         return slot in EQUIPS_SCHEMA;
     }
 
-    isValidEquipItem(item: Item) {
+    isValidEquipItem(item: ITEM_MODEL) {
         return this.isValidEquipSlot(item.type);
     }
 
@@ -15,7 +15,7 @@ export default class EquipsMiddleware extends ItemsMiddleware {
         return this.isItem(socket.character.equips[slot]);
     }
 
-    canWearEquip(item: Item, slot: string): boolean {
+    canWearEquip(item: ITEM_MODEL, slot: string): boolean {
         return item.type === slot;
     }
 

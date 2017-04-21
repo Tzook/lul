@@ -9,24 +9,14 @@
 			"STATUS": "OK"
 		}
 	},
-	"SERVER_INNER": {
-		"ITEMS_DROP": "dropped_items"
-	},
 	"SERVER_GETS": {
 		"ITEM_PICK": "picked_item",
 		"ITEM_DROP": "dropped_item",
-		"ITEM_MOVE": "moved_item",
-		"ENTERED_ROOM": "entered_room",
-		"ITEMS_LOCATIONS": "items_locations"
+		"ITEM_MOVE": "moved_item"
 	},
 	"CLIENT_GETS": {
-		"ITEM_PICK": "actor_pick_item",
 		"ITEM_DELETE": "actor_delete_item",
-		"ITEMS_DROP": "drop_items",
-		"ITEM_DISAPPEAR": "item_disappear",
-		"ITEM_MOVED": "actor_move_item",
-		"ITEMS_LOCATIONS": "items_locations"
+		"ITEM_MOVED": "actor_move_item"
 	},
-	"MAX_ITEMS": 20,
-	"ITEM_DROP_LIFE": 60000
+	"MAX_ITEMS": 20
 }

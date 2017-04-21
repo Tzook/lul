@@ -6,18 +6,12 @@ interface Doc {
     save(fn?: (err: any, product: this, numAffected: number) => void): Promise<this>;
 }
 
-interface Item extends Doc {
-    name: string;
-    icon: string;
-    type: string;
-}
-
 interface Equips {
-    head:   Item;
-    chest:  Item;
-    legs:   Item;
-    gloves: Item;
-    shoes:  Item;
+    head:   ITEM_MODEL;
+    chest:  ITEM_MODEL;
+    legs:   ITEM_MODEL;
+    gloves: ITEM_MODEL;
+    shoes:  ITEM_MODEL;
 }
 
 interface Stats {
@@ -40,8 +34,8 @@ interface Stats {
     primaryAbility: string,
 }
 
-interface ItemsArray extends Array<Item> {
-    set: (index: number, obj: Item|{}) => {};
+interface ItemsArray extends Array<ITEM_MODEL> {
+    set: (index: number, obj: ITEM_MODEL|{}) => {};
 }
 
 interface Char extends Doc {
@@ -72,9 +66,14 @@ interface GameSocket extends SocketIO.Socket {
 }
 
 // items
-interface ITEM_SCHEMA {
+interface ITEM_MODEL {
     key: string,
     type: string,
+}
+
+interface DROP_MODEL {
+    key: string,
+    chance: number,
 }
 
 // rooms
@@ -109,6 +108,7 @@ interface MOB_MODEL {
     exp: number,
     minDmg: number,
     maxDmg: number,
+    drops: DROP_MODEL[],
 }
 
 interface MOB_INSTANCE extends MOB_MODEL {

@@ -5,6 +5,7 @@ import MobsController from "./mobs.controller";
 import RoomsRouter from "../rooms/rooms.router";
 let SERVER_GETS		   = require('../../../server/lib/mobs/mobs.config.json').SERVER_GETS;
 let statsConfig = require('../../../server/lib/stats/stats.config.json');
+let dropsConfig = require('../../../server/lib/drops/drops.config.json');
 
 export default class MobsRouter extends SocketioRouterBase {
 	protected middleware: MobsMiddleware;
@@ -54,7 +55,7 @@ export default class MobsRouter extends SocketioRouterBase {
 				this.controller.despawnMob(mob, socket.character.room);
 				let exp = mob.exp || 10; // hardcoded until handled in the client
 				this.emitter.emit(statsConfig.SERVER_INNER.GAIN_EXP, { exp }, socket);
-				// TODO mob drops
+				this.emitter.emit(dropsConfig.SERVER_INNER.GENERATE_DROPS, {x: mob.x, y: mob.y}, socket, mob.drops);
 			}
 		} else {
 			this.sendError(data, socket, "Mob doesn't exist!");

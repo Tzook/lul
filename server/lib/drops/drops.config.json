@@ -1,0 +1,20 @@
+{
+	"ROUTES": {},
+	"LOGS": {},
+	"SERVER_INNER": {
+		"ITEM_PICK": "item_pick",
+		"ITEMS_DROP": "items_drop",
+		"GENERATE_DROPS": "generate_drops"
+	},
+	"SERVER_GETS": {
+		"ENTERED_ROOM": "entered_room",
+		"ITEMS_LOCATIONS": "items_locations"
+	},
+	"CLIENT_GETS": {
+		"ITEM_PICK": "actor_pick_item",
+		"ITEMS_DROP": "drop_items",
+		"ITEM_DISAPPEAR": "item_disappear",
+		"ITEMS_LOCATIONS": "items_locations"
+	},
+	"ITEM_DROP_LIFE": 60000
+}

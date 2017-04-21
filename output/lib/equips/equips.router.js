@@ -2,7 +2,7 @@
 Object.defineProperty(exports, "__esModule", { value: true });
 const socketio_router_base_1 = require("../socketio/socketio.router.base");
 let config = require('../../../server/lib/equips/equips.config.json');
-let itemsConfig = require('../../../server/lib/items/items.config.json');
+let dropsConfig = require('../../../server/lib/drops/drops.config.json');
 let SERVER_GETS = config.SERVER_GETS;
 class EquipsRouter extends socketio_router_base_1.default {
     init(files, app) {
@@ -95,7 +95,7 @@ class EquipsRouter extends socketio_router_base_1.default {
         if (this.middleware.hasEquip(socket, slot)) {
             let equip = socket.character.equips[slot];
             console.log("dropping equip", equip);
-            this.emitter.emit(itemsConfig.SERVER_INNER.ITEMS_DROP, {}, socket, [equip]);
+            this.emitter.emit(dropsConfig.SERVER_INNER.ITEMS_DROP, {}, socket, [equip]);
             let ItemsModels = this.mongoose.model("Item");
             socket.character.equips[slot] = new ItemsModels({});
             this.io.to(socket.character.room).emit(this.CLIENT_GETS.DELETE_EQUIP, {

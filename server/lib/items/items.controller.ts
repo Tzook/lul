@@ -9,10 +9,6 @@ export default class ItemsController extends MasterController {
 	public setIo(io) {
 		this.io = io;
 	}
-
-    public getItemId(socket: GameSocket, itemId: string): string {
-        return `${socket.character.room}-${itemId}`;
-    }
     
     // HTTP functions
 	// =================
