@@ -37,17 +37,17 @@ export default class DropsRouter extends SocketioRouterBase {
 		}
 	}
 
-    [config.SERVER_INNER.GENERATE_DROPS](data, socket: GameSocket, drops: DROP_MODEL[]) {
+    [config.SERVER_INNER.GENERATE_DROPS](data, socket: GameSocket, drops: string[]) {
         let items = [];
         drops.forEach(drop => {
-            let isDropped = this.controller.isDropped(drop.chance);
+            let isDropped = this.controller.isDropped(0.2); // TODO get drop from item
             if (isDropped) {
-                let item = this.itemsRouter.getItemInfo(drop.key);
+                let item = this.itemsRouter.getItemInfo(drop);
                 if (item) {
                     items.push(item);
                     console.log("Dropping item from drop!", drop, item);
                 } else {
-                    this.sendError({key: drop.key}, socket, "No item info! cannot drop item.");
+                    this.sendError({key: drop}, socket, "No item info! cannot drop item.");
                 }
             }
         });

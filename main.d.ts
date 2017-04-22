@@ -71,11 +71,6 @@ interface ITEM_MODEL {
     type: string,
 }
 
-interface DROP_MODEL {
-    key: string,
-    chance: number,
-}
-
 // rooms
 interface PORTAL_MODEL {
     x: number,
@@ -108,7 +103,7 @@ interface MOB_MODEL {
     exp: number,
     minDmg: number,
     maxDmg: number,
-    drops: DROP_MODEL[],
+    drops: string[],
 }
 
 interface MOB_INSTANCE extends MOB_MODEL {

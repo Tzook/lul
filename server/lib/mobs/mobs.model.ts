@@ -18,6 +18,7 @@ export default class MobsModel extends MasterModel {
         this.controller = files.controller;
 
         this.schema = Object.assign({}, MOB_SCHEMA);
+        this.listenForSchemaAddition('Mobs');
     }
 
     get priority() {
@@ -25,9 +26,11 @@ export default class MobsModel extends MasterModel {
     }
 
     createModel() {
+
         this.setModel('Mobs');
 
 		setTimeout(() => this.controller.warmMobsInfo()); // timeout so the Model can be set
+        this.removeListen('Mobs');
         return Promise.resolve();
     }
 };
