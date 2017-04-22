@@ -44,11 +44,11 @@ export default class MasterModel {
         return 1;
     }
 
-    addToSchema(model, data) {
+    protected addToSchema(model, data) {
         emitter.emit(model + "Schema", data);
     }
 
-    listenForSchemaAddition(model) {
+    protected listenForSchemaAddition(model) {
         emitter.on(model + "Schema", this.addModelToSchema.bind(this));
     }
 
@@ -62,7 +62,7 @@ export default class MasterModel {
         }
     }
 
-    listenForFieldAddition(model: string, field: string, data?) {
+    protected listenForFieldAddition(model: string, field: string, data?) {
         emitter.on(model + "Field", this.addFieldToModel.bind(this, field, data));
     }
 

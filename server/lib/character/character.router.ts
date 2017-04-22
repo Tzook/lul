@@ -7,7 +7,7 @@ export default class CharacterRouter extends MasterRouter {
 	protected middleware: CharacterMiddleware;
 	protected controller: CharacterController;
 
-	initRoutes(app) {
+	protected initRoutes(app) {
 		app.post(this.ROUTES.CHARACTER_CREATE,
 			this.middleware.isLoggedIn.bind(this.middleware),
 			this.middleware.validHasFewCharacters.bind(this.middleware),

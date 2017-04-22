@@ -10,7 +10,7 @@ export default class MasterRouter {
      	this.initRoutes(app);
 	}
 
-	initRoutes(app) {
+	protected initRoutes(app) {
 		// TODO inherit
 	}
 

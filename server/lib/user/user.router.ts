@@ -16,7 +16,7 @@ export default class UserRouter extends MasterRouter {
 		super.init(files, app);
 	}
 
-	initRoutes(app) {
+	protected initRoutes(app) {
 		app.get(this.ROUTES.USER_SESSION,
 			this.middleware.isLoggedIn.bind(this.middleware),
 			this.controller.sendUser.bind(this.controller));

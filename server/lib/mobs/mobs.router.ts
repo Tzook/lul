@@ -17,7 +17,7 @@ export default class MobsRouter extends SocketioRouterBase {
 		super.init(files, app);
 	}
 	
-	initRoutes(app) {
+	protected initRoutes(app) {
 		this.controller.setIo(this.io);
 
 		app.post(this.ROUTES.GENERATE,

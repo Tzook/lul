@@ -3,7 +3,7 @@ import Response from './master.response';
 
 export default class MasterMiddleware extends Response {
 
-	validateParams(req, res, next, params) {
+	protected validateParams(req, res, next, params) {
 		let promises = [];
 		for (let i in params) {
 			promises.push(this.services.isNotEmpty(req.body[params[i].param], {error: this.LOGS.MASTER_INVALID_PARAM, params: {param: params[i].param}}));

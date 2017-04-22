@@ -8,13 +8,10 @@ export default class Response {
 
     init(files, app) {
 		this.services = files.services;
-		this.LOGS = files.config.LOGS;
-        for (var i in config.LOGS) { // merge MASTER logs into the instance logs
-            this.LOGS[i] = config.LOGS[i];
-        }
+		this.LOGS = Object.assign({}, files.config.LOGS, config.LOGS); // merge MASTER logs into the instance logs
     }
 
-    sendError(res, ERROR, tokens?) {
+    protected sendError(res, ERROR, tokens?) {
         return this.services.replaceTokens(ERROR.MSG, tokens)
         .then(error => {
             console.error("Sending an error:", error);
@@ -22,7 +19,7 @@ export default class Response {
         });
     }
 
-    sendData(res, SUCCESS, data?) {
+    protected sendData(res, SUCCESS, data?) {
         let body:any = {code: SUCCESS.CODE, msg: SUCCESS.MSG};
         data && (body.data = data);
         console.info("Sending body", body);
