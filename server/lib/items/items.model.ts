@@ -20,7 +20,7 @@ export default class ItemsModel extends MasterModel {
     init(files, app) {
         this.controller = files.controller;
 
-        this.schema = ITEM_INSTANCE_SCHEMA;
+        this.schema = ITEM_SCHEMA;
     }
 
     get priority() {
