@@ -45,11 +45,16 @@ export default class MobsController extends MasterController {
 
 	protected spawnMobs(spawnInfo: SPAWN_INSTANCE, mobsInSpawn: Map<string, MOB_INSTANCE>, room: string) {
 		let mobsToSpawn = spawnInfo.cap - mobsInSpawn.size;
-		console.log("spawning %d mobs", mobsToSpawn);
-		for (let i = 0; i < mobsToSpawn; i++) {
+		console.log("spawning mob");
+		if (mobsToSpawn > 0) {
 			let mob = this.spawnMob(spawnInfo, room);
 			mob.spawn = spawnInfo; // useful for when we delete the mob
 			mobsInSpawn.set(mob.id, mob);
+
+			if (mobsToSpawn > 1) {
+				// we still have a mob to spawn - set an interval
+				this.setRespawnTimer(mob, room);
+			}
 		}
 	}
 
@@ -131,11 +136,15 @@ export default class MobsController extends MasterController {
 
 		if (mob.spawn.cap == mob.spawn.mobs.size + 1) {
 			// if it's the first mob that we kill, set a timer to respawn
-			console.log("setting interval to respawn", mob.id);
-			setTimeout(() => {
-				this.spawnMobs(mob.spawn, mob.spawn.mobs, room);
-			}, mob.spawn.interval * 1000);
+			this.setRespawnTimer(mob, room);
 		}
+	}
+
+	protected setRespawnTimer(mob: MOB_INSTANCE, room: string) {
+		console.log("setting interval to respawn", mob.id);
+		setTimeout(() => {
+			this.spawnMobs(mob.spawn, mob.spawn.mobs, room);
+		}, mob.spawn.interval * 1000);
 	}
 
 	// HTTP functions
