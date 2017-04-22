@@ -20,7 +20,7 @@ export default class MobsServices extends MasterServices {
 				exp: mob.exp,
 				minDmg: mob.minDMG,
 				maxDmg: mob.maxDMG,
-				drops: mob.drops || [],
+				drops: mob.drops,
 			};
 
 			let mobModel = new this.Model(mobSchema);
