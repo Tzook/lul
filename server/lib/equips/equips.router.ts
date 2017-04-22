@@ -1,6 +1,7 @@
 'use strict';
 import SocketioRouterBase from '../socketio/socketio.router.base';
 import EquipsMiddleware from './equips.middleware';
+import ItemsRouter from '../items/items.router';
 let config = require('../../../server/lib/equips/equips.config.json');
 let dropsConfig = require('../../../server/lib/drops/drops.config.json');
 let SERVER_GETS = config.SERVER_GETS;
@@ -8,10 +9,12 @@ let SERVER_GETS = config.SERVER_GETS;
 export default class EquipsRouter extends SocketioRouterBase {
 	protected middleware: EquipsMiddleware;
 	protected mongoose;
-
+	protected itemsRouter: ItemsRouter;
+	
 	init(files, app) {
 		super.init(files, app);
 		this.mongoose = files.model.mongoose;
+		this.itemsRouter = files.routers.items;
 	}
 
 	[SERVER_GETS.EQUIP_ITEM](data, socket: GameSocket) {
@@ -22,7 +25,10 @@ export default class EquipsRouter extends SocketioRouterBase {
 			&& this.middleware.hasItem(socket, from)) {
 
 			let item = socket.character.items[from];
-			if (!this.middleware.canWearEquip(item, to)) {
+			let itemInfo = this.itemsRouter.getItemInfo(item.key);
+			if (!itemInfo) {
+				this.sendError(data, socket, "Could not find item info for item " + item.key);
+			} else if (!this.middleware.canWearEquip(itemInfo, to)) {
 				this.sendError(data, socket, "Item cannot be equipped there");
 			} else {
 				console.log("equipping item", from, to);
@@ -47,9 +53,9 @@ export default class EquipsRouter extends SocketioRouterBase {
 			&& this.middleware.isValidItemSlot(to)
 			&& this.middleware.hasEquip(socket, from)) {
 
-			let item = socket.character.items[to];
 			if (this.middleware.hasItem(socket, to)
-				&& !this.middleware.canWearEquip(item, from)) {
+				&& !this.middleware.canWearEquip(this.itemsRouter.getItemInfo(socket.character.items[to].key), from)) {
+				// if the wanted slot already has an item, check if it can be replaced
 				this.sendError(data, socket, "Cannot unequip to slot!");
 			} else {
 				console.log("unequipping item", from, to);
@@ -84,10 +90,13 @@ export default class EquipsRouter extends SocketioRouterBase {
 		let itemSlot: number = data.slot;
 		if (this.middleware.isValidItemSlot(itemSlot)) {
 			let item = socket.character.items[itemSlot];
-			if (this.middleware.isValidEquipItem(item)) {
+			let itemInfo = this.itemsRouter.getItemInfo(item.key);
+			if (!itemInfo) {
+				this.sendError(data, socket, "Could not find item info for item " + item.key);
+			} else if (this.middleware.isValidEquipItem(itemInfo)) {
 				this[SERVER_GETS.EQUIP_ITEM]({
 					from: itemSlot,
-					to: item.type
+					to: itemInfo.type
 				}, socket);
 			} else {
 				this.sendError(data, socket, "Item not equipable!");

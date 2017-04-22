@@ -8,7 +8,7 @@ let SERVER_GETS = config.SERVER_GETS;
 
 export default class DropsRouter extends SocketioRouterBase {
     protected controller: DropsController;
-    private dropsMap: Map<string, {x, y, item_id, item: ITEM_MODEL}> = new Map();
+    private dropsMap: Map<string, {x, y, item_id, item: ITEM_INSTANCE}> = new Map();
     protected itemsRouter: ItemsRouter;
 	
 	init(files, app) {
@@ -22,7 +22,7 @@ export default class DropsRouter extends SocketioRouterBase {
 		});
 	}
 
-    [config.SERVER_INNER.ITEM_PICK](data, socket: GameSocket, pickItemFn: (Item) => {}, dataToSend) {
+    [config.SERVER_INNER.ITEM_PICK](data, socket: GameSocket, pickItemFn: (item: ITEM_INSTANCE) => {}, dataToSend) {
 		let itemAndRoomId = this.controller.getItemId(socket, data.item_id);
         if (!this.dropsMap.has(itemAndRoomId)) {
 			this.sendError(data, socket, "Item does not exist");
@@ -40,15 +40,16 @@ export default class DropsRouter extends SocketioRouterBase {
     [config.SERVER_INNER.GENERATE_DROPS](data, socket: GameSocket, drops: string[]) {
         let items = [];
         drops.forEach(drop => {
-            let isDropped = this.controller.isDropped(0.2); // TODO get drop from item
-            if (isDropped) {
-                let item = this.itemsRouter.getItemInfo(drop);
-                if (item) {
-                    items.push(item);
-                    console.log("Dropping item from drop!", drop, item);
-                } else {
-                    this.sendError({key: drop}, socket, "No item info! cannot drop item.");
+			let itemInfo = this.itemsRouter.getItemInfo(drop);
+			if (itemInfo) {
+				let isDropped = this.controller.isDropped(itemInfo.chance);
+				if (isDropped) {
+					let itemInstance = this.itemsRouter.getItemInstance(drop);
+                    items.push(itemInstance);
+                    console.log("Dropping item from drop!", drop, itemInstance);
                 }
+			} else {
+				this.sendError({key: drop}, socket, "No item info! cannot drop item.");
             }
         });
 
@@ -57,7 +58,7 @@ export default class DropsRouter extends SocketioRouterBase {
         }
 	}
 
-    [config.SERVER_INNER.ITEMS_DROP](data, socket: GameSocket, items: ITEM_MODEL[]) {
+    [config.SERVER_INNER.ITEMS_DROP](data, socket: GameSocket, items: ITEM_INSTANCE[]) {
 		let room = socket.character.room;
 		let itemsData = [];
 		
@@ -101,7 +102,7 @@ export default class DropsRouter extends SocketioRouterBase {
 		items.forEach(item => {
 			let itemData;
 			if (!_.isObject(item)) {
-				this.sendError(data, socket, "Must provide an array of items to update locations");
+				this.sendError(data, socket, "Must provide an object to update locations");
 			} else if (!(itemData = this.dropsMap.get(this.controller.getItemId(socket, item.item_id)))) {
 				this.sendError(data, socket, `Item with given item_id ${item.item_id} was not found`);
 			} else if (!_.isFinite(item.x) || !_.isFinite(item.y)) {

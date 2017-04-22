@@ -28,8 +28,12 @@ export default class MasterModel {
         try {
             this.model = this.mongoose.model(name);
         } catch (e) {
-            this.model = this.mongoose.model(name, new this.mongoose.Schema(this.schema, {_id: this.hasId, minimize: false, strict: this.strict}));
+            this.model = this.createNewModel(name, this.schema);
         }
+    }
+
+    protected createNewModel(name, schema, params = {}) {
+        return this.mongoose.model(name, new this.mongoose.Schema(schema, Object.assign({_id: this.hasId, minimize: false, strict: this.strict}, params)));
     }
 
     getModel(name?) {

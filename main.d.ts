@@ -34,8 +34,8 @@ interface Stats {
     primaryAbility: string,
 }
 
-interface ItemsArray extends Array<ITEM_MODEL> {
-    set: (index: number, obj: ITEM_MODEL|{}) => {};
+interface ItemsArray extends Array<ITEM_INSTANCE> {
+    set: (index: number, obj: ITEM_INSTANCE|{}) => {};
 }
 
 interface Char extends Doc {
@@ -69,6 +69,12 @@ interface GameSocket extends SocketIO.Socket {
 interface ITEM_MODEL {
     key: string,
     type: string,
+    gold: number,
+    chance: number,
+}
+
+interface ITEM_INSTANCE {
+    key: string,
 }
 
 // rooms

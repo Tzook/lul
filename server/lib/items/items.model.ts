@@ -6,7 +6,13 @@ let config = require('../../../server/lib/items/items.config.json');
 export const ITEM_SCHEMA = {
     key: String,
     type: String,
+    gold: Number,
+    chance: Number,
 };
+
+export const ITEM_INSTANCE_SCHEMA = {
+    key: String,
+}
 
 export default class ItemsModel extends MasterModel {
     protected controller: ItemsController;
@@ -14,7 +20,7 @@ export default class ItemsModel extends MasterModel {
     init(files, app) {
         this.controller = files.controller;
 
-        this.schema = ITEM_SCHEMA;
+        this.schema = ITEM_INSTANCE_SCHEMA;
     }
 
     get priority() {
@@ -23,21 +29,15 @@ export default class ItemsModel extends MasterModel {
 
     createModel() {
         this.setModel("Item");
-        this.addToSchema("Character", {items: [this.getModel().schema]});
-        let items = [
-			// new this.model(EQUIPS.WEP.ELD),
-            // new this.model(EQUIPS.CHEST.LTHR),
-            // new this.model(EQUIPS.CHEST.ADV),
-            // new this.model(EQUIPS.GLOVE.BLK),
-            // new this.model(EQUIPS.LEG.CLTH),
-            // new this.model(EQUIPS.LEG.GRN),
-            // new this.model(EQUIPS.SHOE.LTHR),
-            // new this.model(EQUIPS.SHOE.STRP),
-		];
-        for (var i = items.length; i < config.MAX_ITEMS; i++) {
-            items[i] = new this.model({});
+
+        let ItemInstanceModel = this.createNewModel("ItemInstance", ITEM_INSTANCE_SCHEMA, {_id: false});
+        this.addToSchema("Character", {items: [ItemInstanceModel.schema]});
+        let items = [];
+        for (var i = 0; i < config.MAX_ITEMS; i++) {
+            items[i] = new ItemInstanceModel({});
         }
         this.listenForFieldAddition("Character", "items", items);
+        
         setTimeout(() => this.controller.warmItemsInfo()); // timeout so the Model can be set
         return Promise.resolve();
     }

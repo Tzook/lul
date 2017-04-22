@@ -1,15 +1,15 @@
 "use strict";
 import MasterModel from "../master/master.model";
 import * as _ from 'underscore';
-import { ITEM_SCHEMA } from "../items/items.model";
+import { ITEM_INSTANCE_SCHEMA } from "../items/items.model";
 
 export const EQUIPS_SCHEMA = {
-    head: ITEM_SCHEMA,
-    chest: ITEM_SCHEMA,
-    legs: ITEM_SCHEMA,
-    gloves: ITEM_SCHEMA,
-    shoes: ITEM_SCHEMA,
-    weapon: ITEM_SCHEMA,
+    head: ITEM_INSTANCE_SCHEMA,
+    chest: ITEM_INSTANCE_SCHEMA,
+    legs: ITEM_INSTANCE_SCHEMA,
+    gloves: ITEM_INSTANCE_SCHEMA,
+    shoes: ITEM_INSTANCE_SCHEMA,
+    weapon: ITEM_INSTANCE_SCHEMA,
 };
 
 export default class EquipsModel extends MasterModel {
@@ -29,7 +29,7 @@ export default class EquipsModel extends MasterModel {
         this.setModel("Equip");
         this.addToSchema("Character", { equips: this.getModel().schema });
         let equips = _.clone(EQUIPS_SCHEMA);
-        let ItemModel = this.getModel("Item");
+        let ItemModel = this.getModel("ItemInstance");
         for (let i in equips) {
             equips[i] = new ItemModel({});
         }
