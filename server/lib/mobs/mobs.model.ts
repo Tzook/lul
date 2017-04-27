@@ -7,6 +7,7 @@ const MOB_SCHEMA = {
     name: String,
     hp: Number,
     lvl: Number,
+    exp: Number,
     minDmg: Number,
     maxDmg: Number
 };
