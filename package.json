@@ -18,7 +18,7 @@
     "express-session": "1.15.2",
     "forever": "0.15.3",
     "heroku-client": "3.0.2",
-    "mongoose": "4.9.5",
+    "mongoose": "4.9.6",
     "passport": "0.3.2",
     "passport-local": "1.0.0",
     "passport.socketio": "3.7.0",
@@ -34,7 +34,7 @@
   "devDependencies": {
     "@types/express": "4.0.35",
     "@types/mongoose": "4.7.11",
-    "@types/node": "7.0.13",
+    "@types/node": "7.0.14",
     "@types/socket.io": "1.4.29",
     "@types/underscore": "1.8.0",
     "gulp": "3.9.1",
