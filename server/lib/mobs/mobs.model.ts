@@ -8,6 +8,8 @@ const MOB_SCHEMA = {
     hp: Number,
     lvl: Number,
     exp: Number,
+    minGold: Number,
+    maxGold: Number,
     minDmg: Number,
     maxDmg: Number
 };

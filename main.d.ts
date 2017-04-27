@@ -47,6 +47,7 @@ interface Char extends Doc {
         z: number;
         climbing: boolean, 
     },
+    gold: number;
     items: ItemsArray,
     equips: Equips,
     stats: Stats,
@@ -107,6 +108,8 @@ interface MOB_MODEL {
     hp: number,
     lvl: number,
     exp: number,
+    minGold: number,
+    maxGold: number,
     minDmg: number,
     maxDmg: number,
     drops: string[],
