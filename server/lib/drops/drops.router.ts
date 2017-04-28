@@ -7,8 +7,9 @@ let config = require('../../../server/lib/drops/drops.config.json');
 let SERVER_GETS = config.SERVER_GETS;
 
 export default class DropsRouter extends SocketioRouterBase {
-    protected controller: DropsController;
     private dropsMap: Map<string, {x, y, item_id, item: ITEM_INSTANCE}> = new Map();
+	private lastHandledItem: string;
+    protected controller: DropsController;
     protected itemsRouter: ItemsRouter;
 	
 	init(files, app) {
@@ -25,12 +26,15 @@ export default class DropsRouter extends SocketioRouterBase {
     [config.SERVER_INNER.ITEM_PICK](data, socket: GameSocket, pickItemFn: (item: ITEM_INSTANCE) => {}) {
 		let itemAndRoomId = this.controller.getItemId(socket, data.item_id);
         if (!this.dropsMap.has(itemAndRoomId)) {
-			this.sendError(data, socket, "Item does not exist");
+			if (this.lastHandledItem !== itemAndRoomId) {
+				this.sendError(data, socket, "Item does not exist");
+			}
 		} else {
 			let picked = pickItemFn(this.dropsMap.get(itemAndRoomId).item);
 			if (picked) {
 				console.log('picking item', data.item_id);
 				this.dropsMap.delete(itemAndRoomId);
+				this.lastHandledItem = itemAndRoomId;
 				this.io.to(socket.character.room).emit(this.CLIENT_GETS.ITEM_PICK, {
 					id: socket.character._id,
 					item_id: data.item_id,
@@ -47,6 +51,9 @@ export default class DropsRouter extends SocketioRouterBase {
 				let isDropped = this.controller.isDropped(itemInfo.chance);
 				if (isDropped) {
 					let itemInstance = this.itemsRouter.getItemInstance(drop);
+					if (itemInfo.cap > 1) {
+						itemInstance.stack = 1;
+					}
                     items.push(itemInstance);
                     console.log("Dropping item from drop!", drop, itemInstance);
                 }
