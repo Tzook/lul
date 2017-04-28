@@ -20,11 +20,28 @@ export default class GoldRouter extends SocketioRouterBase {
                 return;
             }
             socket.character.gold += item.stack;
-            socket.emit(this.CLIENT_GETS.GAIN_GOLD, {
+            socket.emit(this.CLIENT_GETS.CHANGE_GOLD, {
                 amount: item.stack
             });
             console.log("Gaining gold for %s. picked %d, now has: %d", socket.character.name, item.stack, socket.character.gold);
             return true;
 		});
+	}
+
+	[SERVER_GETS.DROP_GOLD](data, socket: GameSocket) {
+        let {amount} = data;
+        if (!(amount > 0)) {
+            this.sendError(data, socket, "Must mention what gold amount to throw");
+        } else {
+            let amountToDrop = Math.min(amount, socket.character.gold);
+            socket.character.gold -= amountToDrop;
+            socket.emit(this.CLIENT_GETS.CHANGE_GOLD, {
+                amount: -amountToDrop
+            });
+            let item = this.itemsRouter.getItemInstance("gold");
+            item.stack = amountToDrop;
+            console.log("dropping gold", item);
+            this.emitter.emit(dropsConfig.SERVER_INNER.ITEMS_DROP, {}, socket, [item]);
+        }
 	}
 };

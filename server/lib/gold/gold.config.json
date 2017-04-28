@@ -2,10 +2,11 @@
 	"ROUTES": {
 	},
 	"SERVER_GETS": {
-		"ITEM_PICK": "picked_item"
+		"ITEM_PICK": "picked_item",
+		"DROP_GOLD": "dropped_gold"
 	},
 	"CLIENT_GETS": {
-		"GAIN_GOLD": "actor_gain_gold"
+		"CHANGE_GOLD": "change_gold_amount"
 	},
 	"LOGS": {
 	}
