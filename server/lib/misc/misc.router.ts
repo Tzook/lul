@@ -20,7 +20,7 @@ export default class MiscRouter extends SocketioRouterBase {
 	[SERVER_GETS.ITEM_PICK](data, socket: GameSocket) {
 		this.emitter.emit(dropsConfig.SERVER_INNER.ITEM_PICK, data, socket, (item: ITEM_INSTANCE): any => {
             let itemInfo = this.itemsRouter.getItemInfo(item.key);
-            if (!(itemInfo.cap > 1)) {
+            if (!(itemInfo.cap > 1) || itemInfo.key === "gold") {
                 return;
             }
             let slots = this.middleware.getStackSlots(socket, item, itemInfo);
@@ -50,7 +50,7 @@ export default class MiscRouter extends SocketioRouterBase {
             } else {
                 item.stack -= stack;
                 itemToDrop.stack = stack;
-                socket.emit(this.CLIENT_GETS.STACK_CHANGE, { slot, stack: item.stack });
+                socket.emit(this.CLIENT_GETS.STACK_CHANGE, { slot, amount: item.stack });
             }
             console.log("dropping misc item", itemToDrop);
             this.emitter.emit(dropsConfig.SERVER_INNER.ITEMS_DROP, {}, socket, [item]);
