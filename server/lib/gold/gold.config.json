@@ -2,16 +2,8 @@
 	"ROUTES": {
 	},
 	"SERVER_GETS": {
-		"EQUIP_ITEM": "equipped_item",
-		"UNEQUIP_ITEM": "unequipped_item",
-		"USE_ITEM": "used_item",
-		"DROP_EQUIP": "dropped_equip",
-		"USE_EQUIP": "used_equip"
 	},
 	"CLIENT_GETS": {
-		"EQUIP_ITEM": "actor_equip_item",
-		"UNEQUIP_ITEM": "actor_unequip_item",
-		"DELETE_EQUIP": "actor_delete_equip"
 	},
 	"LOGS": {
 	}

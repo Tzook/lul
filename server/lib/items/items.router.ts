@@ -34,32 +34,39 @@ export default class ItemsRouter extends SocketioRouterBase {
 
 	[SERVER_GETS.ITEM_PICK](data, socket: GameSocket) {
 		this.emitter.emit(dropsConfig.SERVER_INNER.ITEM_PICK, data, socket, (item: ITEM_INSTANCE): any => {
-			let slot = this.middleware.getFirstAvailableSlot(socket);
+			let itemInfo = this.getItemInfo(item.key);
+            if (itemInfo.cap > 1) {
+                return;
+            }
+            let slot = this.middleware.getFirstAvailableSlot(socket);
 			if (!(slot >= 0)) { 
 				this.sendError(data, socket, "No available slots to pick item");
 			} else {
 				socket.character.items.set(slot, item);
-				return {slot};
+				socket.emit(this.CLIENT_GETS.ITEM_ADD, { slot, item });
+				return true;
 			}	
 		});
 	}
 
 	[SERVER_GETS.ITEM_DROP](data, socket: GameSocket) {
 		let slot = data.slot;
-		if (this.middleware.hasItem(socket, slot)) {
+		if (!this.middleware.hasItem(socket, slot)) {
+			this.sendError(data, socket, "Trying to drop an item but nothing's there!");
+		} else {
 			let item = socket.character.items[slot];
 			console.log("dropping item", item);
 			this.emitter.emit(dropsConfig.SERVER_INNER.ITEMS_DROP, {}, socket, [item]);
 			socket.character.items.set(slot, {});
 			socket.emit(this.CLIENT_GETS.ITEM_DELETE, { slot });
-		} else {
-			this.sendError(data, socket, "Trying to drop an item but nothing's there!");
 		}
 	}
 
 	[SERVER_GETS.ITEM_MOVE](data, socket: GameSocket) {
-		if (this.middleware.isValidItemSlot(data.from)
-		 	&& this.middleware.isValidItemSlot(data.to)) {
+		if (!this.middleware.isValidItemSlot(data.from)
+		 	|| !this.middleware.isValidItemSlot(data.to)) {
+			this.sendError(data, socket, "Invalid slots!");
+		} else {
 			let itemFrom = socket.character.items[data.from];
 			let itemTo = socket.character.items[data.to];
 
@@ -71,8 +78,6 @@ export default class ItemsRouter extends SocketioRouterBase {
 				from: data.from,
 				to: data.to
 			});
-		} else {
-			this.sendError(data, socket, "Invalid slots!");
 		}
 	}
 };

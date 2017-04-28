@@ -1,0 +1,11 @@
+{
+	"ROUTES": {},
+	"SERVER_GETS": {
+		"ITEM_PICK": "picked_item",
+		"MISC_DROP": "dropped_misc"
+	},
+	"CLIENT_GETS": {
+		"STACK_CHANGE": "change_item_stack"
+	},
+	"LOGS": {}
+}

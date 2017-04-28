@@ -120,6 +120,9 @@ export default class SocketioRouter extends SocketioRouterBase {
 	}
 
 	[SERVER_GETS.DISCONNECT](data, socket: GameSocket) {
+		if (!this.map.has(socket.id)) {
+			return;
+		}
 		console.log('disconnected', socket.character.name);
 		socket.user.save(e => {
 			if (e) {

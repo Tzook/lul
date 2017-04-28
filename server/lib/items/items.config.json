@@ -16,7 +16,8 @@
 	},
 	"CLIENT_GETS": {
 		"ITEM_DELETE": "actor_delete_item",
-		"ITEM_MOVED": "actor_move_item"
+		"ITEM_MOVED": "actor_move_item",
+		"ITEM_ADD": "actor_add_item"
 	},
 	"MAX_ITEMS": 20
 }
