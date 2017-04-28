@@ -33,14 +33,15 @@ export default class ItemsRouter extends SocketioRouterBase {
 	}
 
 	[SERVER_GETS.ITEM_PICK](data, socket: GameSocket) {
-		let slot = this.middleware.getFirstAvailableSlot(socket);
-		if (!(slot >= 0)) { 
-			this.sendError(data, socket, "No available slots to pick item");
-		} else {
-			this.emitter.emit(dropsConfig.SERVER_INNER.ITEM_PICK, data, socket, (item: ITEM_INSTANCE) => {
+		this.emitter.emit(dropsConfig.SERVER_INNER.ITEM_PICK, data, socket, (item: ITEM_INSTANCE): any => {
+			let slot = this.middleware.getFirstAvailableSlot(socket);
+			if (!(slot >= 0)) { 
+				this.sendError(data, socket, "No available slots to pick item");
+			} else {
 				socket.character.items.set(slot, item);
-			}, {slot});
-		}
+				return {slot};
+			}	
+		});
 	}
 
 	[SERVER_GETS.ITEM_DROP](data, socket: GameSocket) {

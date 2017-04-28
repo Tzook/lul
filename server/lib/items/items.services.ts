@@ -15,6 +15,7 @@ export default class ItemsServices extends MasterServices {
 				type: item.type,
 				gold: item.goldValue,
 				chance: item.dropChance,
+				cap: item.stackCap,
 			};
 
 			let itemModel = new this.Model(itemSchema);
@@ -43,6 +44,6 @@ export default class ItemsServices extends MasterServices {
 	public getItemInstance(key: string): ITEM_INSTANCE|undefined {
 		// always return a copy of the item, so it can be modified freely
 		let itemInfo = this.getItemInfo(key);
-		return itemInfo ? {key: itemInfo.key} : undefined;
+		return itemInfo ? {key: itemInfo.key, stack: 1} : undefined;
 	}
 };

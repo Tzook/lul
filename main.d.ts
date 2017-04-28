@@ -72,10 +72,12 @@ interface ITEM_MODEL {
     type: string,
     gold: number,
     chance: number,
+    cap?: number,
 }
 
 interface ITEM_INSTANCE {
     key: string,
+    stack?: number,
 }
 
 // rooms

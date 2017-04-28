@@ -8,10 +8,12 @@ export const ITEM_SCHEMA = {
     type: String,
     gold: Number,
     chance: Number,
+    cap: Number,
 };
 
 export const ITEM_INSTANCE_SCHEMA = {
     key: String,
+    stack: Number,
 }
 
 export default class ItemsModel extends MasterModel {
