@@ -80,6 +80,12 @@ interface ITEM_INSTANCE {
     stack?: number,
 }
 
+interface DROP_MODEL {
+    key: string,
+    minStack?: number,
+    maxStack?: number,
+}
+
 // rooms
 interface PORTAL_MODEL {
     x: number,
@@ -110,11 +116,9 @@ interface MOB_MODEL {
     hp: number,
     lvl: number,
     exp: number,
-    minGold: number,
-    maxGold: number,
     minDmg: number,
     maxDmg: number,
-    drops: string[],
+    drops: DROP_MODEL[],
 }
 
 interface MOB_INSTANCE extends MOB_MODEL {

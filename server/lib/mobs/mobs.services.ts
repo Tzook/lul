@@ -13,6 +13,16 @@ export default class MobsServices extends MasterServices {
 		(mobs || []).forEach(mob => {
 			let mobId = mob.key;
 
+			let drops = [];
+			(mob.drops || []).forEach(drop => {
+				let { key, minStack, maxStack } = drop;
+				if (minStack && maxStack) {
+					drops.push({ key, minStack, maxStack });
+				} else {
+					drops.push({ key });
+				}
+			});
+
 			let mobSchema: MOB_MODEL = {
 				mobId,
 				hp: mob.hp,
@@ -20,9 +30,7 @@ export default class MobsServices extends MasterServices {
 				exp: mob.exp,
 				minDmg: mob.minDMG,
 				maxDmg: mob.maxDMG,
-				minGold: mob.MinGoldDrop,
-				maxGold: mob.MaxGoldDrop,
-				drops: mob.drops,
+				drops,
 			};
 
 			let mobModel = new this.Model(mobSchema);

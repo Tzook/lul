@@ -3,6 +3,7 @@ import SocketioRouterBase from '../socketio/socketio.router.base';
 import * as _ from 'underscore';
 import DropsController from "./drops.controller";
 import ItemsRouter from '../items/items.router';
+import DropsServices from './drops.services';
 let config = require('../../../server/lib/drops/drops.config.json');
 let SERVER_GETS = config.SERVER_GETS;
 
@@ -10,10 +11,12 @@ export default class DropsRouter extends SocketioRouterBase {
     private dropsMap: Map<string, {x, y, item_id, item: ITEM_INSTANCE}> = new Map();
 	private lastHandledItem: string;
     protected controller: DropsController;
+    protected services: DropsServices;
     protected itemsRouter: ItemsRouter;
 	
 	init(files, app) {
 		this.itemsRouter = files.routers.items;
+		this.services = files.services;
 		super.init(files, app);
 	}
 
@@ -43,16 +46,16 @@ export default class DropsRouter extends SocketioRouterBase {
 		}
 	}
 
-    [config.SERVER_INNER.GENERATE_DROPS](data, socket: GameSocket, drops: string[]) {
+    [config.SERVER_INNER.GENERATE_DROPS](data, socket: GameSocket, drops: DROP_MODEL[]) {
         let items = [];
         drops.forEach(drop => {
-			let itemInfo = this.itemsRouter.getItemInfo(drop);
+			let itemInfo = this.itemsRouter.getItemInfo(drop.key);
 			if (itemInfo) {
 				let isDropped = this.controller.isDropped(itemInfo.chance);
 				if (isDropped) {
-					let itemInstance = this.itemsRouter.getItemInstance(drop);
+					let itemInstance = this.itemsRouter.getItemInstance(drop.key);
 					if (itemInfo.cap > 1) {
-						itemInstance.stack = 1;
+						itemInstance.stack = this.services.getRandomStack(drop.minStack, drop.maxStack);
 					}
                     items.push(itemInstance);
                     console.log("Dropping item from drop!", drop, itemInstance);
