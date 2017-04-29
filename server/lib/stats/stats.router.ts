@@ -1,12 +1,23 @@
 'use strict';
 import SocketioRouterBase from '../socketio/socketio.router.base';
 import StatsController from './stats.controller';
+import StatsServices from './stats.services';
 let config = require('../../../server/lib/stats/stats.config.json');
 
 export default class StatsRouter extends SocketioRouterBase {
     protected controller: StatsController;
+    protected services: StatsServices;
+
+	init(files, app) {
+		this.services = files.services;
+		super.init(files, app);
+	}
 
     [config.SERVER_INNER.GAIN_EXP] (data, socket: GameSocket) {
+        if (!socket.alive) {
+            this.sendError({}, socket, "Character is not alive!");
+            return;
+        }
         let exp = data.exp;
         let currentLevel = socket.character.stats.lvl;
         this.controller.addExp(socket.character, exp);
@@ -31,6 +42,10 @@ export default class StatsRouter extends SocketioRouterBase {
     }
 
     [config.SERVER_INNER.GAIN_HP] (data, socket: GameSocket) {
+        if (!socket.alive) {
+            this.sendError({}, socket, "Character is not alive!");
+            return;
+        }
         let hp = data.hp;
         this.controller.addHp(socket.character, hp);
 
@@ -40,7 +55,26 @@ export default class StatsRouter extends SocketioRouterBase {
          });
     }
 
+    [config.SERVER_INNER.TAKE_DMG] (data, socket: GameSocket) {
+        if (!socket.alive) {
+            this.sendError({}, socket, "Character is not alive!");
+            return;
+        }
+        let dmg = data.dmg;
+        socket.character.stats.hp.now = this.services.getHpAfterDamage(socket.character.stats.hp.now, dmg);
+		this.io.to(socket.character.room).emit(this.CLIENT_GETS.TAKE_DMG, {
+			id: socket.character._id,
+			dmg,
+			hp: socket.character.stats.hp.now
+		});
+		console.log("Taking damage", socket.character.name, dmg, socket.character.stats.hp.now);
+    }
+
     [config.SERVER_INNER.GAIN_MP] (data, socket: GameSocket) {
+        if (!socket.alive) {
+            this.sendError({}, socket, "Character is not alive!");
+            return;
+        }
         let mp = data.mp;
         this.controller.addMp(socket.character, mp);
 
@@ -52,6 +86,9 @@ export default class StatsRouter extends SocketioRouterBase {
 
     public onConnected(socket: GameSocket) {
         this.regenInterval(socket);
+        Object.defineProperty(socket, 'alive', {get: () => {
+            return socket.character.stats.hp.now > 0;
+        }});
     }
 
     private regenInterval(socket: GameSocket) {

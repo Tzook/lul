@@ -34,5 +34,10 @@ export default class StatsServices extends MasterServices {
 
         console.log("Level up", stats);
     }
+
+	public getHpAfterDamage(hp: number, dmg: number): number {
+		return Math.max(0, Math.floor(hp - dmg));
+	}
 };
+// cache computations
 StatsServices.prototype.getExp = <any>_.memoize(StatsServices.prototype.getExp);

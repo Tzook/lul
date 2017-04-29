@@ -4,6 +4,9 @@ let SERVER_GETS		   = require('../../../server/lib/movement/movement.config.json
 
 export default class MovementRouter extends SocketioRouterBase {
 	[SERVER_GETS.MOVEMENT](data, socket: GameSocket) {
+		if (!socket.alive) {
+            return;
+        }
 		var position = socket.character.position;
 		position.x = data.x;
 		position.y = data.y;
@@ -21,6 +24,9 @@ export default class MovementRouter extends SocketioRouterBase {
 	}
 
 	[SERVER_GETS.START_CLIMB](data, socket: GameSocket) {
+		if (!socket.alive) {
+            return;
+        }
 		socket.character.position.climbing = true;
 		socket.broadcast.to(socket.character.room).emit(this.CLIENT_GETS.START_CLIMB, {
 			id: socket.character._id,
@@ -28,6 +34,9 @@ export default class MovementRouter extends SocketioRouterBase {
 	}
 
 	[SERVER_GETS.STOP_CLIMB](data, socket: GameSocket) {
+		if (!socket.alive) {
+            return;
+        }
 		socket.character.position.climbing = false;
 		socket.broadcast.to(socket.character.room).emit(this.CLIENT_GETS.STOP_CLIMB, {
 			id: socket.character._id,

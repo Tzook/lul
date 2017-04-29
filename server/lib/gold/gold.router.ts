@@ -29,6 +29,10 @@ export default class GoldRouter extends SocketioRouterBase {
 	}
 
 	[SERVER_GETS.DROP_GOLD](data, socket: GameSocket) {
+        if (!socket.alive) {
+            this.sendError({}, socket, "Character is not alive!");
+            return;
+        }
         let {amount} = data;
         if (!(amount > 0)) {
             this.sendError(data, socket, "Must mention what gold amount to throw");

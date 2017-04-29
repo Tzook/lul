@@ -18,6 +18,10 @@ export default class EquipsRouter extends SocketioRouterBase {
 	}
 
 	[SERVER_GETS.EQUIP_ITEM](data, socket: GameSocket) {
+		if (!socket.alive) {
+            this.sendError({}, socket, "Character is not alive!");
+            return;
+        }
 		let from: number = data.from;
 		let to: string = data.to;
 		if (this.middleware.isValidItemSlot(from)
@@ -47,6 +51,10 @@ export default class EquipsRouter extends SocketioRouterBase {
 	}
 
 	[SERVER_GETS.UNEQUIP_ITEM](data, socket: GameSocket) {
+		if (!socket.alive) {
+            this.sendError({}, socket, "Character is not alive!");
+            return;
+        }
 		let from: string = data.from;
 		let to: number = data.to;
 		if (this.middleware.isValidEquipSlot(from)
@@ -107,6 +115,10 @@ export default class EquipsRouter extends SocketioRouterBase {
 	}
 
 	[SERVER_GETS.DROP_EQUIP](data, socket: GameSocket) {
+		if (!socket.alive) {
+            this.sendError({}, socket, "Character is not alive!");
+            return;
+        }
 		let slot = data.slot;
 		if (this.middleware.hasEquip(socket, slot)) {
 			let equip = socket.character.equips[slot];

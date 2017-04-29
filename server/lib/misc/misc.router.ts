@@ -36,6 +36,10 @@ export default class MiscRouter extends SocketioRouterBase {
 	}
 
 	[SERVER_GETS.MISC_DROP](data, socket: GameSocket) {
+        if (!socket.alive) {
+            this.sendError({}, socket, "Character is not alive!");
+            return;
+        }
 		let {slot, stack} = data;
         if (!(stack > 0)) {
 			this.sendError(data, socket, "Must mention what stack amount to throw");

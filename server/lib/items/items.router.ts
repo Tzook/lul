@@ -50,6 +50,10 @@ export default class ItemsRouter extends SocketioRouterBase {
 	}
 
 	[SERVER_GETS.ITEM_DROP](data, socket: GameSocket) {
+		if (!socket.alive) {
+            this.sendError({}, socket, "Character is not alive!");
+            return;
+        }
 		let slot = data.slot;
 		if (!this.middleware.hasItem(socket, slot)) {
 			this.sendError(data, socket, "Trying to drop an item but nothing's there!");
@@ -63,6 +67,10 @@ export default class ItemsRouter extends SocketioRouterBase {
 	}
 
 	[SERVER_GETS.ITEM_MOVE](data, socket: GameSocket) {
+		if (!socket.alive) {
+            this.sendError({}, socket, "Character is not alive!");
+            return;
+        }
 		if (!this.middleware.isValidItemSlot(data.from)
 		 	|| !this.middleware.isValidItemSlot(data.to)) {
 			this.sendError(data, socket, "Invalid slots!");

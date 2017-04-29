@@ -40,6 +40,10 @@ export default class MobsRouter extends SocketioRouterBase {
 	}
 
 	[SERVER_GETS.MOB_TAKE_DMG](data, socket: GameSocket) {
+		if (!socket.alive) {
+            this.sendError({}, socket, "Character is not alive!");
+            return;
+        }
 		if (this.controller.hasMob(data.mob_id)) {
 			let load = socket.lastAttackLoad || 0;
 			let dmg = this.controller.calculateDamage(socket, load);
@@ -73,8 +77,13 @@ export default class MobsRouter extends SocketioRouterBase {
 	}
 
 	[SERVER_GETS.TAKE_DMG](data, socket: GameSocket) {
+		if (!socket.alive) {
+            this.sendError({}, socket, "Character is not alive!");
+            return;
+        }
 		if (this.controller.hasMob(data.mob_id)) {
-			this.controller.hurtChar(data.mob_id, socket);
+			let dmg = this.controller.getHurtCharDmg(data.mob_id, socket);
+			this.emitter.emit(statsConfig.SERVER_INNER.TAKE_DMG, { dmg }, socket);
 		} else {
 			this.sendError(data, socket, "Mob doesn't exist!");
 		}

@@ -4,6 +4,7 @@
 	"SERVER_INNER": {
 		"GAIN_EXP": "gain_exp",
 		"GAIN_HP": "gain_hp",
+		"TAKE_DMG": "take_dmg",
 		"GAIN_MP": "gain_mp"
 	},
 	"SERVER_GETS": {
@@ -12,6 +13,7 @@
 		"GAIN_EXP": "actor_gain_exp",
 		"GAIN_HP": "actor_gain_hp",
 		"GAIN_MP": "actor_gain_mp",
+		"TAKE_DMG": "actor_take_dmg",
 		"LEVEL_UP": "actor_lvl_up"
 	},
 	"LOGS": {

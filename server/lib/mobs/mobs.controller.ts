@@ -113,16 +113,10 @@ export default class MobsController extends MasterController {
 		return mob;
 	}
 
-	public hurtChar(id: string, socket: GameSocket) {
+	public getHurtCharDmg(id: string, socket: GameSocket): number {
 		let mob = this.mobById.get(id);
 		let dmg = this.services.getDamageRange(mob.minDmg, mob.maxDmg);
-		socket.character.stats.hp.now = this.services.getHpAfterDamage(socket.character.stats.hp.now, dmg);
-		this.io.to(socket.character.room).emit(CLIENT_GETS.TAKE_DMG, {
-			id: socket.character._id,
-			dmg,
-			hp: socket.character.stats.hp.now
-		});
-		console.log("Taking damage", socket.character.name, dmg, socket.character.stats.hp.now);
+		return dmg;
 	}
 
 	public despawnMob(mob: MOB_INSTANCE, room: string) {

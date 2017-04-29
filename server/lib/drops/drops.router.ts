@@ -27,6 +27,10 @@ export default class DropsRouter extends SocketioRouterBase {
 	}
 
     [config.SERVER_INNER.ITEM_PICK](data, socket: GameSocket, pickItemFn: (item: ITEM_INSTANCE) => {}) {
+		if (!socket.alive) {
+            this.sendError({}, socket, "Character is not alive!");
+            return;
+        }
 		let itemAndRoomId = this.controller.getItemId(socket, data.item_id);
         if (!this.dropsMap.has(itemAndRoomId)) {
 			if (this.lastHandledItem !== itemAndRoomId) {

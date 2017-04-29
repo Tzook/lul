@@ -63,6 +63,7 @@ interface GameSocket extends SocketIO.Socket {
     user: User;
     map: Map<string, GameSocket>;
     bitch: boolean;
+    alive: boolean,
     lastAttackLoad: number;
 }
 

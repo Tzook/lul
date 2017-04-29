@@ -12,8 +12,7 @@
 		"MOB_SPAWN": "mob_spawn",
 		"MOB_DIE": "mob_die",
 		"MOB_TAKE_DMG": "mob_take_dmg",
-		"MOB_MOVE": "mob_move",
-		"TAKE_DMG": "actor_take_dmg"
+		"MOB_MOVE": "mob_move"
 	},
 	"LOGS": {
 		"GENERATE_MOB": {
