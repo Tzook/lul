@@ -69,6 +69,11 @@ export default class StatsRouter extends SocketioRouterBase {
 			hp: socket.character.stats.hp.now
 		});
 		console.log("Taking damage", socket.character.name, dmg, socket.character.stats.hp.now);
+        if (!socket.alive) {
+            this.io.to(socket.character.room).emit(this.CLIENT_GETS.DEATH, {
+                id: socket.character._id,
+            });
+        }
     }
 
     [config.SERVER_INNER.GAIN_MP] (data, socket: GameSocket) {
