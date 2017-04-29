@@ -8,6 +8,7 @@
 		"GAIN_MP": "gain_mp"
 	},
 	"SERVER_GETS": {
+		"RELEASE_DEATH": "release_death"
 	},
 	"CLIENT_GETS": {
 		"GAIN_EXP": "actor_gain_exp",

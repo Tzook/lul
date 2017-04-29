@@ -2,6 +2,9 @@
 	"ROUTES": {
 		"GENERATE": "/room/generate"
 	},
+	"SERVER_INNER": {
+		"MOVE_TO_TOWN": "move_to_town"
+	},
 	"SERVER_GETS": {
 		"ENTERED_ROOM": "entered_room",
 		"ENTER_PORTAL": "entered_portal",

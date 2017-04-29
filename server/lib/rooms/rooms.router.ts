@@ -4,7 +4,7 @@ import * as _ from 'underscore';
 import RoomsController from './rooms.controller';
 import RoomsMiddleware from "./rooms.middleware";
 import RoomsServices from "./rooms.services";
-let SERVER_GETS = require('../../../server/lib/rooms/rooms.config.json').SERVER_GETS;
+let config = require('../../../server/lib/rooms/rooms.config.json');
 
 export default class RoomsRouter extends SocketioRouterBase {
 	protected middleware: RoomsMiddleware;
@@ -28,7 +28,7 @@ export default class RoomsRouter extends SocketioRouterBase {
 		return this.services.getRoomInfo(room);
 	}
 
-	[SERVER_GETS.ENTERED_ROOM](data, socket: GameSocket) {
+	[config.SERVER_GETS.ENTERED_ROOM](data, socket: GameSocket) {
 		// const also used in items
 		console.log('character %s entered room', socket.character.name);
 		socket.broadcast.to(socket.character.room).emit(this.CLIENT_GETS.JOIN_ROOM, {character: socket.character});
@@ -42,7 +42,7 @@ export default class RoomsRouter extends SocketioRouterBase {
 		this.controller.socketJoinRoom(socket);
 	}
 
-	[SERVER_GETS.ENTER_PORTAL](data, socket: GameSocket) {
+	[config.SERVER_GETS.ENTER_PORTAL](data, socket: GameSocket) {
 		if (!socket.alive) {
             this.sendError({}, socket, "Character is not alive!");
             return;
@@ -62,23 +62,45 @@ export default class RoomsRouter extends SocketioRouterBase {
 				this.sendError(data, socket, "No target portal in room!");
 			} else {
 				let targetPortal = targetRoomInfo.portals[portal.targetPortal];
-
-				socket.broadcast.to(socket.character.room).emit(this.CLIENT_GETS.LEAVE_ROOM, {
-					id: socket.character._id
-				});
-				let oldRoom = socket.character.room;
-				socket.leave(oldRoom);
-				socket.character.room = portal.targetRoom;
-				socket.character.position.x = targetPortal.x;
-				socket.character.position.y = targetPortal.y;
-				socket.emit(this.CLIENT_GETS.MOVE_ROOM, {room: portal.targetRoom, x: targetPortal.x, y: targetPortal.y});
-
-				this.controller.socketLeaveRoom(socket, oldRoom);
+				this.moveRoom(socket, portal.targetRoom, targetPortal);
 			}
 		}
 	}
 
-	[SERVER_GETS.DISCONNECT](data, socket: GameSocket) {
+	[config.SERVER_INNER.MOVE_TO_TOWN] (data, socket: GameSocket) {
+		if (!socket.alive) {
+			this.sendError({}, socket, "Character is not alive!");
+            return;
+		}
+		let roomInfo = this.services.getRoomInfo(socket.character.room);
+		if (!roomInfo) {
+			this.sendError(data, socket, "No room info available for " + socket.character.room);
+		} else {
+			let targetRoomInfo = this.services.getRoomInfo(roomInfo.town);
+			if (!targetRoomInfo) {
+				this.sendError(data, socket, "No target room info available for " + roomInfo.town);
+			} else {
+				let targetPortal = this.controller.pickRandomPortal(targetRoomInfo);
+				this.moveRoom(socket, targetRoomInfo.name, targetPortal);
+			}
+		}
+	}
+
+	private moveRoom(socket: GameSocket, room: string, targetPortal: PORTAL_MODEL) {
+		socket.broadcast.to(socket.character.room).emit(this.CLIENT_GETS.LEAVE_ROOM, {
+			id: socket.character._id
+		});
+		let oldRoom = socket.character.room;
+		socket.leave(oldRoom);
+		socket.character.room = room;
+		socket.character.position.x = targetPortal.x;
+		socket.character.position.y = targetPortal.y;
+		socket.emit(this.CLIENT_GETS.MOVE_ROOM, {room, x: targetPortal.x, y: targetPortal.y});
+
+		this.controller.socketLeaveRoom(socket, oldRoom);
+	}
+
+	[config.SERVER_GETS.DISCONNECT](data, socket: GameSocket) {
 		console.log('disconnect from room');
 		socket.broadcast.to(socket.character.room).emit(this.CLIENT_GETS.LEAVE_ROOM, {
 			 id: socket.character._id
@@ -87,7 +109,7 @@ export default class RoomsRouter extends SocketioRouterBase {
 		this.controller.socketLeaveRoom(socket, socket.character.room);
 	}
 
-	[SERVER_GETS.BITCH_PLEASE](data, socket: GameSocket) {
+	[config.SERVER_GETS.BITCH_PLEASE](data, socket: GameSocket) {
 		let key = data.key;
 		console.log('bitch please received from %s with key %s', socket.character.name, key);
 		this.controller.newBitchRequest(socket, key);

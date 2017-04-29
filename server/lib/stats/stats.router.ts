@@ -3,6 +3,7 @@ import SocketioRouterBase from '../socketio/socketio.router.base';
 import StatsController from './stats.controller';
 import StatsServices from './stats.services';
 let config = require('../../../server/lib/stats/stats.config.json');
+let roomsConfig = require('../../../server/lib/rooms/rooms.config.json');
 
 export default class StatsRouter extends SocketioRouterBase {
     protected controller: StatsController;
@@ -82,6 +83,15 @@ export default class StatsRouter extends SocketioRouterBase {
             mp,
             now: socket.character.stats.mp.now
          });
+    }
+
+    [config.SERVER_GETS.RELEASE_DEATH] (data, socket: GameSocket) {
+        if (socket.alive) {
+            this.sendError({}, socket, "Character is alive!");
+            return;
+        }
+        socket.character.stats.hp.now = socket.character.stats.hp.total;
+        this.emitter.emit(roomsConfig.SERVER_INNER.MOVE_TO_TOWN, {}, socket);
     }
 
     public onConnected(socket: GameSocket) {

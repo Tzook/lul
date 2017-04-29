@@ -85,6 +85,12 @@ export default class RoomsController extends MasterController {
 		});
 	}
 
+	public pickRandomPortal(roomInfo: ROOM_MODEL): PORTAL_MODEL {
+		return <any>_.sample(roomInfo.portals);
+	}
+
+    // HTTP functions
+	// =================
 	public generateRoom(req, res, next) {
         this.services.generateRoom(req.body.scene)
 			.then(d => {
