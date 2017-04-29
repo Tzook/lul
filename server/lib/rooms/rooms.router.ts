@@ -42,20 +42,35 @@ export default class RoomsRouter extends SocketioRouterBase {
 		this.controller.socketJoinRoom(socket);
 	}
 
-	[SERVER_GETS.MOVE_ROOM](data, socket: GameSocket) {
-		console.log('moving user room');
-		if (this.middleware.canEnterRoom(data.room, socket.character.room)) {
-			socket.broadcast.to(socket.character.room).emit(this.CLIENT_GETS.LEAVE_ROOM, {
-				 id: socket.character._id
-			});
-			let oldRoom = socket.character.room;
-			socket.leave(oldRoom);
-			socket.character.room = data.room;
-			socket.emit(this.CLIENT_GETS.MOVE_ROOM, {from: oldRoom, to: data.room});
-
-			this.controller.socketLeaveRoom(socket, oldRoom);
+	[SERVER_GETS.ENTER_PORTAL](data, socket: GameSocket) {
+		console.log('user entered portal', socket.character.name, data.portal);
+		let roomInfo = this.services.getRoomInfo(socket.character.room);
+		if (!roomInfo) {
+			this.sendError(data, socket, "No room info available!");
+		} else if (!roomInfo.portals[data.portal]) {
+			this.sendError(data, socket, "No portal with such key in room: " + socket.character.room);
 		} else {
-			this.sendError(data, socket, "Character is not allowed to move to the given room");
+			let portal = roomInfo.portals[data.portal];
+			let targetRoomInfo = this.services.getRoomInfo(portal.targetRoom);
+			if (!targetRoomInfo) {
+				this.sendError(data, socket, "No target room info available!");
+			} else if (!targetRoomInfo.portals[portal.targetPortal]) {
+				this.sendError(data, socket, "No target portal in room!");
+			} else {
+				let targetPortal = targetRoomInfo.portals[portal.targetPortal];
+
+				socket.broadcast.to(socket.character.room).emit(this.CLIENT_GETS.LEAVE_ROOM, {
+					id: socket.character._id
+				});
+				let oldRoom = socket.character.room;
+				socket.leave(oldRoom);
+				socket.character.room = portal.targetRoom;
+				socket.character.position.x = targetPortal.x;
+				socket.character.position.y = targetPortal.y;
+				socket.emit(this.CLIENT_GETS.MOVE_ROOM, {room: portal.targetRoom, x: targetPortal.x, y: targetPortal.y});
+
+				this.controller.socketLeaveRoom(socket, oldRoom);
+			}
 		}
 	}
 

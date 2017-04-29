@@ -90,6 +90,8 @@ interface DROP_MODEL {
 interface PORTAL_MODEL {
     x: number,
     y: number,
+    targetRoom: string,
+    targetPortal: string,
 }
 interface SPAWN_MODEL {
     mobId: string,
@@ -104,8 +106,9 @@ interface SPAWN_INSTANCE extends SPAWN_MODEL {
 
 interface ROOM_MODEL {
     name: string,
+    town: string,
     portals: {
-        [targetPortal: string]: PORTAL_MODEL
+        [key: string]: PORTAL_MODEL
     },
     spawns: SPAWN_MODEL[],
 }

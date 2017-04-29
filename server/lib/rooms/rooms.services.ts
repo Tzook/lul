@@ -6,15 +6,17 @@ export default class RoomsServices extends MasterServices {
 
 	public generateRoom (scene): Promise<any> {
 		console.log("Generating room from scene:", scene);
-		let name = scene.name;
 		let portals = {};
 		(scene.Portals || []).forEach(portal => {
-			portals[portal.TargetLevel] = {
+			let portalModel: PORTAL_MODEL = {
 				x: portal.PositionX,
-				y: portal.PositionY
+				y: portal.PositionY,
+				targetRoom: portal.TargetLevel,
+				targetPortal: portal.targetPortal,
 			};
+			portals[portal.key] = portalModel;
 		});
-		let spawns = [];
+		let spawns: SPAWN_MODEL[] = [];
 		(scene.Spawners || []).forEach(spawner => {
 			spawns.push({
 				mobId: spawner.MonsterKey,
@@ -25,13 +27,14 @@ export default class RoomsServices extends MasterServices {
 			});
 		});
 		let room: ROOM_MODEL = {
-			name,
+			name: scene.name,
+			town: scene.nearestTownScene,
 			portals,
 			spawns
 		}
 		let roomModel = new this.Model(room);
 		
-		let updatedDocPromise = this.Model.findOneAndUpdate({name}, roomModel, {new: true, upsert: true});
+		let updatedDocPromise = this.Model.findOneAndUpdate({name: room.name}, roomModel, {new: true, upsert: true});
 		return <any>updatedDocPromise;
 	}
 

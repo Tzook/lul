@@ -4,7 +4,7 @@
 	},
 	"SERVER_GETS": {
 		"ENTERED_ROOM": "entered_room",
-		"MOVE_ROOM": "moved_room",
+		"ENTER_PORTAL": "entered_portal",
 		"BITCH_PLEASE": "bitch_please",
 		"DISCONNECT": "disconnect"
 	},
