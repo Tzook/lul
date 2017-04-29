@@ -16,7 +16,7 @@ export default class MobsServices extends MasterServices {
 			let drops = [];
 			(mob.drops || []).forEach(drop => {
 				let { key, minStack, maxStack } = drop;
-				if (minStack && maxStack) {
+				if (minStack >= 1 && maxStack > 1) {
 					drops.push({ key, minStack, maxStack });
 				} else {
 					drops.push({ key });
