@@ -10,7 +10,7 @@ export default class Bootstrap {
             res.sendFile(path.resolve(`playground/test.html`));
         });
         this.app.get('/assets.html', (req, res) => {
-            res.sendFile(path.resolve(`playground/assets.html`));
+            res.sendFile(path.resolve(`playground/assets`));
         });
     }
 
