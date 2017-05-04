@@ -18,7 +18,7 @@
     "express-session": "1.15.2",
     "forever": "0.15.3",
     "heroku-client": "3.0.2",
-    "mongoose": "4.9.6",
+    "mongoose": "4.9.7",
     "passport": "0.3.2",
     "passport-local": "1.0.0",
     "passport.socketio": "3.7.0",
@@ -39,6 +39,6 @@
     "@types/underscore": "1.8.0",
     "gulp": "3.9.1",
     "gulp-develop-server": "0.5.2",
-    "typescript": "2.2.2"
+    "typescript": "2.3.2"
   }
 }
