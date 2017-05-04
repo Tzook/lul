@@ -95,7 +95,7 @@ export default class RoomsRouter extends SocketioRouterBase {
 		socket.character.room = room;
 		socket.character.position.x = targetPortal.x;
 		socket.character.position.y = targetPortal.y;
-		socket.emit(this.CLIENT_GETS.MOVE_ROOM, {room, x: targetPortal.x, y: targetPortal.y});
+		socket.emit(this.CLIENT_GETS.MOVE_ROOM, {room, character: socket.character});
 
 		this.controller.socketLeaveRoom(socket, oldRoom);
 	}
@@ -114,4 +114,8 @@ export default class RoomsRouter extends SocketioRouterBase {
 		console.log('bitch please received from %s with key %s', socket.character.name, key);
 		this.controller.newBitchRequest(socket, key);
 	}
+
+    public onConnected(socket: GameSocket) {
+        socket.emit(this.CLIENT_GETS.MOVE_ROOM, {room: socket.character.room, character: socket.character});
+    }
 };
