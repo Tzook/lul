@@ -23,19 +23,19 @@ export default class StatsController extends MasterController {
         }
     }
 
-    public addHp(character: Char, hp: number) {
+    public addHp(character: Char, hp: number): boolean {
         let nowHp = character.stats.hp.now;
         character.stats.hp.now = Math.min(nowHp + hp, character.stats.hp.total);
-        if (nowHp !== character.stats.hp.now) {
-            console.log("Adding hp to char", hp, character.stats.hp.now, character.name);
-        }
+        let gainedHp = nowHp !== character.stats.hp.now;
+        console.log("Adding hp to char", hp, character.stats.hp.now, character.name);
+        return gainedHp;
     }
 
-    public addMp(character: Char, mp: number) {
+    public addMp(character: Char, mp: number): boolean {
         let nowMp = character.stats.mp.now;
         character.stats.mp.now = Math.min(nowMp + mp, character.stats.mp.total);
-        if (nowMp !== character.stats.mp.now) {
-            console.log("Adding mp to char", mp, character.stats.mp.now, character.name);
-        }
+        let gainedMp = nowMp !== character.stats.mp.now;
+        console.log("Adding mp to char", mp, character.stats.mp.now, character.name);
+        return gainedMp;
     }
 };
