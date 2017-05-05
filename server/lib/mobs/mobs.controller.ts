@@ -24,8 +24,8 @@ export default class MobsController extends MasterController {
 		return this.roomsMobs.has(room);
 	}
 
-	public hasMob(id: string) {
-		return this.mobById.has(id);
+	public hasMob(mobId: string, socket: GameSocket): boolean {
+		return this.mobById.has(this.services.getMobRoomId(socket.character.room, mobId));
 	}
 
 	public startSpawningMobs(roomInfo: ROOM_MODEL) {
@@ -64,7 +64,7 @@ export default class MobsController extends MasterController {
 		mob.x = spawnInfo.x;
 		mob.y = spawnInfo.y;
 
-		this.mobById.set(mob.id, mob);
+		this.mobById.set(this.services.getMobRoomId(room, mob.id), mob);
 		this.notifyAboutMob(mob, this.io.to(room));
 		return mob;
 	}
@@ -87,12 +87,12 @@ export default class MobsController extends MasterController {
 		});
 	}
 
-	public moveMob(id: string, x: number, y: number, socket: GameSocket) {
-		let mob = this.mobById.get(id);
+	public moveMob(mobId: string, x: number, y: number, socket: GameSocket) {
+		let mob = this.mobById.get(this.services.getMobRoomId(socket.character.room, mobId));
 		mob.x = x;
 		mob.y = y;
 		socket.broadcast.to(socket.character.room).emit(CLIENT_GETS.MOB_MOVE, {
-			mob_id: id, 
+			mob_id: mobId, 
 			x,
 			y,
 		});
@@ -107,14 +107,14 @@ export default class MobsController extends MasterController {
 		return dmg;
 	}
 
-	public hurtMob(id: string, dmg: number): MOB_INSTANCE {
-		let mob = this.mobById.get(id);
+	public hurtMob(mobId: string, dmg: number, socket: GameSocket): MOB_INSTANCE {
+		let mob = this.mobById.get(this.services.getMobRoomId(socket.character.room, mobId));
 		mob.hp = this.services.getHpAfterDamage(mob.hp, dmg);
 		return mob;
 	}
 
-	public getHurtCharDmg(id: string, socket: GameSocket): number {
-		let mob = this.mobById.get(id);
+	public getHurtCharDmg(mobId: string, socket: GameSocket): number {
+		let mob = this.mobById.get(this.services.getMobRoomId(socket.character.room, mobId));
 		let dmg = this.services.getDamageRange(mob.minDmg, mob.maxDmg);
 		return dmg;
 	}
@@ -126,7 +126,7 @@ export default class MobsController extends MasterController {
 		});
 		// remove mob references
 		mob.spawn.mobs.delete(mob.id);
-		this.mobById.delete(mob.id);
+		this.mobById.delete(this.services.getMobRoomId(room, mob.id));
 
 		if (mob.spawn.cap == mob.spawn.mobs.size + 1) {
 			// if it's the first mob that we kill, set a timer to respawn

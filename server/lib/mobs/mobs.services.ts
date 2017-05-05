@@ -57,6 +57,10 @@ export default class MobsServices extends MasterServices {
 		return Object.assign({}, this.mobsInfo.get(mobId));
 	}
 
+	public getMobRoomId(room: string, mobId: string): string {
+		return `${room}-${mobId}`;
+	}
+
 	public getDamageRange(min: number, max: number): number {
 		return _.random(Math.floor(min) || 1, Math.floor(max));
 	}
