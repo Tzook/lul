@@ -67,7 +67,6 @@ export default class StatsRouter extends SocketioRouterBase {
         let gainedHp = this.controller.addHp(socket.character, hp);
 
         if (gainedHp) {
-            console.log('healing')
             socket.emit(this.CLIENT_GETS.GAIN_HP, {
                 hp,
                 now: socket.character.stats.hp.now
@@ -105,13 +104,9 @@ export default class StatsRouter extends SocketioRouterBase {
     }
 
     private regenHpInterval(socket: GameSocket) {
-        console.log("trying to start", socket.character.stats.hp);
         if (socket.character.stats.hp.now < socket.character.stats.hp.total) {
-            console.log("starting regen timeout");
             setTimeout(() => {
-                console.log("in timeout");
                 if (socket.connected && socket.alive) {
-                    console.log("trying to heal");
                     this.emitter.emit(config.SERVER_INNER.GAIN_HP, { hp: socket.character.stats.hp.regen }, socket);
                     this.regenHpInterval(socket);
                 }
