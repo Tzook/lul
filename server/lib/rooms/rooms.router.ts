@@ -92,22 +92,23 @@ export default class RoomsRouter extends SocketioRouterBase {
 		});
 		let oldRoom = socket.character.room;
 		socket.leave(oldRoom);
+		this.controller.socketLeaveRoom(socket, oldRoom);
+		
 		socket.character.room = room;
 		socket.character.position.x = targetPortal.x;
 		socket.character.position.y = targetPortal.y;
-		socket.emit(this.CLIENT_GETS.MOVE_ROOM, {room, character: socket.character});
 		console.log("moving character %s to room %s", socket.character.name, room);
+		socket.emit(this.CLIENT_GETS.MOVE_ROOM, {room, character: socket.character});
 
-		this.controller.socketLeaveRoom(socket, oldRoom);
 	}
 
 	[config.SERVER_GETS.DISCONNECT](data, socket: GameSocket) {
 		console.log('disconnect from room');
+		this.controller.socketLeaveRoom(socket, socket.character.room);
+	
 		socket.broadcast.to(socket.character.room).emit(this.CLIENT_GETS.LEAVE_ROOM, {
 			 id: socket.character._id
 		});
-
-		this.controller.socketLeaveRoom(socket, socket.character.room);
 	}
 
 	[config.SERVER_GETS.BITCH_PLEASE](data, socket: GameSocket) {

@@ -31,9 +31,7 @@ export default class RoomsController extends MasterController {
 	}
 
 	public socketLeaveRoom(socket: GameSocket, room: string) {
-		socket.bitch = false;
-		this.roomBitches.delete(room);
-		console.log("stopping bitch: %s, room: %s", socket.character.name, room);
+		this.removeBitch(socket, room);
 
 		let roomObject = socket.adapter.rooms[room];
 		if (roomObject && roomObject.length) {
@@ -41,6 +39,15 @@ export default class RoomsController extends MasterController {
 			let newBitch = socket.map.get(socketId);
 			this.setNewBitch(newBitch, room);
 		}
+	}
+
+	private removeBitch(socket: GameSocket, room: string) {
+		console.log("stopping bitch: %s, room: %s", socket.character.name, room);
+		socket.bitch = false;
+		this.roomBitches.delete(room);
+		socket.emit(config.CLIENT_GETS.BITCH_CHOOSE, {
+			is_bitch: false
+		});
 	}
 
 	protected askForBitch(room: string) {
@@ -62,15 +69,11 @@ export default class RoomsController extends MasterController {
 		let room = socket.character.room;
 		let roomKey = this.roomBitchKeys.get(room);
 		if (key == roomKey) {
-			this.roomBitchKeys.delete(room);
 			let oldBitch = this.roomBitches.get(room);
 			if (oldBitch === socket) {
 				console.log("Same bitch in the room.");
 			} else {
-				oldBitch.bitch = false;
-				oldBitch.emit(config.CLIENT_GETS.BITCH_CHOOSE, {
-					is_bitch: false
-				});
+				this.removeBitch(oldBitch, room);
 				this.setNewBitch(socket, room);
 			}
 		}
