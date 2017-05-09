@@ -54,6 +54,7 @@ export default class StatsRouter extends SocketioRouterBase {
 		});
 		console.log("Taking damage", socket.character.name, dmg, socket.character.stats.hp.now);
         if (!socket.alive) {
+            console.log("character %s is ded", socket.character.name);
             this.io.to(socket.character.room).emit(this.CLIENT_GETS.DEATH, {
                 id: socket.character._id,
             });
@@ -92,6 +93,8 @@ export default class StatsRouter extends SocketioRouterBase {
             return;
         }
         socket.character.stats.hp.now = socket.character.stats.hp.total;
+        socket.emit(this.CLIENT_GETS.RESURRECT, {});
+        console.log("releasing death for", socket.character.name);
         this.emitter.emit(roomsConfig.SERVER_INNER.MOVE_TO_TOWN, {}, socket);
     }
 

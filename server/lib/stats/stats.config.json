@@ -16,6 +16,7 @@
 		"GAIN_MP": "actor_gain_mp",
 		"TAKE_DMG": "actor_take_dmg",
 		"DEATH": "actor_ded",
+		"RESURRECT": "actor_resurrect",
 		"LEVEL_UP": "actor_lvl_up"
 	},
 	"LOGS": {

@@ -96,6 +96,7 @@ export default class RoomsRouter extends SocketioRouterBase {
 		socket.character.position.x = targetPortal.x;
 		socket.character.position.y = targetPortal.y;
 		socket.emit(this.CLIENT_GETS.MOVE_ROOM, {room, character: socket.character});
+		console.log("moving character %s to room %s", socket.character.name, room);
 
 		this.controller.socketLeaveRoom(socket, oldRoom);
 	}
