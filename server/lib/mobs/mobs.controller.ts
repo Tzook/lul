@@ -99,7 +99,8 @@ export default class MobsController extends MasterController {
 	}
 
 	public calculateDamage(socket: GameSocket, load: number): number {
-		let baseDmg = socket.character.stats.str; // currently hardcoded str. once we have abilities, will choose based on main stat
+		// currently hardcoded str. once we have abilities, will choose based on main stat
+		let baseDmg = socket.character.stats.str + socket.bonusStats.str; 
 		let bonusDmg = load * baseDmg / 100;
 		let maxDmg = baseDmg + bonusDmg;
 		let minDmg = maxDmg / 2;

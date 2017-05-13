@@ -7,11 +7,11 @@ interface Doc {
 }
 
 interface Equips {
-    head:   ITEM_MODEL;
-    chest:  ITEM_MODEL;
-    legs:   ITEM_MODEL;
-    gloves: ITEM_MODEL;
-    shoes:  ITEM_MODEL;
+    head:   ITEM_INSTANCE;
+    chest:  ITEM_INSTANCE;
+    legs:   ITEM_INSTANCE;
+    gloves: ITEM_INSTANCE;
+    shoes:  ITEM_INSTANCE;
 }
 
 interface Stats {
@@ -65,6 +65,7 @@ interface GameSocket extends SocketIO.Socket {
     bitch: boolean;
     alive: boolean,
     lastAttackLoad: number;
+    bonusStats?: ITEM_STATS_MODEL;
 }
 
 // items

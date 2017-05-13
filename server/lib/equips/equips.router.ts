@@ -4,6 +4,7 @@ import EquipsMiddleware from './equips.middleware';
 import ItemsRouter from '../items/items.router';
 let config = require('../../../server/lib/equips/equips.config.json');
 let dropsConfig = require('../../../server/lib/drops/drops.config.json');
+let statsConfig = require('../../../server/lib/stats/stats.config.json');
 let SERVER_GETS = config.SERVER_GETS;
 
 export default class EquipsRouter extends SocketioRouterBase {
@@ -36,7 +37,9 @@ export default class EquipsRouter extends SocketioRouterBase {
 				this.sendError(data, socket, "Item cannot be equipped there");
 			} else {
 				console.log("equipping item", from, to);
+				this.removeStats(to, socket);
 				this.middleware.swapEquipAndItem(socket, from, to);
+				this.addStats(to, socket);
 
 				this.io.to(socket.character.room).emit(this.CLIENT_GETS.EQUIP_ITEM, {
 					id: socket.character._id,
@@ -68,7 +71,9 @@ export default class EquipsRouter extends SocketioRouterBase {
 			} else {
 				console.log("unequipping item", from, to);
 
+				this.removeStats(from, socket);
 				this.middleware.swapEquipAndItem(socket, to, from);
+				this.addStats(from, socket);
 
 				this.io.to(socket.character.room).emit(this.CLIENT_GETS.UNEQUIP_ITEM, {
 					id: socket.character._id,
@@ -125,6 +130,7 @@ export default class EquipsRouter extends SocketioRouterBase {
 			console.log("dropping equip", equip);
 
 			this.emitter.emit(dropsConfig.SERVER_INNER.ITEMS_DROP, { }, socket, [equip]);
+			this.removeStats(slot, socket);
 
 			let ItemsModels = this.mongoose.model("Item");
 			socket.character.equips[slot] = new ItemsModels({});
@@ -135,5 +141,15 @@ export default class EquipsRouter extends SocketioRouterBase {
 		} else {
 			this.sendError(data, socket, "Invalid slot!");
 		}
+	}
+
+	private addStats(slot: string, socket: GameSocket) {
+		let equip = socket.character.equips[slot];
+		this.emitter.emit(statsConfig.SERVER_INNER.STATS_ADD, { stats: equip }, socket);
+	}
+
+	private removeStats(slot: string, socket: GameSocket) {
+		let equip = socket.character.equips[slot];
+		this.emitter.emit(statsConfig.SERVER_INNER.STATS_REMOVE, { stats: equip }, socket);
 	}
 };

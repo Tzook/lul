@@ -5,7 +5,9 @@
 		"GAIN_EXP": "gain_exp",
 		"GAIN_HP": "gain_hp",
 		"TAKE_DMG": "take_dmg",
-		"GAIN_MP": "gain_mp"
+		"GAIN_MP": "gain_mp",
+		"STATS_ADD": "stats_add",
+		"STATS_REMOVE": "stats_remove"
 	},
 	"SERVER_GETS": {
 		"RELEASE_DEATH": "release_death"

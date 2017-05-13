@@ -2,6 +2,8 @@
 import SocketioRouterBase from '../socketio/socketio.router.base';
 import StatsController from './stats.controller';
 import StatsServices from './stats.services';
+import { ITEM_STATS_SCHEMA } from "../items/items.model";
+import { EQUIPS_SCHEMA } from '../equips/equips.model';
 let config = require('../../../server/lib/stats/stats.config.json');
 let roomsConfig = require('../../../server/lib/rooms/rooms.config.json');
 
@@ -98,12 +100,36 @@ export default class StatsRouter extends SocketioRouterBase {
         this.emitter.emit(roomsConfig.SERVER_INNER.MOVE_TO_TOWN, {}, socket);
     }
 
+    [config.SERVER_INNER.STATS_ADD] (data, socket: GameSocket) {
+        this.toggleStats(data.stats, socket, true);
+    }
+
+    [config.SERVER_INNER.STATS_REMOVE] (data, socket: GameSocket) {
+        this.toggleStats(data.stats, socket, false);
+    }
+
+    private toggleStats(stats: ITEM_INSTANCE, socket: GameSocket, on: boolean) {
+        for (var stat in ITEM_STATS_SCHEMA) {
+            if (stats[stat]) {
+                socket.bonusStats[stat] = socket.bonusStats[stat] + stats[stat] * (on ? 1 : -1);
+            }
+        }
+    }
+
     public onConnected(socket: GameSocket) {
         this.regenHpInterval(socket);
         this.regenMpInterval(socket);
         Object.defineProperty(socket, 'alive', {get: () => {
             return socket.character.stats.hp.now > 0;
         }});
+        socket.bonusStats = {};
+        for (var stat in ITEM_STATS_SCHEMA) {
+            socket.bonusStats[stat] = 0;
+        }
+        // add the equips to memory
+        for (var itemKey in EQUIPS_SCHEMA) {
+            this[config.SERVER_INNER.STATS_ADD]({stats: socket.character.equips[itemKey]}, socket);
+        }
     }
 
     private regenHpInterval(socket: GameSocket) {
