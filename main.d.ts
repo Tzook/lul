@@ -68,15 +68,29 @@ interface GameSocket extends SocketIO.Socket {
 }
 
 // items
+interface ITEM_STATS_MODEL {
+    str?: number,
+    mag?: number,
+    dex?: number,
+    hp?: number,
+    mp?: number,
+}
 interface ITEM_MODEL {
     key: string,
     type: string,
     gold: number,
     chance: number,
     cap?: number,
+    stats?: ITEM_STATS_MODEL,
+    req?: {
+        str?: number,
+        mag?: number,
+        dex?: number,
+        lvl?: number,
+    }
 }
 
-interface ITEM_INSTANCE {
+interface ITEM_INSTANCE extends ITEM_STATS_MODEL {
     key: string,
     stack?: number,
 }

@@ -18,7 +18,7 @@
     "express-session": "1.15.2",
     "forever": "0.15.3",
     "heroku-client": "3.0.2",
-    "mongoose": "4.9.7",
+    "mongoose": "4.9.8",
     "passport": "0.3.2",
     "passport-local": "1.0.0",
     "passport.socketio": "3.7.0",

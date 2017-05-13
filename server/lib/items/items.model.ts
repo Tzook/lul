@@ -3,18 +3,35 @@ import MasterModel from "../master/master.model";
 import ItemsController from './items.controller';
 let config = require('../../../server/lib/items/items.config.json');
 
+export const STATS_SCHEMA = {
+    str: Number,
+    mag: Number,
+    dex: Number,
+    hp: Number,
+    mp: Number,
+};
+
+export const REQUIRE_SCHEMA = {
+    str: Number,
+    mag: Number,
+    dex: Number,
+    lvl: Number,
+};
+
 export const ITEM_SCHEMA = {
     key: String,
     type: String,
     gold: Number,
     chance: Number,
     cap: Number,
+    stats: STATS_SCHEMA,
+    req: REQUIRE_SCHEMA,
 };
 
-export const ITEM_INSTANCE_SCHEMA = {
+export const ITEM_INSTANCE_SCHEMA = Object.assign({
     key: String,
     stack: Number,
-}
+}, STATS_SCHEMA);
 
 export default class ItemsModel extends MasterModel {
     protected controller: ItemsController;

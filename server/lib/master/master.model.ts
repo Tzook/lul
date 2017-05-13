@@ -9,11 +9,13 @@ export default class MasterModel {
     protected schema;
     protected hasId: boolean;
     protected strict: boolean;
+    protected minimize: boolean;
 
     constructor() {
         this.mongoose = mongoose;
         this.hasId = true;
         this.strict = true;
+        this.minimize = false;
     }
 
     init(files, app) {
@@ -33,7 +35,7 @@ export default class MasterModel {
     }
 
     protected createNewModel(name, schema, params = {}) {
-        return this.mongoose.model(name, new this.mongoose.Schema(schema, Object.assign({_id: this.hasId, minimize: false, strict: this.strict}, params)));
+        return this.mongoose.model(name, new this.mongoose.Schema(schema, Object.assign({_id: this.hasId, minimize: this.minimize, strict: this.strict}, params)));
     }
 
     getModel(name?) {
