@@ -15,8 +15,24 @@ export default class EquipsMiddleware extends ItemsMiddleware {
         return this.isItem(socket.character.equips[slot]);
     }
 
-    canWearEquip(item: ITEM_MODEL, slot: string): boolean {
+    canWearEquip(socket: GameSocket, item: ITEM_MODEL, slot: string): boolean {
+        return this.doesEquipFit(item, slot) && this.hasRequirements(socket, item, slot);
+    }
+
+    private doesEquipFit(item: ITEM_MODEL, slot: string): boolean {
         return item.type === slot;
+    }
+
+    private hasRequirements(socket: GameSocket, item: ITEM_MODEL, slot: string): boolean {
+        for (let stat in (item.req || {})) {
+            let itemValue = item.req[stat];
+            // we only check against base value
+            let charValue = socket.character.stats[stat];
+            if (charValue < itemValue) {
+                return false;
+            }
+        }
+        return true;
     }
 
     swapEquipAndItem(socket: GameSocket, itemSlot: number, equipSlot: string) {

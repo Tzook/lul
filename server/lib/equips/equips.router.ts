@@ -33,7 +33,7 @@ export default class EquipsRouter extends SocketioRouterBase {
 			let itemInfo = this.itemsRouter.getItemInfo(item.key);
 			if (!itemInfo) {
 				this.sendError(data, socket, "Could not find item info for item " + item.key);
-			} else if (!this.middleware.canWearEquip(itemInfo, to)) {
+			} else if (!this.middleware.canWearEquip(socket, itemInfo, to)) {
 				this.sendError(data, socket, "Item cannot be equipped there");
 			} else {
 				console.log("equipping item", from, to);
@@ -65,7 +65,7 @@ export default class EquipsRouter extends SocketioRouterBase {
 			&& this.middleware.hasEquip(socket, from)) {
 
 			if (this.middleware.hasItem(socket, to)
-				&& !this.middleware.canWearEquip(this.itemsRouter.getItemInfo(socket.character.items[to].key), from)) {
+				&& !this.middleware.canWearEquip(socket, this.itemsRouter.getItemInfo(socket.character.items[to].key), from)) {
 				// if the wanted slot already has an item, check if it can be replaced
 				this.sendError(data, socket, "Cannot unequip to slot!");
 			} else {
