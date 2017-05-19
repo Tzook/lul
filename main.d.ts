@@ -58,6 +58,7 @@ interface User extends Doc {
 }
 
 interface GameSocket extends SocketIO.Socket {
+    test?: boolean;
     id: string;
     character: Char;
     user: User;

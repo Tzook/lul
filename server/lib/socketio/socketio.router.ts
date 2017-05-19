@@ -77,9 +77,11 @@ export default class SocketioRouter extends SocketioRouterBase {
 		console.error(errorMessage);
 		next(new Error(errorMessage));
 	}
-
 	initListeners() {
 		this.io.on(this.ROUTES.BEGIN_CONNECTION, (socket: GameSocket) => {
+			if (!this.isProduction() && socket.request._query.test === 'true') {
+				socket.test = true;
+			}
 			socket.user = socket.client.request.user;
 			socket.character = socket.client.request.character;
 			if (this.map.has(socket.user._id.toString())) {
@@ -124,11 +126,14 @@ export default class SocketioRouter extends SocketioRouterBase {
 			return;
 		}
 		console.log('disconnected', socket.character.name);
-		socket.user.save(e => {
-			if (e) {
-				console.error(e);
-			}
-		});
+		// automations should not be saved afterwards - we want it to reset every time
+		if (!socket.test) {
+			socket.user.save(e => {
+				if (e) {
+					console.error(e);
+				}
+			});
+		}
 		this.map.delete(socket.user._id.toString());
 		this.map.delete(socket.character.name);
 		this.map.delete(socket.id);
@@ -151,4 +156,8 @@ export default class SocketioRouter extends SocketioRouterBase {
 					});
 		});
 	}
-};
+
+	private isProduction(): boolean {
+		return process.env.NODE_ENV === "production";
+	}
+ };

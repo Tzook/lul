@@ -325,7 +325,7 @@
 					disconnect();
 				}
 				showLoading();
-				socket = io(location.host, {forceNew: true, query: "id=" + characters[index]._id});
+				socket = io(location.host, {forceNew: true, query: "id=" + characters[index]._id + "&test=" + window.test});
 				// HANDSHAKE APPROVED
 				socket.on('connect', function() {
 					toggleIntro(true);
