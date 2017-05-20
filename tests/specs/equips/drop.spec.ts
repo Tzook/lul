@@ -3,7 +3,7 @@ import { browser } from "protractor/built";
 import { wearEquip, dropEquip } from "./equips.common";
 import { pickItem } from "../items/items.common";
 
-fdescribe('drop equip', () => {
+describe('drop equip', () => {
     beforeAll(wearEquip);
 
     describe('errors', () => {
