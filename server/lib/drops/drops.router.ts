@@ -8,7 +8,7 @@ let config = require('../../../server/lib/drops/drops.config.json');
 let SERVER_GETS = config.SERVER_GETS;
 
 export default class DropsRouter extends SocketioRouterBase {
-    private dropsMap: Map<string, {x, y, item_id, item: ITEM_INSTANCE}> = new Map();
+    private dropsMap: Map<string, Map<string, ITEM_DROP>> = new Map();
 	private lastHandledItem: string;
     protected controller: DropsController;
     protected services: DropsServices;
@@ -20,8 +20,17 @@ export default class DropsRouter extends SocketioRouterBase {
 		super.init(files, app);
 	}
 
+	private getRoomMap(socket: GameSocket) {
+		let map = this.dropsMap.get(socket.character.room);
+		if (!map) {
+			map = new Map();
+			this.dropsMap.set(socket.character.room, map);
+		}
+		return map;
+	}
+
 	[SERVER_GETS.ENTERED_ROOM](data, socket: GameSocket) {
-		this.dropsMap.forEach(itemData => {
+		this.getRoomMap(socket).forEach(itemData => {
 			socket.emit(this.CLIENT_GETS.ITEMS_DROP, [itemData]);
 		});
 	}
@@ -31,17 +40,19 @@ export default class DropsRouter extends SocketioRouterBase {
             this.sendError({}, socket, "Character is not alive!");
             return;
         }
-		let itemAndRoomId = this.controller.getItemId(socket, data.item_id);
-        if (!this.dropsMap.has(itemAndRoomId)) {
-			if (this.lastHandledItem !== itemAndRoomId) {
+		let itemId: string = data.item_id;
+		let map = this.getRoomMap(socket);
+		if (!map.has(itemId)) {
+			if (this.lastHandledItem !== itemId) {
+				// the pickup event happens multiple times so if we are still in the same handling process, don't count it as an error
 				this.sendError(data, socket, "Item does not exist");
 			}
 		} else {
-			let picked = pickItemFn(this.dropsMap.get(itemAndRoomId).item);
+			let picked = pickItemFn(map.get(itemId).item);
 			if (picked) {
 				console.log('picking item', data.item_id);
-				this.dropsMap.delete(itemAndRoomId);
-				this.lastHandledItem = itemAndRoomId;
+				map.delete(itemId);
+				this.lastHandledItem = itemId;
 				this.io.to(socket.character.room).emit(this.CLIENT_GETS.ITEM_PICK, {
 					id: socket.character._id,
 					item_id: data.item_id,
@@ -77,24 +88,24 @@ export default class DropsRouter extends SocketioRouterBase {
     [config.SERVER_INNER.ITEMS_DROP](data, socket: GameSocket, items: ITEM_INSTANCE[]) {
 		let room = socket.character.room;
 		let itemsData = [];
+		let map = this.getRoomMap(socket);
 		// convert the items to plain objects
 		items = JSON.parse(JSON.stringify(items));
 		
 		items.forEach(item => {
 			let itemId = _.uniqueId();
-			let itemAndRoomId = this.controller.getItemId(socket, itemId);
-			let itemData = {
+			let itemData: ITEM_DROP = {
 				x: data.x || socket.character.position.x,
 				y: data.y || socket.character.position.y,
 				item_id: itemId,
 				item
 			};
-			this.dropsMap.set(itemAndRoomId, itemData);
+			map.set(itemId, itemData);
 			itemsData[itemsData.length] = itemData;
 
 			setTimeout(() => {
-				if (this.dropsMap.has(itemAndRoomId)) {
-					this.dropsMap.delete(itemAndRoomId);
+				if (map.has(itemId)) {
+					map.delete(itemId);
 					console.log('removing item', itemId);
 					this.io.to(room).emit(this.CLIENT_GETS.ITEM_DISAPPEAR, {
 						item_id: itemId
@@ -117,11 +128,12 @@ export default class DropsRouter extends SocketioRouterBase {
 			return this.sendError(data, socket, "Must provide an array of items to update locations");
 		}
 		let updatedItems = [];
+		let map = this.getRoomMap(socket);
 		items.forEach(item => {
 			let itemData;
 			if (!_.isObject(item)) {
 				this.sendError(data, socket, "Must provide an object to update locations");
-			} else if (!(itemData = this.dropsMap.get(this.controller.getItemId(socket, item.item_id)))) {
+			} else if (!(itemData = map.get(item.item_id))) {
 				this.sendError(data, socket, `Item with given item_id ${item.item_id} was not found`);
 			} else if (!_.isFinite(item.x) || !_.isFinite(item.y)) {
 				this.sendError(data, socket, `Item with item_id ${item.item_id} received invalid x and y`);

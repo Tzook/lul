@@ -92,6 +92,13 @@ interface ITEM_MODEL {
     }
 }
 
+interface ITEM_DROP {
+    x: number, 
+    y: number, 
+    item_id: string, 
+    item: ITEM_INSTANCE
+}
+
 interface ITEM_INSTANCE extends ITEM_STATS_MODEL {
     key: string,
     stack?: number,
