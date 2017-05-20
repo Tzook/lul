@@ -12,7 +12,7 @@ export default class EquipsMiddleware extends ItemsMiddleware {
     }
 
     hasEquip(socket: GameSocket, slot: string): boolean {
-        return this.isItem(socket.character.equips[slot]);
+        return this.isValidEquipSlot(slot) && this.isItem(socket.character.equips[slot]);
     }
 
     canWearEquip(socket: GameSocket, item: ITEM_MODEL, slot: string): boolean {

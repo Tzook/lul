@@ -44,3 +44,7 @@ export function connectChars() {
         connectChar(newBrowser.instance);
     });
 }
+
+export function getChat(b = browser) {
+    return b.$("#chat").getText();
+}

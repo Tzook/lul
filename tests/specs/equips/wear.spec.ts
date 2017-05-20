@@ -1,5 +1,6 @@
 import { expectText, newBrowser } from '../common';
 import { browser } from "protractor/built";
+import { wearEquip, unwearEquip } from "./equips.common";
 
 describe('wear equip', () => {
     describe('errors', () => {
@@ -41,17 +42,8 @@ describe('wear equip', () => {
     });
 
     describe('equip successfully', () => {
-        beforeAll(() => {
-            browser.executeScript(`socket.emit("equipped_item", {from: 0, to: "legs"});`)
-        });
-        afterAll(() => {
-            browser.executeScript(`socket.emit("unequipped_item", {from: "legs", to: 0});`)
-            expectText("actor_unequip_item", browser);
-        });
-        
-        it('should tell about the event to the actor', () => {
-            expectText("actor_equip_item", browser);
-        });
+        beforeAll(wearEquip);
+        afterAll(unwearEquip);
         
         it('should tell about the event to the other actor', () => {
             expectText("actor_equip_item", newBrowser.instance);
