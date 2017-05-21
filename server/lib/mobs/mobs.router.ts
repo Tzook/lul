@@ -25,7 +25,7 @@ export default class MobsRouter extends SocketioRouterBase {
 			this.controller.generateMobs.bind(this.controller));
 	}
 
-	[SERVER_GETS.ENTERED_ROOM](data, socket: GameSocket) {
+	[SERVER_GETS.ENTERED_ROOM.name](data, socket: GameSocket) {
 		if (!this.controller.hasRoom(socket.character.room)) {
 			// we must spawn new mobs
 			let roomInfo = this.roomsRouter.getRoomInfo(socket.character.room);
@@ -39,7 +39,7 @@ export default class MobsRouter extends SocketioRouterBase {
 		}
 	}
 
-	[SERVER_GETS.MOB_TAKE_DMG](data, socket: GameSocket) {
+	[SERVER_GETS.MOB_TAKE_DMG.name](data, socket: GameSocket) {
 		if (!socket.alive) {
             this.sendError({}, socket, "Character is not alive!");
             return;
@@ -48,7 +48,7 @@ export default class MobsRouter extends SocketioRouterBase {
 			let load = socket.lastAttackLoad || 0;
 			let dmg = this.controller.calculateDamage(socket, load);
 			let mob = this.controller.hurtMob(data.mob_id, dmg, socket);
-			this.io.to(socket.character.room).emit(this.CLIENT_GETS.MOB_TAKE_DMG, {
+			this.io.to(socket.character.room).emit(this.CLIENT_GETS.MOB_TAKE_DMG.name, {
 				id: socket.character._id,
 				mob_id: mob.id,
 				dmg,
@@ -58,15 +58,15 @@ export default class MobsRouter extends SocketioRouterBase {
 			if (mob.hp === 0) {
 				this.controller.despawnMob(mob, socket.character.room);
 				let exp = mob.exp;
-				this.emitter.emit(statsConfig.SERVER_INNER.GAIN_EXP, { exp }, socket);
-				this.emitter.emit(dropsConfig.SERVER_INNER.GENERATE_DROPS, {x: mob.x, y: mob.y}, socket, mob.drops);
+				this.emitter.emit(statsConfig.SERVER_INNER.GAIN_EXP.name, { exp }, socket);
+				this.emitter.emit(dropsConfig.SERVER_INNER.GENERATE_DROPS.name, {x: mob.x, y: mob.y}, socket, mob.drops);
 			}
 		} else {
 			this.sendError(data, socket, "Mob doesn't exist!");
 		}
 	}
 
-	[SERVER_GETS.MOB_MOVE](data, socket: GameSocket) {
+	[SERVER_GETS.MOB_MOVE.name](data, socket: GameSocket) {
 		if (!socket.bitch) {
 			this.sendError(data, socket, "Character is not bitch!", false);
 		} else if (!this.controller.hasMob(data.mob_id, socket)) {
@@ -76,14 +76,14 @@ export default class MobsRouter extends SocketioRouterBase {
 		}
 	}
 
-	[SERVER_GETS.TAKE_DMG](data, socket: GameSocket) {
+	[SERVER_GETS.TAKE_DMG.name](data, socket: GameSocket) {
 		if (!socket.alive) {
             this.sendError({}, socket, "Character is not alive!");
             return;
         }
 		if (this.controller.hasMob(data.mob_id, socket)) {
 			let dmg = this.controller.getHurtCharDmg(data.mob_id, socket);
-			this.emitter.emit(statsConfig.SERVER_INNER.TAKE_DMG, { dmg }, socket);
+			this.emitter.emit(statsConfig.SERVER_INNER.TAKE_DMG.name, { dmg }, socket);
 		} else {
 			this.sendError(data, socket, "Mob doesn't exist!");
 		}

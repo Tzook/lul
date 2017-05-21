@@ -17,8 +17,8 @@ export default class MiscRouter extends SocketioRouterBase {
 		this.itemsRouter = files.routers.items;
 	}
 
-	[SERVER_GETS.ITEM_PICK](data, socket: GameSocket) {
-		this.emitter.emit(dropsConfig.SERVER_INNER.ITEM_PICK, data, socket, (item: ITEM_INSTANCE): any => {
+	[SERVER_GETS.ITEM_PICK.name](data, socket: GameSocket) {
+		this.emitter.emit(dropsConfig.SERVER_INNER.ITEM_PICK.name, data, socket, (item: ITEM_INSTANCE): any => {
             let itemInfo = this.itemsRouter.getItemInfo(item.key);
             if (!(itemInfo.cap > 1) || itemInfo.key === "gold") {
                 return;
@@ -35,7 +35,7 @@ export default class MiscRouter extends SocketioRouterBase {
 		});
 	}
 
-	[SERVER_GETS.MISC_DROP](data, socket: GameSocket) {
+	[SERVER_GETS.MISC_DROP.name](data, socket: GameSocket) {
         if (!socket.alive) {
             this.sendError({}, socket, "Character is not alive!");
             return;
@@ -50,14 +50,14 @@ export default class MiscRouter extends SocketioRouterBase {
             let itemToDrop = Object.assign({}, item);
             if (stack >= item.stack) {
                 socket.character.items.set(slot, {});
-                socket.emit(this.CLIENT_GETS.ITEM_DELETE, { slot });
+                socket.emit(this.CLIENT_GETS.ITEM_DELETE.name, { slot });
             } else {
                 item.stack -= stack;
                 itemToDrop.stack = stack;
-                socket.emit(this.CLIENT_GETS.STACK_CHANGE, { slot, amount: item.stack });
+                socket.emit(this.CLIENT_GETS.STACK_CHANGE.name, { slot, amount: item.stack });
             }
             console.log("dropping misc item", itemToDrop);
-            this.emitter.emit(dropsConfig.SERVER_INNER.ITEMS_DROP, {}, socket, [item]);
+            this.emitter.emit(dropsConfig.SERVER_INNER.ITEMS_DROP.name, {}, socket, [item]);
 		}
 	}
 };

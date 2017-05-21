@@ -45,7 +45,7 @@ export default class RoomsController extends MasterController {
 		console.log("stopping bitch: %s, room: %s", socket.character.name, room);
 		socket.bitch = false;
 		this.roomBitches.delete(room);
-		socket.emit(config.CLIENT_GETS.BITCH_CHOOSE, {
+		socket.emit(config.CLIENT_GETS.BITCH_CHOOSE.name, {
 			is_bitch: false
 		});
 	}
@@ -57,7 +57,7 @@ export default class RoomsController extends MasterController {
 				let key = _.uniqueId();
 				this.roomBitchKeys.set(room, key);
 				console.log("asking bitch please. key %s, room:", key, room);
-				this.io.to(room).emit(config.CLIENT_GETS.BITCH_PLEASE, {
+				this.io.to(room).emit(config.CLIENT_GETS.BITCH_PLEASE.name, {
 					key
 				});
 				this.askForBitch(room);
@@ -83,7 +83,7 @@ export default class RoomsController extends MasterController {
 		console.log("new bitch: %s, room: %s", socket.character.name, room);
 		socket.bitch = true;
 		this.roomBitches.set(room, socket);
-		socket.emit(config.CLIENT_GETS.BITCH_CHOOSE, {
+		socket.emit(config.CLIENT_GETS.BITCH_CHOOSE.name, {
 			is_bitch: true
 		});
 	}

@@ -2,28 +2,28 @@
 	"ROUTES": {
 		"GENERATE": "/room/generate"
 	},
-	"SERVER_INNER": {
-		"MOVE_TO_TOWN": "move_to_town"
-	},
-	"SERVER_GETS": {
-		"ENTERED_ROOM": "entered_room",
-		"ENTER_PORTAL": "entered_portal",
-		"BITCH_PLEASE": "bitch_please",
-		"DISCONNECT": "disconnect"
-	},
-	"CLIENT_GETS": {
-		"JOIN_ROOM": "actor_join_room",
-		"MOVE_ROOM": "actor_move_room",
-		"LEAVE_ROOM": "actor_leave_room",
-		"BITCH_PLEASE": "bitch_please",
-		"BITCH_CHOOSE": "actor_bitch"
-	},
 	"LOGS": {
 		"GENERATE_ROOM": {
 			"MSG": "Generated room successfully.",
 			"CODE": "ROOM_1",
 			"STATUS": "OK"
 		}
+	},
+	"SERVER_INNER": {
+		"MOVE_TO_TOWN": {"name": "move_to_town"}
+	},
+	"SERVER_GETS": {
+		"ENTERED_ROOM": {"name": "entered_room"},
+		"ENTER_PORTAL": {"name": "entered_portal"},
+		"BITCH_PLEASE": {"name": "bitch_please"},
+		"DISCONNECT": {"name": "disconnect"}
+	},
+	"CLIENT_GETS": {
+		"JOIN_ROOM": {"name": "actor_join_room"},
+		"MOVE_ROOM": {"name": "actor_move_room"},
+		"LEAVE_ROOM": {"name": "actor_leave_room"},
+		"BITCH_PLEASE": {"name": "bitch_please"},
+		"BITCH_CHOOSE": {"name": "actor_bitch"}
 	},
 	"DEFAULT_ROOM": "TestingRoom",
 	"BITCH_INTERVAL": 30000

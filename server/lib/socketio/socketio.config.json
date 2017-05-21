@@ -4,14 +4,9 @@
 		"RESTART": "/restart"
 	},
 	"SERVER_GETS": {
-		"DISCONNECT": "disconnect"
+		"DISCONNECT": {"name": "disconnect"}
 	},
 	"CLIENT_GETS": {
-		"CONNECT": "connect",
-		"ERROR": "error",
-		"EVENT_ERROR": "event_error"
-	},
-	"LOGS": {
-
+		"EVENT_ERROR": {"name": "event_error"}
 	}
 }

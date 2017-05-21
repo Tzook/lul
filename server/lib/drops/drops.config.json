@@ -1,20 +1,18 @@
 {
-	"ROUTES": {},
-	"LOGS": {},
 	"SERVER_INNER": {
-		"ITEM_PICK": "item_pick",
-		"ITEMS_DROP": "items_drop",
-		"GENERATE_DROPS": "generate_drops"
+		"ITEM_PICK": {"name": "item_pick"},
+		"ITEMS_DROP": {"name": "items_drop"},
+		"GENERATE_DROPS": {"name": "generate_drops"}
 	},
 	"SERVER_GETS": {
-		"ENTERED_ROOM": "entered_room",
-		"ITEMS_LOCATIONS": "items_locations"
+		"ENTERED_ROOM": {"name": "entered_room"},
+		"ITEMS_LOCATIONS": {"name": "items_locations"}
 	},
 	"CLIENT_GETS": {
-		"ITEM_PICK": "actor_pick_item",
-		"ITEMS_DROP": "drop_items",
-		"ITEM_DISAPPEAR": "item_disappear",
-		"ITEMS_LOCATIONS": "items_locations"
+		"ITEM_PICK": {"name": "actor_pick_item"},
+		"ITEMS_DROP": {"name": "drop_items"},
+		"ITEM_DISAPPEAR": {"name": "item_disappear"},
+		"ITEMS_LOCATIONS": {"name": "items_locations"}
 	},
 	"ITEM_DROP_LIFE": 60000
 }

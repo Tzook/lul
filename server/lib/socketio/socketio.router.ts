@@ -111,17 +111,17 @@ export default class SocketioRouter extends SocketioRouterBase {
 		});
 	}
 
-	private listenToEvents(router: SocketioRouterBase, events: string[], listeners: {on: (string, Function) => {}}[]) {
+	private listenToEvents(router: SocketioRouterBase, events: {name: string}[], listeners: {on: (string, Function) => {}}[]) {
 		for (let i in events) {
 			let event = events[i];
-			let routerFn = router[event].bind(router);
+			let routerFn = router[event.name].bind(router);
 			for (let j in listeners) {
-				listeners[j].on(event, routerFn);
+				listeners[j].on(event.name, routerFn);
 			}
 		}
 	}
 
-	[SERVER_GETS.DISCONNECT](data, socket: GameSocket) {
+	[SERVER_GETS.DISCONNECT.name](data, socket: GameSocket) {
 		if (!this.map.has(socket.id)) {
 			return;
 		}

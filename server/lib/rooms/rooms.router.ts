@@ -28,21 +28,21 @@ export default class RoomsRouter extends SocketioRouterBase {
 		return this.services.getRoomInfo(room);
 	}
 
-	[config.SERVER_GETS.ENTERED_ROOM](data, socket: GameSocket) {
+	[config.SERVER_GETS.ENTERED_ROOM.name](data, socket: GameSocket) {
 		// const also used in items
 		console.log('character %s entered room', socket.character.name);
-		socket.broadcast.to(socket.character.room).emit(this.CLIENT_GETS.JOIN_ROOM, {character: socket.character});
+		socket.broadcast.to(socket.character.room).emit(this.CLIENT_GETS.JOIN_ROOM.name, {character: socket.character});
 		let roomObject = socket.adapter.rooms[socket.character.room];
 		if (roomObject) {
 			_.each(roomObject.sockets, (value, socketId: string) => {
-				socket.emit(this.CLIENT_GETS.JOIN_ROOM, {character: socket.map.get(socketId).character});
+				socket.emit(this.CLIENT_GETS.JOIN_ROOM.name, {character: socket.map.get(socketId).character});
 			});
 		}
 
 		this.controller.socketJoinRoom(socket);
 	}
 
-	[config.SERVER_GETS.ENTER_PORTAL](data, socket: GameSocket) {
+	[config.SERVER_GETS.ENTER_PORTAL.name](data, socket: GameSocket) {
 		if (!socket.alive) {
             this.sendError({}, socket, "Character is not alive!");
             return;
@@ -67,7 +67,7 @@ export default class RoomsRouter extends SocketioRouterBase {
 		}
 	}
 
-	[config.SERVER_INNER.MOVE_TO_TOWN] (data, socket: GameSocket) {
+	[config.SERVER_INNER.MOVE_TO_TOWN.name] (data, socket: GameSocket) {
 		if (!socket.alive) {
 			this.sendError({}, socket, "Character is not alive!");
             return;
@@ -87,7 +87,7 @@ export default class RoomsRouter extends SocketioRouterBase {
 	}
 
 	private moveRoom(socket: GameSocket, room: string, targetPortal: PORTAL_MODEL) {
-		socket.broadcast.to(socket.character.room).emit(this.CLIENT_GETS.LEAVE_ROOM, {
+		socket.broadcast.to(socket.character.room).emit(this.CLIENT_GETS.LEAVE_ROOM.name, {
 			id: socket.character._id
 		});
 		let oldRoom = socket.character.room;
@@ -98,26 +98,26 @@ export default class RoomsRouter extends SocketioRouterBase {
 		socket.character.position.x = targetPortal.x;
 		socket.character.position.y = targetPortal.y;
 		console.log("moving character %s to room %s", socket.character.name, room);
-		socket.emit(this.CLIENT_GETS.MOVE_ROOM, {room, character: socket.character});
+		socket.emit(this.CLIENT_GETS.MOVE_ROOM.name, {room, character: socket.character});
 
 	}
 
-	[config.SERVER_GETS.DISCONNECT](data, socket: GameSocket) {
+	[config.SERVER_GETS.DISCONNECT.name](data, socket: GameSocket) {
 		console.log('disconnect from room');
 		this.controller.socketLeaveRoom(socket, socket.character.room);
 	
-		socket.broadcast.to(socket.character.room).emit(this.CLIENT_GETS.LEAVE_ROOM, {
+		socket.broadcast.to(socket.character.room).emit(this.CLIENT_GETS.LEAVE_ROOM.name, {
 			 id: socket.character._id
 		});
 	}
 
-	[config.SERVER_GETS.BITCH_PLEASE](data, socket: GameSocket) {
+	[config.SERVER_GETS.BITCH_PLEASE.name](data, socket: GameSocket) {
 		let key = data.key;
 		console.log('bitch please received from %s with key %s', socket.character.name, key);
 		this.controller.newBitchRequest(socket, key);
 	}
 
     public onConnected(socket: GameSocket) {
-        socket.emit(this.CLIENT_GETS.MOVE_ROOM, {room: socket.character.room, character: socket.character});
+        socket.emit(this.CLIENT_GETS.MOVE_ROOM.name, {room: socket.character.room, character: socket.character});
     }
 };

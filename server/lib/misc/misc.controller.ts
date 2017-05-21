@@ -20,7 +20,7 @@ export default class MiscController extends MasterController {
                 slotItem.stack += stackToAdd;
                 socket.character.items.set(slot, slotItem);
                 item.stack -= stackToAdd;
-                socket.emit(config.CLIENT_GETS.STACK_CHANGE, { slot, amount: slotItem.stack });
+                socket.emit(config.CLIENT_GETS.STACK_CHANGE.name, { slot, amount: slotItem.stack });
             } else {
                 let itemClone = Object.assign({}, item);
                 itemClone.stack = Math.min(item.stack, itemInfo.cap);

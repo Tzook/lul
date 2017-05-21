@@ -1,18 +1,14 @@
 {
-	"ROUTES": {
-	},
 	"SERVER_GETS": {
-		"EQUIP_ITEM": "equipped_item",
-		"UNEQUIP_ITEM": "unequipped_item",
-		"USE_ITEM": "used_item",
-		"DROP_EQUIP": "dropped_equip",
-		"USE_EQUIP": "used_equip"
+		"EQUIP_ITEM": {"name": "equipped_item"},
+		"UNEQUIP_ITEM": {"name": "unequipped_item"},
+		"USE_ITEM": {"name": "used_item"},
+		"DROP_EQUIP": {"name": "dropped_equip"},
+		"USE_EQUIP": {"name": "used_equip"}
 	},
 	"CLIENT_GETS": {
-		"EQUIP_ITEM": "actor_equip_item",
-		"UNEQUIP_ITEM": "actor_unequip_item",
-		"DELETE_EQUIP": "actor_delete_equip"
-	},
-	"LOGS": {
+		"EQUIP_ITEM": {"name": "actor_equip_item"},
+		"UNEQUIP_ITEM": {"name": "actor_unequip_item"},
+		"DELETE_EQUIP": {"name": "actor_delete_equip"}
 	}
 }

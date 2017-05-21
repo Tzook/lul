@@ -2,23 +2,23 @@
 	"ROUTES": {
 		"GENERATE": "/mob/generate"
 	},
-	"SERVER_GETS": {
-		"ENTERED_ROOM": "entered_room",
-		"MOB_TAKE_DMG": "mob_took_dmg",
-		"MOB_MOVE": "mob_moved",
-		"TAKE_DMG": "took_dmg"
-	},
-	"CLIENT_GETS": {
-		"MOB_SPAWN": "mob_spawn",
-		"MOB_DIE": "mob_die",
-		"MOB_TAKE_DMG": "mob_take_dmg",
-		"MOB_MOVE": "mob_move"
-	},
 	"LOGS": {
 		"GENERATE_MOB": {
 			"MSG": "Generated mob successfully.",
 			"CODE": "MOB_1",
 			"STATUS": "OK"
 		}
+	},
+	"SERVER_GETS": {
+		"ENTERED_ROOM": {"name": "entered_room"},
+		"MOB_TAKE_DMG": {"name": "mob_took_dmg"},
+		"MOB_MOVE": {"name": "mob_moved"},
+		"TAKE_DMG": {"name": "took_dmg"}
+	},
+	"CLIENT_GETS": {
+		"MOB_SPAWN": {"name": "mob_spawn"},
+		"MOB_DIE": {"name": "mob_die"},
+		"MOB_TAKE_DMG": {"name": "mob_take_dmg"},
+		"MOB_MOVE": {"name": "mob_move"}
 	}
 }

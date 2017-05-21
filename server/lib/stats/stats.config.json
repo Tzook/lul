@@ -1,27 +1,23 @@
 {
-	"ROUTES": {
-	},
 	"SERVER_INNER": {
-		"GAIN_EXP": "gain_exp",
-		"GAIN_HP": "gain_hp",
-		"TAKE_DMG": "take_dmg",
-		"GAIN_MP": "gain_mp",
-		"STATS_ADD": "stats_add",
-		"STATS_REMOVE": "stats_remove"
+		"GAIN_EXP": {"name": "gain_exp"},
+		"GAIN_HP": {"name": "gain_hp"},
+		"GAIN_MP": {"name": "gain_mp"},
+		"TAKE_DMG": {"name": "take_dmg"},
+		"STATS_ADD": {"name": "stats_add"},
+		"STATS_REMOVE": {"name": "stats_remove"}
 	},
 	"SERVER_GETS": {
-		"RELEASE_DEATH": "release_death"
+		"RELEASE_DEATH": {"name": "release_death"}
 	},
 	"CLIENT_GETS": {
-		"GAIN_EXP": "actor_gain_exp",
-		"GAIN_HP": "actor_gain_hp",
-		"GAIN_MP": "actor_gain_mp",
-		"TAKE_DMG": "actor_take_dmg",
-		"DEATH": "actor_ded",
-		"RESURRECT": "actor_resurrect",
-		"LEVEL_UP": "actor_lvl_up"
-	},
-	"LOGS": {
+		"GAIN_EXP": {"name": "actor_gain_exp"},
+		"GAIN_HP": {"name": "actor_gain_hp"},
+		"GAIN_MP": {"name": "actor_gain_mp"},
+		"TAKE_DMG": {"name": "actor_take_dmg"},
+		"DEATH": {"name": "actor_ded"},
+		"RESURRECT": {"name": "actor_resurrect"},
+		"LEVEL_UP": {"name": "actor_lvl_up"}
 	},
 	"BEGIN_STATS_SUM": 7,
 	"BEGIN_HP_REGEN": 5,

@@ -13,14 +13,14 @@ export default class GoldRouter extends SocketioRouterBase {
 		this.itemsRouter = files.routers.items;
 	}
 
-	[SERVER_GETS.ITEM_PICK](data, socket: GameSocket) {
-		this.emitter.emit(dropsConfig.SERVER_INNER.ITEM_PICK, data, socket, (item: ITEM_INSTANCE): any => {
+	[SERVER_GETS.ITEM_PICK.name](data, socket: GameSocket) {
+		this.emitter.emit(dropsConfig.SERVER_INNER.ITEM_PICK.name, data, socket, (item: ITEM_INSTANCE): any => {
             let itemInfo = this.itemsRouter.getItemInfo(item.key);
             if (itemInfo.key !== "gold") {
                 return;
             }
             socket.character.gold += item.stack;
-            socket.emit(this.CLIENT_GETS.CHANGE_GOLD, {
+            socket.emit(this.CLIENT_GETS.CHANGE_GOLD.name, {
                 amount: item.stack
             });
             console.log("Gaining gold for %s. picked %d, now has: %d", socket.character.name, item.stack, socket.character.gold);
@@ -28,7 +28,7 @@ export default class GoldRouter extends SocketioRouterBase {
 		});
 	}
 
-	[SERVER_GETS.DROP_GOLD](data, socket: GameSocket) {
+	[SERVER_GETS.DROP_GOLD.name](data, socket: GameSocket) {
         if (!socket.alive) {
             this.sendError({}, socket, "Character is not alive!");
             return;
@@ -39,13 +39,13 @@ export default class GoldRouter extends SocketioRouterBase {
         } else {
             let amountToDrop = Math.min(amount, socket.character.gold);
             socket.character.gold -= amountToDrop;
-            socket.emit(this.CLIENT_GETS.CHANGE_GOLD, {
+            socket.emit(this.CLIENT_GETS.CHANGE_GOLD.name, {
                 amount: -amountToDrop
             });
             let item = this.itemsRouter.getItemInstance("gold");
             item.stack = amountToDrop;
             console.log("dropping gold", item);
-            this.emitter.emit(dropsConfig.SERVER_INNER.ITEMS_DROP, {}, socket, [item]);
+            this.emitter.emit(dropsConfig.SERVER_INNER.ITEMS_DROP.name, {}, socket, [item]);
         }
 	}
 };

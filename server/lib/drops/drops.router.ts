@@ -29,13 +29,13 @@ export default class DropsRouter extends SocketioRouterBase {
 		return map;
 	}
 
-	[SERVER_GETS.ENTERED_ROOM](data, socket: GameSocket) {
+	[SERVER_GETS.ENTERED_ROOM.name](data, socket: GameSocket) {
 		this.getRoomMap(socket).forEach(itemData => {
-			socket.emit(this.CLIENT_GETS.ITEMS_DROP, [itemData]);
+			socket.emit(this.CLIENT_GETS.ITEMS_DROP.name, [itemData]);
 		});
 	}
 
-    [config.SERVER_INNER.ITEM_PICK](data, socket: GameSocket, pickItemFn: (item: ITEM_INSTANCE) => {}) {
+    [config.SERVER_INNER.ITEM_PICK.name](data, socket: GameSocket, pickItemFn: (item: ITEM_INSTANCE) => {}) {
 		if (!socket.alive) {
             this.sendError({}, socket, "Character is not alive!");
             return;
@@ -53,7 +53,7 @@ export default class DropsRouter extends SocketioRouterBase {
 				console.log('picking item', data.item_id);
 				map.delete(itemId);
 				this.lastHandledItem = itemId;
-				this.io.to(socket.character.room).emit(this.CLIENT_GETS.ITEM_PICK, {
+				this.io.to(socket.character.room).emit(this.CLIENT_GETS.ITEM_PICK.name, {
 					id: socket.character._id,
 					item_id: data.item_id,
 				});
@@ -61,7 +61,7 @@ export default class DropsRouter extends SocketioRouterBase {
 		}
 	}
 
-    [config.SERVER_INNER.GENERATE_DROPS](data, socket: GameSocket, drops: DROP_MODEL[]) {
+    [config.SERVER_INNER.GENERATE_DROPS.name](data, socket: GameSocket, drops: DROP_MODEL[]) {
         let items = [];
         drops.forEach(drop => {
 			let itemInfo = this.itemsRouter.getItemInfo(drop.key);
@@ -81,11 +81,11 @@ export default class DropsRouter extends SocketioRouterBase {
         });
 
         if (items.length > 0) {
-            this.emitter.emit(config.SERVER_INNER.ITEMS_DROP, data, socket, items);
+            this.emitter.emit(config.SERVER_INNER.ITEMS_DROP.name, data, socket, items);
         }
 	}
 
-    [config.SERVER_INNER.ITEMS_DROP](data, socket: GameSocket, items: ITEM_INSTANCE[]) {
+    [config.SERVER_INNER.ITEMS_DROP.name](data, socket: GameSocket, items: ITEM_INSTANCE[]) {
 		let room = socket.character.room;
 		let itemsData = [];
 		let map = this.getRoomMap(socket);
@@ -107,7 +107,7 @@ export default class DropsRouter extends SocketioRouterBase {
 				if (map.has(itemId)) {
 					map.delete(itemId);
 					console.log('removing item', itemId);
-					this.io.to(room).emit(this.CLIENT_GETS.ITEM_DISAPPEAR, {
+					this.io.to(room).emit(this.CLIENT_GETS.ITEM_DISAPPEAR.name, {
 						item_id: itemId
 					});
 				}
@@ -115,11 +115,11 @@ export default class DropsRouter extends SocketioRouterBase {
 		});
 
 		if (itemsData.length > 0) {
-		    this.io.to(room).emit(this.CLIENT_GETS.ITEMS_DROP, itemsData);
+		    this.io.to(room).emit(this.CLIENT_GETS.ITEMS_DROP.name, itemsData);
         } 
 	}
 
-	[SERVER_GETS.ITEMS_LOCATIONS](data, socket: GameSocket) {
+	[SERVER_GETS.ITEMS_LOCATIONS.name](data, socket: GameSocket) {
 		if (!socket.bitch) {
 			return this.sendError(data, socket, "Must be bitch to update items locations");
 		}
@@ -144,7 +144,7 @@ export default class DropsRouter extends SocketioRouterBase {
 			}
 		});
 		if (updatedItems.length > 0) {
-			socket.broadcast.to(socket.character.room).emit(this.CLIENT_GETS.ITEMS_LOCATIONS, updatedItems);
+			socket.broadcast.to(socket.character.room).emit(this.CLIENT_GETS.ITEMS_LOCATIONS.name, updatedItems);
 		}
 	}
 };

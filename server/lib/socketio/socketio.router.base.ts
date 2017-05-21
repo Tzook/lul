@@ -37,7 +37,7 @@ export default class SocketioRouterBase extends MasterRouter {
 			event = (new Error()).stack.match(/at (\S+)/g)[1].slice(3).split('.')[1];
 		} catch (e) {}
 		console.error("Sending error to socket %s:", socket.character.name, error, data, event);
-		emit && socket.emit(config.CLIENT_GETS.EVENT_ERROR, {
+		emit && socket.emit(config.CLIENT_GETS.EVENT_ERROR.name, {
 			error,
 			data,
 			event

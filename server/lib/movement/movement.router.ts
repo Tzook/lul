@@ -3,7 +3,7 @@ import SocketioRouterBase from '../socketio/socketio.router.base';
 let SERVER_GETS		   = require('../../../server/lib/movement/movement.config.json').SERVER_GETS;
 
 export default class MovementRouter extends SocketioRouterBase {
-	[SERVER_GETS.MOVEMENT](data, socket: GameSocket) {
+	[SERVER_GETS.MOVEMENT.name](data, socket: GameSocket) {
 		if (!socket.alive) {
             return;
         }
@@ -14,7 +14,7 @@ export default class MovementRouter extends SocketioRouterBase {
 		if (socket.test) {
 			console.log("movement", data, socket.character.name);
 		}
-		socket.broadcast.to(socket.character.room).emit(this.CLIENT_GETS.MOVEMENT, {
+		socket.broadcast.to(socket.character.room).emit(this.CLIENT_GETS.MOVEMENT.name, {
 			id: socket.character._id,
 			x: data.x,
 			y: data.y,
@@ -23,22 +23,22 @@ export default class MovementRouter extends SocketioRouterBase {
 		});
 	}
 
-	[SERVER_GETS.START_CLIMB](data, socket: GameSocket) {
+	[SERVER_GETS.START_CLIMB.name](data, socket: GameSocket) {
 		if (!socket.alive) {
             return;
         }
 		socket.character.position.climbing = true;
-		socket.broadcast.to(socket.character.room).emit(this.CLIENT_GETS.START_CLIMB, {
+		socket.broadcast.to(socket.character.room).emit(this.CLIENT_GETS.START_CLIMB.name, {
 			id: socket.character._id,
 		});
 	}
 
-	[SERVER_GETS.STOP_CLIMB](data, socket: GameSocket) {
+	[SERVER_GETS.STOP_CLIMB.name](data, socket: GameSocket) {
 		if (!socket.alive) {
             return;
         }
 		socket.character.position.climbing = false;
-		socket.broadcast.to(socket.character.room).emit(this.CLIENT_GETS.STOP_CLIMB, {
+		socket.broadcast.to(socket.character.room).emit(this.CLIENT_GETS.STOP_CLIMB.name, {
 			id: socket.character._id,
 		});
 	}

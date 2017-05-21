@@ -1,12 +1,8 @@
 {
-	"ROUTES": {
-	},
 	"SERVER_GETS": {
-		"EMOTE": "emoted"
+		"EMOTE": {"name": "emoted"}
 	},
 	"CLIENT_GETS": {
-		"EMOTE": "actor_emote"
-	},
-	"LOGS": {
+		"EMOTE": {"name": "actor_emote"}
 	}
 }

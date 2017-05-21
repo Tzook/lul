@@ -10,14 +10,14 @@
 		}
 	},
 	"SERVER_GETS": {
-		"ITEM_PICK": "picked_item",
-		"ITEM_DROP": "dropped_item",
-		"ITEM_MOVE": "moved_item"
+		"ITEM_PICK": {"name": "picked_item"},
+		"ITEM_DROP": {"name": "dropped_item"},
+		"ITEM_MOVE": {"name": "moved_item"}
 	},
 	"CLIENT_GETS": {
-		"ITEM_DELETE": "actor_delete_item",
-		"ITEM_MOVED": "actor_move_item",
-		"ITEM_ADD": "actor_add_item"
+		"ITEM_DELETE": {"name": "actor_delete_item"},
+		"ITEM_MOVE": {"name": "actor_move_item"},
+		"ITEM_ADD": {"name": "actor_add_item"}
 	},
 	"MAX_ITEMS": 20
 }

@@ -70,7 +70,7 @@ export default class MobsController extends MasterController {
 	}
 
 	protected notifyAboutMob(mob: MOB_INSTANCE, to: SocketIO.Namespace|SocketIO.Socket) {
-		to.emit(CLIENT_GETS.MOB_SPAWN, {
+		to.emit(CLIENT_GETS.MOB_SPAWN.name, {
 			mob_id: mob.id,
 			x: mob.x,
 			y: mob.y,
@@ -91,7 +91,7 @@ export default class MobsController extends MasterController {
 		let mob = this.mobById.get(this.services.getMobRoomId(socket.character.room, mobId));
 		mob.x = x;
 		mob.y = y;
-		socket.broadcast.to(socket.character.room).emit(CLIENT_GETS.MOB_MOVE, {
+		socket.broadcast.to(socket.character.room).emit(CLIENT_GETS.MOB_MOVE.name, {
 			mob_id: mobId, 
 			x,
 			y,
@@ -122,7 +122,7 @@ export default class MobsController extends MasterController {
 
 	public despawnMob(mob: MOB_INSTANCE, room: string) {
 		console.log("despawning mob", mob.id);
-		this.io.to(room).emit(CLIENT_GETS.MOB_DIE, {
+		this.io.to(room).emit(CLIENT_GETS.MOB_DIE.name, {
 			mob_id: mob.id,
 		});
 		// remove mob references

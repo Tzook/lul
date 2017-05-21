@@ -18,7 +18,7 @@ export default class EquipsRouter extends SocketioRouterBase {
 		this.itemsRouter = files.routers.items;
 	}
 
-	[SERVER_GETS.EQUIP_ITEM](data, socket: GameSocket) {
+	[SERVER_GETS.EQUIP_ITEM.name](data, socket: GameSocket) {
 		if (!socket.alive) {
             this.sendError({}, socket, "Character is not alive!");
             return;
@@ -41,7 +41,7 @@ export default class EquipsRouter extends SocketioRouterBase {
 				this.middleware.swapEquipAndItem(socket, from, to);
 				this.addStats(to, socket);
 
-				this.io.to(socket.character.room).emit(this.CLIENT_GETS.EQUIP_ITEM, {
+				this.io.to(socket.character.room).emit(this.CLIENT_GETS.EQUIP_ITEM.name, {
 					id: socket.character._id,
 					from,
 					to,
@@ -53,7 +53,7 @@ export default class EquipsRouter extends SocketioRouterBase {
 		}
 	}
 
-	[SERVER_GETS.UNEQUIP_ITEM](data, socket: GameSocket) {
+	[SERVER_GETS.UNEQUIP_ITEM.name](data, socket: GameSocket) {
 		if (!socket.alive) {
             this.sendError({}, socket, "Character is not alive!");
             return;
@@ -75,7 +75,7 @@ export default class EquipsRouter extends SocketioRouterBase {
 				this.middleware.swapEquipAndItem(socket, to, from);
 				this.addStats(from, socket);
 
-				this.io.to(socket.character.room).emit(this.CLIENT_GETS.UNEQUIP_ITEM, {
+				this.io.to(socket.character.room).emit(this.CLIENT_GETS.UNEQUIP_ITEM.name, {
 					id: socket.character._id,
 					from,
 					to,
@@ -87,10 +87,10 @@ export default class EquipsRouter extends SocketioRouterBase {
 		}
 	}
 
-	[SERVER_GETS.USE_EQUIP](data, socket: GameSocket) {
+	[SERVER_GETS.USE_EQUIP.name](data, socket: GameSocket) {
 		let slot = this.middleware.getFirstAvailableSlot(socket);
 		if (slot >= 0) {
-			this[SERVER_GETS.UNEQUIP_ITEM]({
+			this[SERVER_GETS.UNEQUIP_ITEM.name]({
 				from: data.slot,
 				to: slot
 			}, socket);
@@ -99,7 +99,7 @@ export default class EquipsRouter extends SocketioRouterBase {
 		}
 	}
 
-	[SERVER_GETS.USE_ITEM](data, socket: GameSocket) {
+	[SERVER_GETS.USE_ITEM.name](data, socket: GameSocket) {
 		let itemSlot: number = data.slot;
 		if (this.middleware.isValidItemSlot(itemSlot)) {
 			let item = socket.character.items[itemSlot];
@@ -107,7 +107,7 @@ export default class EquipsRouter extends SocketioRouterBase {
 			if (!itemInfo) {
 				this.sendError(data, socket, "Could not find item info for item " + item.key);
 			} else if (this.middleware.isValidEquipItem(itemInfo)) {
-				this[SERVER_GETS.EQUIP_ITEM]({
+				this[SERVER_GETS.EQUIP_ITEM.name]({
 					from: itemSlot,
 					to: itemInfo.type
 				}, socket);
@@ -119,7 +119,7 @@ export default class EquipsRouter extends SocketioRouterBase {
 		}
 	}
 
-	[SERVER_GETS.DROP_EQUIP](data, socket: GameSocket) {
+	[SERVER_GETS.DROP_EQUIP.name](data, socket: GameSocket) {
 		if (!socket.alive) {
             this.sendError({}, socket, "Character is not alive!");
             return;
@@ -129,12 +129,12 @@ export default class EquipsRouter extends SocketioRouterBase {
 			let equip = socket.character.equips[slot];
 			console.log("dropping equip", equip);
 
-			this.emitter.emit(dropsConfig.SERVER_INNER.ITEMS_DROP, { }, socket, [equip]);
+			this.emitter.emit(dropsConfig.SERVER_INNER.ITEMS_DROP.name, { }, socket, [equip]);
 			this.removeStats(slot, socket);
 
 			let ItemsModels = this.mongoose.model("Item");
 			socket.character.equips[slot] = new ItemsModels({});
-			this.io.to(socket.character.room).emit(this.CLIENT_GETS.DELETE_EQUIP, {
+			this.io.to(socket.character.room).emit(this.CLIENT_GETS.DELETE_EQUIP.name, {
 				id: socket.character._id,
 				slot
 			});
@@ -145,11 +145,11 @@ export default class EquipsRouter extends SocketioRouterBase {
 
 	private addStats(slot: string, socket: GameSocket) {
 		let equip = socket.character.equips[slot];
-		this.emitter.emit(statsConfig.SERVER_INNER.STATS_ADD, { stats: equip }, socket);
+		this.emitter.emit(statsConfig.SERVER_INNER.STATS_ADD.name, { stats: equip }, socket);
 	}
 
 	private removeStats(slot: string, socket: GameSocket) {
 		let equip = socket.character.equips[slot];
-		this.emitter.emit(statsConfig.SERVER_INNER.STATS_REMOVE, { stats: equip }, socket);
+		this.emitter.emit(statsConfig.SERVER_INNER.STATS_REMOVE.name, { stats: equip }, socket);
 	}
 };

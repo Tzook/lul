@@ -32,8 +32,8 @@ export default class ItemsRouter extends SocketioRouterBase {
 		return this.services.getItemInstance(key);
 	}
 
-	[SERVER_GETS.ITEM_PICK](data, socket: GameSocket) {
-		this.emitter.emit(dropsConfig.SERVER_INNER.ITEM_PICK, data, socket, (item: ITEM_INSTANCE): any => {
+	[SERVER_GETS.ITEM_PICK.name](data, socket: GameSocket) {
+		this.emitter.emit(dropsConfig.SERVER_INNER.ITEM_PICK.name, data, socket, (item: ITEM_INSTANCE): any => {
 			let itemInfo = this.getItemInfo(item.key);
             if (itemInfo.cap > 1) {
                 return;
@@ -49,7 +49,7 @@ export default class ItemsRouter extends SocketioRouterBase {
 		});
 	}
 
-	[SERVER_GETS.ITEM_DROP](data, socket: GameSocket) {
+	[SERVER_GETS.ITEM_DROP.name](data, socket: GameSocket) {
 		if (!socket.alive) {
             this.sendError({}, socket, "Character is not alive!");
             return;
@@ -60,13 +60,13 @@ export default class ItemsRouter extends SocketioRouterBase {
 		} else {
 			let item = socket.character.items[slot];
 			console.log("dropping item", item);
-			this.emitter.emit(dropsConfig.SERVER_INNER.ITEMS_DROP, {}, socket, [item]);
+			this.emitter.emit(dropsConfig.SERVER_INNER.ITEMS_DROP.name, {}, socket, [item]);
 			socket.character.items.set(slot, {});
-			socket.emit(this.CLIENT_GETS.ITEM_DELETE, { slot });
+			socket.emit(this.CLIENT_GETS.ITEM_DELETE.name, { slot });
 		}
 	}
 
-	[SERVER_GETS.ITEM_MOVE](data, socket: GameSocket) {
+	[SERVER_GETS.ITEM_MOVE.name](data, socket: GameSocket) {
 		if (!socket.alive) {
             this.sendError({}, socket, "Character is not alive!");
             return;
@@ -81,7 +81,7 @@ export default class ItemsRouter extends SocketioRouterBase {
 			console.log('moving item from ' + data.from + " to " + data.to, itemFrom, itemTo);
 			socket.character.items.set(data.to, itemFrom);
 			socket.character.items.set(data.from, itemTo);
-			socket.emit(this.CLIENT_GETS.ITEM_MOVED, {
+			socket.emit(this.CLIENT_GETS.ITEM_MOVE.name, {
 				id: socket.character._id,
 				from: data.from,
 				to: data.to

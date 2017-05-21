@@ -16,7 +16,7 @@ export default class StatsRouter extends SocketioRouterBase {
 		super.init(files, app);
 	}
 
-    [config.SERVER_INNER.GAIN_EXP] (data, socket: GameSocket) {
+    [config.SERVER_INNER.GAIN_EXP.name] (data, socket: GameSocket) {
         if (!socket.alive) {
             this.sendError({}, socket, "Character is not alive!");
             return;
@@ -25,17 +25,17 @@ export default class StatsRouter extends SocketioRouterBase {
         let currentLevel = socket.character.stats.lvl;
         this.controller.addExp(socket.character, exp);
 
-        socket.emit(this.CLIENT_GETS.GAIN_EXP, {
+        socket.emit(this.CLIENT_GETS.GAIN_EXP.name, {
             exp,
             now: socket.character.stats.exp
          });
 
         if (currentLevel !== socket.character.stats.lvl) {
-            socket.emit(this.CLIENT_GETS.LEVEL_UP, {
+            socket.emit(this.CLIENT_GETS.LEVEL_UP.name, {
                 id: socket.character._id,
                 stats: socket.character.stats
             });
-            socket.broadcast.to(socket.character.room).emit(this.CLIENT_GETS.LEVEL_UP, {
+            socket.broadcast.to(socket.character.room).emit(this.CLIENT_GETS.LEVEL_UP.name, {
                 id: socket.character._id,
                 stats: {
                     lvl: socket.character.stats.lvl
@@ -44,12 +44,12 @@ export default class StatsRouter extends SocketioRouterBase {
         }
     }
 
-    [config.SERVER_INNER.TAKE_DMG] (data, socket: GameSocket) {
+    [config.SERVER_INNER.TAKE_DMG.name] (data, socket: GameSocket) {
         let dmg = data.dmg;
         let hpAfterDmg = this.services.getHpAfterDamage(socket.character.stats.hp.now, dmg);
         let shouldStartRegen = socket.character.stats.hp.now === socket.character.stats.hp.total && hpAfterDmg < socket.character.stats.hp.now;
         socket.character.stats.hp.now = hpAfterDmg;
-		this.io.to(socket.character.room).emit(this.CLIENT_GETS.TAKE_DMG, {
+		this.io.to(socket.character.room).emit(this.CLIENT_GETS.TAKE_DMG.name, {
 			id: socket.character._id,
 			dmg,
 			hp: socket.character.stats.hp.now
@@ -57,7 +57,7 @@ export default class StatsRouter extends SocketioRouterBase {
 		console.log("Taking damage", socket.character.name, dmg, socket.character.stats.hp.now);
         if (!socket.alive) {
             console.log("character %s is ded", socket.character.name);
-            this.io.to(socket.character.room).emit(this.CLIENT_GETS.DEATH, {
+            this.io.to(socket.character.room).emit(this.CLIENT_GETS.DEATH.name, {
                 id: socket.character._id,
             });
         } else if (shouldStartRegen) {
@@ -65,46 +65,46 @@ export default class StatsRouter extends SocketioRouterBase {
         }
     }
 
-    [config.SERVER_INNER.GAIN_HP] (data, socket: GameSocket) {
+    [config.SERVER_INNER.GAIN_HP.name] (data, socket: GameSocket) {
         let hp = data.hp;
         let gainedHp = this.controller.addHp(socket.character, hp);
 
         if (gainedHp) {
-            socket.emit(this.CLIENT_GETS.GAIN_HP, {
+            socket.emit(this.CLIENT_GETS.GAIN_HP.name, {
                 hp,
                 now: socket.character.stats.hp.now
             });
         }
     }
 
-    [config.SERVER_INNER.GAIN_MP] (data, socket: GameSocket) {
+    [config.SERVER_INNER.GAIN_MP.name] (data, socket: GameSocket) {
         let mp = data.mp;
         let gainedMp = this.controller.addMp(socket.character, mp);
 
         if (gainedMp) {
-            socket.emit(this.CLIENT_GETS.GAIN_MP, {
+            socket.emit(this.CLIENT_GETS.GAIN_MP.name, {
                 mp,
                 now: socket.character.stats.mp.now
             });
         }
     }
 
-    [config.SERVER_GETS.RELEASE_DEATH] (data, socket: GameSocket) {
+    [config.SERVER_GETS.RELEASE_DEATH.name] (data, socket: GameSocket) {
         if (socket.alive) {
             this.sendError({}, socket, "Character is alive!");
             return;
         }
         socket.character.stats.hp.now = socket.character.stats.hp.total;
-        socket.emit(this.CLIENT_GETS.RESURRECT, {});
+        socket.emit(this.CLIENT_GETS.RESURRECT.name, {});
         console.log("releasing death for", socket.character.name);
-        this.emitter.emit(roomsConfig.SERVER_INNER.MOVE_TO_TOWN, {}, socket);
+        this.emitter.emit(roomsConfig.SERVER_INNER.MOVE_TO_TOWN.name, {}, socket);
     }
 
-    [config.SERVER_INNER.STATS_ADD] (data, socket: GameSocket) {
+    [config.SERVER_INNER.STATS_ADD.name] (data, socket: GameSocket) {
         this.toggleStats(data.stats, socket, true);
     }
 
-    [config.SERVER_INNER.STATS_REMOVE] (data, socket: GameSocket) {
+    [config.SERVER_INNER.STATS_REMOVE.name] (data, socket: GameSocket) {
         this.toggleStats(data.stats, socket, false);
     }
 
@@ -128,7 +128,7 @@ export default class StatsRouter extends SocketioRouterBase {
         }
         // add the equips to memory
         for (var itemKey in EQUIPS_SCHEMA) {
-            this[config.SERVER_INNER.STATS_ADD]({stats: socket.character.equips[itemKey]}, socket);
+            this[config.SERVER_INNER.STATS_ADD.name]({stats: socket.character.equips[itemKey]}, socket);
         }
     }
 
@@ -136,7 +136,7 @@ export default class StatsRouter extends SocketioRouterBase {
         if (socket.character.stats.hp.now < socket.character.stats.hp.total) {
             setTimeout(() => {
                 if (socket.connected && socket.alive) {
-                    this.emitter.emit(config.SERVER_INNER.GAIN_HP, { hp: socket.character.stats.hp.regen }, socket);
+                    this.emitter.emit(config.SERVER_INNER.GAIN_HP.name, { hp: socket.character.stats.hp.regen }, socket);
                     this.regenHpInterval(socket);
                 }
             }, config.REGEN_INTERVAL);
@@ -146,7 +146,7 @@ export default class StatsRouter extends SocketioRouterBase {
         if (socket.character.stats.mp.now < socket.character.stats.mp.total) {
             setTimeout(() => {
                 if (socket.connected && socket.alive) {
-                    this.emitter.emit(config.SERVER_INNER.GAIN_MP, { mp: socket.character.stats.mp.regen }, socket);
+                    this.emitter.emit(config.SERVER_INNER.GAIN_MP.name, { mp: socket.character.stats.mp.regen }, socket);
                     this.regenMpInterval(socket);
                 }
             }, config.REGEN_INTERVAL);

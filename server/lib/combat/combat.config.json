@@ -1,12 +1,10 @@
 {
-	"ROUTES": {},
 	"SERVER_GETS": {
-		"LOAD_ATTACK": "loaded_attack",
-		"PERFORM_ATTACK": "performed_attack"
+		"LOAD_ATTACK": {"name": "loaded_attack"},
+		"PERFORM_ATTACK": {"name": "performed_attack"}
 	},
 	"CLIENT_GETS": {
-		"LOAD_ATTACK": "actor_load_attack",
-		"PERFORM_ATTACK": "actor_perform_attack"
-	},
-	"LOGS": {}
+		"LOAD_ATTACK": {"name": "actor_load_attack"},
+		"PERFORM_ATTACK": {"name": "actor_perform_attack"}
+	}
 }

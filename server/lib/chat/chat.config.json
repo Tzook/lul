@@ -1,16 +1,12 @@
 {
-	"ROUTES": {
-	},
 	"SERVER_GETS": {
-		"SHOUT": "shouted",
-		"CHAT": "chatted",
-		"WHISPER": "whispered"
+		"SHOUT": {"name": "shouted"},
+		"CHAT": {"name": "chatted"},
+		"WHISPER": {"name": "whispered"}
 	},
 	"CLIENT_GETS": {
-		"SHOUT": "shout",
-		"CHAT": "chat",
-		"WHISPER": "whisper"
-	},
-	"LOGS": {
+		"SHOUT": {"name": "shout"},
+		"CHAT": {"name": "chat"},
+		"WHISPER": {"name": "whisper"}
 	}
 }
