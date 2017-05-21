@@ -25,6 +25,6 @@
 		"BITCH_PLEASE": {"name": "bitch_please"},
 		"BITCH_CHOOSE": {"name": "actor_bitch"}
 	},
-	"DEFAULT_ROOM": "TestingRoom",
+	"DEFAULT_ROOM": "IntroScene",
 	"BITCH_INTERVAL": 30000
 }

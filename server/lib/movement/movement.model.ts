@@ -7,8 +7,8 @@ export default class MovementModel extends MasterModel {
     init(files, app) {
         this.addToCharacterSchema = {
             position: {
-                x: {type: Number, default: 0},
-                y: {type: Number, default: 0},
+                x: {type: Number, default: -74},
+                y: {type: Number, default: -3},
                 z: {type: Number, default: 0},
                 climbing: {type: Boolean, default: false}
             }
