@@ -131,7 +131,7 @@ export default class SocketioRouter extends SocketioRouterBase {
 
 	private fitThrottle(socket: GameSocket, event: EVENT, defaultThrottle: number, routerFn: Function): boolean {
 		let throttle = event.throttle >= 0 ? event.throttle : defaultThrottle;
-		if (throttle) {
+		if (throttle && !socket.test) {
 			let lastTime = socket.throttles.get(routerFn) || 0;
 			let now = Date.now();
 			let time = now - lastTime;
