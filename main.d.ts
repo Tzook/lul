@@ -1,6 +1,13 @@
 /// <reference path="node_modules/@types/socket.io/index.d.ts" />
 /// <reference path="node_modules/@types/mongoose/index.d.ts" />
 
+interface EVENT {
+    name: string;
+    throttle?: number;
+    bitch?: boolean;
+    alive?: boolean;
+}
+
 interface Doc {
     _id: any;
     save(fn?: (err: any, product: this, numAffected: number) => void): Promise<this>;
@@ -67,6 +74,7 @@ interface GameSocket extends SocketIO.Socket {
     alive: boolean,
     lastAttackLoad: number;
     bonusStats?: ITEM_STATS_MODEL;
+    throttles: Map<Function, number>;
 }
 
 // items

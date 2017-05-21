@@ -6,7 +6,7 @@ import * as Heroku from 'heroku-client';
 import SocketioMiddleware from './socketio.middleware';
 require('./socketio.fixer');
 let passportSocketIo = require('passport.socketio');
-let SERVER_GETS = require('../../../server/lib/socketio/socketio.config.json').SERVER_GETS;
+let config = require('../../../server/lib/socketio/socketio.config.json');
 
 export default class SocketioRouter extends SocketioRouterBase {
 	protected middleware: SocketioMiddleware;
@@ -89,6 +89,7 @@ export default class SocketioRouter extends SocketioRouterBase {
 				socket.disconnect();
 				return;
 			}
+			socket.throttles = new Map();
 			this.map.set(socket.user._id.toString(), socket);
 			this.map.set(socket.character.name, socket);
 			this.map.set(socket.id, socket);
@@ -97,8 +98,8 @@ export default class SocketioRouter extends SocketioRouterBase {
 			for (let j in this.routers) {
 				let router = this.routers[j];
 				router.eventEmitter = emitter;
-				this.listenToEvents(router, router.SERVER_GETS, [socket, emitter]);
-				this.listenToEvents(router, router.SERVER_INNER, [emitter]);
+				this.listenToEvents(router, router.SERVER_GETS, [socket, emitter], config.EVENTS_THROTTLE);
+				this.listenToEvents(router, router.SERVER_INNER, [emitter], 0);
 			}
 
 			console.log('connected', socket.character.name);
@@ -111,17 +112,61 @@ export default class SocketioRouter extends SocketioRouterBase {
 		});
 	}
 
-	private listenToEvents(router: SocketioRouterBase, events: {name: string}[], listeners: {on: (string, Function) => {}}[]) {
+	private listenToEvents(router: SocketioRouterBase, events: EVENT[], listeners: {on: (string, Function) => {}}[], defaultThrottle: number) {
 		for (let i in events) {
 			let event = events[i];
 			let routerFn = router[event.name].bind(router);
 			for (let j in listeners) {
-				listeners[j].on(event.name, routerFn);
+				listeners[j].on(event.name, (...args) => {
+					let socket: GameSocket = args[1];
+					if (this.fitThrottle(socket, event, defaultThrottle, routerFn) && 
+						this.fitBitch(socket, event) && 
+						this.fitAlive(socket, event)) {
+						routerFn.apply(router, args);
+					}
+				});
 			}
 		}
 	}
 
-	[SERVER_GETS.DISCONNECT.name](data, socket: GameSocket) {
+	private fitThrottle(socket: GameSocket, event: EVENT, defaultThrottle: number, routerFn: Function): boolean {
+		let throttle = event.throttle >= 0 ? event.throttle : defaultThrottle;
+		if (throttle) {
+			let lastTime = socket.throttles.get(routerFn) || 0;
+			let now = Date.now();
+			let time = now - lastTime;
+			if (time < throttle) {
+				console.error('Throttling event!', event.name);
+				return false;
+			}
+			socket.throttles.set(routerFn, now);
+		}
+		return true;
+	}
+
+	private fitBitch(socket: GameSocket, event: EVENT): boolean {			
+		if (event.bitch !== undefined) {
+			if (event.bitch !== socket.bitch) {
+				console.error('Not bitch!', event.name);
+				return false;
+			}
+		}
+		return true;
+	}
+
+	private fitAlive(socket: GameSocket, event: EVENT): boolean {
+		if (event.alive !== undefined) {
+			if (event.alive !== socket.alive) {
+				console.error('Not alive!', event.name);
+				return false;
+			}
+		}
+		return true;
+	}
+
+
+
+	[config.SERVER_GETS.DISCONNECT.name](data, socket: GameSocket) {
 		if (!this.map.has(socket.id)) {
 			return;
 		}

@@ -346,7 +346,7 @@
 				});
 				
 				socket.on("event_error", d => setResult({msg: "event_error", d}))
-				socket.on("movement", d => d.z == "-1" && setResult({msg: "movement", d})) // only if it's -z then it means we are in a test
+				socket.on("movement", d => window.test && setResult({msg: "movement", d})) // only if it's -z then it means we are in a test
 
 				socket.on("actor_pick_item", d => setResult({msg: "actor_pick_item", d}))
 				socket.on("actor_delete_item", d => setResult({msg: "actor_delete_item", d}))
@@ -386,7 +386,7 @@
 				socket.on("mob_spawn", d => setResult({msg: "mob_spawn", d}));
 				socket.on("mob_die", d => setResult({msg: "mob_die", d}));
 				socket.on("mob_take_dmg", d => setResult({msg: "mob_take_dmg", d}));
-				socket.on("mob_move", d => setResult({msg: "mob_move", d}));
+				socket.on("mob_move", d => window.test && setResult({msg: "mob_move", d}));
 
 			}
 

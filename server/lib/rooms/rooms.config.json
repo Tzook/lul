@@ -10,11 +10,11 @@
 		}
 	},
 	"SERVER_INNER": {
-		"MOVE_TO_TOWN": {"name": "move_to_town"}
+		"MOVE_TO_TOWN": {"name": "move_to_town", "alive": true}
 	},
 	"SERVER_GETS": {
 		"ENTERED_ROOM": {"name": "entered_room"},
-		"ENTER_PORTAL": {"name": "entered_portal"},
+		"ENTER_PORTAL": {"name": "entered_portal", "alive": true},
 		"BITCH_PLEASE": {"name": "bitch_please"},
 		"DISCONNECT": {"name": "disconnect"}
 	},

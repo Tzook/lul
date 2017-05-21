@@ -1,7 +1,7 @@
 {
 	"SERVER_GETS": {
-		"ITEM_PICK": {"name": "picked_item"},
-		"MISC_DROP": {"name": "dropped_misc"}
+		"ITEM_PICK": {"name": "picked_item", "throttle": 0, "alive": true},
+		"MISC_DROP": {"name": "dropped_misc", "alive": true}
 	},
 	"CLIENT_GETS": {
 		"STACK_CHANGE": {"name": "change_item_stack"}

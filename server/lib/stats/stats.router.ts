@@ -17,10 +17,6 @@ export default class StatsRouter extends SocketioRouterBase {
 	}
 
     [config.SERVER_INNER.GAIN_EXP.name] (data, socket: GameSocket) {
-        if (!socket.alive) {
-            this.sendError({}, socket, "Character is not alive!");
-            return;
-        }
         let exp = data.exp;
         let currentLevel = socket.character.stats.lvl;
         this.controller.addExp(socket.character, exp);
@@ -90,10 +86,6 @@ export default class StatsRouter extends SocketioRouterBase {
     }
 
     [config.SERVER_GETS.RELEASE_DEATH.name] (data, socket: GameSocket) {
-        if (socket.alive) {
-            this.sendError({}, socket, "Character is alive!");
-            return;
-        }
         socket.character.stats.hp.now = socket.character.stats.hp.total;
         socket.emit(this.CLIENT_GETS.RESURRECT.name, {});
         console.log("releasing death for", socket.character.name);

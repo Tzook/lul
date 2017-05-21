@@ -36,10 +36,6 @@ export default class DropsRouter extends SocketioRouterBase {
 	}
 
     [config.SERVER_INNER.ITEM_PICK.name](data, socket: GameSocket, pickItemFn: (item: ITEM_INSTANCE) => {}) {
-		if (!socket.alive) {
-            this.sendError({}, socket, "Character is not alive!");
-            return;
-        }
 		let itemId: string = data.item_id;
 		let map = this.getRoomMap(socket);
 		if (!map.has(itemId)) {
@@ -120,9 +116,6 @@ export default class DropsRouter extends SocketioRouterBase {
 	}
 
 	[SERVER_GETS.ITEMS_LOCATIONS.name](data, socket: GameSocket) {
-		if (!socket.bitch) {
-			return this.sendError(data, socket, "Must be bitch to update items locations");
-		}
 		let items = data.items;
 		if (!_.isArray(items)) {
 			return this.sendError(data, socket, "Must provide an array of items to update locations");

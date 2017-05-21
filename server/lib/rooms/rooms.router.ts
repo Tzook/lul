@@ -43,10 +43,6 @@ export default class RoomsRouter extends SocketioRouterBase {
 	}
 
 	[config.SERVER_GETS.ENTER_PORTAL.name](data, socket: GameSocket) {
-		if (!socket.alive) {
-            this.sendError({}, socket, "Character is not alive!");
-            return;
-        }
 		console.log('user entered portal', socket.character.name, data.portal);
 		let roomInfo = this.services.getRoomInfo(socket.character.room);
 		if (!roomInfo) {
@@ -68,10 +64,6 @@ export default class RoomsRouter extends SocketioRouterBase {
 	}
 
 	[config.SERVER_INNER.MOVE_TO_TOWN.name] (data, socket: GameSocket) {
-		if (!socket.alive) {
-			this.sendError({}, socket, "Character is not alive!");
-            return;
-		}
 		let roomInfo = this.services.getRoomInfo(socket.character.room);
 		if (!roomInfo) {
 			this.sendError(data, socket, "No room info available for " + socket.character.room);

@@ -6,7 +6,7 @@
 	},
 	"SERVER_GETS": {
 		"ENTERED_ROOM": {"name": "entered_room"},
-		"ITEMS_LOCATIONS": {"name": "items_locations"}
+		"ITEMS_LOCATIONS": {"name": "items_locations", "bitch": true}
 	},
 	"CLIENT_GETS": {
 		"ITEM_PICK": {"name": "actor_pick_item"},

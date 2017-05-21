@@ -1,6 +1,6 @@
 {
 	"SERVER_INNER": {
-		"GAIN_EXP": {"name": "gain_exp"},
+		"GAIN_EXP": {"name": "gain_exp", "alive": true},
 		"GAIN_HP": {"name": "gain_hp"},
 		"GAIN_MP": {"name": "gain_mp"},
 		"TAKE_DMG": {"name": "take_dmg"},
@@ -8,7 +8,7 @@
 		"STATS_REMOVE": {"name": "stats_remove"}
 	},
 	"SERVER_GETS": {
-		"RELEASE_DEATH": {"name": "release_death"}
+		"RELEASE_DEATH": {"name": "release_death", "alive": false}
 	},
 	"CLIENT_GETS": {
 		"GAIN_EXP": {"name": "actor_gain_exp"},
