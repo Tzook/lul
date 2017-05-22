@@ -364,9 +364,9 @@
 
 				socket.on("actor_emote", d => setResult({msg: "actor_emote", d}))
 
+				socket.on("shout", d => setResult({msg: "shout", d}))
 				socket.on("chat", d => setResult({msg: "chat", d}))
 				socket.on("whisper", d => setResult({msg: "whisper", d}))
-				socket.on("whisper_fail", d => setResult({msg: "whisper_fail", d}))
 
 				socket.on("actor_join_room", d => setResult({msg: "actor_join_room", d}))
 				socket.on("actor_move_room", d => setResult({msg: "actor_move_room", d}))
