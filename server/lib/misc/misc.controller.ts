@@ -26,7 +26,7 @@ export default class MiscController extends MasterController {
                 itemClone.stack = Math.min(item.stack, itemInfo.cap);
                 socket.character.items.set(slot, itemClone);
                 item.stack -= itemClone.stack;
-                socket.emit(itemsConfig.CLIENT_GETS.ITEM_ADD, { slot, item: itemClone });
+                socket.emit(itemsConfig.CLIENT_GETS.ITEM_ADD.name, { slot, item: itemClone });
             }
         });
     }

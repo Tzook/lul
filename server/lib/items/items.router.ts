@@ -43,7 +43,7 @@ export default class ItemsRouter extends SocketioRouterBase {
 				this.sendError(data, socket, "No available slots to pick item");
 			} else {
 				socket.character.items.set(slot, item);
-				socket.emit(this.CLIENT_GETS.ITEM_ADD, { slot, item });
+				socket.emit(this.CLIENT_GETS.ITEM_ADD.name, { slot, item });
 				return true;
 			}	
 		});
