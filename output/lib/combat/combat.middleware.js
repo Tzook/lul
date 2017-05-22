@@ -3,7 +3,7 @@ Object.defineProperty(exports, "__esModule", { value: true });
 const master_middleware_1 = require("../master/master.middleware");
 class CombatMiddleware extends master_middleware_1.default {
     getValidLoad(load) {
-        return load >= 1 && load <= 100 ? (load | 0) : 1;
+        return load >= 1 && load <= 100 ? (load | 0) : 0;
     }
 }
 exports.default = CombatMiddleware;
