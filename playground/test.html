@@ -348,6 +348,8 @@
 				socket.on("event_error", d => setResult({msg: "event_error", d}))
 				socket.on("movement", d => window.test && setResult({msg: "movement", d})) // only if it's -z then it means we are in a test
 
+				socket.on("change_gold_amount", d => setResult({msg: "change_gold_amount", d}))
+				
 				socket.on("actor_pick_item", d => setResult({msg: "actor_pick_item", d}))
 				socket.on("actor_delete_item", d => setResult({msg: "actor_delete_item", d}))
 				socket.on("drop_items", d => setResult({msg: "drop_items", d}))

@@ -32,6 +32,8 @@ export default class GoldRouter extends SocketioRouterBase {
         let {amount} = data;
         if (!(amount > 0)) {
             this.sendError(data, socket, "Must mention what gold amount to throw");
+        } else if (socket.character.gold === 0) {
+            this.sendError(data, socket, "Character does not have gold to throw!");
         } else {
             let amountToDrop = Math.min(amount, socket.character.gold);
             socket.character.gold -= amountToDrop;
