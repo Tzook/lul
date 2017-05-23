@@ -1,4 +1,14 @@
 {
+	"ROUTES": {
+		"GENERATE": "/quests/generate"
+	},
+	"LOGS": {
+		"GENERATE": {
+			"MSG": "Generated quests successfully.",
+			"CODE": "QUEST_1",
+			"STATUS": "OK"
+		}
+	},
 	"SERVER_GETS": {
 		
 	},

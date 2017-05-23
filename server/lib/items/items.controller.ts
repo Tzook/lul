@@ -4,11 +4,6 @@ import ItemsServices from './items.services';
 
 export default class ItemsController extends MasterController {
     protected services: ItemsServices;
-    private io: SocketIO.Namespace;
-
-	public setIo(io) {
-		this.io = io;
-	}
     
     // HTTP functions
 	// =================

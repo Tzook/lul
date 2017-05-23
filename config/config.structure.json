@@ -21,6 +21,7 @@
 		"mobs",
 		"emote",
 		"stats",
+		"quests",
 		"combat"
 	],
 	"skip": 	 { "master": 1 }

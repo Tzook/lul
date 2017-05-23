@@ -99,19 +99,16 @@ interface ITEM_MODEL {
         lvl?: number,
     }
 }
-
 interface ITEM_DROP {
     x: number, 
     y: number, 
     item_id: string, 
     item: ITEM_INSTANCE
 }
-
 interface ITEM_INSTANCE extends ITEM_STATS_MODEL {
     key: string,
     stack?: number,
 }
-
 interface DROP_MODEL {
     key: string,
     minStack?: number,
@@ -135,7 +132,6 @@ interface SPAWN_MODEL {
 interface SPAWN_INSTANCE extends SPAWN_MODEL {
     mobs?: Map<string, MOB_INSTANCE>, // mobs spawned in the spawn
 }
-
 interface ROOM_MODEL {
     name: string,
     town: string,
@@ -155,14 +151,35 @@ interface MOB_MODEL {
     maxDmg: number,
     drops: DROP_MODEL[],
 }
-
 interface MOB_INSTANCE extends MOB_MODEL {
     id?: string, // a unique id for this specific mob
     x?: number,
     y?: number,
     spawn?: SPAWN_INSTANCE,
 }
-
 interface ROOM_MOBS {
     spawns: SPAWN_INSTANCE[],
+}
+
+// quests
+interface QUEST_CONDITION {
+    cond: "hunt"|"loot"
+    type: string // the key of the item/mob to loot/hunt
+    count: number
+}
+interface QUEST_REQUIREMENTS {
+    class?: string
+    lvl?: number 
+    quests?: string[]
+}
+interface QUEST_REWARDS {
+    items?: ITEM_INSTANCE[]
+    class?: string
+    exp?: number
+}
+interface QUEST_MODEL {
+    key: string
+    cond?: QUEST_CONDITION[] 
+    req?: QUEST_REQUIREMENTS
+    reward?: QUEST_REWARDS
 }
