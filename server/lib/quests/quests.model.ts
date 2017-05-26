@@ -5,7 +5,10 @@ import * as mongoose from 'mongoose';
 
 const QUEST_SCHEMA = {
     key: String,
-    cond: mongoose.Schema.Types.Mixed,
+    cond: {
+        loot: mongoose.Schema.Types.Mixed,
+        hunt: mongoose.Schema.Types.Mixed,
+    },
     req: {
         class: String,
         lvl: Number,
@@ -16,6 +19,11 @@ const QUEST_SCHEMA = {
         class: String,
         exp: Number,
     }
+};
+
+const CHAR_QUESTS = {
+    progress: {type: mongoose.Schema.Types.Mixed, default: {}},
+    done: {type: mongoose.Schema.Types.Mixed, default: {}},
 };
 
 export default class QuestsModel extends MasterModel {
@@ -34,6 +42,8 @@ export default class QuestsModel extends MasterModel {
 
     createModel() {
         this.setModel("Quest");
+
+        this.addToSchema("Character", {quests: CHAR_QUESTS});
 
         setTimeout(() => this.controller.warmQuestsInfo()); // timeout so the Model can be set
         return Promise.resolve();

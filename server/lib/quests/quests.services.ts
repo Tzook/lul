@@ -16,15 +16,13 @@ export default class QuestsServices extends MasterServices {
 			};
             // conditions
             {
-                let conditions = [];
+                let conditions: QUEST_CONDITIONS = {};
                 (quest.conditions || []).forEach(condition => {
-                    conditions.push({
-                        cond: condition.condition,
-                        type: condition.conditionType,
-                        count: condition.targetProgress
-                    });
+                    conditions[condition.condition] = conditions[condition.condition] || {};
+                    conditions[condition.condition][condition.conditionType] = condition.targetProgress;
                     questSchema.cond = conditions;
                 });
+                console.log(questSchema.cond);
             }
             // requirements
             {

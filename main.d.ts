@@ -162,10 +162,13 @@ interface ROOM_MOBS {
 }
 
 // quests
-interface QUEST_CONDITION {
-    cond: "hunt"|"loot"
-    type: string // the key of the item/mob to loot/hunt
-    count: number
+interface QUEST_CONDITIONS {
+    loot?: {
+        [key: string]: number
+    }
+    hunt?: {
+        [key: string]: number
+    }
 }
 interface QUEST_REQUIREMENTS {
     class?: string
@@ -179,7 +182,31 @@ interface QUEST_REWARDS {
 }
 interface QUEST_MODEL {
     key: string
-    cond?: QUEST_CONDITION[] 
+    cond?: QUEST_CONDITIONS
     req?: QUEST_REQUIREMENTS
     reward?: QUEST_REWARDS
+}
+// this looks similar to QUEST_CONDITIONS but it has different meanings
+// this is for progress count. the latter is for total required count
+interface QUEST_PROGRESS {
+    cond?: {
+        loot?: {
+            [key: string]: number
+        }
+        hunt?: {
+            [key: string]: number
+        }
+    }
+}
+interface QUEST_DONE_METADATA {
+    // what do we want to know about completed quests?
+}
+
+interface CHAR_QUESTS {
+    progress: {
+        [key: string]: QUEST_PROGRESS
+    }
+    done: {
+        [key: string]: QUEST_DONE_METADATA
+    }
 }
