@@ -4,6 +4,7 @@ import QuestsMiddleware from "./quests.middleware";
 import QuestsController from "./quests.controller";
 import QuestsServices from './quests.services';
 let SERVER_GETS		   = require('../../../server/lib/quests/quests.config.json').SERVER_GETS;
+let statsConfig = require('../../../server/lib/stats/stats.config.json');
 
 export default class QuestsRouter extends SocketioRouterBase {
     protected middleware: QuestsMiddleware;
@@ -52,13 +53,25 @@ export default class QuestsRouter extends SocketioRouterBase {
 			this.sendError(data, socket, "Quest cannot be completed, it is not in progress!");
 		} else if (unmetReason = this.services.questFinishUnmetReason(socket.character.quests.progress[questKey], questInfo)) {
 			this.sendError(data, socket, "Quest does not meet finishing criteria: " + unmetReason);
+		// TODO no slots for items
+		// } else if () {
 		} else {
 			delete socket.character.quests.progress[questKey];
 			socket.character.quests.done[questKey] = {};
 			socket.character.quests.markModified("progress");
 			socket.character.quests.markModified("done");
 			socket.emit(this.CLIENT_GETS.QUEST_DONE.name, { id: questKey });
-			// TODO reward
+			if (questInfo.reward) {
+				if (questInfo.reward.exp) {
+					this.emitter.emit(statsConfig.SERVER_INNER.GAIN_EXP.name, { exp: questInfo.reward.exp }, socket);
+				}
+
+				// TODO class
+
+				(questInfo.reward.items || []).forEach(item => {
+					// TODO items
+				});
+			}
 		}
 	}
 
