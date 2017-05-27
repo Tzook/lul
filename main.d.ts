@@ -170,10 +170,10 @@ interface QUEST_MODEL {
 }
 interface QUEST_CONDITIONS {
     loot?: {
-        [key: string]: number
+        [itemKey: string]: number
     }
     hunt?: {
-        [key: string]: number
+        [mobKey: string]: number
     }
 }
 interface QUEST_REQUIREMENTS {

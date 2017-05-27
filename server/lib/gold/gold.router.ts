@@ -38,6 +38,13 @@ export default class GoldRouter extends SocketioRouterBase {
         }
 	}
 
+	[config.SERVER_INNER.ITEM_REMOVE.name](data: {stack: number, itemId: string}, socket: GameSocket) {
+		let {stack, itemId} = data;
+		if (this.middleware.isGold({key: itemId})) {
+			this.loseGold(socket, stack);
+		}
+	}
+
 	[config.SERVER_GETS.DROP_GOLD.name](data, socket: GameSocket) {
         let {amount} = data;
         if (!(amount > 0)) {
@@ -46,14 +53,18 @@ export default class GoldRouter extends SocketioRouterBase {
             this.sendError(data, socket, "Character does not have gold to throw!");
         } else {
             let amountToDrop = Math.min(amount, socket.character.gold);
-            socket.character.gold -= amountToDrop;
-            socket.emit(this.CLIENT_GETS.CHANGE_GOLD.name, {
-                amount: -amountToDrop
-            });
+			this.loseGold(socket, amountToDrop);
             let item = this.itemsRouter.getItemInstance("gold");
             item.stack = amountToDrop;
             console.log("dropping gold", item);
             this.emitter.emit(dropsConfig.SERVER_INNER.ITEMS_DROP.name, {}, socket, [item]);
         }
 	}
+
+    private loseGold(socket: GameSocket, amount) {
+        socket.character.gold -= amount;
+        socket.emit(this.CLIENT_GETS.CHANGE_GOLD.name, {
+            amount: -amount
+        });
+    }
 };

@@ -65,16 +65,16 @@ export default class QuestsServices extends MasterServices {
         return "";
     }
 
-    public questFinishUnmetReason(quests: CHAR_QUESTS, itemsCounts: ITEMS_COUNTS, questInfo: QUEST_MODEL): string {
+    public questFinishUnmetReason(char: Char, itemsCounts: ITEMS_COUNTS, questInfo: QUEST_MODEL): string {
         for (var itemKey in ((questInfo.cond || {}).loot || {})) {
-            let progress = itemsCounts.get(itemKey);
+            let progress = itemKey === "gold" ? char.gold : itemsCounts.get(itemKey);
             let target = questInfo.cond.loot[itemKey];
             if (progress < target) {
                 return `loot ${progress} / ${target} ${itemKey}`;
             }
         }
         for (var mobKey in ((questInfo.cond || {}).hunt || {})) {
-            let progress = quests.hunt[mobKey][questInfo.key];
+            let progress = char.quests.hunt[mobKey][questInfo.key];
             let target = questInfo.cond.hunt[mobKey];
             if (progress < target) {
                 return `hunt ${progress} / ${target} ${mobKey}`;

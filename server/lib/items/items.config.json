@@ -10,7 +10,7 @@
 		}
 	},
 	"SERVER_INNER": {
-		"ITEMS_ADD": {"name": "add_items"},
+		"ITEM_REMOVE": {"name": "remove_item"},
 		"ITEM_ADD": {"name": "add_item"}
 	},
 	"SERVER_GETS": {

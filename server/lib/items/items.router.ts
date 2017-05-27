@@ -68,6 +68,27 @@ export default class ItemsRouter extends SocketioRouterBase {
 		}
 	}
 
+	[config.SERVER_INNER.ITEM_REMOVE.name](data: {stack: number, itemId: string}, socket: GameSocket) {
+		let {stack, itemId} = data;
+		let itemInfo = this.getItemInfo(itemId);
+		if (!this.middleware.isMisc(itemInfo)) {
+			for (let slot = 0; slot < socket.character.items.length; slot++) {
+				let item = socket.character.items[slot];
+				if (item.key === itemId) {
+					this.deleteItem(socket, slot);
+					if (--stack === 0) {
+						break;
+					}
+				}
+			}
+		}
+	}
+
+	public deleteItem(socket: GameSocket, slot: number) {
+		socket.character.items.set(slot, {});
+		socket.emit(this.CLIENT_GETS.ITEM_DELETE.name, { slot });
+	}
+
 	[config.SERVER_GETS.ITEM_DROP.name](data, socket: GameSocket) {
 		let slot = data.slot;
 		if (!this.middleware.hasItem(socket, slot)) {
@@ -76,8 +97,7 @@ export default class ItemsRouter extends SocketioRouterBase {
 			let item = socket.character.items[slot];
 			console.log("dropping item", item);
 			this.emitter.emit(dropsConfig.SERVER_INNER.ITEMS_DROP.name, {}, socket, [item]);
-			socket.character.items.set(slot, {});
-			socket.emit(this.CLIENT_GETS.ITEM_DELETE.name, { slot });
+			this.deleteItem(socket, slot);
 		}
 	}
 
@@ -98,13 +118,5 @@ export default class ItemsRouter extends SocketioRouterBase {
 				to: data.to
 			});
 		}
-	}
-
-	[config.SERVER_INNER.ITEMS_ADD.name](data: {items: ITEM_INSTANCE[], slots: {[key: string]: number[]}}, socket: GameSocket) {
-		let {items, slots} = data;
-		items.forEach(item => {
-			let itemSlots = slots[item.key];
-			this.emitter.emit(config.SERVER_INNER.ITEM_ADD.name, { slots: itemSlots, item }, socket);
-		});
 	}
 };

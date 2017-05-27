@@ -43,6 +43,29 @@ export default class MiscRouter extends SocketioRouterBase {
         }
 	}
 
+	[config.SERVER_INNER.ITEM_REMOVE.name](data: {stack: number, itemId: string}, socket: GameSocket) {
+		let {stack, itemId} = data;
+		let itemInfo = this.itemsRouter.getItemInfo(itemId);
+		if (this.middleware.isMisc(itemInfo)) {
+			for (let slot = 0; slot < socket.character.items.length; slot++) {
+				let item = socket.character.items[slot];
+				if (item.key === itemId) {
+                    if (item.stack <= stack) {
+                        stack -= item.stack;
+					    this.itemsRouter.deleteItem(socket, slot);
+                    } else {
+                        item.stack -= stack;
+                        stack = 0;
+                        socket.emit(config.CLIENT_GETS.STACK_CHANGE.name, { slot, amount: item.stack });
+                    }
+					if (stack === 0) {
+						break;
+					}
+				}
+			}
+		}
+	}
+
 	[config.SERVER_GETS.MISC_DROP.name](data, socket: GameSocket) {
         // let {slot, stack} = data;
         // if (!(stack > 0)) {

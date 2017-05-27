@@ -54,7 +54,7 @@ export default class QuestsRouter extends SocketioRouterBase {
 			this.sendError(data, socket, "Could not find a quest with such key so can't complete.");
 		} else if (!socket.character.quests.progress[questKey]) {
 			this.sendError(data, socket, "Quest cannot be completed, it is not in progress!");
-		} else if (unmetReason = this.services.questFinishUnmetReason(socket.character.quests, this.itemsRouter.getItemsCounts(socket), questInfo)) {
+		} else if (unmetReason = this.services.questFinishUnmetReason(socket.character, this.itemsRouter.getItemsCounts(socket), questInfo)) {
 			this.sendError(data, socket, "Quest does not meet finishing criteria: " + unmetReason);
 		} else if (!(slots = this.itemsRouter.getItemsSlots(socket, (questInfo.reward || {}).items || []))) {
 			this.sendError(data, socket, `There must be ${questInfo.reward.items.length} empty slots for the quest rewards.`);
@@ -62,24 +62,24 @@ export default class QuestsRouter extends SocketioRouterBase {
 			this.services.finishQuest(socket.character.quests, questInfo);
 			socket.emit(this.CLIENT_GETS.QUEST_DONE.name, { id: questKey });
 			
-			// TODO if had loot cond, remove loot from character
+			_.forEach((questInfo.cond || {}).loot, (stack, itemId) => {
+				this.emitter.emit(itemsConfig.SERVER_INNER.ITEM_REMOVE.name, { stack, itemId }, socket);
+			});
 
-			if (questInfo.reward) {
-				if (questInfo.reward.exp) {
-					this.emitter.emit(statsConfig.SERVER_INNER.GAIN_EXP.name, { exp: questInfo.reward.exp }, socket);
-				}
-
-				// TODO class
-
-				let items = _.map(questInfo.reward.items, item => {
-					let instance = this.itemsRouter.getItemInstance(item.key);
-					if (item.stack > 0) {
-						instance.stack = item.stack;
-					}
-					return instance;
-				});
-				this.emitter.emit(itemsConfig.SERVER_INNER.ITEMS_ADD.name, { items, slots }, socket);
+			if ((questInfo.reward || {}).exp) {
+				this.emitter.emit(statsConfig.SERVER_INNER.GAIN_EXP.name, { exp: questInfo.reward.exp }, socket);
 			}
+
+			// TODO class
+
+			_.forEach((questInfo.reward || {}).items, item => {
+				let instance = this.itemsRouter.getItemInstance(item.key);
+				if (item.stack > 0) {
+					instance.stack = item.stack;
+				}
+				let itemSlots = slots[item.key];
+				this.emitter.emit(itemsConfig.SERVER_INNER.ITEM_ADD.name, { slots: itemSlots, item: instance }, socket);
+			});
 			console.log("completed quest", questKey, socket.character.name);
 		}
 	}
