@@ -9,6 +9,10 @@
 			"STATUS": "OK"
 		}
 	},
+	"SERVER_INNER": {
+		"HUNT_MOB": {"name": "hunt_mob"},
+		"LOOT_VALUE_CHANGE": {"name": "loot_value_change"}
+	},
 	"SERVER_GETS": {
 		"QUEST_START": {"name": "quest_started"},
 		"QUEST_DONE": {"name": "quest_completed"},

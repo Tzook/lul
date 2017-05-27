@@ -20,6 +20,7 @@
     "@types/jasminewd2": "2.0.2",
     "npm-run-all": "4.0.2",
     "protractor": "5.1.2",
+    "protractor-fail-fast": "3.0.2",
     "typescript": "2.3.3"
   }
 }

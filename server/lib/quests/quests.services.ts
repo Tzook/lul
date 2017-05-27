@@ -39,6 +39,16 @@ export default class QuestsServices extends MasterServices {
         return progress;
     }
 
+    public prefillQuestLoot(char: Char, quest: QUEST_PROGRESS) {
+        if (quest.loot) {
+            char.items.forEach(item => {
+                if (quest.loot[item.key] !== undefined) {
+                    quest.loot[item.key] += item.stack || 1;
+                }
+            });
+        }
+    }
+
     public questFinishUnmetReason(questProgress: QUEST_PROGRESS, questInfo: QUEST_MODEL): string {
         for (var itemKey in (questProgress.loot || {})) {
             let progress = questProgress.loot[itemKey];

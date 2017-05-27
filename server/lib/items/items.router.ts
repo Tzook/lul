@@ -4,6 +4,7 @@ import ItemsMiddleware from "./items.middleware";
 import ItemsController from './items.controller';
 import ItemsServices from './items.services';
 let dropsConfig = require('../../../server/lib/drops/drops.config.json');
+let questsConfig = require('../../../server/lib/quests/quests.config.json');
 let SERVER_GETS = require('../../../server/lib/items/items.config.json').SERVER_GETS;
 
 export default class ItemsRouter extends SocketioRouterBase {
@@ -42,6 +43,7 @@ export default class ItemsRouter extends SocketioRouterBase {
 			} else {
 				socket.character.items.set(slot, item);
 				socket.emit(this.CLIENT_GETS.ITEM_ADD.name, { slot, item });
+				this.emitter.emit(questsConfig.SERVER_INNER.LOOT_VALUE_CHANGE.name, {id: item.key, value: item.stack || 1}, socket)
 				return true;
 			}	
 		});
@@ -57,6 +59,7 @@ export default class ItemsRouter extends SocketioRouterBase {
 			this.emitter.emit(dropsConfig.SERVER_INNER.ITEMS_DROP.name, {}, socket, [item]);
 			socket.character.items.set(slot, {});
 			socket.emit(this.CLIENT_GETS.ITEM_DELETE.name, { slot });
+			this.emitter.emit(questsConfig.SERVER_INNER.LOOT_VALUE_CHANGE.name, {id: item.key, value: -(item.stack || 1)}, socket)
 		}
 	}
 

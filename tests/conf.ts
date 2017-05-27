@@ -1,8 +1,12 @@
+import * as failFast from 'protractor-fail-fast';
 import { Config } from 'protractor';
 import { raiseBrowser, raiseBrowser2, connectChars } from "./specs/common";
 
 export let config: Config = {
     framework: 'jasmine',
+    plugins: [
+        failFast.init(),
+    ],
     capabilities: {
         browserName: 'chrome'
     },
@@ -23,8 +27,8 @@ export let config: Config = {
         }
         console.log(process.argv);
     },
-
-    // You could set no globals to true to avoid jQuery '$' and protractor '$'
-    // collisions on the global namespace.
+    afterLaunch: () => {
+        failFast.clean(); 
+    },
     noGlobals: true
 };
