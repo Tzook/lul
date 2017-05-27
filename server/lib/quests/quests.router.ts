@@ -34,10 +34,11 @@ export default class QuestsRouter extends SocketioRouterBase {
 		} else if (unmetReason = this.services.questReqUnmetReason(socket.character, questInfo)) {
 			this.sendError(data, socket, "Character does not meet the quest requirement: " + unmetReason);
 		} else {
-			socket.character.quests.progress[questKey] = this.services.getCleanQuest(questInfo);
+			let quest = this.services.getCleanQuest(questInfo)
+			socket.character.quests.progress[questKey] = quest;
 			socket.character.quests.markModified("progress");
 			socket.emit(this.CLIENT_GETS.QUEST_START.name, { id: questKey });
-			// TODO send progress
+			socket.emit(this.CLIENT_GETS.QUEST_PROGRESS.name, { id: questKey, hunt: quest.hunt, loot: quest.loot});
 		}
 	}
 
