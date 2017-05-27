@@ -4,8 +4,10 @@ import QuestsMiddleware from "./quests.middleware";
 import QuestsController from "./quests.controller";
 import QuestsServices from './quests.services';
 import ItemsRouter from '../items/items.router';
+import * as _ from 'underscore';
 let config = require('../../../server/lib/quests/quests.config.json');
 let statsConfig = require('../../../server/lib/stats/stats.config.json');
+let itemsConfig = require('../../../server/lib/items/items.config.json');
 
 export default class QuestsRouter extends SocketioRouterBase {
 	protected middleware: QuestsMiddleware;
@@ -47,14 +49,15 @@ export default class QuestsRouter extends SocketioRouterBase {
 		let questKey = data.id;
 		let questInfo = this.services.getQuestInfo(questKey);
 		let unmetReason;
+		let slots: {[key: string]: number[]}|false;
 		if (!questInfo) {
 			this.sendError(data, socket, "Could not find a quest with such key so can't complete.");
 		} else if (!socket.character.quests.progress[questKey]) {
 			this.sendError(data, socket, "Quest cannot be completed, it is not in progress!");
 		} else if (unmetReason = this.services.questFinishUnmetReason(socket.character.quests, this.itemsRouter.getItemsCounts(socket), questInfo)) {
 			this.sendError(data, socket, "Quest does not meet finishing criteria: " + unmetReason);
-		// TODO no slots for items
-		// } else if () {
+		} else if (!(slots = this.itemsRouter.getItemsSlots(socket, (questInfo.reward || {}).items || []))) {
+			this.sendError(data, socket, `There must be ${questInfo.reward.items.length} empty slots for the quest rewards.`);
 		} else {
 			this.services.finishQuest(socket.character.quests, questInfo);
 			socket.emit(this.CLIENT_GETS.QUEST_DONE.name, { id: questKey });
@@ -68,9 +71,14 @@ export default class QuestsRouter extends SocketioRouterBase {
 
 				// TODO class
 
-				(questInfo.reward.items || []).forEach(item => {
-					// TODO items
+				let items = _.map(questInfo.reward.items, item => {
+					let instance = this.itemsRouter.getItemInstance(item.key);
+					if (item.stack > 0) {
+						instance.stack = item.stack;
+					}
+					return instance;
 				});
+				this.emitter.emit(itemsConfig.SERVER_INNER.ITEMS_ADD.name, { items, slots }, socket);
 			}
 			console.log("completed quest", questKey, socket.character.name);
 		}
@@ -95,8 +103,9 @@ export default class QuestsRouter extends SocketioRouterBase {
 		let fields: Set<string> = new Set();
 		for (let questKey in quests) {
 			quests[questKey]++;
-            socket.emit(this.CLIENT_GETS.QUEST_PROGRESS.name, { quest_id: questKey, item_id: data.id, value: quests[questKey], type: "hunt"});
+            socket.emit(this.CLIENT_GETS.QUEST_PROGRESS.name, { quest_id: questKey, mob_id: data.id, value: quests[questKey]});
 			fields.add("hunt");
+			console.log("Hunt for quest", data.id, questKey, quests[questKey]);
 		}
 		this.services.markModified(socket.character.quests, fields);
 	}

@@ -4,7 +4,7 @@ import ItemsMiddleware from "./items.middleware";
 import ItemsController from './items.controller';
 import ItemsServices from './items.services';
 let dropsConfig = require('../../../server/lib/drops/drops.config.json');
-let SERVER_GETS = require('../../../server/lib/items/items.config.json').SERVER_GETS;
+let config = require('../../../server/lib/items/items.config.json');
 
 export default class ItemsRouter extends SocketioRouterBase {
 	protected middleware: ItemsMiddleware;
@@ -39,7 +39,11 @@ export default class ItemsRouter extends SocketioRouterBase {
 		return map;
 	}
 
-	[SERVER_GETS.ITEM_PICK.name](data, socket: GameSocket) {
+	public getItemsSlots(socket: GameSocket, items: ITEM_INSTANCE[]): false|{[key: string]: number[]} {
+		return this.middleware.getItemsSlots(socket, items);
+	}
+
+	[config.SERVER_GETS.ITEM_PICK.name](data, socket: GameSocket) {
 		this.emitter.emit(dropsConfig.SERVER_INNER.ITEM_PICK.name, data, socket, (item: ITEM_INSTANCE): any => {
 			let itemInfo = this.getItemInfo(item.key);
             if (itemInfo.cap > 1) {
@@ -49,14 +53,22 @@ export default class ItemsRouter extends SocketioRouterBase {
 			if (!(slot >= 0)) { 
 				this.sendError(data, socket, "No available slots to pick item");
 			} else {
-				socket.character.items.set(slot, item);
-				socket.emit(this.CLIENT_GETS.ITEM_ADD.name, { slot, item });
+				this[config.SERVER_INNER.ITEM_ADD.name]({slots: [slot], item}, socket);
 				return true;
 			}	
 		});
 	}
 
-	[SERVER_GETS.ITEM_DROP.name](data, socket: GameSocket) {
+	[config.SERVER_INNER.ITEM_ADD.name](data: {slots: number[], item: ITEM_INSTANCE}, socket: GameSocket) {
+		let {slots, item} = data;
+		let itemInfo = this.getItemInfo(item.key);
+		if (!this.middleware.isGold(item) && !this.middleware.isMisc(itemInfo)) {
+			socket.character.items.set(slots[0], item);
+			socket.emit(this.CLIENT_GETS.ITEM_ADD.name, { slot: slots[0], item });
+		}
+	}
+
+	[config.SERVER_GETS.ITEM_DROP.name](data, socket: GameSocket) {
 		let slot = data.slot;
 		if (!this.middleware.hasItem(socket, slot)) {
 			this.sendError(data, socket, "Trying to drop an item but nothing's there!");
@@ -69,7 +81,7 @@ export default class ItemsRouter extends SocketioRouterBase {
 		}
 	}
 
-	[SERVER_GETS.ITEM_MOVE.name](data, socket: GameSocket) {
+	[config.SERVER_GETS.ITEM_MOVE.name](data, socket: GameSocket) {
 		if (!this.middleware.isValidItemSlot(data.from)
 		 	|| !this.middleware.isValidItemSlot(data.to)) {
 			this.sendError(data, socket, "Invalid slots!");
@@ -86,5 +98,13 @@ export default class ItemsRouter extends SocketioRouterBase {
 				to: data.to
 			});
 		}
+	}
+
+	[config.SERVER_INNER.ITEMS_ADD.name](data: {items: ITEM_INSTANCE[], slots: {[key: string]: number[]}}, socket: GameSocket) {
+		let {items, slots} = data;
+		items.forEach(item => {
+			let itemSlots = slots[item.key];
+			this.emitter.emit(config.SERVER_INNER.ITEM_ADD.name, { slots: itemSlots, item }, socket);
+		});
 	}
 };

@@ -1,4 +1,7 @@
 {
+	"SERVER_INNER": {
+		"ITEM_ADD": {"name": "add_item"}
+	},
 	"SERVER_GETS": {
 		"ITEM_PICK": {"name": "picked_item", "throttle": 0, "alive": true},
 		"MISC_DROP": {"name": "dropped_misc", "alive": true}

@@ -351,6 +351,8 @@
 				socket.on("actor_delete_item", d => setResult({msg: "actor_delete_item", d}))
 				socket.on("drop_items", d => setResult({msg: "drop_items", d}))
 				socket.on("item_disappear", d => setResult({msg: "item_disappear", d}))
+				socket.on("actor_add_item", d => setResult({msg: "actor_add_item", d}))
+				socket.on("change_item_stack", d => setResult({msg: "change_item_stack", d}))
 				socket.on("actor_move_item", d => setResult({msg: "actor_move_item", d}))
 				socket.on("items_locations", d => setResult({msg: "items_locations", d}))
 

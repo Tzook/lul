@@ -20,7 +20,7 @@ export default class MiscRouter extends SocketioRouterBase {
 	[config.SERVER_GETS.ITEM_PICK.name](data, socket: GameSocket) {
 		this.emitter.emit(dropsConfig.SERVER_INNER.ITEM_PICK.name, data, socket, (item: ITEM_INSTANCE): any => {
             let itemInfo = this.itemsRouter.getItemInfo(item.key);
-            if (!(itemInfo.cap > 1) || itemInfo.key === "gold") {
+            if (!this.middleware.isMisc(itemInfo)) {
                 return;
             }
             let slots = this.middleware.getStackSlots(socket, item, itemInfo);
@@ -33,6 +33,14 @@ export default class MiscRouter extends SocketioRouterBase {
                 return true;
             }	
 		});
+	}
+
+	[config.SERVER_INNER.ITEM_ADD.name](data: {slots: number[], item: ITEM_INSTANCE}, socket: GameSocket) {
+		let {slots, item} = data;
+		let itemInfo = this.itemsRouter.getItemInfo(item.key);
+        if (this.middleware.isMisc(itemInfo)) {
+            this.controller.pickMiscItem(socket, slots, item, itemInfo);
+        }
 	}
 
 	[config.SERVER_GETS.MISC_DROP.name](data, socket: GameSocket) {

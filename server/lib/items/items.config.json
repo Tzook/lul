@@ -9,6 +9,10 @@
 			"STATUS": "OK"
 		}
 	},
+	"SERVER_INNER": {
+		"ITEMS_ADD": {"name": "add_items"},
+		"ITEM_ADD": {"name": "add_item"}
+	},
 	"SERVER_GETS": {
 		"ITEM_PICK": {"name": "picked_item", "throttle": 0, "alive": true},
 		"ITEM_DROP": {"name": "dropped_item", "alive": true},
