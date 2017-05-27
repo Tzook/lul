@@ -1,9 +1,87 @@
 'use strict';
 import MasterServices from '../master/master.services';	
 import * as _ from 'underscore';
+let config = require('../../../server/lib/quests/quests.config.json');
 
 export default class QuestsServices extends MasterServices {
 	private questsInfo: Map<string, QUEST_MODEL> = new Map();
+
+    public startQuest(quests: CHAR_QUESTS, questInfo: QUEST_MODEL) {
+        quests.progress[questInfo.key] = {};
+        let fields: Set<string> = new Set(["progress"]);
+			
+        for (var itemKey in ((questInfo.cond || {}).loot || {})) {
+            quests.loot[itemKey] = quests.loot[itemKey] || {};
+            quests.loot[itemKey][questInfo.key] = 0;
+            fields.add("loot");
+        }
+        for (var mobKey in ((questInfo.cond || {}).hunt || {})) {
+            quests.hunt[mobKey] = quests.hunt[mobKey] || {};
+            quests.hunt[mobKey][questInfo.key] = 0;
+            fields.add("hunt");
+        }
+        this.markModified(quests, fields);
+    }
+
+    public finishQuest(quests: CHAR_QUESTS, questInfo: QUEST_MODEL) {
+        this.removeQuest(quests, questInfo);
+        quests.done[questInfo.key] = {};
+        quests.markModified("done");
+    }
+
+    public abortQuest(quests: CHAR_QUESTS, questInfo: QUEST_MODEL) {
+        this.removeQuest(quests, questInfo);
+    }
+
+    private removeQuest(quests: CHAR_QUESTS, questInfo: QUEST_MODEL) {
+        delete quests.progress[questInfo.key];
+        let fields: Set<string> = new Set(["progress"]);
+			
+        for (var itemKey in ((questInfo.cond || {}).loot || {})) {
+            delete quests.loot[itemKey][questInfo.key];
+            if (_.isEmpty(quests.loot[itemKey])) {
+                delete quests.loot[itemKey];
+            }
+            fields.add("loot");
+        }
+        for (var mobKey in ((questInfo.cond || {}).hunt || {})) {
+            delete quests.hunt[mobKey][questInfo.key];
+            if (_.isEmpty(quests.hunt[mobKey])) {
+                delete quests.hunt[mobKey];
+            }
+            fields.add("hunt");
+        }
+        this.markModified(quests, fields);
+    }
+
+    public prefillQuestLoot(socket: GameSocket, questInfo: QUEST_MODEL) {
+        let itemsToReport: Set<string> = new Set();
+        let fields: Set<string> = new Set();
+        if ((questInfo.cond || {}).loot) {
+            socket.character.items.forEach(item => {
+                if (questInfo.cond.loot[item.key]) {
+                    socket.character.quests.loot[item.key][questInfo.key] += item.stack || 1;
+                    itemsToReport.add(item.key);
+                    fields.add("loot");
+                }
+            });
+        }
+        for (let itemKey of itemsToReport) {
+            socket.emit(config.CLIENT_GETS.QUEST_PROGRESS.name, { 
+                quest_id: questInfo.key, 
+                item_id: itemKey, 
+                value: socket.character.quests.loot[itemKey][questInfo.key],
+                type: "loot"
+            });
+        }
+        this.markModified(socket.character.quests, fields);
+    }
+
+    public markModified(quests: CHAR_QUESTS, fields: Set<string>) {
+        for (let field of fields) {
+            quests.markModified(field);
+        }
+    }
 
     public questReqUnmetReason(char: Char, questInfo: QUEST_MODEL): string {
         let req = questInfo.req;
@@ -24,41 +102,16 @@ export default class QuestsServices extends MasterServices {
         return "";
     }
 
-    public getCleanQuest(questInfo: QUEST_MODEL): QUEST_PROGRESS {
-        let progress: QUEST_PROGRESS = {};
-        if (questInfo.cond) {
-            for (var itemKey in (questInfo.cond.loot || {})) {
-                progress.loot = progress.loot || {};
-                progress.loot[itemKey] = 0;
-            }
-            for (var mobKey in (questInfo.cond.hunt || {})) {
-                progress.hunt = progress.hunt || {};
-                progress.hunt[mobKey] = 0;
-            }
-        }
-        return progress;
-    }
-
-    public prefillQuestLoot(char: Char, quest: QUEST_PROGRESS) {
-        if (quest.loot) {
-            char.items.forEach(item => {
-                if (quest.loot[item.key] !== undefined) {
-                    quest.loot[item.key] += item.stack || 1;
-                }
-            });
-        }
-    }
-
-    public questFinishUnmetReason(questProgress: QUEST_PROGRESS, questInfo: QUEST_MODEL): string {
-        for (var itemKey in (questProgress.loot || {})) {
-            let progress = questProgress.loot[itemKey];
+    public questFinishUnmetReason(quests: CHAR_QUESTS, questInfo: QUEST_MODEL): string {
+        for (var itemKey in ((questInfo.cond || {}).loot || {})) {
+            let progress = quests.loot[itemKey][questInfo.key];
             let target = questInfo.cond.loot[itemKey];
             if (progress < target) {
                 return `loot ${progress} / ${target} ${itemKey}`;
             }
         }
-        for (var mobKey in (questProgress.hunt || {})) {
-            let progress = questProgress.hunt[mobKey];
+        for (var mobKey in ((questInfo.cond || {}).hunt || {})) {
+            let progress = quests.hunt[mobKey][questInfo.key];
             let target = questInfo.cond.hunt[mobKey];
             if (progress < target) {
                 return `hunt ${progress} / ${target} ${mobKey}`;
@@ -86,7 +139,6 @@ export default class QuestsServices extends MasterServices {
                     conditions[condition.condition][condition.conditionType] = condition.targetProgress;
                     questSchema.cond = conditions;
                 });
-                console.log(questSchema.cond);
             }
             // requirements
             {

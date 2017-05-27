@@ -35,13 +35,9 @@ export default class QuestsRouter extends SocketioRouterBase {
 		} else if (unmetReason = this.services.questReqUnmetReason(socket.character, questInfo)) {
 			this.sendError(data, socket, "Character does not meet the quest requirement: " + unmetReason);
 		} else {
-			let quest = this.services.getCleanQuest(questInfo);
-			this.services.prefillQuestLoot(socket.character, quest);
-			socket.character.quests.progress[questKey] = quest;
-			socket.character.quests.markModified("progress");
+			this.services.startQuest(socket.character.quests, questInfo);
 			socket.emit(this.CLIENT_GETS.QUEST_START.name, { id: questKey });
-			socket.emit(this.CLIENT_GETS.QUEST_PROGRESS.name, { id: questKey, hunt: quest.hunt, loot: quest.loot});
-			console.log("started quest", quest, socket.character.name);
+			this.services.prefillQuestLoot(socket, questInfo);
 		}
 	}
 
@@ -53,15 +49,12 @@ export default class QuestsRouter extends SocketioRouterBase {
 			this.sendError(data, socket, "Could not find a quest with such key so can't complete.");
 		} else if (!socket.character.quests.progress[questKey]) {
 			this.sendError(data, socket, "Quest cannot be completed, it is not in progress!");
-		} else if (unmetReason = this.services.questFinishUnmetReason(socket.character.quests.progress[questKey], questInfo)) {
+		} else if (unmetReason = this.services.questFinishUnmetReason(socket.character.quests, questInfo)) {
 			this.sendError(data, socket, "Quest does not meet finishing criteria: " + unmetReason);
 		// TODO no slots for items
 		// } else if () {
 		} else {
-			delete socket.character.quests.progress[questKey];
-			socket.character.quests.done[questKey] = {};
-			socket.character.quests.markModified("progress");
-			socket.character.quests.markModified("done");
+			this.services.finishQuest(socket.character.quests, questInfo);
 			socket.emit(this.CLIENT_GETS.QUEST_DONE.name, { id: questKey });
 			
 			// TODO if had loot cond, remove loot from character
@@ -89,38 +82,31 @@ export default class QuestsRouter extends SocketioRouterBase {
 		} else if (!socket.character.quests.progress[questKey]) {
 			this.sendError(data, socket, "Quest cannot be aborted, it is not in progress!");
 		} else {
-			delete socket.character.quests.progress[questKey];
-			socket.character.quests.markModified("progress");
+			this.services.abortQuest(socket.character.quests, questInfo)
 			socket.emit(this.CLIENT_GETS.QUEST_ABORT.name, { id: questKey });
 			console.log("aborting quest", questKey, socket.character.name);
 		}
 	}
 
 	[config.SERVER_INNER.LOOT_VALUE_CHANGE.name](data, socket: GameSocket) {
-		let hadChange = false;
-		for (var questKey in socket.character.quests.progress) {
-			let loot = socket.character.quests.progress[questKey].loot;
-			if (loot && loot[data.id] !== undefined) {
-				loot[data.id] = Math.max(loot[data.id] + data.value, 0);
-				socket.emit(this.CLIENT_GETS.QUEST_PROGRESS.name, { id: questKey, loot});
-				hadChange = true;
-				console.log("updating quest loot", questKey, loot, socket.character.name);
-			}
+		let quests = socket.character.quests.loot[data.id] || {};
+		let fields: Set<string> = new Set();
+		for (let questKey in quests) {
+			quests[questKey] = Math.max(quests[questKey] + data.value, 0);
+            socket.emit(this.CLIENT_GETS.QUEST_PROGRESS.name, { quest_id: questKey, item_id: data.id, value: quests[questKey], type: "loot"});
+			fields.add("loot");
 		}
-		hadChange && socket.character.quests.markModified("progress");
+		this.services.markModified(socket.character.quests, fields);
 	}
 
 	[config.SERVER_INNER.HUNT_MOB.name](data, socket: GameSocket) {
-		let hadChange = false;
-		for (var questKey in socket.character.quests.progress) {
-			let hunt = socket.character.quests.progress[questKey].hunt;
-			if (hunt && hunt[data.id] !== undefined) {
-				hunt[data.id]++;
-				socket.emit(this.CLIENT_GETS.QUEST_PROGRESS.name, { id: questKey, hunt});
-				hadChange = true;
-				console.log("updating quest hunt", questKey, hunt, socket.character.name);
-			}
+		let quests = socket.character.quests.hunt[data.id] || {};
+		let fields: Set<string> = new Set();
+		for (let questKey in quests) {
+			quests[questKey]++;
+            socket.emit(this.CLIENT_GETS.QUEST_PROGRESS.name, { quest_id: questKey, item_id: data.id, value: quests[questKey], type: "hunt"});
+			fields.add("hunt");
 		}
-		hadChange && socket.character.quests.markModified("progress");
+		this.services.markModified(socket.character.quests, fields);
 	}
 };

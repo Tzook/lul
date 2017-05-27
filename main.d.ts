@@ -187,26 +187,23 @@ interface QUEST_MODEL {
     req?: QUEST_REQUIREMENTS
     reward?: QUEST_REWARDS
 }
-// this looks similar to QUEST_CONDITIONS but it has different meanings
-// this is for progress count. the latter is for total required count
-interface QUEST_PROGRESS {
-    loot?: {
-        [key: string]: number
-    }
-    hunt?: {
-        [key: string]: number
-    }
-}
-interface QUEST_DONE_METADATA {
-    // what do we want to know about completed quests?
-}
 
 interface CHAR_QUESTS {
     markModified: (path) => {}
     progress: {
-        [key: string]: QUEST_PROGRESS
+        [questKey: string]: {}
     }
     done: {
-        [key: string]: QUEST_DONE_METADATA
+        [questKey: string]: {}
+    }
+    loot: {
+        [itemId: string]: {
+            [questKey: string]: number
+        }
+    }
+    hunt: {
+        [mobId: string]: {
+            [questKey: string]: number
+        }
     }
 }
