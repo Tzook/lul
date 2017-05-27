@@ -124,31 +124,26 @@
 				return Math.floor(Math.random() * 16777215).toString(16);
 			}
 
-			function setResult(result) {
+			function setResult(result, forceScroll) {
 				var $elem = jQuery('<p></p>');
-				if (result.ch) {
-					if (result.d !== undefined) {
-						setCharText(result.ch, result.d);
-						$elem.append(`<b>${result.ch}</b>: `).append(document.createTextNode(result.d));
-					} else {
-						$elem.text(`${result.ch} the fag has logged in!`);
-					}
-				} else {
-					$elem.append(
-						(result.msg ? `msg: "${result.msg}" ` : '') +
-						(result.error ? `error: "${result.error}"<br>` : '') +
-						(result.status ? ` status: "${result.status}" ` : '') +
-						(result.code ? ` code: "${result.code}" ` : '') +
-						(result.d ? `<br>data: ${JSON.stringify(result.d, null, 4).replace(/\n/g, '<br>')}` : '')
-					);
-					if (result.d && result.d.characters) {
-						characters = result.d.characters;
-						$connect.prop('disabled', false);
-					}
+				$elem.append(
+					(result.msg ? `msg: "${result.msg}" ` : '') +
+					(result.error ? `error: "${result.error}"<br>` : '') +
+					(result.status ? ` status: "${result.status}" ` : '') +
+					(result.code ? ` code: "${result.code}" ` : '') +
+					(result.d ? `<br>data: ${JSON.stringify(result.d, null, 4).replace(/\n/g, '<br>')}` : '')
+				);
+				if (result.d && result.d.characters) {
+					characters = result.d.characters;
+					$connect.prop('disabled', false);
 				}
 				$elem.css('color', getRandomColor()); // random color
+				var shouldScroll = $chat[0].scrollHeight - $chat[0].scrollTop - $chat[0].clientHeight == 0;
 				$chat.append($elem);
-				$chat.animate({scrollTop: $chat[0].scrollHeight}, window.test ? 0 : 300);
+				if (forceScroll || shouldScroll) { // if scroll is at bottom
+					$chat.animate({scrollTop: $chat[0].scrollHeight}, 0);
+				}
+				console.info(result.d);
 			}
 
 			function clearResults () {
@@ -330,8 +325,10 @@
 				socket.on('connect', function() {
 					toggleIntro(true);
 					hideLoading();
-					setResult({msg: 'connected.'});
-					socket.emit("entered_room", "");
+					setTimeout(function() {
+						setResult({msg: 'connected.'}, true);
+						socket.emit("entered_room", "");
+					}, 500);
 				});
 				// HANDSHAKE REJECTED / HAD ERROR
 				socket.on('error', function(error) {
@@ -390,6 +387,10 @@
 				socket.on("mob_take_dmg", d => setResult({msg: "mob_take_dmg", d}));
 				socket.on("mob_move", d => window.test && setResult({msg: "mob_move", d}));
 
+				socket.on("quest_start", d => setResult({msg: "quest_start", d}));
+				socket.on("quest_complete", d => setResult({msg: "quest_complete", d}));
+				socket.on("quest_abort", d => setResult({msg: "quest_abort", d}));
+				socket.on("quest_progress", d => setResult({msg: "quest_progress", d}));
 			}
 
 			function move(dX, dY) {

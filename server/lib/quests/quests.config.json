@@ -10,9 +10,14 @@
 		}
 	},
 	"SERVER_GETS": {
-		
+		"QUEST_START": {"name": "quest_started"},
+		"QUEST_DONE": {"name": "quest_completed"},
+		"QUEST_ABORT": {"name": "quest_aborted"}
 	},
 	"CLIENT_GETS": {
-		
+		"QUEST_START": {"name": "quest_start"},
+		"QUEST_DONE": {"name": "quest_complete"},
+		"QUEST_ABORT": {"name": "quest_abort"},
+		"QUEST_PROGRESS": {"name": "quest_progress"}
 	}
 }

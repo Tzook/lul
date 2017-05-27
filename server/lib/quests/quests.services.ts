@@ -5,6 +5,60 @@ import * as _ from 'underscore';
 export default class QuestsServices extends MasterServices {
 	private questsInfo: Map<string, QUEST_MODEL> = new Map();
 
+    public questReqUnmetReason(char: Char, questInfo: QUEST_MODEL): string {
+        let req = questInfo.req;
+        if (req) {
+            if (req.lvl && char.stats.lvl < req.lvl) {
+                return `level ${char.stats.lvl} / ${req.lvl}`;
+            }
+
+            // TODO add class check
+
+            for (var i in (req.quests || [])) {
+                let reqQuest = req.quests[i];
+                if (!char.quests.done[reqQuest]) {
+                    return `quest id '${reqQuest}'`;
+                }
+            }
+        }
+        return "";
+    }
+
+    public getCleanQuest(questInfo: QUEST_MODEL): QUEST_PROGRESS {
+        let progress: QUEST_PROGRESS = {};
+        if (questInfo.cond) {
+            for (var itemKey in (questInfo.cond.loot || {})) {
+                progress.loot = progress.loot || {};
+                progress.loot[itemKey] = 0;
+            }
+            for (var mobKey in (questInfo.cond.hunt || {})) {
+                progress.hunt = progress.hunt || {};
+                progress.hunt[mobKey] = 0;
+            }
+        }
+        return progress;
+    }
+
+    public questFinishUnmetReason(questProgress: QUEST_PROGRESS, questInfo: QUEST_MODEL): string {
+        for (var itemKey in (questProgress.loot || {})) {
+            let progress = questProgress.loot[itemKey];
+            let target = questInfo.cond.loot[itemKey];
+            if (progress < target) {
+                return `loot ${progress} / ${target} ${itemKey}`;
+            }
+        }
+        for (var mobKey in (questProgress.hunt || {})) {
+            let progress = questProgress.hunt[mobKey];
+            let target = questInfo.cond.hunt[mobKey];
+            if (progress < target) {
+                return `hunt ${progress} / ${target} ${mobKey}`;
+            }
+        }
+        return "";
+    }
+
+    // HTTP functions
+	// =================
     public generateQuests(quests: any[]): Promise<any> {
 		console.log("Generating quests from data:", quests);
 		
@@ -78,7 +132,6 @@ export default class QuestsServices extends MasterServices {
 	public getQuestInfo(key: string): QUEST_MODEL|undefined {
 		return this.questsInfo.get(key);
 	}
-
 
     public getQuests(): Promise<Map<string, QUEST_MODEL>> {
 		return this.Model.find({}).lean()

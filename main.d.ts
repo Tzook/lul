@@ -58,6 +58,7 @@ interface Char extends Doc {
     items: ItemsArray,
     equips: Equips,
     stats: Stats,
+    quests: CHAR_QUESTS
 }
 
 interface User extends Doc {
@@ -189,13 +190,11 @@ interface QUEST_MODEL {
 // this looks similar to QUEST_CONDITIONS but it has different meanings
 // this is for progress count. the latter is for total required count
 interface QUEST_PROGRESS {
-    cond?: {
-        loot?: {
-            [key: string]: number
-        }
-        hunt?: {
-            [key: string]: number
-        }
+    loot?: {
+        [key: string]: number
+    }
+    hunt?: {
+        [key: string]: number
     }
 }
 interface QUEST_DONE_METADATA {
@@ -203,6 +202,7 @@ interface QUEST_DONE_METADATA {
 }
 
 interface CHAR_QUESTS {
+    markModified: (path) => {}
     progress: {
         [key: string]: QUEST_PROGRESS
     }

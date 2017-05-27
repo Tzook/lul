@@ -22,8 +22,8 @@ const QUEST_SCHEMA = {
 };
 
 const CHAR_QUESTS = {
-    progress: {type: mongoose.Schema.Types.Mixed, default: {}},
-    done: {type: mongoose.Schema.Types.Mixed, default: {}},
+    progress: {},
+    done: {},
 };
 
 export default class QuestsModel extends MasterModel {
@@ -43,7 +43,9 @@ export default class QuestsModel extends MasterModel {
     createModel() {
         this.setModel("Quest");
 
-        this.addToSchema("Character", {quests: CHAR_QUESTS});
+        let CharQuestModel = this.createNewModel("CharQuest", CHAR_QUESTS, {_id: false, strict: false, minimize: false});
+        this.addToSchema("Character", {quests: CharQuestModel.schema});
+        this.listenForFieldAddition("Character", "quests", CHAR_QUESTS);
 
         setTimeout(() => this.controller.warmQuestsInfo()); // timeout so the Model can be set
         return Promise.resolve();
