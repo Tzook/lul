@@ -24,7 +24,6 @@ const QUEST_SCHEMA = {
 const CHAR_QUESTS = {
     progress: {},
     done: {},
-    loot: {},
     hunt: {},
 };
 

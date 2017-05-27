@@ -4,7 +4,6 @@ import ItemsMiddleware from "./items.middleware";
 import ItemsController from './items.controller';
 import ItemsServices from './items.services';
 let dropsConfig = require('../../../server/lib/drops/drops.config.json');
-let questsConfig = require('../../../server/lib/quests/quests.config.json');
 let SERVER_GETS = require('../../../server/lib/items/items.config.json').SERVER_GETS;
 
 export default class ItemsRouter extends SocketioRouterBase {
@@ -31,6 +30,15 @@ export default class ItemsRouter extends SocketioRouterBase {
 		return this.services.getItemInstance(key);
 	}
 
+	public getItemsCounts(socket: GameSocket) {
+		let map: ITEMS_COUNTS = new Map();
+		for (let item of socket.character.items) {
+			let currentCount = map.get(item.key) || 0;
+			map.set(item.key, currentCount + (item.stack || 1));
+		}
+		return map;
+	}
+
 	[SERVER_GETS.ITEM_PICK.name](data, socket: GameSocket) {
 		this.emitter.emit(dropsConfig.SERVER_INNER.ITEM_PICK.name, data, socket, (item: ITEM_INSTANCE): any => {
 			let itemInfo = this.getItemInfo(item.key);
@@ -43,7 +51,6 @@ export default class ItemsRouter extends SocketioRouterBase {
 			} else {
 				socket.character.items.set(slot, item);
 				socket.emit(this.CLIENT_GETS.ITEM_ADD.name, { slot, item });
-				this.emitter.emit(questsConfig.SERVER_INNER.LOOT_VALUE_CHANGE.name, {id: item.key, value: item.stack || 1}, socket)
 				return true;
 			}	
 		});
@@ -59,7 +66,6 @@ export default class ItemsRouter extends SocketioRouterBase {
 			this.emitter.emit(dropsConfig.SERVER_INNER.ITEMS_DROP.name, {}, socket, [item]);
 			socket.character.items.set(slot, {});
 			socket.emit(this.CLIENT_GETS.ITEM_DELETE.name, { slot });
-			this.emitter.emit(questsConfig.SERVER_INNER.LOOT_VALUE_CHANGE.name, {id: item.key, value: -(item.stack || 1)}, socket)
 		}
 	}
 

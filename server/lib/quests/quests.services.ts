@@ -1,7 +1,6 @@
 'use strict';
 import MasterServices from '../master/master.services';	
 import * as _ from 'underscore';
-let config = require('../../../server/lib/quests/quests.config.json');
 
 export default class QuestsServices extends MasterServices {
 	private questsInfo: Map<string, QUEST_MODEL> = new Map();
@@ -9,12 +8,7 @@ export default class QuestsServices extends MasterServices {
     public startQuest(quests: CHAR_QUESTS, questInfo: QUEST_MODEL) {
         quests.progress[questInfo.key] = {};
         let fields: Set<string> = new Set(["progress"]);
-			
-        for (var itemKey in ((questInfo.cond || {}).loot || {})) {
-            quests.loot[itemKey] = quests.loot[itemKey] || {};
-            quests.loot[itemKey][questInfo.key] = 0;
-            fields.add("loot");
-        }
+
         for (var mobKey in ((questInfo.cond || {}).hunt || {})) {
             quests.hunt[mobKey] = quests.hunt[mobKey] || {};
             quests.hunt[mobKey][questInfo.key] = 0;
@@ -36,14 +30,6 @@ export default class QuestsServices extends MasterServices {
     private removeQuest(quests: CHAR_QUESTS, questInfo: QUEST_MODEL) {
         delete quests.progress[questInfo.key];
         let fields: Set<string> = new Set(["progress"]);
-			
-        for (var itemKey in ((questInfo.cond || {}).loot || {})) {
-            delete quests.loot[itemKey][questInfo.key];
-            if (_.isEmpty(quests.loot[itemKey])) {
-                delete quests.loot[itemKey];
-            }
-            fields.add("loot");
-        }
         for (var mobKey in ((questInfo.cond || {}).hunt || {})) {
             delete quests.hunt[mobKey][questInfo.key];
             if (_.isEmpty(quests.hunt[mobKey])) {
@@ -52,29 +38,6 @@ export default class QuestsServices extends MasterServices {
             fields.add("hunt");
         }
         this.markModified(quests, fields);
-    }
-
-    public prefillQuestLoot(socket: GameSocket, questInfo: QUEST_MODEL) {
-        let itemsToReport: Set<string> = new Set();
-        let fields: Set<string> = new Set();
-        if ((questInfo.cond || {}).loot) {
-            socket.character.items.forEach(item => {
-                if (questInfo.cond.loot[item.key]) {
-                    socket.character.quests.loot[item.key][questInfo.key] += item.stack || 1;
-                    itemsToReport.add(item.key);
-                    fields.add("loot");
-                }
-            });
-        }
-        for (let itemKey of itemsToReport) {
-            socket.emit(config.CLIENT_GETS.QUEST_PROGRESS.name, { 
-                quest_id: questInfo.key, 
-                item_id: itemKey, 
-                value: socket.character.quests.loot[itemKey][questInfo.key],
-                type: "loot"
-            });
-        }
-        this.markModified(socket.character.quests, fields);
     }
 
     public markModified(quests: CHAR_QUESTS, fields: Set<string>) {
@@ -102,9 +65,9 @@ export default class QuestsServices extends MasterServices {
         return "";
     }
 
-    public questFinishUnmetReason(quests: CHAR_QUESTS, questInfo: QUEST_MODEL): string {
+    public questFinishUnmetReason(quests: CHAR_QUESTS, itemsCounts: ITEMS_COUNTS, questInfo: QUEST_MODEL): string {
         for (var itemKey in ((questInfo.cond || {}).loot || {})) {
-            let progress = quests.loot[itemKey][questInfo.key];
+            let progress = itemsCounts.get(itemKey);
             let target = questInfo.cond.loot[itemKey];
             if (progress < target) {
                 return `loot ${progress} / ${target} ${itemKey}`;

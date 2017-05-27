@@ -10,8 +10,7 @@
 		}
 	},
 	"SERVER_INNER": {
-		"HUNT_MOB": {"name": "hunt_mob"},
-		"LOOT_VALUE_CHANGE": {"name": "loot_value_change"}
+		"HUNT_MOB": {"name": "hunt_mob"}
 	},
 	"SERVER_GETS": {
 		"QUEST_START": {"name": "quest_started"},

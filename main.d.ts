@@ -41,7 +41,7 @@ interface Stats {
     primaryAbility: string,
 }
 
-interface ItemsArray extends Array<ITEM_INSTANCE> {
+interface CHAR_ITEMS extends Array<ITEM_INSTANCE> {
     set: (index: number, obj: ITEM_INSTANCE|{}) => {};
 }
 
@@ -55,15 +55,13 @@ interface Char extends Doc {
         climbing: boolean, 
     },
     gold: number;
-    items: ItemsArray,
+    items: CHAR_ITEMS,
     equips: Equips,
     stats: Stats,
     quests: CHAR_QUESTS
 }
 
-interface User extends Doc {
-
-}
+interface User extends Doc {}
 
 interface GameSocket extends SocketIO.Socket {
     test?: boolean;
@@ -110,6 +108,7 @@ interface ITEM_INSTANCE extends ITEM_STATS_MODEL {
     key: string,
     stack?: number,
 }
+interface ITEMS_COUNTS extends Map<string, number> {}
 interface DROP_MODEL {
     key: string,
     minStack?: number,
@@ -163,6 +162,12 @@ interface ROOM_MOBS {
 }
 
 // quests
+interface QUEST_MODEL {
+    key: string
+    cond?: QUEST_CONDITIONS
+    req?: QUEST_REQUIREMENTS
+    reward?: QUEST_REWARDS
+}
 interface QUEST_CONDITIONS {
     loot?: {
         [key: string]: number
@@ -181,12 +186,6 @@ interface QUEST_REWARDS {
     class?: string
     exp?: number
 }
-interface QUEST_MODEL {
-    key: string
-    cond?: QUEST_CONDITIONS
-    req?: QUEST_REQUIREMENTS
-    reward?: QUEST_REWARDS
-}
 
 interface CHAR_QUESTS {
     markModified: (path) => {}
@@ -195,11 +194,6 @@ interface CHAR_QUESTS {
     }
     done: {
         [questKey: string]: {}
-    }
-    loot: {
-        [itemId: string]: {
-            [questKey: string]: number
-        }
     }
     hunt: {
         [mobId: string]: {

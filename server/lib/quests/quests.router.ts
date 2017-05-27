@@ -3,16 +3,19 @@ import SocketioRouterBase from '../socketio/socketio.router.base';
 import QuestsMiddleware from "./quests.middleware";
 import QuestsController from "./quests.controller";
 import QuestsServices from './quests.services';
+import ItemsRouter from '../items/items.router';
 let config = require('../../../server/lib/quests/quests.config.json');
 let statsConfig = require('../../../server/lib/stats/stats.config.json');
 
 export default class QuestsRouter extends SocketioRouterBase {
-    protected middleware: QuestsMiddleware;
+	protected middleware: QuestsMiddleware;
 	protected controller: QuestsController;
 	protected services: QuestsServices;
+	protected itemsRouter: ItemsRouter;
 
 	init(files, app) {
 		this.services = files.services;
+		this.itemsRouter = files.routers.items;
 		super.init(files, app);
 	}
 
@@ -37,7 +40,6 @@ export default class QuestsRouter extends SocketioRouterBase {
 		} else {
 			this.services.startQuest(socket.character.quests, questInfo);
 			socket.emit(this.CLIENT_GETS.QUEST_START.name, { id: questKey });
-			this.services.prefillQuestLoot(socket, questInfo);
 		}
 	}
 
@@ -49,7 +51,7 @@ export default class QuestsRouter extends SocketioRouterBase {
 			this.sendError(data, socket, "Could not find a quest with such key so can't complete.");
 		} else if (!socket.character.quests.progress[questKey]) {
 			this.sendError(data, socket, "Quest cannot be completed, it is not in progress!");
-		} else if (unmetReason = this.services.questFinishUnmetReason(socket.character.quests, questInfo)) {
+		} else if (unmetReason = this.services.questFinishUnmetReason(socket.character.quests, this.itemsRouter.getItemsCounts(socket), questInfo)) {
 			this.sendError(data, socket, "Quest does not meet finishing criteria: " + unmetReason);
 		// TODO no slots for items
 		// } else if () {
@@ -86,17 +88,6 @@ export default class QuestsRouter extends SocketioRouterBase {
 			socket.emit(this.CLIENT_GETS.QUEST_ABORT.name, { id: questKey });
 			console.log("aborting quest", questKey, socket.character.name);
 		}
-	}
-
-	[config.SERVER_INNER.LOOT_VALUE_CHANGE.name](data, socket: GameSocket) {
-		let quests = socket.character.quests.loot[data.id] || {};
-		let fields: Set<string> = new Set();
-		for (let questKey in quests) {
-			quests[questKey] = Math.max(quests[questKey] + data.value, 0);
-            socket.emit(this.CLIENT_GETS.QUEST_PROGRESS.name, { quest_id: questKey, item_id: data.id, value: quests[questKey], type: "loot"});
-			fields.add("loot");
-		}
-		this.services.markModified(socket.character.quests, fields);
 	}
 
 	[config.SERVER_INNER.HUNT_MOB.name](data, socket: GameSocket) {

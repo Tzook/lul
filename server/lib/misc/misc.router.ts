@@ -5,7 +5,6 @@ import MiscMiddleware from "./misc.middleware";
 import MiscController from "./misc.controller";
 
 let dropsConfig = require('../../../server/lib/drops/drops.config.json');
-let questsConfig = require('../../../server/lib/quests/quests.config.json');
 let config = require('../../../server/lib/misc/misc.config.json');
 
 export default class MiscRouter extends SocketioRouterBase {
@@ -24,7 +23,6 @@ export default class MiscRouter extends SocketioRouterBase {
             if (!(itemInfo.cap > 1) || itemInfo.key === "gold") {
                 return;
             }
-            let stack = item.stack;
             let slots = this.middleware.getStackSlots(socket, item, itemInfo);
 
             console.log("picking up item for slots", item, slots);
@@ -32,7 +30,6 @@ export default class MiscRouter extends SocketioRouterBase {
                 this.sendError(data, socket, "No available slots to pick misc item");
             } else {
                 this.controller.pickMiscItem(socket, slots, item, itemInfo);
-                this.emitter.emit(questsConfig.SERVER_INNER.LOOT_VALUE_CHANGE.name, {id: item.key, value: stack || 1}, socket)
                 return true;
             }	
 		});
