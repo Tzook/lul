@@ -103,7 +103,7 @@ export default class QuestsRouter extends SocketioRouterBase {
 		let fields: Set<string> = new Set();
 		for (let questKey in quests) {
 			quests[questKey]++;
-            socket.emit(this.CLIENT_GETS.QUEST_PROGRESS.name, { quest_id: questKey, mob_id: data.id, value: quests[questKey]});
+            socket.emit(this.CLIENT_GETS.QUEST_HUNT_PROGRESS.name, { id: questKey, mob_id: data.id, value: quests[questKey]});
 			fields.add("hunt");
 			console.log("Hunt for quest", data.id, questKey, quests[questKey]);
 		}

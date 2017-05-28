@@ -21,6 +21,6 @@
 		"QUEST_START": {"name": "quest_start"},
 		"QUEST_DONE": {"name": "quest_complete"},
 		"QUEST_ABORT": {"name": "quest_abort"},
-		"QUEST_PROGRESS": {"name": "quest_progress"}
+		"QUEST_HUNT_PROGRESS": {"name": "quest_hunt_progress"}
 	}
 }
