@@ -102,10 +102,13 @@ export default class QuestsRouter extends SocketioRouterBase {
 		let quests = socket.character.quests.hunt[data.id] || {};
 		let fields: Set<string> = new Set();
 		for (let questKey in quests) {
-			quests[questKey]++;
-            socket.emit(this.CLIENT_GETS.QUEST_HUNT_PROGRESS.name, { id: questKey, mob_id: data.id, value: quests[questKey]});
-			fields.add("hunt");
-			console.log("Hunt for quest", data.id, questKey, quests[questKey]);
+			let questInfo = this.services.getQuestInfo(questKey);
+			if (quests[questKey] < questInfo.cond.hunt[data.id]) {
+				quests[questKey]++;
+				socket.emit(this.CLIENT_GETS.QUEST_HUNT_PROGRESS.name, { id: questKey, mob_id: data.id, value: quests[questKey]});
+				fields.add("hunt");
+				console.log("Hunt for quest", data.id, questKey, quests[questKey]);
+			}
 		}
 		this.services.markModified(socket.character.quests, fields);
 	}
