@@ -74,6 +74,8 @@ interface GameSocket extends SocketIO.Socket {
     lastAttackLoad: number;
     bonusStats?: ITEM_STATS_MODEL;
     throttles: Map<Function, number>;
+    maxHp: number;
+    maxMp: number;
 }
 
 // items
