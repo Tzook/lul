@@ -3,6 +3,7 @@
 		"GAIN_EXP": {"name": "gain_exp", "alive": true},
 		"GAIN_HP": {"name": "gain_hp"},
 		"GAIN_MP": {"name": "gain_mp"},
+		"GAIN_STATS": {"name": "gain_stats"},
 		"TAKE_DMG": {"name": "take_dmg"},
 		"STATS_ADD": {"name": "stats_add"},
 		"STATS_REMOVE": {"name": "stats_remove"}

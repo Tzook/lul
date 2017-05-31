@@ -83,6 +83,20 @@ export default class StatsRouter extends SocketioRouterBase {
         }
     }
 
+    [config.SERVER_INNER.GAIN_STATS.name] (data: {stats: BASE_STATS_MODEL}, socket: GameSocket) {
+        let {stats} = data;
+        
+        this.services.addStr(socket.character.stats, stats.str || 0);
+        this.services.addMag(socket.character.stats, stats.mag || 0);
+        this.services.addDex(socket.character.stats, stats.dex || 0);
+        this.services.addHp(socket.character.stats, stats.hp || 0);
+        this.services.addMp(socket.character.stats, stats.mp || 0);
+
+        socket.emit(this.CLIENT_GETS.GAIN_STATS.name, {
+            stats: socket.character.stats
+        });
+    }
+
     [config.SERVER_GETS.RELEASE_DEATH.name] (data, socket: GameSocket) {
         socket.character.stats.hp.now = socket.maxHp;
         socket.emit(this.CLIENT_GETS.RESURRECT.name, {});

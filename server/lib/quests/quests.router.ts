@@ -72,6 +72,11 @@ export default class QuestsRouter extends SocketioRouterBase {
 			}
 
 			// TODO class
+			
+			// reward stats
+			if ((questInfo.reward || {}).stats) {
+				this.emitter.emit(statsConfig.SERVER_INNER.GAIN_STATS.name, { stats: questInfo.reward.stats }, socket);
+			}
 
 			// reward items
 			_.forEach((questInfo.reward || {}).items, item => {
