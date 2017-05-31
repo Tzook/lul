@@ -30,7 +30,7 @@ export default class GoldRouter extends SocketioRouterBase {
         let {item} = data;
 
         if (this.middleware.isGold(item)) {
-            socket.character.gold += item.stack;
+            socket.character.gold += +item.stack;
             socket.emit(this.CLIENT_GETS.CHANGE_GOLD.name, {
                 amount: item.stack
             });

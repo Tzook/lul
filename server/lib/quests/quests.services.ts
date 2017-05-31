@@ -97,14 +97,14 @@ export default class QuestsServices extends MasterServices {
                 let conditions: QUEST_CONDITIONS = {};
                 (quest.conditions || []).forEach(condition => {
                     conditions[condition.condition] = conditions[condition.condition] || {};
-                    conditions[condition.condition][condition.conditionType] = condition.targetProgress;
+                    conditions[condition.condition][condition.conditionType] = +condition.targetProgress;
                     questSchema.cond = conditions;
                 });
             }
             // requirements
             {
                 let req: QUEST_REQUIREMENTS = {};
-                if (quest.minLevel > 0) req.lvl = quest.minLevel;
+                if (quest.minLevel > 0) req.lvl = +quest.minLevel;
                 if (quest.requiredClass) req.class = quest.requiredClass;
                 let reqQuests = [];
                 (quest.RequiredQuests || []).forEach(reqQuest => {
@@ -119,16 +119,16 @@ export default class QuestsServices extends MasterServices {
             {
                 let rewards: QUEST_REWARDS = {};
                 if (quest.rewardClass) rewards.class = quest.rewardClass;
-                if (quest.rewardExp > 0) rewards.exp = quest.rewardExp;
+                if (quest.rewardExp > 0) rewards.exp = +quest.rewardExp;
                 if (quest.rewardPrimaryAbility) rewards.ability = quest.rewardPrimaryAbility;
 
                 // stats
                 let stats: BASE_STATS_MODEL = {};
-                if (quest.rewardSTR) stats.str = quest.rewardSTR;
-                if (quest.rewardMAG) stats.mag = quest.rewardMAG;
-                if (quest.rewardDEX) stats.dex = quest.rewardDEX;
-                if (quest.rewardHP) stats.hp = quest.rewardHP;
-                if (quest.rewardMP) stats.mp = quest.rewardMP;
+                if (quest.rewardSTR > 0) stats.str = +quest.rewardSTR;
+                if (quest.rewardMAG > 0) stats.mag = +quest.rewardMAG;
+                if (quest.rewardDEX > 0) stats.dex = +quest.rewardDEX;
+                if (quest.rewardHP > 0) stats.hp = +quest.rewardHP;
+                if (quest.rewardMP > 0) stats.mp = +quest.rewardMP;
                 if (!_.isEmpty(stats)) {
                     rewards.stats = stats;
                 }
@@ -138,7 +138,7 @@ export default class QuestsServices extends MasterServices {
                 (quest.rewardItems || []).forEach(item => {
                     let rewardItem: ITEM_INSTANCE = { key: item.key };
                     if (item.stack > 1) {
-                        rewardItem.stack = item.stack;
+                        rewardItem.stack = +item.stack;
                     }
                     items.push(rewardItem);
                     rewards.items = items;
