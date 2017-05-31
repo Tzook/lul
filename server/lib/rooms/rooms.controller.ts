@@ -9,6 +9,7 @@ export default class RoomsController extends MasterController {
 	private io: SocketIO.Namespace;
 	private roomBitchKeys: Map<string, string> = new Map();
 	private roomBitches: Map<string, GameSocket> = new Map();
+	private roomBitchTimeouts: Map<string, number> = new Map();
 
 	constructor() {
 		super();
@@ -24,20 +25,25 @@ export default class RoomsController extends MasterController {
 		let roomObject = socket.adapter.rooms[room];
 		if (roomObject.length === 1) {
 			this.setNewBitch(socket, room);
-		}
-		if (roomObject.length === 2) {
+		} else {
 			this.askForBitch(room);
 		}
 	}
 
 	public socketLeaveRoom(socket: GameSocket, room: string) {
-		this.removeBitch(socket, room);
-
-		let roomObject = socket.adapter.rooms[room];
-		if (roomObject && roomObject.length) {
-			let socketId = Object.keys(roomObject.sockets)[0];
-			let newBitch = socket.map.get(socketId);
-			this.setNewBitch(newBitch, room);
+		if (socket.bitch) {
+			this.removeBitch(socket, room);
+			let roomObject = socket.adapter.rooms[room];
+			if (roomObject && roomObject.length) {
+				// Since our bitch left, we want to set a random socket as the bitch immediately
+				// Then ask the fastest to be the bitch
+				let socketId = this.pickRandomSocket(Object.keys(roomObject.sockets));
+				let newBitch = socket.map.get(socketId);
+				this.setNewBitch(newBitch, room);
+				if (roomObject.length > 1) {
+					this.askForBitch(room);
+				}
+			}
 		}
 	}
 
@@ -51,18 +57,20 @@ export default class RoomsController extends MasterController {
 	}
 
 	protected askForBitch(room: string) {
-		setTimeout(() => {
-			let sockets = (<any>this.io.sockets).adapter.rooms[room];
-            if (sockets && sockets.length > 1) {
-				let key = _.uniqueId();
-				this.roomBitchKeys.set(room, key);
-				console.log("asking bitch please. key %s, room:", key, room);
-				this.io.to(room).emit(config.CLIENT_GETS.BITCH_PLEASE.name, {
-					key
-				});
+		clearTimeout(this.roomBitchTimeouts.get(room));
+		let sockets = (<any>this.io.sockets).adapter.rooms[room];
+		if (sockets && sockets.length > 1) {
+			let key = _.uniqueId();
+			this.roomBitchKeys.set(room, key);
+			console.log("asking bitch please. key %s, room:", key, room);
+			this.io.to(room).emit(config.CLIENT_GETS.BITCH_PLEASE.name, {
+				key
+			});
+			let timeout = setTimeout(() => {
 				this.askForBitch(room);
-            }
-        }, config.BITCH_INTERVAL);
+			}, config.BITCH_INTERVAL);
+			this.roomBitchTimeouts.set(room, timeout);
+		}
 	}
 
 	public newBitchRequest(socket: GameSocket, key: string) {
@@ -89,7 +97,11 @@ export default class RoomsController extends MasterController {
 	}
 
 	public pickRandomPortal(roomInfo: ROOM_MODEL): PORTAL_MODEL {
-		return <any>_.sample(roomInfo.portals);
+		return <PORTAL_MODEL>_.sample(roomInfo.portals);
+	}
+
+	public pickRandomSocket(sockets: string[]): string {
+		return <string>_.sample(sockets);
 	}
 
     // HTTP functions

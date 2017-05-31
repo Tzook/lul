@@ -26,5 +26,5 @@
 		"BITCH_CHOOSE": {"name": "actor_bitch"}
 	},
 	"DEFAULT_ROOM": "IntroScene",
-	"BITCH_INTERVAL": 30000
+	"BITCH_INTERVAL": 10000
 }
