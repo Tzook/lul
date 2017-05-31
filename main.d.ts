@@ -10,7 +10,7 @@ interface EVENT {
 
 interface Doc {
     _id: any;
-    save(fn?: (err: any, product: this, numAffected: number) => void): Promise<this>;
+    save?(fn?: (err: any, product: this, numAffected: number) => void): Promise<this>;
 }
 
 interface Equips {
@@ -45,7 +45,7 @@ interface CHAR_ITEMS extends Array<ITEM_INSTANCE> {
     set: (index: number, obj: ITEM_INSTANCE|{}) => {};
 }
 
-interface PublicChar {
+interface PublicChar extends Doc {
     name: string;
     position: {
         x: number;
@@ -58,7 +58,7 @@ interface PublicChar {
     stats: Stats,
 }
 
-interface Char extends Doc, PublicChar {
+interface Char extends PublicChar {
     room: string;
     gold: number;
     items: CHAR_ITEMS,
