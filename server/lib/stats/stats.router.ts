@@ -29,15 +29,11 @@ export default class StatsRouter extends SocketioRouterBase {
          });
 
         if (currentLevel !== socket.character.stats.lvl) {
-            socket.emit(this.CLIENT_GETS.LEVEL_UP.name, {
+            this.io.to(socket.character.room).emit(this.CLIENT_GETS.LEVEL_UP.name, {
                 id: socket.character._id,
-                stats: socket.character.stats
             });
-            socket.broadcast.to(socket.character.room).emit(this.CLIENT_GETS.LEVEL_UP.name, {
-                id: socket.character._id,
-                stats: {
-                    lvl: socket.character.stats.lvl
-                }
+            socket.emit(this.CLIENT_GETS.GAIN_STATS.name, {
+                stats: socket.character.stats
             });
         }
     }

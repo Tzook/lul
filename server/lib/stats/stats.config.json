@@ -14,6 +14,7 @@
 		"GAIN_EXP": {"name": "actor_gain_exp"},
 		"GAIN_HP": {"name": "actor_gain_hp"},
 		"GAIN_MP": {"name": "actor_gain_mp"},
+		"GAIN_STATS": {"name": "actor_gain_stats"},
 		"TAKE_DMG": {"name": "actor_take_dmg"},
 		"DEATH": {"name": "actor_ded"},
 		"RESURRECT": {"name": "actor_resurrect"},
