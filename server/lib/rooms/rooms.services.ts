@@ -4,6 +4,8 @@ import MasterServices from '../master/master.services';
 export default class RoomsServices extends MasterServices {
 	private roomsInfo: Map<string, ROOM_MODEL> = new Map();
 
+    // HTTP functions
+	// =================
 	public generateRoom (scene): Promise<any> {
 		console.log("Generating room from scene:", scene);
 		let portals = {};

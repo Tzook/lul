@@ -31,11 +31,15 @@ export default class RoomsRouter extends SocketioRouterBase {
 	[config.SERVER_GETS.ENTERED_ROOM.name](data, socket: GameSocket) {
 		// const also used in items
 		console.log('character %s entered room', socket.character.name);
-		socket.broadcast.to(socket.character.room).emit(this.CLIENT_GETS.JOIN_ROOM.name, {character: socket.character});
+		socket.broadcast.to(socket.character.room).emit(this.CLIENT_GETS.JOIN_ROOM.name, {
+			character: this.middleware.getPublicCharInfo(socket.character)
+		});
 		let roomObject = socket.adapter.rooms[socket.character.room];
 		if (roomObject) {
 			_.each(roomObject.sockets, (value, socketId: string) => {
-				socket.emit(this.CLIENT_GETS.JOIN_ROOM.name, {character: socket.map.get(socketId).character});
+				socket.emit(this.CLIENT_GETS.JOIN_ROOM.name, {
+					character: this.middleware.getPublicCharInfo(socket.map.get(socketId).character)
+				});
 			});
 		}
 
@@ -90,7 +94,10 @@ export default class RoomsRouter extends SocketioRouterBase {
 		socket.character.position.x = targetPortal.x;
 		socket.character.position.y = targetPortal.y;
 		console.log("moving character %s to room %s", socket.character.name, room);
-		socket.emit(this.CLIENT_GETS.MOVE_ROOM.name, {room, character: socket.character});
+		socket.emit(this.CLIENT_GETS.MOVE_ROOM.name, {
+			room,
+			character: socket.character
+		});
 
 	}
 
@@ -110,6 +117,9 @@ export default class RoomsRouter extends SocketioRouterBase {
 	}
 
     public onConnected(socket: GameSocket) {
-        socket.emit(this.CLIENT_GETS.MOVE_ROOM.name, {room: socket.character.room, character: socket.character});
+        socket.emit(this.CLIENT_GETS.MOVE_ROOM.name, {
+			room: socket.character.room,
+			character: socket.character,
+		});
     }
 };

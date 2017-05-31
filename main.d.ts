@@ -45,8 +45,7 @@ interface CHAR_ITEMS extends Array<ITEM_INSTANCE> {
     set: (index: number, obj: ITEM_INSTANCE|{}) => {};
 }
 
-interface Char extends Doc {
-    room: string;
+interface PublicChar {
     name: string;
     position: {
         x: number;
@@ -54,10 +53,15 @@ interface Char extends Doc {
         z: number;
         climbing: boolean, 
     },
-    gold: number;
-    items: CHAR_ITEMS,
+    looks,
     equips: Equips,
     stats: Stats,
+}
+
+interface Char extends Doc, PublicChar {
+    room: string;
+    gold: number;
+    items: CHAR_ITEMS,
     quests: CHAR_QUESTS
 }
 
