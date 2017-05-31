@@ -2,6 +2,7 @@
 import MasterModel from '../master/master.model';
 import QuestsController from "./quests.controller";
 import * as mongoose from 'mongoose';
+import { BASE_STATS_SCHEMA } from "../stats/stats.model";
 
 const QUEST_SCHEMA = {
     key: String,
@@ -18,6 +19,8 @@ const QUEST_SCHEMA = {
         items: mongoose.Schema.Types.Mixed,
         class: String,
         exp: Number,
+        stats: BASE_STATS_SCHEMA,
+        ability: String
     }
 };
 

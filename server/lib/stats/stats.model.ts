@@ -10,6 +10,14 @@ const BAR_SCHEMA = {
     regen: Number,
 }
 
+export const BASE_STATS_SCHEMA = {
+    str: Number,
+    mag: Number,
+    dex: Number,
+    hp: Number,
+    mp: Number,
+};
+
 const STATS_SCHEMA = {
     str: 3,
     mag: 2,

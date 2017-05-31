@@ -1,7 +1,8 @@
 'use strict';
 import MasterServices from '../master/master.services';
-import { ITEM_STATS_SCHEMA, REQUIRE_SCHEMA } from "./items.model";
+import { REQUIRE_SCHEMA } from "./items.model";
 import * as _ from 'underscore';
+import { BASE_STATS_SCHEMA } from "../stats/stats.model";
 
 export default class ItemsServices extends MasterServices {
 	private itemsInfo: Map<string, ITEM_MODEL> = new Map();
@@ -21,7 +22,7 @@ export default class ItemsServices extends MasterServices {
 			};
 
 			this.pushStats(itemSchema, item, "req", REQUIRE_SCHEMA);
-			this.pushStats(itemSchema, item, "stats", ITEM_STATS_SCHEMA);
+			this.pushStats(itemSchema, item, "stats", BASE_STATS_SCHEMA);
 
 			let itemModel = new this.Model(itemSchema);
 			models.push(itemModel);

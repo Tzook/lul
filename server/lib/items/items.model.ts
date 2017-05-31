@@ -1,15 +1,8 @@
 "use strict";
 import MasterModel from "../master/master.model";
 import ItemsController from './items.controller';
+import { BASE_STATS_SCHEMA } from "../stats/stats.model";
 let config = require('../../../server/lib/items/items.config.json');
-
-export const ITEM_STATS_SCHEMA = {
-    str: Number,
-    mag: Number,
-    dex: Number,
-    hp: Number,
-    mp: Number,
-};
 
 export const REQUIRE_SCHEMA = {
     str: Number,
@@ -24,14 +17,14 @@ export const ITEM_SCHEMA = {
     gold: Number,
     chance: Number,
     cap: Number,
-    stats: ITEM_STATS_SCHEMA,
+    stats: BASE_STATS_SCHEMA,
     req: REQUIRE_SCHEMA,
 };
 
 export const ITEM_INSTANCE_SCHEMA = Object.assign({
     key: String,
     stack: Number,
-}, ITEM_STATS_SCHEMA);
+}, BASE_STATS_SCHEMA);
 
 export default class ItemsModel extends MasterModel {
     protected controller: ItemsController;

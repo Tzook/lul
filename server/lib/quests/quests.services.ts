@@ -91,9 +91,7 @@ export default class QuestsServices extends MasterServices {
 		let models = [];
 
 		(quests || []).forEach(quest => {
-			let questSchema: QUEST_MODEL = {
-				key: quest.key,
-			};
+			let questSchema: QUEST_MODEL = { key: quest.key };
             // conditions
             {
                 let conditions: QUEST_CONDITIONS = {};
@@ -106,12 +104,8 @@ export default class QuestsServices extends MasterServices {
             // requirements
             {
                 let req: QUEST_REQUIREMENTS = {};
-                if (quest.minLevel > 0) {
-                    req.lvl = quest.minLevel;
-                }
-                if (quest.requiredClass) {
-                    req.class = quest.requiredClass;
-                }
+                if (quest.minLevel > 0) req.lvl = quest.minLevel;
+                if (quest.requiredClass) req.class = quest.requiredClass;
                 let reqQuests = [];
                 (quest.RequiredQuests || []).forEach(reqQuest => {
                     reqQuests.push(reqQuest.key);
@@ -124,17 +118,25 @@ export default class QuestsServices extends MasterServices {
             // rewards
             {
                 let rewards: QUEST_REWARDS = {};
-                if (quest.rewardClass) {
-                    rewards.class = quest.rewardClass
+                if (quest.rewardClass) rewards.class = quest.rewardClass;
+                if (quest.rewardExp > 0) rewards.exp = quest.rewardExp;
+                if (quest.rewardPrimaryAbility) rewards.ability = quest.rewardPrimaryAbility;
+
+                // stats
+                let stats: BASE_STATS_MODEL = {};
+                if (quest.rewardSTR) stats.str = quest.rewardSTR;
+                if (quest.rewardMAG) stats.mag = quest.rewardMAG;
+                if (quest.rewardDEX) stats.dex = quest.rewardDEX;
+                if (quest.rewardHP) stats.hp = quest.rewardHP;
+                if (quest.rewardMP) stats.mp = quest.rewardMP;
+                if (!_.isEmpty(stats)) {
+                    rewards.stats = stats;
                 }
-                if (quest.rewardExp > 0) {
-                    rewards.exp = quest.rewardExp
-                }
+
+                // items
                 let items = [];
                 (quest.rewardItems || []).forEach(item => {
-                    let rewardItem: ITEM_INSTANCE = {
-                        key: item.key,
-                    };
+                    let rewardItem: ITEM_INSTANCE = { key: item.key };
                     if (item.stack > 1) {
                         rewardItem.stack = item.stack;
                     }

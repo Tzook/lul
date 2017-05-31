@@ -72,14 +72,14 @@ interface GameSocket extends SocketIO.Socket {
     bitch: boolean;
     alive: boolean,
     lastAttackLoad: number;
-    bonusStats?: ITEM_STATS_MODEL;
+    bonusStats?: BASE_STATS_MODEL;
     throttles: Map<Function, number>;
     maxHp: number;
     maxMp: number;
 }
 
 // items
-interface ITEM_STATS_MODEL {
+interface BASE_STATS_MODEL {
     str?: number,
     mag?: number,
     dex?: number,
@@ -92,7 +92,7 @@ interface ITEM_MODEL {
     gold: number,
     chance: number,
     cap?: number,
-    stats?: ITEM_STATS_MODEL,
+    stats?: BASE_STATS_MODEL,
     req?: {
         str?: number,
         mag?: number,
@@ -106,7 +106,7 @@ interface ITEM_DROP {
     item_id: string, 
     item: ITEM_INSTANCE
 }
-interface ITEM_INSTANCE extends ITEM_STATS_MODEL {
+interface ITEM_INSTANCE extends BASE_STATS_MODEL {
     key: string,
     stack?: number,
 }
@@ -187,6 +187,8 @@ interface QUEST_REWARDS {
     items?: ITEM_INSTANCE[]
     class?: string
     exp?: number
+    stats?: BASE_STATS_MODEL
+    ability?: string
 }
 
 interface CHAR_QUESTS {

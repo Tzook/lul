@@ -66,12 +66,14 @@ export default class QuestsRouter extends SocketioRouterBase {
 				this.emitter.emit(itemsConfig.SERVER_INNER.ITEM_REMOVE.name, { stack, itemId }, socket);
 			});
 
+			// reward exp
 			if ((questInfo.reward || {}).exp) {
 				this.emitter.emit(statsConfig.SERVER_INNER.GAIN_EXP.name, { exp: questInfo.reward.exp }, socket);
 			}
 
 			// TODO class
 
+			// reward items
 			_.forEach((questInfo.reward || {}).items, item => {
 				let instance = this.itemsRouter.getItemInstance(item.key);
 				if (item.stack > 0) {

@@ -2,8 +2,8 @@
 import SocketioRouterBase from '../socketio/socketio.router.base';
 import StatsController from './stats.controller';
 import StatsServices from './stats.services';
-import { ITEM_STATS_SCHEMA } from "../items/items.model";
 import { EQUIPS_SCHEMA } from '../equips/equips.model';
+import { BASE_STATS_SCHEMA } from "./stats.model";
 let config = require('../../../server/lib/stats/stats.config.json');
 let roomsConfig = require('../../../server/lib/rooms/rooms.config.json');
 
@@ -105,7 +105,7 @@ export default class StatsRouter extends SocketioRouterBase {
     private toggleStats(stats: ITEM_INSTANCE, socket: GameSocket, on: boolean) {
         const sign = on ? 1 : -1;
         const hadFullHp = socket.character.stats.hp.now === socket.maxHp;
-        for (var stat in ITEM_STATS_SCHEMA) {
+        for (var stat in BASE_STATS_SCHEMA) {
             if (stats[stat]) {
                 socket.bonusStats[stat] += stats[stat] * sign;
             }
@@ -126,7 +126,7 @@ export default class StatsRouter extends SocketioRouterBase {
         Object.defineProperty(socket, 'maxHp', {get: () => socket.character.stats.hp.total + socket.bonusStats.hp});
         Object.defineProperty(socket, 'maxMp', {get: () => socket.character.stats.mp.total + socket.bonusStats.mp});
         socket.bonusStats = {};
-        for (var stat in ITEM_STATS_SCHEMA) {
+        for (var stat in BASE_STATS_SCHEMA) {
             socket.bonusStats[stat] = 0;
         }
         // add the equips to memory
