@@ -2,12 +2,14 @@
 import SocketioRouterBase from '../socketio/socketio.router.base';
 import EquipsMiddleware from './equips.middleware';
 import ItemsRouter from '../items/items.router';
+import EquipsController from './equips.controller';
 let config = require('../../../server/lib/equips/equips.config.json');
 let dropsConfig = require('../../../server/lib/drops/drops.config.json');
 let statsConfig = require('../../../server/lib/stats/stats.config.json');
 let SERVER_GETS = config.SERVER_GETS;
 
 export default class EquipsRouter extends SocketioRouterBase {
+	protected controller: EquipsController;
 	protected middleware: EquipsMiddleware;
 	protected mongoose;
 	protected itemsRouter: ItemsRouter;
@@ -16,6 +18,12 @@ export default class EquipsRouter extends SocketioRouterBase {
 		super.init(files, app);
 		this.mongoose = files.model.mongoose;
 		this.itemsRouter = files.routers.items;
+	}
+
+	protected initRoutes(app) {
+		app.post(this.ROUTES.BEGIN,
+			this.middleware.validateHasSercetKey.bind(this.middleware),
+			this.controller.beginEquips.bind(this.controller));
 	}
 
 	[SERVER_GETS.EQUIP_ITEM.name](data, socket: GameSocket) {

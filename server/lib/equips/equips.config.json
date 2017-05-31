@@ -1,4 +1,14 @@
 {
+	"ROUTES": {
+		"BEGIN": "/equips/begin"
+	},
+	"LOGS": {
+		"BEGIN_EQUIPS": {
+			"MSG": "New chars will begin with the equips.",
+			"CODE": "EQUIP_1",
+			"STATUS": "OK"
+		}
+	},
 	"SERVER_GETS": {
 		"EQUIP_ITEM": {"name": "equipped_item", "alive": true},
 		"UNEQUIP_ITEM": {"name": "unequipped_item", "alive": true},

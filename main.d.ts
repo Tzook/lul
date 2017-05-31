@@ -13,12 +13,26 @@ interface Doc {
     save?(fn?: (err: any, product: this, numAffected: number) => void): Promise<this>;
 }
 
+interface Config extends Doc {
+    beginEquips: BeginEquips
+}
+
+interface BeginEquips {
+    head?:   string;
+    chest?:  string;
+    legs?:   string;
+    gloves?: string;
+    shoes?:  string;
+    weapon?:  string;
+}
+
 interface Equips {
     head:   ITEM_INSTANCE;
     chest:  ITEM_INSTANCE;
     legs:   ITEM_INSTANCE;
     gloves: ITEM_INSTANCE;
     shoes:  ITEM_INSTANCE;
+    weapon:  ITEM_INSTANCE;
 }
 
 interface Stats {

@@ -2,6 +2,8 @@
 import MasterModel from "../master/master.model";
 import * as _ from 'underscore';
 import { ITEM_INSTANCE_SCHEMA } from "../items/items.model";
+import SocketioRouter from '../socketio/socketio.router';
+import ItemsRouter from '../items/items.router';
 
 export const EQUIPS_SCHEMA = {
     head: ITEM_INSTANCE_SCHEMA,
@@ -13,11 +15,19 @@ export const EQUIPS_SCHEMA = {
 };
 
 export default class EquipsModel extends MasterModel {
+    protected beginSchema;
+    protected socketioRouter: SocketioRouter;
+    protected itemsRouter: ItemsRouter;
+	
     init(files, app) {
+		this.socketioRouter = files.routers.socketio;
+		this.itemsRouter = files.routers.items;
         this.hasId = false;
         this.schema = _.clone(EQUIPS_SCHEMA);
+        this.beginSchema = _.clone(EQUIPS_SCHEMA);
         for (let i in this.schema) {
             this.schema[i] = this.mongoose.Schema.Types.Mixed;
+            this.beginSchema[i] = String;
         }
     }
 
@@ -27,14 +37,21 @@ export default class EquipsModel extends MasterModel {
 
     createModel() {
         this.setModel("Equip");
+        
         this.addToSchema("Character", { equips: this.getModel().schema });
-        let equips = _.clone(EQUIPS_SCHEMA);
-        let ItemModel = this.getModel("ItemInstance");
-        for (let i in equips) {
-            equips[i] = new ItemModel({});
-        }
-
-        this.listenForFieldAddition("Character", "equips", equips);
+        this.addToSchema("Config", { beginEquips: this.beginSchema });
+        
+        this.listenForFieldAddition("Character", "equips", () => {
+            let equips = _.clone(EQUIPS_SCHEMA);
+            let ItemModel = this.getModel("ItemInstance");
+            let config = this.socketioRouter.getConfig();
+            for (let type in equips) {
+                let itemInstance = this.itemsRouter.getItemInstance(config.beginEquips[type]) || {};
+                equips[type] = new ItemModel(itemInstance);
+            }
+            return equips;
+        });
+        
         return Promise.resolve();
     }
 };

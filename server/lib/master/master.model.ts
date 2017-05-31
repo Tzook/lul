@@ -73,6 +73,7 @@ export default class MasterModel {
     }
 
     protected addFieldToModel(field, data, obj, reqBody) {
+        data = typeof data === "function" ? data() : data;
         obj[field] = data;
     }
 };

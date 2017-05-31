@@ -4,12 +4,14 @@ import Emitter = require('events');
 import MasterRouter from "../master/master.router";
 import * as Heroku from 'heroku-client';
 import SocketioMiddleware from './socketio.middleware';
+import SocketioServices from './socketio.services';
 require('./socketio.fixer');
 let passportSocketIo = require('passport.socketio');
 let config = require('../../../server/lib/socketio/socketio.config.json');
 
 export default class SocketioRouter extends SocketioRouterBase {
 	protected middleware: SocketioMiddleware;
+	protected services: SocketioServices;
 	protected routers: SocketioRouterBase[];
 	protected map: Map<string, GameSocket>;
 
@@ -24,10 +26,15 @@ export default class SocketioRouter extends SocketioRouterBase {
 	 */
 	init(files, app) {
 		super.init(files, app);
+		this.services = files.services;
 		this.mapRouters(files.routers);
 		this.initDependencies(app.mongoStore);
 		this.initListeners();
 		this.restartServerEvent(app);
+	}
+
+	public getConfig(): Config {
+		return this.services.getConfig();
 	}
 
 	private mapRouters(routers: MasterRouter[]) {
@@ -53,6 +60,7 @@ export default class SocketioRouter extends SocketioRouterBase {
 				fail:         this.onAuthorizeFail.bind(this),
 		}));
 	}
+
 	onAuthorizeSuccess(req, next: Function) {
 		for (let i = 0; i < req.user.characters.length; i++) {
 			if (req.user.characters[i]._id.equals(req._query.id)) {
@@ -72,11 +80,13 @@ export default class SocketioRouter extends SocketioRouterBase {
 			next();
 		}
 	}
+
 	onAuthorizeFail(req, message, error, next) {
 		let errorMessage = 'Error occured trying to connect to user: ' + message;
 		console.error(errorMessage);
 		next(new Error(errorMessage));
 	}
+
 	initListeners() {
 		this.io.on(this.ROUTES.BEGIN_CONNECTION, (socket: GameSocket) => {
 			if (!this.isProduction() && socket.request._query.test === 'true') {
@@ -163,8 +173,6 @@ export default class SocketioRouter extends SocketioRouterBase {
 		}
 		return true;
 	}
-
-
 
 	[config.SERVER_GETS.DISCONNECT.name](data, socket: GameSocket) {
 		if (!this.map.has(socket.id)) {
