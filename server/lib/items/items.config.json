@@ -7,6 +7,9 @@
 			"MSG": "Generated items successfully.",
 			"CODE": "ITEM_1",
 			"STATUS": "OK"
+		},
+		"INVENTORY_FULL": {
+			"MSG": "No inventory slots!"
 		}
 	},
 	"SERVER_INNER": {

@@ -5,6 +5,7 @@ import MiscMiddleware from "./misc.middleware";
 import MiscController from "./misc.controller";
 
 let dropsConfig = require('../../../server/lib/drops/drops.config.json');
+let itemsConfig = require('../../../server/lib/items/items.config.json');
 let config = require('../../../server/lib/misc/misc.config.json');
 
 export default class MiscRouter extends SocketioRouterBase {
@@ -27,7 +28,7 @@ export default class MiscRouter extends SocketioRouterBase {
 
             console.log("picking up item for slots", item, slots);
             if (slots.length === 0) { 
-                this.sendError(data, socket, "No available slots to pick misc item");
+                this.sendError(data, socket, itemsConfig.LOGS.INVENTORY_FULL.MSG, true, true);
             } else {
                 this.controller.pickMiscItem(socket, slots, item, itemInfo);
                 return true;

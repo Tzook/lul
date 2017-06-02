@@ -30,7 +30,7 @@ export default class SocketioRouterBase extends MasterRouter {
 		return 'socketio';
 	}
 
-	protected sendError(data: any, socket: GameSocket, error: string, emit = true) {
+	protected sendError(data: any, socket: GameSocket, error: string, emit = true, display = false) {
 		let event = "";
 		try {
 			// grab event from stack trace
@@ -40,7 +40,8 @@ export default class SocketioRouterBase extends MasterRouter {
 		emit && socket.emit(config.CLIENT_GETS.EVENT_ERROR.name, {
 			error,
 			data,
-			event
+			event,
+			display,
 		});
 	}
 };

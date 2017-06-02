@@ -51,7 +51,7 @@ export default class ItemsRouter extends SocketioRouterBase {
             }
             let slot = this.middleware.getFirstAvailableSlot(socket);
 			if (!(slot >= 0)) { 
-				this.sendError(data, socket, "No available slots to pick item");
+				this.sendError(data, socket, config.LOGS.INVENTORY_FULL.MSG, true, true);
 			} else {
 				this[config.SERVER_INNER.ITEM_ADD.name]({slots: [slot], item}, socket);
 				return true;
