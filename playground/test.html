@@ -383,6 +383,7 @@
 
 				socket.on("actor_load_attack", d => setResult({msg: "actor_load_attack", d}))
 				socket.on("actor_perform_attack", d => setResult({msg: "actor_perform_attack", d}))
+				socket.on("actor_change_ability", d => setResult({msg: "actor_change_ability", d}))
 				
 				socket.on("mob_spawn", d => setResult({msg: "mob_spawn", d}));
 				socket.on("mob_die", d => setResult({msg: "mob_die", d}));

@@ -1,10 +1,12 @@
 {
 	"SERVER_GETS": {
 		"LOAD_ATTACK": {"name": "loaded_attack", "alive": true},
-		"PERFORM_ATTACK": {"name": "performed_attack", "alive": true}
+		"PERFORM_ATTACK": {"name": "performed_attack", "alive": true},
+		"CHANGE_ABILITY": {"name": "changed_ability", "alive": true}
 	},
 	"CLIENT_GETS": {
 		"LOAD_ATTACK": {"name": "actor_load_attack"},
-		"PERFORM_ATTACK": {"name": "actor_perform_attack"}
+		"PERFORM_ATTACK": {"name": "actor_perform_attack"},
+		"CHANGE_ABILITY": {"name": "actor_change_ability"}
 	}
 }
