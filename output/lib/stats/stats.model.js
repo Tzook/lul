@@ -24,7 +24,7 @@ const STATS_SCHEMA = {
     hp: {},
     mp: {},
     abilities: config.BEGIN_ABILITIES,
-    primaryAbility: config.ABILITY_MEELE
+    primaryAbility: config.ABILITY_MELEE
 };
 class StatsModel extends master_model_1.default {
     init(files, app) {

@@ -26,7 +26,7 @@
 	"BEGIN_MP_REGEN": 10,
 	"REGEN_INTERVAL": 5000,
 	"BEGIN_ABILITIES": ["melee", "range"],
-	"ABILITY_MEELE": "melee",
+	"ABILITY_MELEE": "melee",
 	"MAG_TO_MP_RATIO": 6,
 	"STR_TO_HP_RATIO": 5,
 	"LEVEL_UP_STAT_BONUS": 1

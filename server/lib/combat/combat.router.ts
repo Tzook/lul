@@ -31,6 +31,8 @@ export default class CombatRouter extends SocketioRouterBase {
 			this.sendError(data, socket, "Must send what ability to use");
 		} else if (!this.middleware.canChangeAbility(socket, ability)) {
 			this.sendError(data, socket, "Character cannot change to this ability");
+		} else if (socket.character.stats.primaryAbility === ability) {
+			this.sendError(data, socket, "Character already has this ability");
 		} else {
 			console.log("changing ability", socket.character.name, ability);
 			socket.character.stats.primaryAbility = ability;
