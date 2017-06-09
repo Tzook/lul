@@ -63,6 +63,8 @@ export default class MobsController extends MasterController {
 		mob.id = _.uniqueId();
 		mob.x = spawnInfo.x;
 		mob.y = spawnInfo.y;
+        mob.dmgers = new Map();
+        mob.dmged = 0;
 
 		this.mobById.set(this.services.getMobRoomId(room, mob.id), mob);
 		this.notifyAboutMob(mob, this.io.to(room));
@@ -110,8 +112,14 @@ export default class MobsController extends MasterController {
 
 	public hurtMob(mobId: string, dmg: number, socket: GameSocket): MOB_INSTANCE {
 		let mob = this.mobById.get(this.services.getMobRoomId(socket.character.room, mobId));
-		mob.hp = this.services.getHpAfterDamage(mob.hp, dmg);
-		return mob;
+        let actualDmg = this.services.getDamageToHurt(mob.hp, dmg);
+		mob.hp -= actualDmg;
+        
+        let charDmgSoFar = mob.dmgers.get(socket.character.name) || 0;
+        mob.dmgers.set(socket.character.name, charDmgSoFar + actualDmg);
+        mob.dmged += actualDmg;
+		
+        return mob;
 	}
 
 	public getHurtCharDmg(mobId: string, socket: GameSocket): number {

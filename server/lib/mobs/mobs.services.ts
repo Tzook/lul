@@ -65,7 +65,12 @@ export default class MobsServices extends MasterServices {
 		return _.random(Math.floor(min) || 1, Math.floor(max));
 	}
 
-	public getHpAfterDamage(hp: number, dmg: number): number {
-		return Math.max(0, Math.floor(hp - dmg));
+	public getDamageToHurt(hp: number, dmg: number): number {
+		return Math.min(hp, dmg);
 	}
+
+    public getExp(mob: MOB_INSTANCE, charDmg: number): number {
+        // we round the exp up for the character :)
+        return Math.ceil(mob.exp * (charDmg / mob.dmged));
+    }
 };

@@ -175,6 +175,8 @@ interface MOB_INSTANCE extends MOB_MODEL {
     id?: string, // a unique id for this specific mob
     x?: number,
     y?: number,
+    dmgers?: Map<string, number>
+    dmged?: number
     spawn?: SPAWN_INSTANCE,
 }
 interface ROOM_MOBS {

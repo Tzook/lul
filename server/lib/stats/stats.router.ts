@@ -20,6 +20,10 @@ export default class StatsRouter extends SocketioRouterBase {
 
     [config.SERVER_INNER.GAIN_EXP.name] (data, socket: GameSocket) {
         let exp = data.exp;
+        if (!(exp > 0)) {
+            console.log("trying to gain exp that is not positive", socket.character.name, exp);
+            return;
+        }
         let currentLevel = socket.character.stats.lvl;
         this.controller.addExp(socket, exp);
 

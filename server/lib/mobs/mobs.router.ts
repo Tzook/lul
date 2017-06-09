@@ -3,6 +3,7 @@ import SocketioRouterBase from '../socketio/socketio.router.base';
 import MobsMiddleware from "./mobs.middleware";
 import MobsController from "./mobs.controller";
 import RoomsRouter from "../rooms/rooms.router";
+import MobsServices from './mobs.services';
 let config = require('../../../server/lib/mobs/mobs.config.json');
 let statsConfig = require('../../../server/lib/stats/stats.config.json');
 let dropsConfig = require('../../../server/lib/drops/drops.config.json');
@@ -11,10 +12,12 @@ let questsConfig = require('../../../server/lib/quests/quests.config.json');
 export default class MobsRouter extends SocketioRouterBase {
 	protected middleware: MobsMiddleware;
 	protected controller: MobsController;
+    protected services: MobsServices;
 	protected roomsRouter: RoomsRouter;
 	
 	init(files, app) {
 		this.roomsRouter = files.routers.rooms;
+        this.services = files.services;
 		super.init(files, app);
 	}
 	
@@ -54,9 +57,23 @@ export default class MobsRouter extends SocketioRouterBase {
 			});
 			if (mob.hp === 0) {
 				this.controller.despawnMob(mob, socket.character.room);
-				this.emitter.emit(statsConfig.SERVER_INNER.GAIN_EXP.name, { exp: mob.exp }, socket);
-				this.emitter.emit(dropsConfig.SERVER_INNER.GENERATE_DROPS.name, {x: mob.x, y: mob.y}, socket, mob.drops);
-				this.emitter.emit(questsConfig.SERVER_INNER.HUNT_MOB.name, {id: mob.mobId}, socket);
+
+                let max = {dmg: 0, socket: null}; 
+                for (let [charId, charDmg] of mob.dmgers) {
+                    let charSocket = socket.map.get(charId);
+                    if (charSocket && charSocket.character.room === socket.character.room) {
+                        // found char and he's in our room
+                        let exp = this.services.getExp(mob, charDmg);
+				        this.emitter.emit(statsConfig.SERVER_INNER.GAIN_EXP.name, { exp }, charSocket);
+                        if (charDmg > max.dmg) {
+                            max.dmg = charDmg;
+                            max.socket = charSocket;
+                        }
+                    }
+                }
+
+                this.emitter.emit(dropsConfig.SERVER_INNER.GENERATE_DROPS.name, {x: mob.x, y: mob.y}, max.socket, mob.drops);
+                this.emitter.emit(questsConfig.SERVER_INNER.HUNT_MOB.name, {id: mob.mobId}, max.socket);
 			}
 		} else {
 			this.sendError(data, socket, "Mob doesn't exist!");
