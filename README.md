@@ -1,7 +1,7 @@
-# "lul"
+# LUL
 
-A server for the "lul", a MMORG (Massive Multiplayer Online Role-Playing Game).
-Written in Node.JS and Socket.io in TypeScript.
+A server for LUL, an MMORG (Massive Multiplayer Online Role-Playing Game).
+Written in Node.JS, Socket.io and TypeScript.
 Covered with End to End automations, using Protractor.
 
 ## Getting Started
