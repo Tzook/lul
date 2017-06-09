@@ -1,4 +1,9 @@
+<p align="center">
+    <img alt="LUL" src="https://images.mmorpg.com/images/mmorpg_logo.png" width="400"/>
+</p>
+
 # LUL
+
 
 A server for LUL, an MMORG (Massive Multiplayer Online Role-Playing Game).
 Written in Node.JS, Socket.io and TypeScript.
