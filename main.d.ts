@@ -122,6 +122,7 @@ interface ITEM_DROP {
     x: number, 
     y: number, 
     item_id: string, 
+    owner?: string
     item: ITEM_INSTANCE
 }
 interface ITEM_INSTANCE extends BASE_STATS_MODEL {

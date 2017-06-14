@@ -12,7 +12,9 @@
 		"ITEM_PICK": {"name": "actor_pick_item"},
 		"ITEMS_DROP": {"name": "drop_items"},
 		"ITEM_DISAPPEAR": {"name": "item_disappear"},
-		"ITEMS_LOCATIONS": {"name": "items_locations"}
+		"ITEMS_LOCATIONS": {"name": "items_locations"},
+		"ITEM_OWNER_GONE": {"name": "item_owner_gone"}
 	},
-	"ITEM_DROP_LIFE": 60000
+	"ITEM_DROP_LIFE_TIME": 60000,
+	"ITEM_DROP_OWN_TIME": 15000
 }

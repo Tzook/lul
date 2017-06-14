@@ -43,18 +43,22 @@ export default class DropsRouter extends SocketioRouterBase {
 				// the pickup event happens multiple times so if we are still in the same handling process, don't count it as an error
 				this.sendError(data, socket, "Item does not exist");
 			}
-		} else {
-			let picked = pickItemFn(map.get(itemId).item);
-			if (picked) {
-				console.log('picking item', data.item_id);
-				map.delete(itemId);
-				this.lastHandledItem = itemId;
-				this.io.to(socket.character.room).emit(this.CLIENT_GETS.ITEM_PICK.name, {
-					id: socket.character._id,
-					item_id: data.item_id,
-				});
-			}
+            return;
 		}
+        let itemDrop = map.get(itemId);
+        if (itemDrop.owner && itemDrop.owner !== socket.character.name) {
+            return this.sendError(data, socket, `Item owner is ${itemDrop.owner} and you are ${socket.character.name}.`);
+        }
+        let picked = pickItemFn(itemDrop.item);
+        if (picked) {
+            console.log('picking item', data.item_id);
+            map.delete(itemId);
+            this.lastHandledItem = itemId;
+            this.io.to(socket.character.room).emit(this.CLIENT_GETS.ITEM_PICK.name, {
+                id: socket.character._id,
+                item_id: data.item_id,
+            });
+        }
 	}
 
     [config.SERVER_INNER.GENERATE_DROPS.name](data, socket: GameSocket, drops: DROP_MODEL[]) {
@@ -107,7 +111,22 @@ export default class DropsRouter extends SocketioRouterBase {
 						item_id: itemId
 					});
 				}
-			}, config.ITEM_DROP_LIFE);
+			}, config.ITEM_DROP_LIFE_TIME);
+            
+            if (data.owner) {
+                itemData.owner = data.owner;
+
+                setTimeout(() => {
+                    let item = map.get(itemId);
+                    if (item) {
+                        delete item.owner;
+                        console.log('removing owner from item', itemId);
+                        this.io.to(room).emit(this.CLIENT_GETS.ITEM_OWNER_GONE.name, {
+                            item_id: itemId
+                        });
+                    }
+                }, config.ITEM_DROP_OWN_TIME);
+            }
 		});
 
 		if (itemsData.length > 0) {

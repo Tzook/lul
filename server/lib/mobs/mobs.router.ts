@@ -72,7 +72,7 @@ export default class MobsRouter extends SocketioRouterBase {
                     }
                 }
 
-                this.emitter.emit(dropsConfig.SERVER_INNER.GENERATE_DROPS.name, {x: mob.x, y: mob.y}, max.socket, mob.drops);
+                this.emitter.emit(dropsConfig.SERVER_INNER.GENERATE_DROPS.name, {x: mob.x, y: mob.y, owner: max.socket.character.name}, max.socket, mob.drops);
                 this.emitter.emit(questsConfig.SERVER_INNER.HUNT_MOB.name, {id: mob.mobId}, max.socket);
 			}
 		} else {
