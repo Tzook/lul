@@ -10,7 +10,8 @@
 		}
 	},
 	"SERVER_INNER": {
-		"MOVE_TO_TOWN": {"name": "move_to_town", "alive": true}
+		"MOVE_TO_TOWN": {"name": "move_to_town", "alive": true},
+		"LEFT_ROOM": {"name": "left_room"}
 	},
 	"SERVER_GETS": {
 		"ENTERED_ROOM": {"name": "entered_room"},
@@ -21,7 +22,7 @@
 	"CLIENT_GETS": {
 		"JOIN_ROOM": {"name": "actor_join_room"},
 		"MOVE_ROOM": {"name": "actor_move_room"},
-		"LEAVE_ROOM": {"name": "actor_leave_room"},
+		"LEFT_ROOM": {"name": "actor_leave_room"},
 		"BITCH_PLEASE": {"name": "bitch_please"},
 		"BITCH_CHOOSE": {"name": "actor_bitch"}
 	},

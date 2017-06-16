@@ -9,6 +9,9 @@
 			"STATUS": "OK"
 		}
 	},
+    "SERVER_INNER": {
+        "LEFT_ROOM": {"name": "left_room"}
+    },
 	"SERVER_GETS": {
 		"ENTERED_ROOM": {"name": "entered_room"},
 		"MOB_TAKE_DMG": {"name": "mob_took_dmg", "alive": true},
@@ -19,6 +22,8 @@
 		"MOB_SPAWN": {"name": "mob_spawn"},
 		"MOB_DIE": {"name": "mob_die"},
 		"MOB_TAKE_DMG": {"name": "mob_take_dmg"},
-		"MOB_MOVE": {"name": "mob_move"}
-	}
+		"MOB_MOVE": {"name": "mob_move"},
+		"AGGRO": {"name": "aggro"}
+	},
+    "MEELE_THREAT": "1.2"
 }

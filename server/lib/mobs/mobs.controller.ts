@@ -2,7 +2,8 @@
 import MasterController from '../master/master.controller';
 import MobsServices from './mobs.services';
 import * as _ from 'underscore';
-let CLIENT_GETS = require('../../../server/lib/mobs/mobs.config.json').CLIENT_GETS;
+let config = require('../../../server/lib/mobs/mobs.config.json');
+let statsConfig = require('../../../server/lib/stats/stats.config.json');
 
 export default class MobsController extends MasterController {
 	protected services: MobsServices;
@@ -64,6 +65,10 @@ export default class MobsController extends MasterController {
 		mob.x = spawnInfo.x;
 		mob.y = spawnInfo.y;
         mob.dmgers = new Map();
+        mob.threat = {
+            top: "",
+            map: new Map()
+        };
         mob.dmged = 0;
 
 		this.mobById.set(this.services.getMobRoomId(room, mob.id), mob);
@@ -72,7 +77,7 @@ export default class MobsController extends MasterController {
 	}
 
 	protected notifyAboutMob(mob: MOB_INSTANCE, to: SocketIO.Namespace|SocketIO.Socket) {
-		to.emit(CLIENT_GETS.MOB_SPAWN.name, {
+		to.emit(config.CLIENT_GETS.MOB_SPAWN.name, {
 			mob_id: mob.id,
 			x: mob.x,
 			y: mob.y,
@@ -93,7 +98,7 @@ export default class MobsController extends MasterController {
 		let mob = this.mobById.get(this.services.getMobRoomId(socket.character.room, mobId));
 		mob.x = x;
 		mob.y = y;
-		socket.broadcast.to(socket.character.room).emit(CLIENT_GETS.MOB_MOVE.name, {
+		socket.broadcast.to(socket.character.room).emit(config.CLIENT_GETS.MOB_MOVE.name, {
 			mob_id: mobId, 
 			x,
 			y,
@@ -118,9 +123,49 @@ export default class MobsController extends MasterController {
         let charDmgSoFar = mob.dmgers.get(socket.character.name) || 0;
         mob.dmgers.set(socket.character.name, charDmgSoFar + actualDmg);
         mob.dmged += actualDmg;
+        
+        this.addThreat(mob, actualDmg, socket);
 		
         return mob;
 	}
+
+    private addThreat(mob: MOB_INSTANCE, threat: number, socket: GameSocket) {
+        if (socket.character.stats.primaryAbility === statsConfig.ABILITY_MELEE) {
+            threat *= config.MEELE_THREAT;
+        }
+        threat += mob.threat.map.get(socket.character.name) || 0;
+        mob.threat.map.set(socket.character.name, threat);
+
+        if (!mob.threat.top || (mob.threat.top !== socket.character.name && threat > mob.threat.map.get(mob.threat.top))) {
+            if (mob.threat.top) {
+                socket.map.get(mob.threat.top).threats.delete(mob);
+            }
+            socket.threats.add(mob);
+            mob.threat.top = socket.character.name;
+            this.aggroChanged(mob, socket.character.room, socket.character._id);
+        }
+    }
+
+    private aggroChanged(mob: MOB_INSTANCE, room: string, id) {
+        console.log("Changing aggro", mob.id);
+		this.io.to(room).emit(config.CLIENT_GETS.AGGRO.name, {
+			id,
+            mob_id: mob.id,
+		});
+    }
+
+    public removeThreat(mob: MOB_INSTANCE, socket: GameSocket) {
+        let maxSocket: GameSocket;
+        let maxThreat = 0;
+        for (let [char, threat] of mob.threat.map) {
+            let charSocket = socket.map.get(char);
+            if (charSocket && charSocket.character.room === socket.character.room && threat > maxThreat) {
+                [maxSocket, maxThreat] = [charSocket, threat];
+            }
+        }
+        mob.threat.top = maxSocket ? maxSocket.character.room : undefined;
+        this.aggroChanged(mob, socket.character.room, maxSocket ? maxSocket.character._id : undefined)
+    }
 
 	public getHurtCharDmg(mobId: string, socket: GameSocket): number {
 		let mob = this.mobById.get(this.services.getMobRoomId(socket.character.room, mobId));
@@ -128,18 +173,21 @@ export default class MobsController extends MasterController {
 		return dmg;
 	}
 
-	public despawnMob(mob: MOB_INSTANCE, room: string) {
+	public despawnMob(mob: MOB_INSTANCE, socket: GameSocket) {
 		console.log("despawning mob", mob.id);
-		this.io.to(room).emit(CLIENT_GETS.MOB_DIE.name, {
+		this.io.to(socket.character.room).emit(config.CLIENT_GETS.MOB_DIE.name, {
 			mob_id: mob.id,
 		});
 		// remove mob references
+        if (mob.threat.top) {
+            socket.map.get(mob.threat.top).threats.delete(mob);
+        }
 		mob.spawn.mobs.delete(mob.id);
-		this.mobById.delete(this.services.getMobRoomId(room, mob.id));
+		this.mobById.delete(this.services.getMobRoomId(socket.character.room, mob.id));
 
 		if (mob.spawn.cap == mob.spawn.mobs.size + 1) {
 			// if it's the first mob that we kill, set a timer to respawn
-			this.setRespawnTimer(mob, room);
+			this.setRespawnTimer(mob, socket.character.room);
 		}
 	}
 

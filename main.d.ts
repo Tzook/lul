@@ -94,6 +94,7 @@ interface GameSocket extends SocketIO.Socket {
     throttles: Map<Function, number>;
     maxHp: number;
     maxMp: number;
+    threats: Set<MOB_INSTANCE>
 }
 
 // items
@@ -177,6 +178,10 @@ interface MOB_INSTANCE extends MOB_MODEL {
     x?: number,
     y?: number,
     dmgers?: Map<string, number>
+    threat?: {
+        top?: string
+        map: Map<string, number>
+    }
     dmged?: number
     spawn?: SPAWN_INSTANCE,
 }

@@ -29,6 +29,10 @@ export default class MobsRouter extends SocketioRouterBase {
 			this.controller.generateMobs.bind(this.controller));
 	}
 
+    public onConnected(socket: GameSocket) {
+        socket.threats = new Set();
+    }
+
 	[config.SERVER_GETS.ENTERED_ROOM.name](data, socket: GameSocket) {
 		if (!this.controller.hasRoom(socket.character.room)) {
 			// we must spawn new mobs
@@ -41,6 +45,13 @@ export default class MobsRouter extends SocketioRouterBase {
 		} else {
 			this.controller.notifyAboutMobs(socket);
 		}
+	}
+
+	[config.SERVER_INNER.LEFT_ROOM.name](data, socket: GameSocket) {
+		for (let mob of socket.threats) {
+            this.controller.removeThreat(mob, socket);
+        }
+        socket.threats.clear();
 	}
 
 	[config.SERVER_GETS.MOB_TAKE_DMG.name](data, socket: GameSocket) {
@@ -56,7 +67,7 @@ export default class MobsRouter extends SocketioRouterBase {
 				hp: mob.hp,
 			});
 			if (mob.hp === 0) {
-				this.controller.despawnMob(mob, socket.character.room);
+				this.controller.despawnMob(mob, socket);
 
                 let max = {dmg: 0, socket: null}; 
                 for (let [charId, charDmg] of mob.dmgers) {
