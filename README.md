@@ -20,7 +20,7 @@ gulp
 
 The tests package is isolated and located inside the /tests folder.
 The target of the tests is to run locally before committing changes and to be a sanity indicator that everything is ok.
-Tests are written in Protractor with Karma and cover the Bibliotheca from end to end.
+Tests are written in Protractor with Karma and cover the server from end to end.
 
 ### Run the tests once
 To just perform the tests once, we simply run:
