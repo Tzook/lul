@@ -10,7 +10,6 @@ export default class MovementModel extends MasterModel {
                 x: {type: Number, default: -74},
                 y: {type: Number, default: -3},
                 z: {type: Number, default: 0},
-                climbing: {type: Boolean, default: false}
             }
         };
     }
