@@ -5,6 +5,7 @@ import QuestsController from "./quests.controller";
 import QuestsServices from './quests.services';
 import ItemsRouter from '../items/items.router';
 import * as _ from 'underscore';
+import PartyRouter from '../party/party.router';
 let config = require('../../../server/lib/quests/quests.config.json');
 let statsConfig = require('../../../server/lib/stats/stats.config.json');
 let itemsConfig = require('../../../server/lib/items/items.config.json');
@@ -14,10 +15,12 @@ export default class QuestsRouter extends SocketioRouterBase {
 	protected controller: QuestsController;
 	protected services: QuestsServices;
 	protected itemsRouter: ItemsRouter;
+    protected partyRouter: PartyRouter;
 
 	init(files, app) {
 		this.services = files.services;
 		this.itemsRouter = files.routers.items;
+        this.partyRouter = files.routers.party;
 		super.init(files, app);
 	}
 
@@ -104,17 +107,20 @@ export default class QuestsRouter extends SocketioRouterBase {
 	}
 
 	[config.SERVER_INNER.HUNT_MOB.name](data, socket: GameSocket) {
-		let quests = socket.character.quests.hunt[data.id] || {};
-		let fields: Set<string> = new Set();
-		for (let questKey in quests) {
-			let questInfo = this.services.getQuestInfo(questKey);
-			if (quests[questKey] < questInfo.cond.hunt[data.id]) {
-				quests[questKey]++;
-				socket.emit(this.CLIENT_GETS.QUEST_HUNT_PROGRESS.name, { id: questKey, mob_id: data.id, value: quests[questKey]});
-				fields.add("hunt");
-				console.log("Hunt for quest", data.id, questKey, quests[questKey]);
-			}
-		}
-		this.services.markModified(socket.character.quests, fields);
+        let partySockets = this.partyRouter.getPartyMembersInMap(socket);
+        for (let memberSocket of partySockets) {
+            let quests = memberSocket.character.quests.hunt[data.id] || {};
+            let fields: Set<string> = new Set();
+            for (let questKey in quests) {
+                let questInfo = this.services.getQuestInfo(questKey);
+                if (quests[questKey] < questInfo.cond.hunt[data.id]) {
+                    quests[questKey]++;
+                    memberSocket.emit(this.CLIENT_GETS.QUEST_HUNT_PROGRESS.name, { id: questKey, mob_id: data.id, value: quests[questKey]});
+                    fields.add("hunt");
+                    console.log("Hunt for quest", data.id, questKey, quests[questKey]);
+                }
+            }
+            this.services.markModified(memberSocket.character.quests, fields);
+        }
 	}
 };
