@@ -7,6 +7,14 @@ export default class PartyMiddleware extends MasterMiddleware {
         return party.leader === name;
     }
 
+    public isMember(name: string, party: PARTY_MODEL): boolean {
+        return party.members.has(name);
+    }
+
+    public isInParty(name: string, party: PARTY_MODEL): boolean {
+        return this.isLeader(name, party) || this.isMember(name, party); 
+    }
+
     public isPartyFull(party: PARTY_MODEL): boolean {
         return party.members.size  + 1 >= config.MAX_PARTY_MEMBERS;
     }

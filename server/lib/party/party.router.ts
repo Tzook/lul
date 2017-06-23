@@ -68,7 +68,7 @@ export default class PartyRouter extends SocketioRouterBase {
             return this.sendError(data, socket, "Cannot switch lead - must be in a party", true, true);
         } else if (!this.middleware.isLeader(socket.character.name, party)) {
             return this.sendError(data, socket, "Cannot switch lead - must be party leader", true, true);
-        } else if (!party.members.has(data.char_name)) {
+        } else if (!this.middleware.isMember(data.char_name, party)) {
             return this.sendError(data, socket, "Cannot switch lead - character not in party", true, true);
         }
         this.controller.makeLeader(socket, data.char_name, party);
@@ -80,7 +80,7 @@ export default class PartyRouter extends SocketioRouterBase {
             return this.sendError(data, socket, "Cannot kick - must be in a party", true, true);
         } else if (!this.middleware.isLeader(socket.character.name, party)) {
             return this.sendError(data, socket, "Cannot kick - must be party leader", true, true);
-        } else if (!party.members.has(data.char_name)) {
+        } else if (!this.middleware.isMember(data.char_name, party)) {
             return this.sendError(data, socket, "Cannot kick - character not in party", true, true);
         }
         this.controller.kickFromParty(socket, data.char_name, party);
@@ -95,5 +95,9 @@ export default class PartyRouter extends SocketioRouterBase {
 
     public getPartyMembersInMap(socket: GameSocket): GameSocket[] {
         return this.controller.getPartyMembersInMap(socket);
+    }
+
+    public arePartyMembers(name1: string, name2: string): boolean {
+        return this.controller.arePartyMembers(name1, name2);
     }
 };

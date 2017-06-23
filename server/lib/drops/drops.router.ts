@@ -4,6 +4,7 @@ import * as _ from 'underscore';
 import DropsController from "./drops.controller";
 import ItemsRouter from '../items/items.router';
 import DropsServices from './drops.services';
+import PartyRouter from '../party/party.router';
 let config = require('../../../server/lib/drops/drops.config.json');
 let SERVER_GETS = config.SERVER_GETS;
 
@@ -13,9 +14,11 @@ export default class DropsRouter extends SocketioRouterBase {
     protected controller: DropsController;
     protected services: DropsServices;
     protected itemsRouter: ItemsRouter;
+    protected partyRouter: PartyRouter;
 	
 	init(files, app) {
 		this.itemsRouter = files.routers.items;
+        this.partyRouter = files.routers.party;
 		this.services = files.services;
 		super.init(files, app);
 	}
@@ -46,8 +49,9 @@ export default class DropsRouter extends SocketioRouterBase {
             return;
 		}
         let itemDrop = map.get(itemId);
-        if (itemDrop.owner && itemDrop.owner !== socket.character.name) {
-            return this.sendError(data, socket, `Item owner is ${itemDrop.owner} and you are ${socket.character.name}.`);
+        let owner = itemDrop.owner;
+        if (owner && (owner !== socket.character.name && !this.partyRouter.arePartyMembers(owner, socket.character.name))) {
+            return this.sendError(data, socket, `Item owner is ${owner} and you are ${socket.character.name}.`);
         }
         let picked = pickItemFn(itemDrop.item);
         if (picked) {

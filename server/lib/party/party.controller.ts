@@ -115,18 +115,27 @@ export default class PartyController extends MasterController {
 
     public getPartyMembersInMap(socket: GameSocket): GameSocket[] {
         let sockets = [];
-        let party = this.charToParty.get(socket.character.name);
+        let party = this.getCharParty(socket);
         if (!party) {
             sockets.push(socket);
         } else {
             let allPartyMembers = this.services.getAllPartyMembers(party);
             for (let memberName of allPartyMembers) {
                 let memberSocket = socket.map.get(memberName);
-                if (memberSocket && memberSocket.character.room === socket.character.room) {
+                if (memberSocket && memberSocket.character.room === socket.character.room && memberSocket.alive) {
                     sockets.push(memberSocket);
                 }
             }
         }
         return sockets;
+    }
+
+    public arePartyMembers(name1: string, name2: string): boolean {
+        let areMembers = false;
+        let party = this.getParty(name1);
+        if (party) {
+            areMembers = this.middleware.isInParty(name2, party);
+        }
+        return areMembers;
     }
 };
