@@ -48,7 +48,7 @@ export default class PartyController extends MasterController {
         this.io.to(party.name).emit(config.CLIENT_GETS.JOIN_PARTY.name, {
             char_name: socket.character.name
         });
-        // TODO send party members to the newby
+        this.tellPartyMembers(socket, party);
 
         this.charToParty.set(socket.character.name, party);
         party.members.add(socket.character.name);

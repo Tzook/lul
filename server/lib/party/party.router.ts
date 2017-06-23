@@ -10,7 +10,7 @@ export default class PartyRouter extends SocketioRouterBase {
     
     [config.SERVER_GETS.CREATE_PARTY.name](data, socket: GameSocket) {
         if (this.controller.getCharParty(socket)) {
-            return this.sendError(data, socket, "Character already in party");
+            return this.sendError(data, socket, "Cannot create - character already in party");
         }
         this.controller.createParty(socket);
 	}
