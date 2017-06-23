@@ -17,4 +17,8 @@ export default class PartyServices extends MasterServices {
         // no one is online - pick the first one
         return party.members.values().next().value;
     }
+
+    public getAllPartyMembers(party: PARTY_MODEL): string[] {
+        return Array.from(party.members).concat(party.leader);
+    }
 };
