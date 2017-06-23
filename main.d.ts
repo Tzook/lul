@@ -232,3 +232,11 @@ interface CHAR_QUESTS {
         }
     }
 }
+
+// Party
+interface PARTY_MODEL {
+    name: string // party name
+    leader: string // leader name
+    members: Set<string> // list of member names
+    invitees: Map<string, number> // invitee name to its clear-timeout id
+}

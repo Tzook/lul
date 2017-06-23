@@ -1,8 +1,101 @@
 'use strict';
 import MasterController from '../master/master.controller';
+import PartyServices from './party.services';
+import PartyMiddleware from './party.middleware';
+let config = require('../../../server/lib/party/party.config.json');
 
 export default class PartyController extends MasterController {
-    private partyToChars: Map<string, string[]> = new Map();
-    private charToParty: Map<string, string> = new Map();
+    protected services: PartyServices;
+    protected middleware: PartyMiddleware;
+    private charToParty: Map<string, PARTY_MODEL> = new Map();
 
+	init(files, app) {
+		this.middleware = files.middleware;
+		super.init(files, app);
+	}
+
+    public getCharParty(socket: GameSocket): PARTY_MODEL|undefined {
+        return this.getParty(socket.character.name);
+    }
+
+    public getParty(name: string): PARTY_MODEL|undefined {
+        return this.charToParty.get(name);;
+    }
+
+    public createParty(socket: GameSocket) {
+        socket.emit(config.CLIENT_GETS.CREATE_PARTY.name, {});
+        let party: PARTY_MODEL = {
+            name: this.services.getPartyName(),
+            leader: socket.character.name,
+            members: new Set(),
+            invitees: new Map(),
+        };
+        this.charToParty.set(socket.character.name, party);
+        socket.join(party.name);
+    }
+
+    public inviteToParty(inviteeSocket: GameSocket, party: PARTY_MODEL) {
+        inviteeSocket.emit(config.CLIENT_GETS.INVITE_TO_PARTY.name, {});
+        party.invitees.set(inviteeSocket.character.name, setTimeout(() => {
+            // remove the invitation after a certain amount of time
+            party.invitees.delete(inviteeSocket.character.name);
+        }, config.INVITE_EXPIRE_TIME));
+    }
+
+    public joinParty(socket: GameSocket, party: PARTY_MODEL) {
+        socket.join(party.name);
+
+        this.io.to(party.name).emit(config.CLIENT_GETS.JOIN_PARTY.name, {
+            char_name: socket.character.name
+        });
+        // TODO send party members to the newby
+
+        this.charToParty.set(socket.character.name, party);
+        clearTimeout(party.invitees.get(socket.character.name));
+        party.invitees.delete(socket.character.name);
+    }
+
+    public leaveParty(socket: GameSocket, party: PARTY_MODEL) {
+        this.io.to(party.name).emit(config.CLIENT_GETS.LEAVE_PARTY.name, {
+            char_name: socket.character.name
+        });
+        socket.leave(party.name);
+
+        if (this.middleware.isLeader(socket.character.name, party)) {
+            if (party.members.size > 0) {
+                party.leader = this.services.pickLeader(socket, party);
+                this.io.to(party.name).emit(config.CLIENT_GETS.LEAD_PARTY.name, {
+                    char_name: party.leader
+                });
+            } else {
+                // party is disbanded. nothing else to do
+            }
+        } else {
+            party.members.delete(socket.character.name);
+        }
+
+        this.charToParty.delete(socket.character.name);
+    }
+
+    public kickFromParty(socket: GameSocket, kickedCharName: string, party: PARTY_MODEL) {
+        this.io.to(party.name).emit(config.CLIENT_GETS.KICK_FROM_PARTY.name, {
+            char_name: kickedCharName
+        });
+
+        let kickedCharSocket = socket.map.get(kickedCharName);
+        if (kickedCharSocket) {
+            // party member is online - remove him
+            kickedCharSocket.leave(party.name);
+        }
+        
+        party.members.delete(kickedCharName);
+        this.charToParty.delete(kickedCharName);
+    }
+
+    public tellPartyMembers(socket: GameSocket, party: PARTY_MODEL) {
+        socket.emit(config.CLIENT_GETS.PARTY_MEMBERS.name, {
+            leader_name: party.leader,
+            chars_names: Array.from(party.members)
+        });
+    }
 };
