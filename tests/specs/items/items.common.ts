@@ -10,7 +10,7 @@ export function pickItem() {
 
 export function getItemId() {
     return getChat().then(chat => {
-        let [, itemId] = chat.match(/"item_id": "([0-9]*)"/);
+        let [, itemId] = chat.match(/"item_id": "(item-[0-9]*)"/);
         return itemId;
     });
 }

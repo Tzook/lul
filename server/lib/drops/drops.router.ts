@@ -93,7 +93,7 @@ export default class DropsRouter extends SocketioRouterBase {
 		items = JSON.parse(JSON.stringify(items));
 		
 		items.forEach(item => {
-			let itemId = _.uniqueId();
+			let itemId = _.uniqueId("item-");
 			let itemData: ITEM_DROP = {
 				x: data.x || socket.character.position.x,
 				y: data.y || socket.character.position.y,

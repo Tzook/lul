@@ -52,7 +52,7 @@ export default class MobsController extends MasterController {
 
 	protected spawnMob(spawnInfo: SPAWN_INSTANCE, room: string): MOB_INSTANCE {
 		let mob: MOB_INSTANCE = this.services.getMobInfo(spawnInfo.mobId);
-		mob.id = _.uniqueId();
+		mob.id = _.uniqueId("mob-");
 		mob.x = spawnInfo.x;
 		mob.y = spawnInfo.y;
         mob.dmgers = new Map();

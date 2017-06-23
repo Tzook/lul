@@ -51,7 +51,7 @@ export default class RoomsController extends MasterController {
 		clearTimeout(this.roomBitchTimeouts.get(room));
 		let sockets = (<any>this.io.sockets).adapter.rooms[room];
 		if (sockets && sockets.length > 1) {
-			let key = _.uniqueId();
+			let key = _.uniqueId("bitch-");
 			this.roomBitchKeys.set(room, key);
 			console.log("asking bitch please. key %s, room:", key, room);
 			this.io.to(room).emit(config.CLIENT_GETS.BITCH_PLEASE.name, {
