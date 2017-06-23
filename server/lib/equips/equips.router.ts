@@ -27,10 +27,6 @@ export default class EquipsRouter extends SocketioRouterBase {
 	}
 
 	[SERVER_GETS.EQUIP_ITEM.name](data, socket: GameSocket) {
-		if (!socket.alive) {
-            this.sendError({}, socket, "Character is not alive!");
-            return;
-        }
 		let from: number = data.from;
 		let to: string = data.to;
 		if (this.middleware.isValidItemSlot(from)
@@ -44,7 +40,6 @@ export default class EquipsRouter extends SocketioRouterBase {
 			} else if (!this.middleware.canWearEquip(socket, itemInfo, to)) {
 				this.sendError(data, socket, "Item cannot be equipped there");
 			} else {
-				console.log("equipping item", from, to);
 				this.removeStats(to, socket);
 				this.middleware.swapEquipAndItem(socket, from, to);
 				this.addStats(to, socket);
@@ -62,10 +57,6 @@ export default class EquipsRouter extends SocketioRouterBase {
 	}
 
 	[SERVER_GETS.UNEQUIP_ITEM.name](data, socket: GameSocket) {
-		if (!socket.alive) {
-            this.sendError({}, socket, "Character is not alive!");
-            return;
-        }
 		let from: string = data.from;
 		let to: number = data.to;
 		if (this.middleware.isValidEquipSlot(from)
@@ -77,7 +68,6 @@ export default class EquipsRouter extends SocketioRouterBase {
 				// if the wanted slot already has an item, check if it can be replaced
 				this.sendError(data, socket, "Cannot unequip to slot!");
 			} else {
-				console.log("unequipping item", from, to);
 
 				this.removeStats(from, socket);
 				this.middleware.swapEquipAndItem(socket, to, from);
@@ -128,14 +118,9 @@ export default class EquipsRouter extends SocketioRouterBase {
 	}
 
 	[SERVER_GETS.DROP_EQUIP.name](data, socket: GameSocket) {
-		if (!socket.alive) {
-            this.sendError({}, socket, "Character is not alive!");
-            return;
-        }
 		let slot = data.slot;
 		if (this.middleware.hasEquip(socket, slot)) {
 			let equip = socket.character.equips[slot];
-			console.log("dropping equip", equip);
 
 			this.emitter.emit(dropsConfig.SERVER_INNER.ITEMS_DROP.name, { }, socket, [equip]);
 			this.removeStats(slot, socket);

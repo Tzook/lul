@@ -11,12 +11,12 @@
 	},
 	"SERVER_INNER": {
 		"MOVE_TO_TOWN": {"name": "move_to_town", "alive": true},
-		"LEFT_ROOM": {"name": "left_room"}
+		"LEFT_ROOM": {"name": "left_room", "log": true}
 	},
 	"SERVER_GETS": {
-		"ENTERED_ROOM": {"name": "entered_room"},
-		"ENTER_PORTAL": {"name": "entered_portal", "alive": true},
-		"BITCH_PLEASE": {"name": "bitch_please"},
+		"ENTERED_ROOM": {"name": "entered_room", "log": true},
+		"ENTER_PORTAL": {"name": "entered_portal", "alive": true, "log": true},
+		"BITCH_PLEASE": {"name": "bitch_please", "log": true},
 		"DISCONNECT": {"name": "disconnect"}
 	},
 	"CLIENT_GETS": {

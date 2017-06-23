@@ -62,8 +62,8 @@ export default class QuestsRouter extends SocketioRouterBase {
 			this.services.finishQuest(socket.character.quests, questInfo);
 			socket.emit(this.CLIENT_GETS.QUEST_DONE.name, { id: questKey });
 			
-			_.forEach((questInfo.cond || {}).loot, (stack, itemId) => {
-				this.emitter.emit(itemsConfig.SERVER_INNER.ITEM_REMOVE.name, { stack, itemId }, socket);
+			_.forEach((questInfo.cond || {}).loot, (stack, key) => {
+				this.emitter.emit(itemsConfig.SERVER_INNER.ITEM_REMOVE.name, {item: { stack, key }}, socket);
 			});
 
 			// reward exp
@@ -87,7 +87,6 @@ export default class QuestsRouter extends SocketioRouterBase {
 				let itemSlots = slots[item.key];
 				this.emitter.emit(itemsConfig.SERVER_INNER.ITEM_ADD.name, { slots: itemSlots, item: instance }, socket);
 			});
-			console.log("completed quest", questKey, socket.character.name);
 		}
 	}
 
@@ -101,7 +100,6 @@ export default class QuestsRouter extends SocketioRouterBase {
 		} else {
 			this.services.abortQuest(socket.character.quests, questInfo)
 			socket.emit(this.CLIENT_GETS.QUEST_ABORT.name, { id: questKey });
-			console.log("aborting quest", questKey, socket.character.name);
 		}
 	}
 

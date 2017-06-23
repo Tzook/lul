@@ -68,13 +68,13 @@ export default class ItemsRouter extends SocketioRouterBase {
 		}
 	}
 
-	[config.SERVER_INNER.ITEM_REMOVE.name](data: {stack: number, itemId: string}, socket: GameSocket) {
-		let {stack, itemId} = data;
-		let itemInfo = this.getItemInfo(itemId);
+	[config.SERVER_INNER.ITEM_REMOVE.name](data: {item: ITEM_INSTANCE}, socket: GameSocket) {
+		let {stack, key} = data.item;
+		let itemInfo = this.getItemInfo(key);
 		if (!this.middleware.isMisc(itemInfo)) {
 			for (let slot = 0; slot < socket.character.items.length; slot++) {
 				let item = socket.character.items[slot];
-				if (item.key === itemId) {
+				if (item.key === key) {
 					this.deleteItem(socket, slot);
 					if (--stack === 0) {
 						break;
@@ -95,7 +95,6 @@ export default class ItemsRouter extends SocketioRouterBase {
 			this.sendError(data, socket, "Trying to drop an item but nothing's there!");
 		} else {
 			let item = socket.character.items[slot];
-			console.log("dropping item", item);
 			this.emitter.emit(dropsConfig.SERVER_INNER.ITEMS_DROP.name, {}, socket, [item]);
 			this.deleteItem(socket, slot);
 		}
@@ -109,7 +108,6 @@ export default class ItemsRouter extends SocketioRouterBase {
 			let itemFrom = socket.character.items[data.from];
 			let itemTo = socket.character.items[data.to];
 
-			console.log('moving item from ' + data.from + " to " + data.to, itemFrom, itemTo);
 			socket.character.items.set(data.to, itemFrom);
 			socket.character.items.set(data.from, itemTo);
 			socket.emit(this.CLIENT_GETS.ITEM_MOVE.name, {

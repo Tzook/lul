@@ -29,8 +29,6 @@ export default class RoomsRouter extends SocketioRouterBase {
 	}
 
 	[config.SERVER_GETS.ENTERED_ROOM.name](data, socket: GameSocket) {
-		// const also used in items
-		console.log('character %s entered room', socket.character.name);
 		socket.broadcast.to(socket.character.room).emit(this.CLIENT_GETS.JOIN_ROOM.name, {
 			character: this.middleware.getPublicCharInfo(socket.character)
 		});
@@ -47,7 +45,6 @@ export default class RoomsRouter extends SocketioRouterBase {
 	}
 
 	[config.SERVER_GETS.ENTER_PORTAL.name](data, socket: GameSocket) {
-		console.log('user entered portal', socket.character.name, data.portal);
 		let roomInfo = this.services.getRoomInfo(socket.character.room);
 		if (!roomInfo) {
 			this.sendError(data, socket, "No room info available!");
@@ -90,7 +87,6 @@ export default class RoomsRouter extends SocketioRouterBase {
 		socket.character.room = room;
 		socket.character.position.x = targetPortal.x;
 		socket.character.position.y = targetPortal.y;
-		console.log("moving character %s to room %s", socket.character.name, room);
 		socket.emit(this.CLIENT_GETS.MOVE_ROOM.name, {
 			room,
 			character: socket.character
@@ -99,7 +95,6 @@ export default class RoomsRouter extends SocketioRouterBase {
 	}
 
 	[config.SERVER_GETS.DISCONNECT.name](data, socket: GameSocket) {
-		console.log('disconnect from room');
 		this.emitter.emit(config.SERVER_INNER.LEFT_ROOM.name, {}, socket);
 	}
 
@@ -113,7 +108,6 @@ export default class RoomsRouter extends SocketioRouterBase {
 
 	[config.SERVER_GETS.BITCH_PLEASE.name](data, socket: GameSocket) {
 		let key = data.key;
-		console.log('bitch please received from %s with key %s', socket.character.name, key);
 		this.controller.newBitchRequest(socket, key);
 	}
 

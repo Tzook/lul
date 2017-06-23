@@ -7,7 +7,6 @@ export default class StatsController extends MasterController {
 
     public addExp(socket: GameSocket, exp: number) {
         const {character} = socket;
-        console.log("Adding exp to char", exp, character.stats.exp, character.name);
         character.stats.exp += exp;
         // level up the char if he passed the exp needed
         let expNeededToLevel = this.services.getExp(character.stats.lvl);
@@ -28,7 +27,6 @@ export default class StatsController extends MasterController {
         let nowHp = socket.character.stats.hp.now;
         socket.character.stats.hp.now = Math.min(nowHp + hp, socket.maxHp);
         let gainedHp = nowHp !== socket.character.stats.hp.now;
-        console.log("Adding hp to char", hp, socket.character.stats.hp.now, socket.character.name);
         return gainedHp;
     }
 
@@ -36,7 +34,6 @@ export default class StatsController extends MasterController {
         let nowMp = socket.character.stats.mp.now;
         socket.character.stats.mp.now = Math.min(nowMp + mp, socket.maxMp);
         let gainedMp = nowMp !== socket.character.stats.mp.now;
-        console.log("Adding mp to char", mp, socket.character.stats.mp.now, socket.character.name);
         return gainedMp;
     }
 };

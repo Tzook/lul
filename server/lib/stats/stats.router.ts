@@ -21,8 +21,7 @@ export default class StatsRouter extends SocketioRouterBase {
     [config.SERVER_INNER.GAIN_EXP.name] (data, socket: GameSocket) {
         let exp = data.exp;
         if (!(exp > 0)) {
-            console.log("trying to gain exp that is not positive", socket.character.name, exp);
-            return;
+            return this.sendError(data, socket, "trying to gain exp that is not positive");
         }
         let currentLevel = socket.character.stats.lvl;
         this.controller.addExp(socket, exp);
@@ -52,9 +51,8 @@ export default class StatsRouter extends SocketioRouterBase {
 			dmg,
 			hp: socket.character.stats.hp.now
 		});
-		console.log("Taking damage", socket.character.name, dmg, socket.character.stats.hp.now);
         if (!socket.alive) {
-            console.log("character %s is ded", socket.character.name);
+            this.log({}, socket,  "character is ded");
             this.io.to(socket.character.room).emit(this.CLIENT_GETS.DEATH.name, {
                 id: socket.character._id,
             });
@@ -104,7 +102,6 @@ export default class StatsRouter extends SocketioRouterBase {
     [config.SERVER_GETS.RELEASE_DEATH.name] (data, socket: GameSocket) {
         socket.character.stats.hp.now = socket.maxHp;
         socket.emit(this.CLIENT_GETS.RESURRECT.name, {});
-        console.log("releasing death for", socket.character.name);
         this.emitter.emit(roomsConfig.SERVER_INNER.MOVE_TO_TOWN.name, {}, socket);
     }
 

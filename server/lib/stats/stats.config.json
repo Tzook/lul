@@ -1,15 +1,15 @@
 {
 	"SERVER_INNER": {
-		"GAIN_EXP": {"name": "gain_exp", "alive": true},
-		"GAIN_HP": {"name": "gain_hp"},
-		"GAIN_MP": {"name": "gain_mp"},
-		"GAIN_STATS": {"name": "gain_stats"},
-		"TAKE_DMG": {"name": "take_dmg"},
-		"STATS_ADD": {"name": "stats_add"},
-		"STATS_REMOVE": {"name": "stats_remove"}
+		"GAIN_EXP": {"name": "gain_exp", "alive": true, "log": true},
+		"GAIN_HP": {"name": "gain_hp", "alive": true, "log": true},
+		"GAIN_MP": {"name": "gain_mp", "alive": true, "log": true},
+		"GAIN_STATS": {"name": "gain_stats", "alive": true, "log": true},
+		"TAKE_DMG": {"name": "take_dmg", "alive": true, "log": true},
+		"STATS_ADD": {"name": "stats_add", "alive": true},
+		"STATS_REMOVE": {"name": "stats_remove", "alive": true}
 	},
 	"SERVER_GETS": {
-		"RELEASE_DEATH": {"name": "release_death", "alive": false}
+		"RELEASE_DEATH": {"name": "release_death", "alive": false, "log": true}
 	},
 	"CLIENT_GETS": {
 		"GAIN_EXP": {"name": "actor_gain_exp"},

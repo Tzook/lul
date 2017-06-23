@@ -1,8 +1,8 @@
 {
 	"SERVER_GETS": {
-		"SHOUT": {"name": "shouted"},
-		"CHAT": {"name": "chatted"},
-		"WHISPER": {"name": "whispered"}
+		"SHOUT": {"name": "shouted", "log": true},
+		"CHAT": {"name": "chatted", "log": true},
+		"WHISPER": {"name": "whispered", "log": true}
 	},
 	"CLIENT_GETS": {
 		"SHOUT": {"name": "shout"},

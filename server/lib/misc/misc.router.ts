@@ -44,13 +44,13 @@ export default class MiscRouter extends SocketioRouterBase {
         }
 	}
 
-	[config.SERVER_INNER.ITEM_REMOVE.name](data: {stack: number, itemId: string}, socket: GameSocket) {
-		let {stack, itemId} = data;
-		let itemInfo = this.itemsRouter.getItemInfo(itemId);
+	[config.SERVER_INNER.ITEM_REMOVE.name](data: {item: ITEM_INSTANCE}, socket: GameSocket) {
+		let {stack, key} = data.item;
+		let itemInfo = this.itemsRouter.getItemInfo(key);
 		if (this.middleware.isMisc(itemInfo)) {
 			for (let slot = 0; slot < socket.character.items.length; slot++) {
 				let item = socket.character.items[slot];
-				if (item.key === itemId) {
+				if (item.key === key) {
                     if (item.stack <= stack) {
                         stack -= item.stack;
 					    this.itemsRouter.deleteItem(socket, slot);

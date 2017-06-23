@@ -179,12 +179,12 @@ export default class SocketioRouter extends SocketioRouterBase {
 		if (!this.map.has(socket.id)) {
 			return;
 		}
-		console.log('disconnected', socket.character.name);
+        this.log({}, socket, "Disconnected");
 		// automations should not be saved afterwards - we want it to reset every time
 		if (!socket.test) {
 			socket.user.save(e => {
 				if (e) {
-					console.error(e);
+					console.error("Saving user error", e);
 				}
 			});
 		}

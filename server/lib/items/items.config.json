@@ -18,8 +18,8 @@
 	},
 	"SERVER_GETS": {
 		"ITEM_PICK": {"name": "picked_item", "throttle": 0, "alive": true},
-		"ITEM_DROP": {"name": "dropped_item", "alive": true},
-		"ITEM_MOVE": {"name": "moved_item", "alive": true}
+		"ITEM_DROP": {"name": "dropped_item", "alive": true, "log": true},
+		"ITEM_MOVE": {"name": "moved_item", "alive": true, "log": true}
 	},
 	"CLIENT_GETS": {
 		"ITEM_DELETE": {"name": "actor_delete_item"},

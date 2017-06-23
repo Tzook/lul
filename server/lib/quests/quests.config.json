@@ -13,9 +13,9 @@
 		"HUNT_MOB": {"name": "hunt_mob"}
 	},
 	"SERVER_GETS": {
-		"QUEST_START": {"name": "quest_started", "alive": true},
-		"QUEST_DONE": {"name": "quest_completed", "alive": true},
-		"QUEST_ABORT": {"name": "quest_aborted", "alive": true}
+		"QUEST_START": {"name": "quest_started", "alive": true, "log": true},
+		"QUEST_DONE": {"name": "quest_completed", "alive": true, "log": true},
+		"QUEST_ABORT": {"name": "quest_aborted", "alive": true, "log": true}
 	},
 	"CLIENT_GETS": {
 		"QUEST_START": {"name": "quest_start"},
