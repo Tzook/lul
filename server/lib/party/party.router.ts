@@ -73,4 +73,11 @@ export default class PartyRouter extends SocketioRouterBase {
         }
         this.controller.kickFromParty(socket, data.char_name, party);
 	}
+
+    public onConnected(socket: GameSocket) {
+        let party = this.controller.getCharParty(socket);
+        if (party) {
+            this.controller.tellPartyMembers(socket, party);
+        }
+    }
 };

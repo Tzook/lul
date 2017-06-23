@@ -395,6 +395,14 @@
 				socket.on("quest_complete", d => setResult({msg: "quest_complete", d}));
 				socket.on("quest_abort", d => setResult({msg: "quest_abort", d}));
 				socket.on("quest_progress", d => setResult({msg: "quest_progress", d}));
+
+				socket.on("create_party", d => setResult({msg: "create_party", d}));
+				socket.on("party_invitation", d => setResult({msg: "party_invitation", d}));
+				socket.on("actor_join_party", d => setResult({msg: "actor_join_party", d}));
+				socket.on("actor_leave_party", d => setResult({msg: "actor_leave_party", d}));
+				socket.on("actor_lead_party", d => setResult({msg: "actor_lead_party", d}));
+				socket.on("actor_kicked_from_party", d => setResult({msg: "actor_kicked_from_party", d}));
+				socket.on("party_members", d => setResult({msg: "party_members", d}));
 			}
 
 			function move(dX, dY) {
