@@ -1,8 +1,17 @@
 {
 	"SERVER_GETS": {
-		
+        "CREATE_PARTY": {"name": "create_party"},
+        "INVITE_TO_PARTY": {"name": "invite_to_party"},
+        "JOIN_PARTY": {"name": "join_party"},
+        "LEAVE_PARTY": {"name": "leave_party"},
+        "KICK_FROM_PARTY": {"name": "kick_from_party"}
 	},
 	"CLIENT_GETS": {
-		
+        "CREATE_PARTY": {"name": "create_party"},
+        "JOIN_PARTY": {"name": "actor_join_party"},
+        "LEAVE_PARTY": {"name": "actor_leave_party"},
+        "KICK_FROM_PARTY": {"name": "actor_kicked_from_party"},
+        "LEAD_PARTY": {"name": "actor_lead_party"},
+        "PARTY_MEMBERS": {"name": "party_members"}
 	}
 }
