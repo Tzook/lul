@@ -2,6 +2,7 @@
 import MasterController from '../master/master.controller';
 import MobsServices from './mobs.services';
 import * as _ from 'underscore';
+import StatsServices from '../stats/stats.services';
 let config = require('../../../server/lib/mobs/mobs.config.json');
 let statsConfig = require('../../../server/lib/stats/stats.config.json');
 
@@ -97,8 +98,8 @@ export default class MobsController extends MasterController {
 	}
 
 	public calculateDamage(socket: GameSocket, load: number): number {
-		// currently hardcoded str. once we have abilities, will choose based on main stat
-		let baseDmg = socket.character.stats.str + socket.bonusStats.str; 
+		let mainStat = StatsServices.getMainStat(socket);
+		let baseDmg = socket.character.stats[mainStat] + socket.bonusStats[mainStat]; 
 		let bonusDmg = load * baseDmg / 100;
 		let maxDmg = baseDmg + bonusDmg;
 		let minDmg = maxDmg / 2;

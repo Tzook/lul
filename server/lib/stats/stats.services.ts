@@ -57,6 +57,10 @@ export default class StatsServices extends MasterServices {
 	public getHpAfterDamage(hp: number, dmg: number): number {
 		return Math.max(0, Math.floor(hp - dmg));
 	}
+
+    public static getMainStat(socket: GameSocket): string {
+        return socket.character.stats.primaryAbility === "range" ? "dex" : "str";
+    } 
 };
 // cache computations
 StatsServices.prototype.getExp = <any>_.memoize(StatsServices.prototype.getExp);
