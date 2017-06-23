@@ -93,6 +93,10 @@ export default class PartyRouter extends SocketioRouterBase {
         }
     }
 
+    public getCharParty(socket: GameSocket): PARTY_MODEL|undefined {
+        return this.controller.getCharParty(socket);
+    }
+
     public getPartyMembersInMap(socket: GameSocket): GameSocket[] {
         return this.controller.getPartyMembersInMap(socket);
     }

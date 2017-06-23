@@ -4,6 +4,7 @@ import MobsMiddleware from "./mobs.middleware";
 import MobsController from "./mobs.controller";
 import RoomsRouter from "../rooms/rooms.router";
 import MobsServices from './mobs.services';
+import PartyRouter from '../party/party.router';
 let config = require('../../../server/lib/mobs/mobs.config.json');
 let statsConfig = require('../../../server/lib/stats/stats.config.json');
 let dropsConfig = require('../../../server/lib/drops/drops.config.json');
@@ -14,9 +15,11 @@ export default class MobsRouter extends SocketioRouterBase {
 	protected controller: MobsController;
     protected services: MobsServices;
 	protected roomsRouter: RoomsRouter;
+    protected partyRouter: PartyRouter;
 	
 	init(files, app) {
 		this.roomsRouter = files.routers.rooms;
+        this.partyRouter = files.routers.party;
         this.services = files.services;
 		super.init(files, app);
 	}
@@ -67,17 +70,34 @@ export default class MobsRouter extends SocketioRouterBase {
 			if (mob.hp === 0) {
 				this.controller.despawnMob(mob, socket);
 
-                let max = {dmg: 0, socket: null}; 
+                let max = {dmg: 0, socket: null};
+                let parties: Map<PARTY_MODEL | GameSocket, {exp: number, socket: GameSocket}> = new Map();
                 for (let [charId, charDmg] of mob.dmgers) {
                     let charSocket = socket.map.get(charId);
-                    if (charSocket && charSocket.character.room === socket.character.room) {
-                        // found char and he's in our room
+                    if (charSocket && charSocket.character.room === socket.character.room && charSocket.alive) {
+                        // found char and he's alive in our room
                         let exp = this.services.getExp(mob, charDmg);
-				        this.emitter.emit(statsConfig.SERVER_INNER.GAIN_EXP.name, { exp }, charSocket);
+                        let party = this.partyRouter.getCharParty(charSocket);
+                        if (party) {
+                            let currentPartyExp = (parties.get(party) || {exp: 0}).exp;
+                            parties.set(party, {socket: charSocket, exp: currentPartyExp});
+                        } else {
+				            this.emitter.emit(statsConfig.SERVER_INNER.GAIN_EXP.name, { exp }, charSocket);
+                        }
+
                         if (charDmg > max.dmg) {
                             max.dmg = charDmg;
                             max.socket = charSocket;
                         }
+                    }
+                }
+                for (let [, {socket, exp}] of parties) {
+                    let partySockets = this.partyRouter.getPartyMembersInMap(socket);
+                    // split exp equally among party members
+                    exp = Math.ceil(exp / partySockets.length);
+
+                    for (let memberSocket of partySockets) {
+                        this.emitter.emit(statsConfig.SERVER_INNER.GAIN_EXP.name, { exp }, memberSocket);
                     }
                 }
 
