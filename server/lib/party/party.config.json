@@ -4,6 +4,7 @@
         "INVITE_TO_PARTY": {"name": "invite_to_party", "log": true},
         "JOIN_PARTY": {"name": "join_party", "log": true},
         "LEAVE_PARTY": {"name": "leave_party", "log": true},
+        "LEAD_PARTY": {"name": "change_party_leader", "log": true},
         "KICK_FROM_PARTY": {"name": "kick_from_party", "log": true}
 	},
 	"CLIENT_GETS": {

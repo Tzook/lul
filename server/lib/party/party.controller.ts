@@ -51,6 +51,7 @@ export default class PartyController extends MasterController {
         // TODO send party members to the newby
 
         this.charToParty.set(socket.character.name, party);
+        party.members.add(socket.character.name);
         clearTimeout(party.invitees.get(socket.character.name));
         party.invitees.delete(socket.character.name);
     }
@@ -68,7 +69,11 @@ export default class PartyController extends MasterController {
                     char_name: party.leader
                 });
             } else {
-                // party is disbanded. nothing else to do
+                // party is disbanded. 
+                // remove pending invitations
+                for (let [, timeout] of party.invitees) {
+                    clearTimeout(timeout);
+                }
             }
         } else {
             party.members.delete(socket.character.name);
@@ -77,19 +82,28 @@ export default class PartyController extends MasterController {
         this.charToParty.delete(socket.character.name);
     }
 
-    public kickFromParty(socket: GameSocket, kickedCharName: string, party: PARTY_MODEL) {
+    public makeLeader(socket: GameSocket, charName: string, party: PARTY_MODEL) {
+        this.io.to(party.name).emit(config.CLIENT_GETS.LEAD_PARTY.name, {
+            char_name: charName
+        });
+        party.leader = charName;
+        party.members.delete(charName);
+        party.members.add(socket.character.name);
+    }
+
+    public kickFromParty(socket: GameSocket, charName: string, party: PARTY_MODEL) {
         this.io.to(party.name).emit(config.CLIENT_GETS.KICK_FROM_PARTY.name, {
-            char_name: kickedCharName
+            char_name: charName
         });
 
-        let kickedCharSocket = socket.map.get(kickedCharName);
-        if (kickedCharSocket) {
+        let kickedSocket = socket.map.get(charName);
+        if (kickedSocket) {
             // party member is online - remove him
-            kickedCharSocket.leave(party.name);
+            kickedSocket.leave(party.name);
         }
         
-        party.members.delete(kickedCharName);
-        this.charToParty.delete(kickedCharName);
+        party.members.delete(charName);
+        this.charToParty.delete(charName);
     }
 
     public tellPartyMembers(socket: GameSocket, party: PARTY_MODEL) {

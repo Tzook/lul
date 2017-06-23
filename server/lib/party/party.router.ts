@@ -62,6 +62,18 @@ export default class PartyRouter extends SocketioRouterBase {
         this.controller.leaveParty(socket, party);
 	}
 
+	[config.SERVER_GETS.LEAD_PARTY.name](data, socket: GameSocket) {
+        let party = this.controller.getCharParty(socket);
+        if (!party) {
+            return this.sendError(data, socket, "Cannot switch lead - must be in a party", true, true);
+        } else if (!this.middleware.isLeader(socket.character.name, party)) {
+            return this.sendError(data, socket, "Cannot switch lead - must be party leader", true, true);
+        } else if (!party.members.has(data.char_name)) {
+            return this.sendError(data, socket, "Cannot switch lead - character not in party", true, true);
+        }
+        this.controller.makeLeader(socket, data.char_name, party);
+	}
+
 	[config.SERVER_GETS.KICK_FROM_PARTY.name](data, socket: GameSocket) {
         let party = this.controller.getCharParty(socket);
         if (!party) {
