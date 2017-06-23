@@ -3,6 +3,7 @@ import { browser } from "protractor/built";
 
 export const TEST_USERNAME = 'test';
 export const TEST_USERNAME2 = 'test2';
+export const TEST_USERNAME3 = 'test3';
 export const TEST_USERNAME_UNCAUGHT = 'uncaughtTestName';
 export const TEST_PASSWORD = '12345678123456781234567812345678';
 

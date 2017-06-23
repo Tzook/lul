@@ -1,5 +1,5 @@
 import { browser, ProtractorBrowser } from "protractor/built";
-import { login, TEST_USERNAME2 } from "./user/user.common";
+import { login, TEST_USERNAME2, TEST_USERNAME3 } from './user/user.common';
 
 const WAIT_TIME = 5000;
 const URL = 'http://localhost:5000/';
@@ -14,11 +14,20 @@ export function raiseBrowser(b = {instance: browser}, username = undefined) {
 };
 
 export const newBrowser: {instance?: ProtractorBrowser} = {};
+export const browser3: {instance?: ProtractorBrowser} = {};
+
+function raiseNewBrowser(b, username) {
+    // see https://github.com/angular/protractor/blob/master/spec/interaction/interaction_spec.js
+    beforeAll(() => b.instance = browser.forkNewDriverInstance());
+    raiseBrowser(b as any, username);
+}
 
 export function raiseBrowser2() {
-    // see https://github.com/angular/protractor/blob/master/spec/interaction/interaction_spec.js
-    beforeAll(() => newBrowser.instance = browser.forkNewDriverInstance());
-    raiseBrowser(newBrowser as any, TEST_USERNAME2);
+    raiseNewBrowser(newBrowser, TEST_USERNAME2)
+}
+
+export function raiseBrowser3() {
+    raiseNewBrowser(browser3, TEST_USERNAME3)
 }
 
 export function clearLogs(b = browser) {
@@ -42,6 +51,7 @@ export function connectChars() {
     beforeAll(() => {
         connectChar();
         connectChar(newBrowser.instance);
+        connectChar(browser3.instance);
     });
 }
 
