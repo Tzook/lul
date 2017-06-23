@@ -1,6 +1,8 @@
 import { browser } from 'protractor/built';
-import { expectText, newBrowser, clearLogs } from '../common';
+import { expectText, newBrowser, clearLogs, browser3 } from '../common';
 import { getItemId, pickItem } from '../items/items.common';
+import { createParty, joinParty, leaveParty } from "../party/party.common";
+import { TEST_CHAR_NAME, TEST_CHAR_NAME2, TEST_CHAR_NAME3 } from '../character/character.common';
 
 describe('gold', () => {
     afterAll(() => clearLogs(newBrowser.instance));
@@ -12,6 +14,25 @@ describe('gold', () => {
                 clearLogs();
                 browser.executeScript(`socket.emit("picked_item", {item_id: "${itemId}"});`)
                 expectText(`"amount": 5`);
+            });
+        });
+
+        it('should share gold equally among all party members in room', () => {
+            createParty();
+            joinParty(browser, newBrowser.instance, TEST_CHAR_NAME, TEST_CHAR_NAME2);
+            joinParty(browser, browser3.instance, TEST_CHAR_NAME, TEST_CHAR_NAME3);
+            browser.executeScript(`socket.emit("dropped_gold", {amount: 10});`)
+            getItemId().then(itemId => {
+                clearLogs();
+                browser.executeScript(`socket.emit("picked_item", {item_id: "${itemId}"});`)
+                expectText(`"amount": 5`);
+                leaveParty();
+                leaveParty(newBrowser.instance);
+                leaveParty(browser3.instance);
+                // bring back the gold to the other char
+                newBrowser.instance.executeScript(`socket.emit("dropped_gold", {amount: 5});`)
+                expectText(`"amount": -5`, newBrowser.instance);
+                pickItem();
             });
         });
     });
@@ -34,8 +55,8 @@ describe('gold', () => {
             });
 
             it('should not allow to drop gold if character has zero gold', () => {
-                newBrowser.instance.executeScript(`socket.emit("dropped_gold", {amount: 5});`)
-                expectText(`"Character does not have gold to throw!"`, newBrowser.instance);
+                browser3.instance.executeScript(`socket.emit("dropped_gold", {amount: 5});`)
+                expectText(`"Character does not have gold to throw!"`, browser3.instance);
             });
         });
 

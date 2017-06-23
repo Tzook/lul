@@ -2,6 +2,7 @@
 import SocketioRouterBase from '../socketio/socketio.router.base';
 import ItemsRouter from '../items/items.router';
 import GoldMiddleware from './gold.middleware';
+import PartyRouter from '../party/party.router';
 
 let dropsConfig = require('../../../server/lib/drops/drops.config.json');
 let config = require('../../../server/lib/gold/gold.config.json');
@@ -9,10 +10,12 @@ let config = require('../../../server/lib/gold/gold.config.json');
 export default class GoldRouter extends SocketioRouterBase {
 	protected middleware: GoldMiddleware;
     protected itemsRouter: ItemsRouter;
+    protected partyRouter: PartyRouter;
 
 	init(files, app) {
 		super.init(files, app);
 		this.itemsRouter = files.routers.items;
+        this.partyRouter = files.routers.party;
 	}
 
 	[config.SERVER_GETS.ITEM_PICK.name](data, socket: GameSocket) {
@@ -21,7 +24,12 @@ export default class GoldRouter extends SocketioRouterBase {
             if (!this.middleware.isGold(itemInfo)) {
                 return;
             }
-            this[config.SERVER_INNER.ITEM_ADD.name]({item}, socket);
+            let partySockets = this.partyRouter.getPartyMembersInMap(socket);
+            // divide the gold equally among party members in room
+            item.stack = Math.ceil(item.stack / partySockets.length);
+            for (let memberSocket of partySockets) {
+                this[config.SERVER_INNER.ITEM_ADD.name]({item}, memberSocket);
+            }
             return true;
 		});
 	}
