@@ -149,6 +149,7 @@ export default class MobsController extends MasterController {
     public removeThreat(mob: MOB_INSTANCE, socket: GameSocket) {
         let maxSocket: GameSocket;
         let maxThreat = 0;
+        mob.threat.map.delete(socket.character.name);
         for (let [char, threat] of mob.threat.map) {
             let charSocket = socket.map.get(char);
             if (charSocket && charSocket.character.room === socket.character.room && threat > maxThreat) {
