@@ -6,18 +6,9 @@ let config = require('../../../server/lib/rooms/rooms.config.json');
 
 export default class RoomsController extends MasterController {
 	protected services: RoomsServices;
-	private io: SocketIO.Namespace;
 	private roomBitchKeys: Map<string, string> = new Map();
 	private roomBitches: Map<string, GameSocket> = new Map();
 	private roomBitchTimeouts: Map<string, number> = new Map();
-
-	constructor() {
-		super();
-	}
-
-	public setIo(io) {
-		this.io = io;
-	}
 
 	public socketJoinRoom(socket: GameSocket) {
 		let room = socket.character.room;

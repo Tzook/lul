@@ -9,15 +9,6 @@ export default class MobsController extends MasterController {
 	protected services: MobsServices;
 	private roomsMobs: Map<string, ROOM_MOBS> = new Map();
 	private mobById: Map<string, MOB_INSTANCE> = new Map();
-	private io: SocketIO.Namespace;
-
-	constructor() {
-		super();
-	}
-
-	public setIo(io) {
-		this.io = io;
-	}
 
 	// Socket functions
 	// =================

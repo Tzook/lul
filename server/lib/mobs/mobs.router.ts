@@ -22,8 +22,6 @@ export default class MobsRouter extends SocketioRouterBase {
 	}
 	
 	protected initRoutes(app) {
-		this.controller.setIo(this.io);
-
 		app.post(this.ROUTES.GENERATE,
 			this.middleware.validateHasSercetKey.bind(this.middleware),
 			this.controller.generateMobs.bind(this.controller));

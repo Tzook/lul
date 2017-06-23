@@ -17,8 +17,6 @@ export default class RoomsRouter extends SocketioRouterBase {
 	}
 
 	protected initRoutes(app) {
-		this.controller.setIo(this.io);
-		
 		app.post(this.ROUTES.GENERATE,
 			this.middleware.validateHasSercetKey.bind(this.middleware),
 			this.controller.generateRoom.bind(this.controller));
