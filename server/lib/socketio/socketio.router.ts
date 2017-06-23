@@ -132,7 +132,8 @@ export default class SocketioRouter extends SocketioRouterBase {
 					if (this.fitThrottle(socket, event, defaultThrottle, routerFn) && 
 						this.fitBitch(socket, event) && 
 						this.fitAlive(socket, event)) {
-						routerFn.apply(router, args);
+                            event.log && this.log(args[0], socket, event.name);
+						    routerFn.apply(router, args);
 					}
 				});
 			}

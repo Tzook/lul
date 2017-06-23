@@ -6,6 +6,7 @@ interface EVENT {
     throttle?: number;
     bitch?: boolean;
     alive?: boolean;
+    log?: boolean;
 }
 
 interface Doc {

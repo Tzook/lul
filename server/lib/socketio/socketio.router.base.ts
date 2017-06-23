@@ -30,6 +30,10 @@ export default class SocketioRouterBase extends MasterRouter {
 		return 'socketio';
 	}
 
+    protected log(data: any, socket: GameSocket, message: string) {
+        console.info(message, socket.character.name, data);
+    }
+
 	protected sendError(data: any, socket: GameSocket, error: string, emit = true, display = false) {
 		let event = "";
 		try {
