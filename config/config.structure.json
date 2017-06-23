@@ -22,7 +22,8 @@
 		"emote",
 		"stats",
 		"quests",
-		"combat"
+		"combat",
+		"party"
 	],
 	"skip": 	 { "master": 1 }
 }
