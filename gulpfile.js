@@ -15,13 +15,12 @@ function compile() {
 }
 
 gulp.task("compile", compile);
+gulp.task("restart", server.restart);
 
-gulp.task("restart", () => {
-    return compile().pipe(server({path: "output/main.js"}));
-});
-
-gulp.task("watch", ["restart"], () => {
-    gulp.watch(["server/**/*"], ["restart"]);
+gulp.task("watch", ["compile"], () => {
+    server.listen({path: "output/main.js"});
+    gulp.watch(["server/**/*"], ["compile"]);
+    gulp.watch(["output/**/*"], ["restart"])
 });
 
 gulp.task("default", () => {
