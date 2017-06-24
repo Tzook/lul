@@ -39,10 +39,10 @@ export default class ChatRouter extends SocketioRouterBase {
 
 	[SERVER_GETS.PARTY_CHAT.name](data, socket: GameSocket) {
 		const party = this.partyRouter.getCharParty(socket);
-		if (!party || !party.name) {
+		if (!party) {
 			this.sendError(data, socket, "Failed to find party for engaging in party chat");
 		} else {
-			socket.broadcast.to(party.name).emit(this.CLIENT_GETS.CHAT.name, {
+			socket.broadcast.to(party.name).emit(this.CLIENT_GETS.PARTY_CHAT.name, {
 				id: socket.character._id,
 				msg: data.msg,
 			});

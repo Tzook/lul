@@ -9,6 +9,6 @@
 		"SHOUT": {"name": "shout"},
 		"CHAT": {"name": "chat"},
 		"WHISPER": {"name": "whisper"},
-		"PARTY_CHAT": {"name": "party_chat", "log": true}
+		"PARTY_CHAT": {"name": "party_chat"}
 	}
 }
