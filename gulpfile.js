@@ -17,7 +17,7 @@ function compile() {
 gulp.task("compile", compile);
 
 gulp.task("restart", () => {
-    compile().pipe(server({path: "output/main.js"}));
+    return compile().pipe(server({path: "output/main.js"}));
 });
 
 gulp.task("watch", ["restart"], () => {

@@ -44,7 +44,7 @@
     "npm": "4.0.2"
   },
   "license": "MIT",
+    "//": "No devDependencies. Everything needed for compilation is in dependencies, because heroku compiles the files",
   "devDependencies": {
-      "//": "No devDependencies. Everything needed for compilation is in dependencies, because heroku compiles the files"
   }
 }

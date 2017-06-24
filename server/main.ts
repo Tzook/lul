@@ -8,4 +8,3 @@ main.useDependencies();
 main.beginServer();
 main.attachAppVariables();
 main.connectToDbAndBootstrap();
-console.log("This part was committed without compiling");
