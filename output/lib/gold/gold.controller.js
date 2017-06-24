@@ -1,9 +1,0 @@
-'use strict';
-Object.defineProperty(exports, "__esModule", { value: true });
-const master_controller_1 = require("../master/master.controller");
-class GoldController extends master_controller_1.default {
-}
-exports.default = GoldController;
-;
-
-//# sourceMappingURL=data:application/json;charset=utf8;base64,eyJ2ZXJzaW9uIjozLCJzb3VyY2VzIjpbIi4uL3NlcnZlci9saWIvZ29sZC9nb2xkLmNvbnRyb2xsZXIudHMiXSwibmFtZXMiOltdLCJtYXBwaW5ncyI6IkFBQUEsWUFBWSxDQUFDOztBQUNiLG1FQUEyRDtBQUUzRCxvQkFBb0MsU0FBUSwyQkFBZ0I7Q0FFM0Q7QUFGRCxpQ0FFQztBQUFBLENBQUMiLCJmaWxlIjoibGliL2dvbGQvZ29sZC5jb250cm9sbGVyLmpzIiwic291cmNlc0NvbnRlbnQiOlsiJ3VzZSBzdHJpY3QnO1xuaW1wb3J0IE1hc3RlckNvbnRyb2xsZXIgZnJvbSAnLi4vbWFzdGVyL21hc3Rlci5jb250cm9sbGVyJztcblxuZXhwb3J0IGRlZmF1bHQgY2xhc3MgR29sZENvbnRyb2xsZXIgZXh0ZW5kcyBNYXN0ZXJDb250cm9sbGVyIHtcblxufTsiXX0=

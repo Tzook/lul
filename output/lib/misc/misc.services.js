@@ -1,9 +1,0 @@
-'use strict';
-Object.defineProperty(exports, "__esModule", { value: true });
-const master_services_1 = require("../master/master.services");
-class MiscServices extends master_services_1.default {
-}
-exports.default = MiscServices;
-;
-
-//# sourceMappingURL=data:application/json;charset=utf8;base64,eyJ2ZXJzaW9uIjozLCJzb3VyY2VzIjpbIi4uL3NlcnZlci9saWIvbWlzYy9taXNjLnNlcnZpY2VzLnRzIl0sIm5hbWVzIjpbXSwibWFwcGluZ3MiOiJBQUFBLFlBQVksQ0FBQzs7QUFDYiwrREFBdUQ7QUFFdkQsa0JBQWtDLFNBQVEseUJBQWM7Q0FFdkQ7QUFGRCwrQkFFQztBQUFBLENBQUMiLCJmaWxlIjoibGliL21pc2MvbWlzYy5zZXJ2aWNlcy5qcyIsInNvdXJjZXNDb250ZW50IjpbIid1c2Ugc3RyaWN0JztcbmltcG9ydCBNYXN0ZXJTZXJ2aWNlcyBmcm9tICcuLi9tYXN0ZXIvbWFzdGVyLnNlcnZpY2VzJztcblxuZXhwb3J0IGRlZmF1bHQgY2xhc3MgTWlzY1NlcnZpY2VzIGV4dGVuZHMgTWFzdGVyU2VydmljZXMge1xuXG59OyJdfQ==

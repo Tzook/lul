@@ -1,9 +1,0 @@
-'use strict';
-Object.defineProperty(exports, "__esModule", { value: true });
-const master_middleware_1 = require("../master/master.middleware");
-class QuestsMiddleware extends master_middleware_1.default {
-}
-exports.default = QuestsMiddleware;
-;
-
-//# sourceMappingURL=data:application/json;charset=utf8;base64,eyJ2ZXJzaW9uIjozLCJzb3VyY2VzIjpbIi4uL3NlcnZlci9saWIvcXVlc3RzL3F1ZXN0cy5taWRkbGV3YXJlLnRzIl0sIm5hbWVzIjpbXSwibWFwcGluZ3MiOiJBQUFBLFlBQVksQ0FBQzs7QUFDYixtRUFBMkQ7QUFFM0Qsc0JBQXNDLFNBQVEsMkJBQWdCO0NBRTdEO0FBRkQsbUNBRUM7QUFBQSxDQUFDIiwiZmlsZSI6ImxpYi9xdWVzdHMvcXVlc3RzLm1pZGRsZXdhcmUuanMiLCJzb3VyY2VzQ29udGVudCI6WyIndXNlIHN0cmljdCc7XG5pbXBvcnQgTWFzdGVyTWlkZGxld2FyZSBmcm9tICcuLi9tYXN0ZXIvbWFzdGVyLm1pZGRsZXdhcmUnO1xuXG5leHBvcnQgZGVmYXVsdCBjbGFzcyBRdWVzdHNNaWRkbGV3YXJlIGV4dGVuZHMgTWFzdGVyTWlkZGxld2FyZSB7XG5cbn07Il19

@@ -1,9 +1,0 @@
-'use strict';
-Object.defineProperty(exports, "__esModule", { value: true });
-const master_middleware_1 = require("../master/master.middleware");
-class MovementMiddleware extends master_middleware_1.default {
-}
-exports.default = MovementMiddleware;
-;
-
-//# sourceMappingURL=data:application/json;charset=utf8;base64,eyJ2ZXJzaW9uIjozLCJzb3VyY2VzIjpbIi4uL3NlcnZlci9saWIvbW92ZW1lbnQvbW92ZW1lbnQubWlkZGxld2FyZS50cyJdLCJuYW1lcyI6W10sIm1hcHBpbmdzIjoiQUFBQSxZQUFZLENBQUM7O0FBQ2IsbUVBQTJEO0FBRTNELHdCQUF3QyxTQUFRLDJCQUFnQjtDQUUvRDtBQUZELHFDQUVDO0FBQUEsQ0FBQyIsImZpbGUiOiJsaWIvbW92ZW1lbnQvbW92ZW1lbnQubWlkZGxld2FyZS5qcyIsInNvdXJjZXNDb250ZW50IjpbIid1c2Ugc3RyaWN0JztcbmltcG9ydCBNYXN0ZXJNaWRkbGV3YXJlIGZyb20gJy4uL21hc3Rlci9tYXN0ZXIubWlkZGxld2FyZSc7XG5cbmV4cG9ydCBkZWZhdWx0IGNsYXNzIE1vdmVtZW50TWlkZGxld2FyZSBleHRlbmRzIE1hc3Rlck1pZGRsZXdhcmUge1xuXG59OyJdfQ==

@@ -1,9 +1,0 @@
-'use strict';
-Object.defineProperty(exports, "__esModule", { value: true });
-const master_services_1 = require("../master/master.services");
-class EmoteServices extends master_services_1.default {
-}
-exports.default = EmoteServices;
-;
-
-//# sourceMappingURL=data:application/json;charset=utf8;base64,eyJ2ZXJzaW9uIjozLCJzb3VyY2VzIjpbIi4uL3NlcnZlci9saWIvZW1vdGUvZW1vdGUuc2VydmljZXMudHMiXSwibmFtZXMiOltdLCJtYXBwaW5ncyI6IkFBQUEsWUFBWSxDQUFDOztBQUNiLCtEQUF1RDtBQUV2RCxtQkFBbUMsU0FBUSx5QkFBYztDQUV4RDtBQUZELGdDQUVDO0FBQUEsQ0FBQyIsImZpbGUiOiJsaWIvZW1vdGUvZW1vdGUuc2VydmljZXMuanMiLCJzb3VyY2VzQ29udGVudCI6WyIndXNlIHN0cmljdCc7XG5pbXBvcnQgTWFzdGVyU2VydmljZXMgZnJvbSAnLi4vbWFzdGVyL21hc3Rlci5zZXJ2aWNlcyc7XG5cbmV4cG9ydCBkZWZhdWx0IGNsYXNzIEVtb3RlU2VydmljZXMgZXh0ZW5kcyBNYXN0ZXJTZXJ2aWNlcyB7XG5cbn07Il19

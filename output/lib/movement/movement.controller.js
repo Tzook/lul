@@ -1,9 +1,0 @@
-'use strict';
-Object.defineProperty(exports, "__esModule", { value: true });
-const master_controller_1 = require("../master/master.controller");
-class MovementController extends master_controller_1.default {
-}
-exports.default = MovementController;
-;
-
-//# sourceMappingURL=data:application/json;charset=utf8;base64,eyJ2ZXJzaW9uIjozLCJzb3VyY2VzIjpbIi4uL3NlcnZlci9saWIvbW92ZW1lbnQvbW92ZW1lbnQuY29udHJvbGxlci50cyJdLCJuYW1lcyI6W10sIm1hcHBpbmdzIjoiQUFBQSxZQUFZLENBQUM7O0FBQ2IsbUVBQTJEO0FBRTNELHdCQUF3QyxTQUFRLDJCQUFnQjtDQUUvRDtBQUZELHFDQUVDO0FBQUEsQ0FBQyIsImZpbGUiOiJsaWIvbW92ZW1lbnQvbW92ZW1lbnQuY29udHJvbGxlci5qcyIsInNvdXJjZXNDb250ZW50IjpbIid1c2Ugc3RyaWN0JztcbmltcG9ydCBNYXN0ZXJDb250cm9sbGVyIGZyb20gJy4uL21hc3Rlci9tYXN0ZXIuY29udHJvbGxlcic7XG5cbmV4cG9ydCBkZWZhdWx0IGNsYXNzIE1vdmVtZW50Q29udHJvbGxlciBleHRlbmRzIE1hc3RlckNvbnRyb2xsZXIge1xuXG59OyJdfQ==

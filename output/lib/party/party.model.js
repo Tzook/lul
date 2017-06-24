@@ -1,9 +1,0 @@
-'use strict';
-Object.defineProperty(exports, "__esModule", { value: true });
-const master_model_1 = require("../master/master.model");
-class PartyModel extends master_model_1.default {
-}
-exports.default = PartyModel;
-;
-
-//# sourceMappingURL=data:application/json;charset=utf8;base64,eyJ2ZXJzaW9uIjozLCJzb3VyY2VzIjpbIi4uL3NlcnZlci9saWIvcGFydHkvcGFydHkubW9kZWwudHMiXSwibmFtZXMiOltdLCJtYXBwaW5ncyI6IkFBQUEsWUFBWSxDQUFDOztBQUNiLHlEQUFpRDtBQUVqRCxnQkFBZ0MsU0FBUSxzQkFBVztDQUVsRDtBQUZELDZCQUVDO0FBQUEsQ0FBQyIsImZpbGUiOiJsaWIvcGFydHkvcGFydHkubW9kZWwuanMiLCJzb3VyY2VzQ29udGVudCI6WyIndXNlIHN0cmljdCc7XG5pbXBvcnQgTWFzdGVyTW9kZWwgZnJvbSAnLi4vbWFzdGVyL21hc3Rlci5tb2RlbCc7XG5cbmV4cG9ydCBkZWZhdWx0IGNsYXNzIFBhcnR5TW9kZWwgZXh0ZW5kcyBNYXN0ZXJNb2RlbCB7XG5cbn07Il19

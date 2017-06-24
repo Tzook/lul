@@ -1,9 +1,0 @@
-'use strict';
-Object.defineProperty(exports, "__esModule", { value: true });
-const master_model_1 = require("../master/master.model");
-class EmoteModel extends master_model_1.default {
-}
-exports.default = EmoteModel;
-;
-
-//# sourceMappingURL=data:application/json;charset=utf8;base64,eyJ2ZXJzaW9uIjozLCJzb3VyY2VzIjpbIi4uL3NlcnZlci9saWIvZW1vdGUvZW1vdGUubW9kZWwudHMiXSwibmFtZXMiOltdLCJtYXBwaW5ncyI6IkFBQUEsWUFBWSxDQUFDOztBQUNiLHlEQUFpRDtBQUVqRCxnQkFBZ0MsU0FBUSxzQkFBVztDQUVsRDtBQUZELDZCQUVDO0FBQUEsQ0FBQyIsImZpbGUiOiJsaWIvZW1vdGUvZW1vdGUubW9kZWwuanMiLCJzb3VyY2VzQ29udGVudCI6WyIndXNlIHN0cmljdCc7XG5pbXBvcnQgTWFzdGVyTW9kZWwgZnJvbSAnLi4vbWFzdGVyL21hc3Rlci5tb2RlbCc7XG5cbmV4cG9ydCBkZWZhdWx0IGNsYXNzIEVtb3RlTW9kZWwgZXh0ZW5kcyBNYXN0ZXJNb2RlbCB7XG5cbn07Il19

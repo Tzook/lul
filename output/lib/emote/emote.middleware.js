@@ -1,9 +1,0 @@
-'use strict';
-Object.defineProperty(exports, "__esModule", { value: true });
-const master_middleware_1 = require("../master/master.middleware");
-class EmoteMiddleware extends master_middleware_1.default {
-}
-exports.default = EmoteMiddleware;
-;
-
-//# sourceMappingURL=data:application/json;charset=utf8;base64,eyJ2ZXJzaW9uIjozLCJzb3VyY2VzIjpbIi4uL3NlcnZlci9saWIvZW1vdGUvZW1vdGUubWlkZGxld2FyZS50cyJdLCJuYW1lcyI6W10sIm1hcHBpbmdzIjoiQUFBQSxZQUFZLENBQUM7O0FBQ2IsbUVBQTJEO0FBRTNELHFCQUFxQyxTQUFRLDJCQUFnQjtDQUU1RDtBQUZELGtDQUVDO0FBQUEsQ0FBQyIsImZpbGUiOiJsaWIvZW1vdGUvZW1vdGUubWlkZGxld2FyZS5qcyIsInNvdXJjZXNDb250ZW50IjpbIid1c2Ugc3RyaWN0JztcbmltcG9ydCBNYXN0ZXJNaWRkbGV3YXJlIGZyb20gJy4uL21hc3Rlci9tYXN0ZXIubWlkZGxld2FyZSc7XG5cbmV4cG9ydCBkZWZhdWx0IGNsYXNzIEVtb3RlTWlkZGxld2FyZSBleHRlbmRzIE1hc3Rlck1pZGRsZXdhcmUge1xuXG59OyJdfQ==

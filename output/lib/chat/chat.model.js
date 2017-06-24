@@ -1,9 +1,0 @@
-'use strict';
-Object.defineProperty(exports, "__esModule", { value: true });
-const master_model_1 = require("../master/master.model");
-class ChatModel extends master_model_1.default {
-}
-exports.default = ChatModel;
-;
-
-//# sourceMappingURL=data:application/json;charset=utf8;base64,eyJ2ZXJzaW9uIjozLCJzb3VyY2VzIjpbIi4uL3NlcnZlci9saWIvY2hhdC9jaGF0Lm1vZGVsLnRzIl0sIm5hbWVzIjpbXSwibWFwcGluZ3MiOiJBQUFBLFlBQVksQ0FBQzs7QUFDYix5REFBaUQ7QUFFakQsZUFBK0IsU0FBUSxzQkFBVztDQUVqRDtBQUZELDRCQUVDO0FBQUEsQ0FBQyIsImZpbGUiOiJsaWIvY2hhdC9jaGF0Lm1vZGVsLmpzIiwic291cmNlc0NvbnRlbnQiOlsiJ3VzZSBzdHJpY3QnO1xuaW1wb3J0IE1hc3Rlck1vZGVsIGZyb20gJy4uL21hc3Rlci9tYXN0ZXIubW9kZWwnO1xuXG5leHBvcnQgZGVmYXVsdCBjbGFzcyBDaGF0TW9kZWwgZXh0ZW5kcyBNYXN0ZXJNb2RlbCB7XG5cbn07Il19

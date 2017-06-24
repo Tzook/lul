@@ -1,9 +1,0 @@
-'use strict';
-Object.defineProperty(exports, "__esModule", { value: true });
-const master_controller_1 = require("../master/master.controller");
-class ChatController extends master_controller_1.default {
-}
-exports.default = ChatController;
-;
-
-//# sourceMappingURL=data:application/json;charset=utf8;base64,eyJ2ZXJzaW9uIjozLCJzb3VyY2VzIjpbIi4uL3NlcnZlci9saWIvY2hhdC9jaGF0LmNvbnRyb2xsZXIudHMiXSwibmFtZXMiOltdLCJtYXBwaW5ncyI6IkFBQUEsWUFBWSxDQUFDOztBQUNiLG1FQUEyRDtBQUUzRCxvQkFBb0MsU0FBUSwyQkFBZ0I7Q0FFM0Q7QUFGRCxpQ0FFQztBQUFBLENBQUMiLCJmaWxlIjoibGliL2NoYXQvY2hhdC5jb250cm9sbGVyLmpzIiwic291cmNlc0NvbnRlbnQiOlsiJ3VzZSBzdHJpY3QnO1xuaW1wb3J0IE1hc3RlckNvbnRyb2xsZXIgZnJvbSAnLi4vbWFzdGVyL21hc3Rlci5jb250cm9sbGVyJztcblxuZXhwb3J0IGRlZmF1bHQgY2xhc3MgQ2hhdENvbnRyb2xsZXIgZXh0ZW5kcyBNYXN0ZXJDb250cm9sbGVyIHtcblxufTsiXX0=

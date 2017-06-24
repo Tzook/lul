@@ -1,9 +1,0 @@
-'use strict';
-Object.defineProperty(exports, "__esModule", { value: true });
-const master_model_1 = require("../master/master.model");
-class CombatModel extends master_model_1.default {
-}
-exports.default = CombatModel;
-;
-
-//# sourceMappingURL=data:application/json;charset=utf8;base64,eyJ2ZXJzaW9uIjozLCJzb3VyY2VzIjpbIi4uL3NlcnZlci9saWIvY29tYmF0L2NvbWJhdC5tb2RlbC50cyJdLCJuYW1lcyI6W10sIm1hcHBpbmdzIjoiQUFBQSxZQUFZLENBQUM7O0FBQ2IseURBQWlEO0FBRWpELGlCQUFpQyxTQUFRLHNCQUFXO0NBRW5EO0FBRkQsOEJBRUM7QUFBQSxDQUFDIiwiZmlsZSI6ImxpYi9jb21iYXQvY29tYmF0Lm1vZGVsLmpzIiwic291cmNlc0NvbnRlbnQiOlsiJ3VzZSBzdHJpY3QnO1xuaW1wb3J0IE1hc3Rlck1vZGVsIGZyb20gJy4uL21hc3Rlci9tYXN0ZXIubW9kZWwnO1xuXG5leHBvcnQgZGVmYXVsdCBjbGFzcyBDb21iYXRNb2RlbCBleHRlbmRzIE1hc3Rlck1vZGVsIHtcblxufTsiXX0=

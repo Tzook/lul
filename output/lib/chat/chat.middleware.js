@@ -1,9 +1,0 @@
-'use strict';
-Object.defineProperty(exports, "__esModule", { value: true });
-const master_middleware_1 = require("../master/master.middleware");
-class ChatMiddleware extends master_middleware_1.default {
-}
-exports.default = ChatMiddleware;
-;
-
-//# sourceMappingURL=data:application/json;charset=utf8;base64,eyJ2ZXJzaW9uIjozLCJzb3VyY2VzIjpbIi4uL3NlcnZlci9saWIvY2hhdC9jaGF0Lm1pZGRsZXdhcmUudHMiXSwibmFtZXMiOltdLCJtYXBwaW5ncyI6IkFBQUEsWUFBWSxDQUFDOztBQUNiLG1FQUEyRDtBQUUzRCxvQkFBb0MsU0FBUSwyQkFBZ0I7Q0FFM0Q7QUFGRCxpQ0FFQztBQUFBLENBQUMiLCJmaWxlIjoibGliL2NoYXQvY2hhdC5taWRkbGV3YXJlLmpzIiwic291cmNlc0NvbnRlbnQiOlsiJ3VzZSBzdHJpY3QnO1xuaW1wb3J0IE1hc3Rlck1pZGRsZXdhcmUgZnJvbSAnLi4vbWFzdGVyL21hc3Rlci5taWRkbGV3YXJlJztcblxuZXhwb3J0IGRlZmF1bHQgY2xhc3MgQ2hhdE1pZGRsZXdhcmUgZXh0ZW5kcyBNYXN0ZXJNaWRkbGV3YXJlIHtcblxufTsiXX0=

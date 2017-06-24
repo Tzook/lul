@@ -1,9 +1,0 @@
-'use strict';
-Object.defineProperty(exports, "__esModule", { value: true });
-const items_middleware_1 = require("../items/items.middleware");
-class MiscMiddleware extends items_middleware_1.default {
-}
-exports.default = MiscMiddleware;
-;
-
-//# sourceMappingURL=data:application/json;charset=utf8;base64,eyJ2ZXJzaW9uIjozLCJzb3VyY2VzIjpbIi4uL3NlcnZlci9saWIvbWlzYy9taXNjLm1pZGRsZXdhcmUudHMiXSwibmFtZXMiOltdLCJtYXBwaW5ncyI6IkFBQUEsWUFBWSxDQUFDOztBQUNiLGdFQUF3RDtBQUV4RCxvQkFBb0MsU0FBUSwwQkFBZTtDQUUxRDtBQUZELGlDQUVDO0FBQUEsQ0FBQyIsImZpbGUiOiJsaWIvbWlzYy9taXNjLm1pZGRsZXdhcmUuanMiLCJzb3VyY2VzQ29udGVudCI6WyIndXNlIHN0cmljdCc7XG5pbXBvcnQgSXRlbXNNaWRkbGV3YXJlIGZyb20gJy4uL2l0ZW1zL2l0ZW1zLm1pZGRsZXdhcmUnO1xuXG5leHBvcnQgZGVmYXVsdCBjbGFzcyBNaXNjTWlkZGxld2FyZSBleHRlbmRzIEl0ZW1zTWlkZGxld2FyZSB7XG4gICAgXG59OyJdfQ==

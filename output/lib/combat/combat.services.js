@@ -1,9 +1,0 @@
-'use strict';
-Object.defineProperty(exports, "__esModule", { value: true });
-const master_services_1 = require("../master/master.services");
-class CombatServices extends master_services_1.default {
-}
-exports.default = CombatServices;
-;
-
-//# sourceMappingURL=data:application/json;charset=utf8;base64,eyJ2ZXJzaW9uIjozLCJzb3VyY2VzIjpbIi4uL3NlcnZlci9saWIvY29tYmF0L2NvbWJhdC5zZXJ2aWNlcy50cyJdLCJuYW1lcyI6W10sIm1hcHBpbmdzIjoiQUFBQSxZQUFZLENBQUM7O0FBQ2IsK0RBQXVEO0FBRXZELG9CQUFvQyxTQUFRLHlCQUFjO0NBRXpEO0FBRkQsaUNBRUM7QUFBQSxDQUFDIiwiZmlsZSI6ImxpYi9jb21iYXQvY29tYmF0LnNlcnZpY2VzLmpzIiwic291cmNlc0NvbnRlbnQiOlsiJ3VzZSBzdHJpY3QnO1xuaW1wb3J0IE1hc3RlclNlcnZpY2VzIGZyb20gJy4uL21hc3Rlci9tYXN0ZXIuc2VydmljZXMnO1xuXG5leHBvcnQgZGVmYXVsdCBjbGFzcyBDb21iYXRTZXJ2aWNlcyBleHRlbmRzIE1hc3RlclNlcnZpY2VzIHtcblxufTsiXX0=
