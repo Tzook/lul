@@ -5,9 +5,9 @@ import MasterRouter from "../master/master.router";
 import * as Heroku from 'heroku-client';
 import SocketioMiddleware from './socketio.middleware';
 import SocketioServices from './socketio.services';
+import config from "./socketio.config";
 require('./socketio.fixer');
-let passportSocketIo = require('passport.socketio');
-let config = require('../../../server/lib/socketio/socketio.config.json');
+import * as passportSocketIo from 'passport.socketio';
 
 export default class SocketioRouter extends SocketioRouterBase {
 	protected middleware: SocketioMiddleware;

@@ -1,5 +1,5 @@
 'use strict';
-let config = require('../../../server/lib/master/master.config.json');
+import config from "../master/master.config";
 const STATUS_CODES = config.STATUS_CODES;
 
 export default class Response {

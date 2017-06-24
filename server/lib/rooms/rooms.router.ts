@@ -4,7 +4,7 @@ import * as _ from 'underscore';
 import RoomsController from './rooms.controller';
 import RoomsMiddleware from "./rooms.middleware";
 import RoomsServices from "./rooms.services";
-let config = require('../../../server/lib/rooms/rooms.config.json');
+import config from "./rooms.config";
 
 export default class RoomsRouter extends SocketioRouterBase {
 	protected middleware: RoomsMiddleware;

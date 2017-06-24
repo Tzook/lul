@@ -5,8 +5,7 @@ import DropsController from "./drops.controller";
 import ItemsRouter from '../items/items.router';
 import DropsServices from './drops.services';
 import PartyRouter from '../party/party.router';
-let config = require('../../../server/lib/drops/drops.config.json');
-let SERVER_GETS = config.SERVER_GETS;
+import config from "../drops/drops.config";
 
 export default class DropsRouter extends SocketioRouterBase {
     private dropsMap: Map<string, Map<string, ITEM_DROP>> = new Map();
@@ -32,7 +31,7 @@ export default class DropsRouter extends SocketioRouterBase {
 		return map;
 	}
 
-	[SERVER_GETS.ENTERED_ROOM.name](data, socket: GameSocket) {
+	[config.SERVER_GETS.ENTERED_ROOM.name](data, socket: GameSocket) {
 		this.getRoomMap(socket).forEach(itemData => {
 			socket.emit(this.CLIENT_GETS.ITEMS_DROP.name, [itemData]);
 		});
@@ -138,7 +137,7 @@ export default class DropsRouter extends SocketioRouterBase {
         } 
 	}
 
-	[SERVER_GETS.ITEMS_LOCATIONS.name](data, socket: GameSocket) {
+	[config.SERVER_GETS.ITEMS_LOCATIONS.name](data, socket: GameSocket) {
 		let items = data.items;
 		if (!_.isArray(items)) {
 			return this.sendError(data, socket, "Must provide an array of items to update locations");

@@ -3,9 +3,8 @@ import SocketioRouterBase from '../socketio/socketio.router.base';
 import ItemsRouter from '../items/items.router';
 import GoldMiddleware from './gold.middleware';
 import PartyRouter from '../party/party.router';
-
-let dropsConfig = require('../../../server/lib/drops/drops.config.json');
-let config = require('../../../server/lib/gold/gold.config.json');
+import dropsConfig from "../drops/drops.config";
+import config from "../gold/gold.config";
 
 export default class GoldRouter extends SocketioRouterBase {
 	protected middleware: GoldMiddleware;

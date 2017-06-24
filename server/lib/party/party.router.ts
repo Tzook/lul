@@ -2,7 +2,7 @@
 import SocketioRouterBase from '../socketio/socketio.router.base';
 import PartyController from './party.controller';
 import PartyMiddleware from './party.middleware';
-let config = require('../../../server/lib/party/party.config.json');
+import config from "./party.config";
 
 export default class PartyRouter extends SocketioRouterBase {
     protected controller: PartyController;

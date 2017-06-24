@@ -3,10 +3,9 @@ import SocketioRouterBase from '../socketio/socketio.router.base';
 import ItemsRouter from '../items/items.router';
 import MiscMiddleware from "./misc.middleware";
 import MiscController from "./misc.controller";
-
-let dropsConfig = require('../../../server/lib/drops/drops.config.json');
-let itemsConfig = require('../../../server/lib/items/items.config.json');
-let config = require('../../../server/lib/misc/misc.config.json');
+import dropsConfig from "../drops/drops.config";
+import itemsConfig from "../items/items.config";
+import config from "../misc/misc.config";
 
 export default class MiscRouter extends SocketioRouterBase {
 	protected itemsRouter: ItemsRouter;

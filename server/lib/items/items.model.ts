@@ -2,7 +2,7 @@
 import MasterModel from "../master/master.model";
 import ItemsController from './items.controller';
 import { BASE_STATS_SCHEMA } from "../stats/stats.model";
-let config = require('../../../server/lib/items/items.config.json');
+import config from "../items/items.config";
 
 export const REQUIRE_SCHEMA = {
     str: Number,

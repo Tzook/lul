@@ -6,9 +6,9 @@ import QuestsServices from './quests.services';
 import ItemsRouter from '../items/items.router';
 import * as _ from 'underscore';
 import PartyRouter from '../party/party.router';
-let config = require('../../../server/lib/quests/quests.config.json');
-let statsConfig = require('../../../server/lib/stats/stats.config.json');
-let itemsConfig = require('../../../server/lib/items/items.config.json');
+import config from './quests.config';
+import statsConfig from '../stats/stats.config';
+import itemsConfig from '../items/items.config';
 
 export default class QuestsRouter extends SocketioRouterBase {
 	protected middleware: QuestsMiddleware;

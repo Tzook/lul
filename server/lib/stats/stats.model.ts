@@ -2,7 +2,7 @@
 import MasterModel from '../master/master.model';
 import StatsServices from './stats.services';
 import * as _ from 'underscore';
-let config = require('../../../server/lib/stats/stats.config.json');
+import config from "./stats.config";
 
 const BAR_SCHEMA = {
     now: Number,

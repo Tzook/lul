@@ -4,14 +4,14 @@ import StatsController from './stats.controller';
 import StatsServices from './stats.services';
 import { EQUIPS_SCHEMA } from '../equips/equips.model';
 import { BASE_STATS_SCHEMA } from "./stats.model";
-let config = require('../../../server/lib/stats/stats.config.json');
-let roomsConfig = require('../../../server/lib/rooms/rooms.config.json');
+import config from "./stats.config";
+import roomsConfig from "../rooms/rooms.config";
 
 export default class StatsRouter extends SocketioRouterBase {
     protected controller: StatsController;
     protected services: StatsServices;
-    private hpTimeoutId: number;
-    private mpTimeoutId: number;
+    private hpTimeoutId: NodeJS.Timer;
+    private mpTimeoutId: NodeJS.Timer;
 
 	init(files, app) {
 		this.services = files.services;

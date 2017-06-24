@@ -3,10 +3,9 @@ import SocketioRouterBase from '../socketio/socketio.router.base';
 import EquipsMiddleware from './equips.middleware';
 import ItemsRouter from '../items/items.router';
 import EquipsController from './equips.controller';
-let config = require('../../../server/lib/equips/equips.config.json');
-let dropsConfig = require('../../../server/lib/drops/drops.config.json');
-let statsConfig = require('../../../server/lib/stats/stats.config.json');
-let SERVER_GETS = config.SERVER_GETS;
+import config from "../equips/equips.config";
+import dropsConfig from "../drops/drops.config";
+import statsConfig from "../stats/stats.config";
 
 export default class EquipsRouter extends SocketioRouterBase {
 	protected controller: EquipsController;
@@ -26,7 +25,7 @@ export default class EquipsRouter extends SocketioRouterBase {
 			this.controller.beginEquips.bind(this.controller));
 	}
 
-	[SERVER_GETS.EQUIP_ITEM.name](data, socket: GameSocket) {
+	[config.SERVER_GETS.EQUIP_ITEM.name](data, socket: GameSocket) {
 		let from: number = data.from;
 		let to: string = data.to;
 		if (this.middleware.isValidItemSlot(from)
@@ -56,7 +55,7 @@ export default class EquipsRouter extends SocketioRouterBase {
 		}
 	}
 
-	[SERVER_GETS.UNEQUIP_ITEM.name](data, socket: GameSocket) {
+	[config.SERVER_GETS.UNEQUIP_ITEM.name](data, socket: GameSocket) {
 		let from: string = data.from;
 		let to: number = data.to;
 		if (this.middleware.isValidEquipSlot(from)
@@ -85,10 +84,10 @@ export default class EquipsRouter extends SocketioRouterBase {
 		}
 	}
 
-	[SERVER_GETS.USE_EQUIP.name](data, socket: GameSocket) {
+	[config.SERVER_GETS.USE_EQUIP.name](data, socket: GameSocket) {
 		let slot = this.middleware.getFirstAvailableSlot(socket);
 		if (slot >= 0) {
-			this[SERVER_GETS.UNEQUIP_ITEM.name]({
+			this[config.SERVER_GETS.UNEQUIP_ITEM.name]({
 				from: data.slot,
 				to: slot
 			}, socket);
@@ -97,7 +96,7 @@ export default class EquipsRouter extends SocketioRouterBase {
 		}
 	}
 
-	[SERVER_GETS.USE_ITEM.name](data, socket: GameSocket) {
+	[config.SERVER_GETS.USE_ITEM.name](data, socket: GameSocket) {
 		let itemSlot: number = data.slot;
 		if (this.middleware.isValidItemSlot(itemSlot)) {
 			let item = socket.character.items[itemSlot];
@@ -105,7 +104,7 @@ export default class EquipsRouter extends SocketioRouterBase {
 			if (!itemInfo) {
 				this.sendError(data, socket, "Could not find item info for item " + item.key);
 			} else if (this.middleware.isValidEquipItem(itemInfo)) {
-				this[SERVER_GETS.EQUIP_ITEM.name]({
+				this[config.SERVER_GETS.EQUIP_ITEM.name]({
 					from: itemSlot,
 					to: itemInfo.type
 				}, socket);
@@ -117,7 +116,7 @@ export default class EquipsRouter extends SocketioRouterBase {
 		}
 	}
 
-	[SERVER_GETS.DROP_EQUIP.name](data, socket: GameSocket) {
+	[config.SERVER_GETS.DROP_EQUIP.name](data, socket: GameSocket) {
 		let slot = data.slot;
 		if (this.middleware.hasEquip(socket, slot)) {
 			let equip = socket.character.equips[slot];

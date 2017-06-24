@@ -1,7 +1,7 @@
 'use strict';
 import MasterMiddleware from '../master/master.middleware';
 import ItemsServices from './items.services';
-let config = require('../../../server/lib/items/items.config.json');
+import config from "../items/items.config";
 
 export const NO_SLOT = -1;
 

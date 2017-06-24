@@ -3,8 +3,8 @@ import SocketioRouterBase from '../socketio/socketio.router.base';
 import ItemsMiddleware from "./items.middleware";
 import ItemsController from './items.controller';
 import ItemsServices from './items.services';
-let dropsConfig = require('../../../server/lib/drops/drops.config.json');
-let config = require('../../../server/lib/items/items.config.json');
+import dropsConfig from "../drops/drops.config";
+import config from "../items/items.config";
 
 export default class ItemsRouter extends SocketioRouterBase {
 	protected middleware: ItemsMiddleware;

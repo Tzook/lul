@@ -1,7 +1,7 @@
 'use strict';
 import SocketioRouterBase from '../socketio/socketio.router.base';
 import PartyRouter from "../party/party.router";
-let SERVER_GETS = require('../../../server/lib/chat/chat.config.json').SERVER_GETS;
+import config from "../chat/chat.config";
 
 export default class ChatRouter extends SocketioRouterBase {
 	protected partyRouter: PartyRouter;
@@ -11,21 +11,21 @@ export default class ChatRouter extends SocketioRouterBase {
         this.partyRouter = files.routers.party;
 	}
 
-	[SERVER_GETS.SHOUT.name](data, socket: GameSocket) {
+	[config.SERVER_GETS.SHOUT.name](data, socket: GameSocket) {
 		socket.broadcast.emit(this.CLIENT_GETS.SHOUT.name, {
 			id: socket.character._id,
 			msg: data.msg,
 		});
 	}
 
-	[SERVER_GETS.CHAT.name](data, socket: GameSocket) {
+	[config.SERVER_GETS.CHAT.name](data, socket: GameSocket) {
 		socket.broadcast.to(socket.character.room).emit(this.CLIENT_GETS.CHAT.name, {
 			id: socket.character._id,
 			msg: data.msg,
 		});
 	}
 
-	[SERVER_GETS.WHISPER.name](data, socket: GameSocket) {
+	[config.SERVER_GETS.WHISPER.name](data, socket: GameSocket) {
 		let targetSocket = socket.map.get(data.to);
 		if (!targetSocket) {
 			this.sendError(data, socket, "Failed to find socket for whisper");
@@ -37,7 +37,7 @@ export default class ChatRouter extends SocketioRouterBase {
 		}
 	}
 
-	[SERVER_GETS.PARTY_CHAT.name](data, socket: GameSocket) {
+	[config.SERVER_GETS.PARTY_CHAT.name](data, socket: GameSocket) {
 		const party = this.partyRouter.getCharParty(socket);
 		if (!party) {
 			this.sendError(data, socket, "Failed to find party for engaging in party chat");

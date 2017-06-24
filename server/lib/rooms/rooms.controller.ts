@@ -2,13 +2,13 @@
 import MasterController from '../master/master.controller';
 import * as _ from 'underscore';
 import RoomsServices from "./rooms.services";
-let config = require('../../../server/lib/rooms/rooms.config.json');
+import config from "./rooms.config";
 
 export default class RoomsController extends MasterController {
 	protected services: RoomsServices;
 	private roomBitchKeys: Map<string, string> = new Map();
 	private roomBitches: Map<string, GameSocket> = new Map();
-	private roomBitchTimeouts: Map<string, number> = new Map();
+	private roomBitchTimeouts: Map<string, NodeJS.Timer> = new Map();
 
 	public socketJoinRoom(socket: GameSocket) {
 		let room = socket.character.room;

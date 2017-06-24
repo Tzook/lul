@@ -1,7 +1,7 @@
 'use strict';
 import MasterMiddleware from '../master/master.middleware';
 import CharacterServices from './character.services';
-let config = require('../../../server/lib/character/character.config.json');
+import config from "../character/character.config";
 
 export default class CharacterMiddleware extends MasterMiddleware {
 	protected services: CharacterServices;

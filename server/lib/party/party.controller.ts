@@ -2,7 +2,7 @@
 import MasterController from '../master/master.controller';
 import PartyServices from './party.services';
 import PartyMiddleware from './party.middleware';
-let config = require('../../../server/lib/party/party.config.json');
+import config from "./party.config";
 
 export default class PartyController extends MasterController {
     protected services: PartyServices;

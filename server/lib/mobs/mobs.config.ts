@@ -25,5 +25,5 @@ export default {
 		"MOB_MOVE": {"name": "mob_move"},
 		"AGGRO": {"name": "aggro"}
 	},
-    "MEELE_THREAT": "1.2"
+    "MEELE_THREAT": 1.2
 }

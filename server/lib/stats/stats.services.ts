@@ -1,6 +1,6 @@
 'use strict';
 import MasterServices from '../master/master.services';
-let config = require('../../../server/lib/stats/stats.config.json');
+import config from './stats.config';
 import * as _ from 'underscore';
 
 export default class StatsServices extends MasterServices {

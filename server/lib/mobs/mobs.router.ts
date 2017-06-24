@@ -1,14 +1,14 @@
 'use strict';
-import SocketioRouterBase from '../socketio/socketio.router.base';
+import SocketioRouterBase from "../socketio/socketio.router.base";
 import MobsMiddleware from "./mobs.middleware";
 import MobsController from "./mobs.controller";
 import RoomsRouter from "../rooms/rooms.router";
-import MobsServices from './mobs.services';
-import PartyRouter from '../party/party.router';
-let config = require('../../../server/lib/mobs/mobs.config.json');
-let statsConfig = require('../../../server/lib/stats/stats.config.json');
-let dropsConfig = require('../../../server/lib/drops/drops.config.json');
-let questsConfig = require('../../../server/lib/quests/quests.config.json');
+import MobsServices from "./mobs.services";
+import PartyRouter from "../party/party.router";
+import config from "../mobs/mobs.config";
+import statsConfig from "../stats/stats.config";
+import dropsConfig from "../drops/drops.config";
+import questsConfig from "../quests/quests.config";
 
 export default class MobsRouter extends SocketioRouterBase {
 	protected middleware: MobsMiddleware;

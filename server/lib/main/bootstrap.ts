@@ -35,15 +35,15 @@ export default class Bootstrap {
     }
 
     private createFiles(structure, i) {
-        let files = {};
+        let files: any = {};
         // creates new instances
         let feature = structure.folders[i];
         for (let j = 0; j < structure.templates.length; j++) {
-            let path = `../${feature}/${feature}.${structure.templates[j]}.js`;
+            let path = `../${feature}/${feature}.${structure.templates[j]}`;
             files[structure.templates[j]] = new (require(path).default)();
-        }
+        } 
         // load config files
-        files["config"] = require(`../${feature}/${feature}.config.js`);
+        files.config = require(`../${feature}/${feature}.config`).default;
 
         return files;
     }
