@@ -19,6 +19,10 @@
     "express": "4.15.3",
     "express-session": "1.15.3",
     "forever": "0.15.3",
+    "gulp": "3.9.1",
+    "gulp-develop-server": "0.5.2",
+    "gulp-sourcemaps": "2.6.0",
+    "gulp-typescript": "3.1.7",
     "heroku-client": "3.0.2",
     "mongoose": "4.10.2",
     "passport": "0.3.2",
@@ -26,6 +30,7 @@
     "passport.socketio": "3.7.0",
     "q": "1.5.0",
     "socket.io": "2.0.3",
+    "typescript": "2.3.4",
     "underscore": "1.8.3"
   },
   "engines": {
@@ -38,11 +43,6 @@
     "@types/mongoose": "4.7.13",
     "@types/node": "8.0.2",
     "@types/socket.io": "1.4.29",
-    "@types/underscore": "1.8.1",
-    "gulp": "3.9.1",
-    "gulp-develop-server": "0.5.2",
-    "gulp-sourcemaps": "2.6.0",
-    "gulp-typescript": "3.1.7",
-    "typescript": "2.3.4"
+    "@types/underscore": "1.8.1"
   }
 }
