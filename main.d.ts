@@ -52,6 +52,7 @@ interface Stats {
         total: number,
         regen: number,
     },
+    class: string,
     abilities: string[],
     primaryAbility: string,
 }

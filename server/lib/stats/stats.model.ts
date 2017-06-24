@@ -27,6 +27,7 @@ const STATS_SCHEMA = {
     hp: {},
     mp: {},
     abilities: config.BEGIN_ABILITIES,
+    class: "adventurer",
     primaryAbility: config.ABILITY_MELEE
 }
 
