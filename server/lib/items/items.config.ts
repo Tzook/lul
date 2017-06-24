@@ -1,4 +1,4 @@
-{
+export default {
 	"ROUTES": {
 		"GENERATE": "/items/generate"
 	},

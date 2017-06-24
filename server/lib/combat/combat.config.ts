@@ -1,4 +1,4 @@
-{
+export default {
 	"SERVER_GETS": {
 		"LOAD_ATTACK": {"name": "loaded_attack", "alive": true, "log": true},
 		"PERFORM_ATTACK": {"name": "performed_attack", "alive": true, "log": true},

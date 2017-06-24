@@ -4,7 +4,6 @@
 				  "model",
 				  "router",
 				  "services"],
-	"configs":	 ["config"],
 	"folders": [
 		"master",
 		"user",

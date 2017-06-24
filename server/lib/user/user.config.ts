@@ -1,4 +1,4 @@
-{
+export default {
 	"ROUTES": {
 		"USER_DELETE": "/user/delete",
 		"USER_LOGIN": "/user/login",

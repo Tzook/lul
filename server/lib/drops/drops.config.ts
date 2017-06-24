@@ -1,4 +1,4 @@
-{
+export default {
 	"SERVER_INNER": {
 		"ITEM_PICK": {"name": "item_pick"},
 		"ITEMS_DROP": {"name": "items_drop"},

@@ -1,4 +1,4 @@
-{
+export default {
 	"SERVER_INNER": {
 		"GAIN_EXP": {"name": "gain_exp", "alive": true, "log": true},
 		"GAIN_HP": {"name": "gain_hp", "alive": true, "log": true},

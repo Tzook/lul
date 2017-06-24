@@ -1,4 +1,4 @@
-{
+export default {
 	"SERVER_INNER": {
 		"ITEM_REMOVE": {"name": "remove_item"},
 		"ITEM_ADD": {"name": "add_item"}

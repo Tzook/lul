@@ -1,4 +1,4 @@
-{
+export default {
 	"SERVER_GETS": {
 		"SHOUT": {"name": "shouted", "log": true},
 		"CHAT": {"name": "chatted", "log": true},

@@ -1,4 +1,4 @@
-{
+export default {
 	"ROUTES": {
 		"CHARACTER_CREATE": "/character/create",
 		"CHARACTER_DELETE": "/character/delete"

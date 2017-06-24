@@ -1,4 +1,4 @@
-{
+export default {
 	"SERVER_GETS": {
 		"MOVEMENT": {"name": "movement", "throttle": 0},
 		"START_CLIMB": {"name": "started_climbing", "alive": true},

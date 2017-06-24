@@ -1,4 +1,4 @@
-{
+export default {
 	"SERVER_GETS": {
         "CREATE_PARTY": {"name": "create_party", "log": true},
         "INVITE_TO_PARTY": {"name": "invite_to_party", "log": true},

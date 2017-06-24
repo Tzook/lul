@@ -1,4 +1,4 @@
-{
+export default {
 	"SERVER_GETS": {
 		"EMOTE": {"name": "emoted", "log": true}
 	},
