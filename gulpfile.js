@@ -5,14 +5,19 @@ const ts = require("gulp-typescript");
 const sourcemaps = require('gulp-sourcemaps');
 const tsProject = ts.createProject("tsconfig.json");
 
-gulp.task("restart", () => {
-    tsProject.src()
+function compile() {
+    return tsProject.src()
         .pipe(sourcemaps.init())
         .pipe(tsProject())
         .js
         .pipe(sourcemaps.write())
-        .pipe(gulp.dest(tsProject.options.outDir))
-        .pipe(server({path: "output/main.js"}));
+        .pipe(gulp.dest(tsProject.options.outDir));
+}
+
+gulp.task("compile", compile);
+
+gulp.task("restart", () => {
+    compile().pipe(server({path: "output/main.js"}));
 });
 
 gulp.task("watch", ["restart"], () => {

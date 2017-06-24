@@ -7,7 +7,8 @@
     "// start-explanation": "1) verify n exists. 2) verify node latest version exists while keeping the machine's original node version installed. 3) start app with node latest version",
     "start": "INSTALL_V=8.1.2 && ([ -a /usr/local/bin/n ] || sudo npm i -g n) && ([ -d /usr/local/n/versions/node/$INSTALL_V ] || (CURRENT_V=$(node -v) && sudo n $INSTALL_V && sudo n $CURRENT_V)) && n use $INSTALL_V node_modules/.bin/gulp watch --color",
     "// test-explanation": "1) start app in the background and save its process id. 2) run tests in tests folder. 3) kill app with saved proccess id.",
-    "test": "gulp & SERVER_PID=$!; (cd tests; npm i && node run-tests.js); kill $SERVER_PID"
+    "test": "gulp & SERVER_PID=$!; (cd tests; npm i && node run-tests.js); kill $SERVER_PID",
+    "postinstall": "echo 'Testing if post install actually works for heroku' && gulp compile"
   },
   "dependencies": {
     "body-parser": "1.17.2",
