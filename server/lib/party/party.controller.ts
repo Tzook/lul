@@ -48,10 +48,10 @@ export default class PartyController extends MasterController {
         this.io.to(party.name).emit(config.CLIENT_GETS.JOIN_PARTY.name, {
             char_name: socket.character.name
         });
+        party.members.add(socket.character.name);
         this.tellPartyMembers(socket, party);
 
         this.charToParty.set(socket.character.name, party);
-        party.members.add(socket.character.name);
         clearTimeout(party.invitees.get(socket.character.name));
         party.invitees.delete(socket.character.name);
     }
