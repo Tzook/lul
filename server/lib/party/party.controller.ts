@@ -35,7 +35,9 @@ export default class PartyController extends MasterController {
     }
 
     public inviteToParty(inviteeSocket: GameSocket, party: PARTY_MODEL) {
-        inviteeSocket.emit(config.CLIENT_GETS.INVITE_TO_PARTY.name, {});
+        inviteeSocket.emit(config.CLIENT_GETS.INVITE_TO_PARTY.name, {
+            leader_name: party.leader
+        });
         party.invitees.set(inviteeSocket.character.name, setTimeout(() => {
             // remove the invitation after a certain amount of time
             party.invitees.delete(inviteeSocket.character.name);
