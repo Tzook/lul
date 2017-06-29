@@ -6,15 +6,15 @@
   "scripts": {
     "// start-explanation": "1) verify n exists. 2) verify node latest version exists while keeping the machine's original node version installed. 3) start app with node latest version",
     "start": "INSTALL_V=8.1.2 && ([ -a /usr/local/bin/n ] || sudo npm i -g n) && ([ -d /usr/local/n/versions/node/$INSTALL_V ] || (CURRENT_V=$(node -v) && sudo n $INSTALL_V && sudo n $CURRENT_V)) && n use $INSTALL_V node_modules/.bin/gulp watch --color",
-    "// test-explanation": "1) start app in the background and save its process id. 2) run tests in tests folder. 3) kill app with saved proccess id.",
+    "// test-explanation": "1) start app in the background and save its process id. 2) run tests in tests folder. 3) kill app with saved process id.",
     "test": "gulp & SERVER_PID=$!; (cd tests; npm i && node run-tests.js); kill $SERVER_PID",
     "// postinstall-explanation": "this task is run by heroku after deploying, so it compiles the output files",
     "postinstall": "gulp compile"
   },
   "dependencies": {
-    "@types/express": "4.0.35",
-    "@types/mongoose": "4.7.13",
-    "@types/node": "8.0.2",
+    "@types/express": "4.0.36",
+    "@types/mongoose": "4.7.18",
+    "@types/node": "8.0.6",
     "@types/socket.io": "1.4.29",
     "@types/underscore": "1.8.1",
     "body-parser": "1.17.2",
@@ -30,13 +30,13 @@
     "gulp-sourcemaps": "2.6.0",
     "gulp-typescript": "3.1.7",
     "heroku-client": "3.0.2",
-    "mongoose": "4.10.2",
+    "mongoose": "4.11.0",
     "passport": "0.3.2",
     "passport-local": "1.0.0",
     "passport.socketio": "3.7.0",
     "q": "1.5.0",
     "socket.io": "2.0.3",
-    "typescript": "2.3.4",
+    "typescript": "2.4.1",
     "underscore": "1.8.3"
   },
   "engines": {

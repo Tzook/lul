@@ -22,7 +22,7 @@ export default class Main {
 
 	useDb() {
 		mongoose.Promise = global.Promise;
-		mongoose.connect(process.env.dbUrl ? process.env.dbUrl : require('../../../config/.env.json').dbUrl);
+		mongoose.connect(process.env.dbUrl ? process.env.dbUrl : require('../../../config/.env.json').dbUrl, {useMongoClient: true});
 		mongoose.connection.on('error', console.error.bind(console, 'connection error:'));
 	}
 
