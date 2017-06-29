@@ -27,7 +27,7 @@ export default class PartyController extends MasterController {
         let party: PARTY_MODEL = {
             name: this.services.getPartyName(),
             leader: socket.character.name,
-            members: new Set(),
+            members: new Set([socket.character.name]),
             invitees: new Map(),
         };
         this.charToParty.set(socket.character.name, party);
@@ -64,6 +64,7 @@ export default class PartyController extends MasterController {
         });
         socket.leave(party.name);
 
+        party.members.delete(socket.character.name);
         if (this.middleware.isLeader(socket.character.name, party)) {
             if (party.members.size > 0) {
                 party.leader = this.services.pickLeader(socket, party);
@@ -77,20 +78,16 @@ export default class PartyController extends MasterController {
                     clearTimeout(timeout);
                 }
             }
-        } else {
-            party.members.delete(socket.character.name);
         }
 
         this.charToParty.delete(socket.character.name);
     }
 
-    public makeLeader(socket: GameSocket, charName: string, party: PARTY_MODEL) {
+    public makeLeader(charName: string, party: PARTY_MODEL) {
         this.io.to(party.name).emit(config.CLIENT_GETS.LEAD_PARTY.name, {
             char_name: charName
         });
         party.leader = charName;
-        party.members.delete(charName);
-        party.members.add(socket.character.name);
     }
 
     public kickFromParty(socket: GameSocket, charName: string, party: PARTY_MODEL) {
@@ -121,8 +118,7 @@ export default class PartyController extends MasterController {
         if (!party) {
             sockets.push(socket);
         } else {
-            let allPartyMembers = this.services.getAllPartyMembers(party);
-            for (let memberName of allPartyMembers) {
+            for (let memberName of party.members) {
                 let memberSocket = socket.map.get(memberName);
                 if (memberSocket && memberSocket.character.room === socket.character.room && memberSocket.alive) {
                     sockets.push(memberSocket);
@@ -136,7 +132,7 @@ export default class PartyController extends MasterController {
         let areMembers = false;
         let party = this.getParty(name1);
         if (party) {
-            areMembers = this.middleware.isInParty(name2, party);
+            areMembers = this.middleware.isMember(name2, party);
         }
         return areMembers;
     }

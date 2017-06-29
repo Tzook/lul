@@ -71,7 +71,7 @@ export default class PartyRouter extends SocketioRouterBase {
         } else if (!this.middleware.isMember(data.char_name, party)) {
             return this.sendError(data, socket, "Cannot switch lead - character not in party", true, true);
         }
-        this.controller.makeLeader(socket, data.char_name, party);
+        this.controller.makeLeader(data.char_name, party);
 	}
 
 	[config.SERVER_GETS.KICK_FROM_PARTY.name](data, socket: GameSocket) {
