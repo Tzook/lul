@@ -80,7 +80,7 @@ export default class MobsRouter extends SocketioRouterBase {
                         let party = this.partyRouter.getCharParty(charSocket);
                         if (party) {
                             let currentPartyExp = (parties.get(party) || {exp: 0}).exp;
-                            parties.set(party, {socket: charSocket, exp: currentPartyExp});
+                            parties.set(party, {socket: charSocket, exp: currentPartyExp + exp});
                         } else {
 				            this.emitter.emit(statsConfig.SERVER_INNER.GAIN_EXP.name, { exp }, charSocket);
                         }
