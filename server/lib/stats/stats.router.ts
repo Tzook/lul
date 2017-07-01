@@ -57,7 +57,7 @@ export default class StatsRouter extends SocketioRouterBase {
                 id: socket.character._id,
             });
         } else {
-            this.regenHpIfNeeds(socket, hadFullHp);
+            hadFullHp && this.regenHpInterval(socket);
         }
     }
 
@@ -106,14 +106,14 @@ export default class StatsRouter extends SocketioRouterBase {
     }
 
     [config.SERVER_INNER.STATS_ADD.name] (data, socket: GameSocket) {
-        this.toggleStats(data.stats, socket, true);
+        this.toggleStats(data.stats, socket, true, data.validate);
     }
 
     [config.SERVER_INNER.STATS_REMOVE.name] (data, socket: GameSocket) {
-        this.toggleStats(data.stats, socket, false);
+        this.toggleStats(data.stats, socket, false, true);
     }
 
-    private toggleStats(stats: ITEM_INSTANCE, socket: GameSocket, on: boolean) {
+    private toggleStats(stats: ITEM_INSTANCE, socket: GameSocket, on: boolean, validate = true) {
         const sign = on ? 1 : -1;
         const hadFullHp = socket.character.stats.hp.now === socket.maxHp;
         for (var stat in BASE_STATS_SCHEMA) {
@@ -123,13 +123,15 @@ export default class StatsRouter extends SocketioRouterBase {
         }
         socket.bonusStats.hp += this.services.strToHp(stats.str || 0) * sign;
         socket.bonusStats.mp += this.services.magToMp(stats.mag || 0) * sign;
-        if (socket.character.stats.hp.now > socket.maxHp) {
-            socket.character.stats.hp.now = socket.maxHp;
+        if (validate) {
+            if (socket.character.stats.hp.now > socket.maxHp) {
+                socket.character.stats.hp.now = socket.maxHp;
+            }
+            if (socket.character.stats.mp.now > socket.maxMp) {
+                socket.character.stats.mp.now = socket.maxMp;
+            }
+            hadFullHp && this.regenHpInterval(socket);
         }
-        if (socket.character.stats.mp.now > socket.maxMp) {
-            socket.character.stats.mp.now = socket.maxMp;
-        }
-        this.regenHpIfNeeds(socket, hadFullHp);
     }
 
     public onConnected(socket: GameSocket) {
@@ -142,16 +144,10 @@ export default class StatsRouter extends SocketioRouterBase {
         }
         // add the equips to memory
         for (var itemKey in EQUIPS_SCHEMA) {
-            this[config.SERVER_INNER.STATS_ADD.name]({stats: socket.character.equips[itemKey]}, socket);
+            this[config.SERVER_INNER.STATS_ADD.name]({stats: socket.character.equips[itemKey], validate: false}, socket);
         }
         this.regenHpInterval(socket);
         this.regenMpInterval(socket);
-    }
-
-    private regenHpIfNeeds(socket: GameSocket, hadFullHp) {
-        if (hadFullHp && socket.character.stats.hp.now < socket.maxHp) {
-            this.regenHpInterval(socket);
-        }
     }
 
     private regenHpInterval(socket: GameSocket) {
