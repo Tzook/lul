@@ -26,6 +26,10 @@ export default class RoomsRouter extends SocketioRouterBase {
 		return this.services.getRoomInfo(room);
 	}
 
+    public getPublicCharInfo(char: Char) {
+        return this.middleware.getPublicCharInfo(char);
+    }
+
 	[config.SERVER_GETS.ENTERED_ROOM.name](data, socket: GameSocket) {
 		socket.broadcast.to(socket.character.room).emit(this.CLIENT_GETS.JOIN_ROOM.name, {
 			character: this.middleware.getPublicCharInfo(socket.character)
@@ -57,7 +61,10 @@ export default class RoomsRouter extends SocketioRouterBase {
 				this.sendError(data, socket, "No target portal in room!");
 			} else {
 				let targetPortal = targetRoomInfo.portals[portal.targetPortal];
-				this.moveRoom(socket, portal.targetRoom, targetPortal);
+                this.emitter.emit(config.SERVER_INNER.MOVE_ROOM.name, {
+                    room: portal.targetRoom, 
+                    targetPortal
+                }, socket);
 			}
 		}
 	}
@@ -72,12 +79,16 @@ export default class RoomsRouter extends SocketioRouterBase {
 				this.sendError(data, socket, "No target room info available for " + roomInfo.town);
 			} else {
 				let targetPortal = this.controller.pickRandomPortal(targetRoomInfo);
-				this.moveRoom(socket, targetRoomInfo.name, targetPortal);
+                this.emitter.emit(config.SERVER_INNER.MOVE_ROOM.name, {
+                    room: targetRoomInfo.name, 
+                    targetPortal
+                }, socket);
 			}
 		}
 	}
 
-	private moveRoom(socket: GameSocket, room: string, targetPortal: PORTAL_MODEL) {
+	[config.SERVER_INNER.MOVE_ROOM.name](data: {room: string, targetPortal: PORTAL_MODEL}, socket: GameSocket) {
+        let {room, targetPortal} = data;
 		socket.leave(socket.character.room);
 
         this.emitter.emit(config.SERVER_INNER.LEFT_ROOM.name, {}, socket);
@@ -89,7 +100,6 @@ export default class RoomsRouter extends SocketioRouterBase {
 			room,
 			character: socket.character
 		});
-
 	}
 
 	[config.SERVER_GETS.DISCONNECT.name](data, socket: GameSocket) {

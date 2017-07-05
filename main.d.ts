@@ -85,7 +85,6 @@ interface User extends Doc {}
 
 interface GameSocket extends SocketIO.Socket {
     test?: boolean;
-    id: string;
     character: Char;
     user: User;
     map: Map<string, GameSocket>;
@@ -97,6 +96,7 @@ interface GameSocket extends SocketIO.Socket {
     maxHp: number;
     maxMp: number;
     threats: Set<MOB_INSTANCE>
+    getKnownsList: (() => Iterable<string>)[] // List of getters for knowns
 }
 
 // items

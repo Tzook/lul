@@ -32,13 +32,17 @@ export default class StatsRouter extends SocketioRouterBase {
          });
 
         if (currentLevel !== socket.character.stats.lvl) {
-            this.io.to(socket.character.room).emit(this.CLIENT_GETS.LEVEL_UP.name, {
-                id: socket.character._id,
-            });
-            socket.emit(this.CLIENT_GETS.GAIN_STATS.name, {
-                stats: socket.character.stats
-            });
+            this.emitter.emit(config.SERVER_INNER.GAIN_LVL.name, {}, socket);
         }
+    }
+
+    [config.SERVER_INNER.GAIN_LVL.name] (data, socket: GameSocket) {
+        this.io.to(socket.character.room).emit(this.CLIENT_GETS.LEVEL_UP.name, {
+            id: socket.character._id,
+        });
+        socket.emit(this.CLIENT_GETS.GAIN_STATS.name, {
+            stats: socket.character.stats
+        });
     }
 
     [config.SERVER_INNER.TAKE_DMG.name] (data, socket: GameSocket) {

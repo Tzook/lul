@@ -1,6 +1,7 @@
 export default {
 	"SERVER_INNER": {
 		"GAIN_EXP": {"name": "gain_exp", "alive": true, "log": true},
+		"GAIN_LVL": {"name": "gain_lvl", "alive": true, "log": true},
 		"GAIN_HP": {"name": "gain_hp", "alive": true, "log": true},
 		"GAIN_MP": {"name": "gain_mp", "alive": true, "log": true},
 		"GAIN_STATS": {"name": "gain_stats", "alive": true, "log": true},

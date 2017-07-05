@@ -11,6 +11,7 @@ export default {
 	},
 	"SERVER_INNER": {
 		"MOVE_TO_TOWN": {"name": "move_to_town", "alive": true},
+        "MOVE_ROOM": {"name": "move_room"},
 		"LEFT_ROOM": {"name": "left_room", "log": true}
 	},
 	"SERVER_GETS": {
