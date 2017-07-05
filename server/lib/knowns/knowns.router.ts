@@ -49,13 +49,13 @@ export default class KnownsRouter extends SocketioRouterBase {
             let knowns = this.services.getLoggedInKnowns(socket);
             for (let knownSocket of knowns) {
                 socket.emit(config.CLIENT_GETS.KNOWN_INFO.name, {
-                    char: this.roomsRouter.getPublicCharInfo(knownSocket.character)
+                    character: this.roomsRouter.getPublicCharInfo(knownSocket.character)
                 });
             }
             let namespace = this.services.getKnownsNamespace(knowns);
             if (namespace) {
                 namespace.emit(config.CLIENT_GETS.KNOWN_LOGIN.name, {
-                    char: this.roomsRouter.getPublicCharInfo(socket.character)
+                    character: this.roomsRouter.getPublicCharInfo(socket.character)
                 });
             }
         });
