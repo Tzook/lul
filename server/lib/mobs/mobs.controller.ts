@@ -156,7 +156,7 @@ export default class MobsController extends MasterController {
                 [maxSocket, maxThreat] = [charSocket, threat];
             }
         }
-        mob.threat.top = maxSocket ? maxSocket.character.room : undefined;
+        mob.threat.top = maxSocket ? maxSocket.character.name : undefined;
         this.aggroChanged(mob, socket.character.room, maxSocket ? maxSocket.character._id : undefined)
     }
 
