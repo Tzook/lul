@@ -10,8 +10,6 @@ import roomsConfig from "../rooms/rooms.config";
 export default class StatsRouter extends SocketioRouterBase {
     protected controller: StatsController;
     protected services: StatsServices;
-    private hpTimeoutId: NodeJS.Timer;
-    private mpTimeoutId: NodeJS.Timer;
 
 	init(files, app) {
 		this.services = files.services;
@@ -155,14 +153,10 @@ export default class StatsRouter extends SocketioRouterBase {
     }
 
     private regenHpInterval(socket: GameSocket) {
-        console.log("HEAL: checking if can heal", {now: socket.character.stats.hp.now, maxHp: socket.maxHp});
         if (socket.character.stats.hp.now < socket.maxHp) {
-            console.log("HEAL: can heal");
-            clearTimeout(this.hpTimeoutId);
-            this.hpTimeoutId = setTimeout(() => {
-                console.log("HEAL: in timeout", {connected: socket.connected, alive: socket.alive});
+            clearTimeout(socket.hpRegenTimer);
+            socket.hpRegenTimer = setTimeout(() => {
                 if (socket.connected && socket.alive) {
-                    console.log("HEAL: healing");
                     this.emitter.emit(config.SERVER_INNER.GAIN_HP.name, { hp: socket.character.stats.hp.regen }, socket);
                     this.regenHpInterval(socket);
                 }
@@ -171,8 +165,8 @@ export default class StatsRouter extends SocketioRouterBase {
     }
     private regenMpInterval(socket: GameSocket) {
         if (socket.character.stats.mp.now < socket.maxMp) {
-            clearTimeout(this.mpTimeoutId);
-            this.mpTimeoutId = setTimeout(() => {
+            clearTimeout(socket.mpRegenTimer);
+            socket.mpRegenTimer = setTimeout(() => {
                 if (socket.connected && socket.alive) {
                     this.emitter.emit(config.SERVER_INNER.GAIN_MP.name, { mp: socket.character.stats.mp.regen }, socket);
                     this.regenMpInterval(socket);
