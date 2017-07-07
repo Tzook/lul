@@ -28,5 +28,5 @@ export default {
 		"BITCH_CHOOSE": {"name": "actor_bitch"}
 	},
 	"DEFAULT_ROOM": "IntroScene",
-	"BITCH_INTERVAL": 10000
+	"BITCH_INTERVAL": 5000
 }

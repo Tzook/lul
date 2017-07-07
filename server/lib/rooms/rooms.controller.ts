@@ -67,7 +67,8 @@ export default class RoomsController extends MasterController {
 	public newBitchRequest(socket: GameSocket, key: string) {
 		let room = socket.character.room;
 		let roomKey = this.roomBitchKeys.get(room);
-		if (key == roomKey) {
+		if (roomKey && key == roomKey) {
+            this.roomBitchKeys.delete(room);
 			let oldBitch = this.roomBitches.get(room);
 			if (oldBitch === socket) {
 				console.log("Same bitch in the room.");
