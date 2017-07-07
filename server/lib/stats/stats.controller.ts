@@ -27,6 +27,7 @@ export default class StatsController extends MasterController {
         let nowHp = socket.character.stats.hp.now;
         socket.character.stats.hp.now = Math.min(nowHp + hp, socket.maxHp);
         let gainedHp = nowHp !== socket.character.stats.hp.now;
+        console.log("Added hp to user", {nowHp, hp, maxHp: socket.maxHp, newNow: socket.character.stats.hp.now, gainedHp})
         return gainedHp;
     }
 

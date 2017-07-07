@@ -175,6 +175,13 @@ export default class SocketioRouter extends SocketioRouterBase {
 		return true;
 	}
 
+
+	public onConnected(socket: GameSocket) {
+        if (!socket.test) {
+            socket.saveTimer = setInterval(() => this.saveUser(socket), config.SAVE_INTERVAL)
+        }
+	}
+
 	[config.SERVER_GETS.DISCONNECT.name](data, socket: GameSocket) {
 		if (!this.map.has(socket.id)) {
 			return;
@@ -182,16 +189,17 @@ export default class SocketioRouter extends SocketioRouterBase {
         this.log({}, socket, "Disconnected");
 		// automations should not be saved afterwards - we want it to reset every time
 		if (!socket.test) {
-			socket.user.save(e => {
-				if (e) {
-					console.error("Saving user error", e);
-				}
-			});
+            clearInterval(socket.saveTimer);
+            this.saveUser(socket);
 		}
 		this.map.delete(socket.user._id.toString());
 		this.map.delete(socket.character.name);
 		this.map.delete(socket.id);
 	}
+
+    private saveUser(socket: GameSocket) {
+        socket.user.save(e => e && console.error("Saving user error", socket.character.name, e));
+    }
 
 	private restartServerEvent(app) {
 		let token = process.env.herokuAuth ? process.env.herokuAuth : require('../../../config/.env.json').herokuAuth;

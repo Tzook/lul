@@ -9,5 +9,6 @@ export default {
 	"CLIENT_GETS": {
 		"EVENT_ERROR": {"name": "event_error"}
 	},
-	"EVENTS_THROTTLE": 100
+	"EVENTS_THROTTLE": 100,
+	SAVE_INTERVAL: 10000,
 }

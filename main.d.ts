@@ -96,6 +96,7 @@ interface GameSocket extends SocketIO.Socket {
     maxHp: number;
     maxMp: number;
     threats: Set<MOB_INSTANCE>
+    saveTimer: NodeJS.Timer;
     getKnownsList: (() => Iterable<string>)[] // List of getters for knowns
 }
 

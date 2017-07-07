@@ -155,10 +155,14 @@ export default class StatsRouter extends SocketioRouterBase {
     }
 
     private regenHpInterval(socket: GameSocket) {
+        console.log("HEAL: checking if can heal", {now: socket.character.stats.hp.now, maxHp: socket.maxHp});
         if (socket.character.stats.hp.now < socket.maxHp) {
+            console.log("HEAL: can heal");
             clearTimeout(this.hpTimeoutId);
             this.hpTimeoutId = setTimeout(() => {
+                console.log("HEAL: in timeout", {connected: socket.connected, alive: socket.alive});
                 if (socket.connected && socket.alive) {
+                    console.log("HEAL: healing");
                     this.emitter.emit(config.SERVER_INNER.GAIN_HP.name, { hp: socket.character.stats.hp.regen }, socket);
                     this.regenHpInterval(socket);
                 }
