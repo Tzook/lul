@@ -15,7 +15,7 @@ export default {
 	"SERVER_GETS": {
 		"ENTERED_ROOM": {"name": "entered_room"},
 		"MOB_TAKE_DMG": {"name": "mob_took_dmg", "alive": true},
-		"MOB_MOVE": {"name": "mob_moved", "throttle": 0, "bitch": true},
+		"MOBS_MOVE": {"name": "mobs_moved", "throttle": 0, "bitch": true},
 		"TAKE_DMG": {"name": "took_dmg", "alive": true}
 	},
 	"CLIENT_GETS": {

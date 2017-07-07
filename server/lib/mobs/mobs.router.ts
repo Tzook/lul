@@ -109,12 +109,14 @@ export default class MobsRouter extends SocketioRouterBase {
 		}
 	}
 
-	[config.SERVER_GETS.MOB_MOVE.name](data, socket: GameSocket) {
-		if (!this.controller.hasMob(data.mob_id, socket)) {
-			this.sendError(data, socket, "Mob doesn't exist!");
-		} else {
-			this.controller.moveMob(data.mob_id, data.x, data.y, socket);
-		}
+	[config.SERVER_GETS.MOBS_MOVE.name](data, socket: GameSocket) {
+        (data.mobs || []).forEach(mob => {
+            if (!this.controller.hasMob(mob.mob_id, socket)) {
+                this.sendError(mob, socket, "Mob doesn't exist!");
+            } else {
+                this.controller.moveMob(mob.mob_id, mob.x, mob.y, socket);
+            }
+        });
 	}
 
 	[config.SERVER_GETS.TAKE_DMG.name](data, socket: GameSocket) {
