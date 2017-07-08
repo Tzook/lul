@@ -2,20 +2,21 @@
 import SocketioRouterBase from '../socketio/socketio.router.base';
 import PartyController from './party.controller';
 import PartyMiddleware from './party.middleware';
-import config from './party.config';
+import partyConfig from '../party/party.config';
+import knownsConfig from '../knowns/knowns.config';
 
 export default class PartyRouter extends SocketioRouterBase {
     protected controller: PartyController;
     protected middleware: PartyMiddleware;
     
-    [config.SERVER_GETS.CREATE_PARTY.name](data, socket: GameSocket) {
+    [partyConfig.SERVER_GETS.CREATE_PARTY.name](data, socket: GameSocket) {
         if (this.controller.getCharParty(socket)) {
             return this.sendError(data, socket, "Cannot create - character already in party");
         }
         this.controller.createParty(socket);
 	}
 
-	[config.SERVER_GETS.INVITE_TO_PARTY.name](data, socket: GameSocket) {
+	[partyConfig.SERVER_GETS.INVITE_TO_PARTY.name](data, socket: GameSocket) {
         let party = this.controller.getCharParty(socket);
         if (!party) {
             return this.sendError(data, socket, "Cannot invite - must be in a party", true, true);
@@ -35,7 +36,7 @@ export default class PartyRouter extends SocketioRouterBase {
         this.controller.inviteToParty(inviteeSocket, party);
 	}
 
-	[config.SERVER_GETS.JOIN_PARTY.name](data, socket: GameSocket) {
+	[partyConfig.SERVER_GETS.JOIN_PARTY.name](data, socket: GameSocket) {
         if (this.controller.getCharParty(socket)) {
             return this.sendError(data, socket, "Cannot join - already in party", true, true);
         }
@@ -50,11 +51,12 @@ export default class PartyRouter extends SocketioRouterBase {
         } else if (this.middleware.isPartyFull(party)) {
             return this.sendError(data, socket, "Cannot join - party is full", true, true);
         }
-
+        
+        this.emitter.emit(knownsConfig.SERVER_INNER.UPDATE_KNOWN.name, {knowns: party.members}, socket);
         this.controller.joinParty(socket, party);
 	}
 
-	[config.SERVER_GETS.LEAVE_PARTY.name](data, socket: GameSocket) {
+	[partyConfig.SERVER_GETS.LEAVE_PARTY.name](data, socket: GameSocket) {
         let party = this.controller.getCharParty(socket);
         if (!party) {
             return this.sendError(data, socket, "Cannot leave - must be in a party", true, true);
@@ -62,7 +64,7 @@ export default class PartyRouter extends SocketioRouterBase {
         this.controller.leaveParty(socket, party);
 	}
 
-	[config.SERVER_GETS.LEAD_PARTY.name](data, socket: GameSocket) {
+	[partyConfig.SERVER_GETS.LEAD_PARTY.name](data, socket: GameSocket) {
         let party = this.controller.getCharParty(socket);
         if (!party) {
             return this.sendError(data, socket, "Cannot switch lead - must be in a party", true, true);
@@ -74,7 +76,7 @@ export default class PartyRouter extends SocketioRouterBase {
         this.controller.makeLeader(data.char_name, party);
 	}
 
-	[config.SERVER_GETS.KICK_FROM_PARTY.name](data, socket: GameSocket) {
+	[partyConfig.SERVER_GETS.KICK_FROM_PARTY.name](data, socket: GameSocket) {
         let party = this.controller.getCharParty(socket);
         if (!party) {
             return this.sendError(data, socket, "Cannot kick - must be in a party", true, true);
@@ -87,12 +89,13 @@ export default class PartyRouter extends SocketioRouterBase {
 	}
 
     public onConnected(socket: GameSocket) {
-        {
+        // wait 2 ticks - one tick so the user gets his known list and then 2nd tick to tell him about his party members
+        process.nextTick(() => process.nextTick(() => {
             let party = this.controller.getCharParty(socket);
             if (party) {
                 this.controller.tellPartyMembers(socket, party);
             }
-        }
+        }));
         socket.getKnownsList = socket.getKnownsList || [];
         socket.getKnownsList.push(() => {
             let party = this.controller.getCharParty(socket);

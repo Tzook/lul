@@ -404,6 +404,11 @@
 				socket.on("actor_kicked_from_party", d => setResult({msg: "actor_kicked_from_party", d}));
 				socket.on("party_members", d => setResult({msg: "party_members", d}));
 				socket.on("party_chat", d => setResult({msg: "party_chat", d}));
+				
+                socket.on("known_logout", d => setResult({msg: "known_logout", d}));
+                socket.on("known_login", d => setResult({msg: "known_login", d}));
+                socket.on("known_move_room", d => setResult({msg: "known_move_room", d}));
+                socket.on("known_info", d => setResult({msg: "known_info", d}));
 			}
 
 			function move(dX, dY) {

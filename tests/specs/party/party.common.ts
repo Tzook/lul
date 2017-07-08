@@ -18,8 +18,10 @@ export function inviteToParty(leaderB, otherB, otherName) {
 
 export function acceptPartyInvitation(leaderB, otherB, leaderName) {
     otherB.executeScript(`socket.emit("join_party", {leader_name: "${leaderName}"});`);
+    expectText("known_info", otherB, false);
     expectText("actor_join_party", otherB, false);
     expectText("party_members", otherB);
+    expectText("known_info", leaderB, false);
     expectText("actor_join_party", leaderB);
 }
 

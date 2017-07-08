@@ -1,4 +1,3 @@
-
 import SocketioRouterBase from '../socketio/socketio.router.base';
 import KnownsServices from './knowns.services';
 import RoomsRouter from '../rooms/rooms.router';
@@ -25,7 +24,7 @@ export default class KnownsRouter extends SocketioRouterBase {
     }
 
 	[config.SERVER_INNER.MOVE_ROOM.name](data: {room: string}, socket: GameSocket) {
-        let namespace = this.services.getKnownsNamespace(this.services.getLoggedInKnowns(socket));
+        let namespace = this.services.getKnownsNamespace(this.services.getLoggedInKnownsFromList(socket));
         if (namespace) {
             namespace.emit(config.CLIENT_GETS.KNOWN_MOVE_ROOM.name, {
                 name: socket.character.name,
@@ -34,8 +33,20 @@ export default class KnownsRouter extends SocketioRouterBase {
         }
 	}
 
+	[config.SERVER_INNER.UPDATE_KNOWN.name](data: {knowns: Set<string>}, socket: GameSocket) {
+        let knowns = this.services.getLoggedInKnowns(socket, data.knowns, new Set());
+        this.notifyKnown(socket, knowns);
+
+        let namespace = this.services.getKnownsNamespace(knowns);
+        if (namespace) {
+            namespace.emit(config.CLIENT_GETS.KNOWN_INFO.name, {
+                character: this.roomsRouter.getPublicCharInfo(socket.character)
+            });
+        }
+	}
+
     [config.SERVER_GETS.DISCONNECT.name](data, socket: GameSocket) {
-        let namespace = this.services.getKnownsNamespace(this.services.getLoggedInKnowns(socket));
+        let namespace = this.services.getKnownsNamespace(this.services.getLoggedInKnownsFromList(socket));
         if (namespace) {
             namespace.emit(config.CLIENT_GETS.KNOWN_LOGOUT.name, {
                 name: socket.character.name
@@ -46,18 +57,26 @@ export default class KnownsRouter extends SocketioRouterBase {
     public onConnected(socket: GameSocket) {
         // wait for all places to assign it, so do it on the next tick
         process.nextTick(() => {
-            let knowns = this.services.getLoggedInKnowns(socket);
-            for (let knownSocket of knowns) {
-                socket.emit(config.CLIENT_GETS.KNOWN_INFO.name, {
-                    character: this.roomsRouter.getPublicCharInfo(knownSocket.character)
-                });
-            }
+            let knowns = this.services.getLoggedInKnownsFromList(socket);
+            this.notifyKnown(socket, knowns);
+            
             let namespace = this.services.getKnownsNamespace(knowns);
             if (namespace) {
-                namespace.emit(config.CLIENT_GETS.KNOWN_LOGIN.name, {
+                namespace.emit(config.CLIENT_GETS.KNOWN_INFO.name, {
                     character: this.roomsRouter.getPublicCharInfo(socket.character)
+                });
+                namespace.emit(config.CLIENT_GETS.KNOWN_LOGIN.name, {
+                    name: socket.character.name
                 });
             }
         });
+    }
+
+    private notifyKnown(socket: GameSocket, knowns: Set<GameSocket>) {
+        for (let knownSocket of knowns) {
+            socket.emit(config.CLIENT_GETS.KNOWN_INFO.name, {
+                character: this.roomsRouter.getPublicCharInfo(knownSocket.character)
+            });
+        }
     }
 };
