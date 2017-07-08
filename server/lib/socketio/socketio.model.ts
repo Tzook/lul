@@ -1,4 +1,4 @@
-'use strict';
+
 import MasterModel from '../master/master.model';
 import SocketioServices from './socketio.services';
 

@@ -1,5 +1,5 @@
-'use strict';
-import config from "../master/master.config";
+
+import config from '../master/master.config';
 const STATUS_CODES = config.STATUS_CODES;
 
 export default class Response {

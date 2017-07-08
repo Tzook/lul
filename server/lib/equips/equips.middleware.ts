@@ -1,4 +1,4 @@
-'use strict';
+
 import ItemsMiddleware from '../items/items.middleware';
 import {EQUIPS_SCHEMA} from "./equips.model";
 

@@ -1,4 +1,4 @@
-'use strict';
+
 import Emitter = require('events');
 import * as mongoose from "mongoose";
 let emitter = new Emitter.EventEmitter();

@@ -1,6 +1,6 @@
-import socketioConfig from "../socketio/socketio.config";
-import roomsConfig from "../rooms/rooms.config";
-import statsConfig from "../stats/stats.config";
+import socketioConfig from '../socketio/socketio.config';
+import roomsConfig from '../rooms/rooms.config';
+import statsConfig from '../stats/stats.config';
 
 
 export default {

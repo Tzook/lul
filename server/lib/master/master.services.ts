@@ -1,6 +1,6 @@
 import * as mongoose from "mongoose";
 import * as Q from "q";
-import MasterModel from "./master.model";
+import MasterModel from './master.model';
 
 export default class MasterServices {
     protected Q;

@@ -1,7 +1,7 @@
-'use strict';
+
 import MasterRouter from '../master/master.router';
 import Emitter = require('events');
-import config from "./socketio.config";
+import config from './socketio.config';
 
 export default class SocketioRouterBase extends MasterRouter {
 	protected io: SocketIO.Namespace;

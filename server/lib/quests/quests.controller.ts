@@ -1,6 +1,6 @@
-'use strict';
+
 import MasterController from '../master/master.controller';
-import QuestsServices from "./quests.services";
+import QuestsServices from './quests.services';
 
 export default class QuestsController extends MasterController {
     protected services: QuestsServices;

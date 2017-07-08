@@ -1,6 +1,6 @@
-'use strict';
+
 import MasterModel from '../master/master.model';
-import MobsController from "./mobs.controller";
+import MobsController from './mobs.controller';
 
 const MOB_SCHEMA = {
     mobId: String, 

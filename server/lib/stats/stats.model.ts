@@ -1,8 +1,8 @@
-'use strict';
+
 import MasterModel from '../master/master.model';
 import StatsServices from './stats.services';
 import * as _ from 'underscore';
-import config from "./stats.config";
+import config from './stats.config';
 
 const BAR_SCHEMA = {
     now: Number,

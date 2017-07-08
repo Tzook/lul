@@ -1,4 +1,4 @@
-'use strict';
+
 let Socket = require('socket.io/lib/socket');
 let emit = require('events').EventEmitter.prototype.emit;
 

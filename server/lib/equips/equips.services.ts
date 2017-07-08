@@ -1,4 +1,4 @@
-'use strict';
+
 import MasterServices from '../master/master.services';
 import ItemsRouter from '../items/items.router';
 import EquipsMiddleware from './equips.middleware';

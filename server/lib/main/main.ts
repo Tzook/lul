@@ -1,4 +1,4 @@
-'use strict';
+
 // External dependencies
 let 	express 		= require('express'),
 		http			= require('http'),

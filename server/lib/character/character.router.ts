@@ -1,4 +1,4 @@
-'use strict';
+
 import MasterRouter from '../master/master.router';
 import CharacterMiddleware from './character.middleware';
 import CharacterController from './character.controller';

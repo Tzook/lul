@@ -1,7 +1,7 @@
-'use strict';
+
 import SocketioRouterBase from '../socketio/socketio.router.base';
 import CombatMiddleware from './combat.middleware';
-import config from "../combat/combat.config";
+import config from '../combat/combat.config';
 
 export default class CombatRouter extends SocketioRouterBase {
 	protected middleware: CombatMiddleware;

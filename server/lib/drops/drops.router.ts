@@ -1,11 +1,11 @@
-'use strict';
+
 import SocketioRouterBase from '../socketio/socketio.router.base';
 import * as _ from 'underscore';
-import DropsController from "./drops.controller";
+import DropsController from './drops.controller';
 import ItemsRouter from '../items/items.router';
 import DropsServices from './drops.services';
 import PartyRouter from '../party/party.router';
-import config from "../drops/drops.config";
+import config from '../drops/drops.config';
 
 export default class DropsRouter extends SocketioRouterBase {
     private dropsMap: Map<string, Map<string, ITEM_DROP>> = new Map();

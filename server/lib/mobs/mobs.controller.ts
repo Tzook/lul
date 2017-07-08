@@ -1,10 +1,10 @@
-'use strict';
+
 import MasterController from '../master/master.controller';
 import MobsServices from './mobs.services';
 import * as _ from 'underscore';
 import StatsServices from '../stats/stats.services';
-import config from "../mobs/mobs.config";
-import statsConfig from "../stats/stats.config";
+import config from '../mobs/mobs.config';
+import statsConfig from '../stats/stats.config';
 
 export default class MobsController extends MasterController {
 	protected services: MobsServices;

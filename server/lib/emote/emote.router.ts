@@ -1,6 +1,6 @@
-'use strict';
+
 import SocketioRouterBase from '../socketio/socketio.router.base';
-import config from "../emote/emote.config";
+import config from '../emote/emote.config';
 
 export default class EmoteRouter extends SocketioRouterBase {
 	[config.SERVER_GETS.EMOTE.name](data, socket: GameSocket) {

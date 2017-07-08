@@ -1,7 +1,7 @@
-'use strict';
+
 import MasterRouter from '../master/master.router';
-import UserController from "./user.controller";
-import UserMiddleware from "./user.middleware";
+import UserController from './user.controller';
+import UserMiddleware from './user.middleware';
 let passport        = require('passport'),
     LocalStrategy   = require('passport-local').Strategy;
 

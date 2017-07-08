@@ -1,4 +1,4 @@
-'use strict';
+
 import MasterController from '../master/master.controller';
 import EquipsServices from './equips.services';
 

@@ -1,8 +1,8 @@
-'use strict';
+
 import MasterController from '../master/master.controller';
 import * as _ from 'underscore';
-import RoomsServices from "./rooms.services";
-import config from "./rooms.config";
+import RoomsServices from './rooms.services';
+import config from './rooms.config';
 
 export default class RoomsController extends MasterController {
 	protected services: RoomsServices;

@@ -1,6 +1,6 @@
-'use strict';
+
 import MasterModel from '../master/master.model';
-import QuestsController from "./quests.controller";
+import QuestsController from './quests.controller';
 import * as mongoose from 'mongoose';
 import { BASE_STATS_SCHEMA } from "../stats/stats.model";
 

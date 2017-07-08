@@ -1,5 +1,5 @@
-"use strict";
-import MasterModel from "../master/master.model";
+
+import MasterModel from '../master/master.model';
 
 export default class GoldModel extends MasterModel {
     get priority() {

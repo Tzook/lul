@@ -1,4 +1,4 @@
-'use strict';
+
 import MasterServices from '../master/master.services';
 import * as _ from 'underscore';
 

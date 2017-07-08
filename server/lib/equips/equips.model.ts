@@ -1,5 +1,5 @@
-"use strict";
-import MasterModel from "../master/master.model";
+
+import MasterModel from '../master/master.model';
 import * as _ from 'underscore';
 import { ITEM_INSTANCE_SCHEMA } from "../items/items.model";
 import SocketioRouter from '../socketio/socketio.router';

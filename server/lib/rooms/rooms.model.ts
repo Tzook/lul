@@ -1,6 +1,6 @@
-'use strict';
+
 import MasterModel from '../master/master.model';
-import RoomsController from "./rooms.controller";
+import RoomsController from './rooms.controller';
 
 export default class RoomsModel extends MasterModel {
     private addToCharacterSchema;

@@ -1,10 +1,10 @@
-'use strict';
+
 import SocketioRouterBase from '../socketio/socketio.router.base';
-import ItemsMiddleware from "./items.middleware";
+import ItemsMiddleware from './items.middleware';
 import ItemsController from './items.controller';
 import ItemsServices from './items.services';
-import dropsConfig from "../drops/drops.config";
-import config from "../items/items.config";
+import dropsConfig from '../drops/drops.config';
+import config from '../items/items.config';
 
 export default class ItemsRouter extends SocketioRouterBase {
 	protected middleware: ItemsMiddleware;

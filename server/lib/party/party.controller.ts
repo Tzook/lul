@@ -1,8 +1,8 @@
-'use strict';
+
 import MasterController from '../master/master.controller';
 import PartyServices from './party.services';
 import PartyMiddleware from './party.middleware';
-import config from "./party.config";
+import config from './party.config';
 
 export default class PartyController extends MasterController {
     protected services: PartyServices;

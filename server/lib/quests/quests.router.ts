@@ -1,7 +1,7 @@
-'use strict';
+
 import SocketioRouterBase from '../socketio/socketio.router.base';
-import QuestsMiddleware from "./quests.middleware";
-import QuestsController from "./quests.controller";
+import QuestsMiddleware from './quests.middleware';
+import QuestsController from './quests.controller';
 import QuestsServices from './quests.services';
 import ItemsRouter from '../items/items.router';
 import * as _ from 'underscore';

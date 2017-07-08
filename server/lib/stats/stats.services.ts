@@ -1,4 +1,4 @@
-'use strict';
+
 import MasterServices from '../master/master.services';
 import config from './stats.config';
 import * as _ from 'underscore';

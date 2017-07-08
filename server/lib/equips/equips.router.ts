@@ -1,11 +1,11 @@
-'use strict';
+
 import SocketioRouterBase from '../socketio/socketio.router.base';
 import EquipsMiddleware from './equips.middleware';
 import ItemsRouter from '../items/items.router';
 import EquipsController from './equips.controller';
-import config from "../equips/equips.config";
-import dropsConfig from "../drops/drops.config";
-import statsConfig from "../stats/stats.config";
+import config from '../equips/equips.config';
+import dropsConfig from '../drops/drops.config';
+import statsConfig from '../stats/stats.config';
 
 export default class EquipsRouter extends SocketioRouterBase {
 	protected controller: EquipsController;

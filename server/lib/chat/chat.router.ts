@@ -1,7 +1,7 @@
-'use strict';
+
 import SocketioRouterBase from '../socketio/socketio.router.base';
-import PartyRouter from "../party/party.router";
-import config from "../chat/chat.config";
+import PartyRouter from '../party/party.router';
+import config from '../chat/chat.config';
 
 export default class ChatRouter extends SocketioRouterBase {
 	protected partyRouter: PartyRouter;

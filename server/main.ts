@@ -1,5 +1,5 @@
 /// <reference path="../main.d.ts" />
-'use strict';
+
 import Main from './lib/main/main';
 
 let main = new Main();

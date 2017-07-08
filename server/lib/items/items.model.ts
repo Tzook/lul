@@ -1,8 +1,8 @@
-"use strict";
-import MasterModel from "../master/master.model";
+
+import MasterModel from '../master/master.model';
 import ItemsController from './items.controller';
 import { BASE_STATS_SCHEMA } from "../stats/stats.model";
-import config from "../items/items.config";
+import config from '../items/items.config';
 
 export const REQUIRE_SCHEMA = {
     str: Number,

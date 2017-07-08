@@ -1,6 +1,6 @@
-'use strict';
+
 import SocketioRouterBase from '../socketio/socketio.router.base';
-import config from "./movement.config";
+import config from './movement.config';
 
 export default class MovementRouter extends SocketioRouterBase {
 	[config.SERVER_GETS.MOVEMENT.name](data, socket: GameSocket) {

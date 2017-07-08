@@ -1,11 +1,11 @@
-'use strict';
+
 import SocketioRouterBase from '../socketio/socketio.router.base';
 import ItemsRouter from '../items/items.router';
-import MiscMiddleware from "./misc.middleware";
-import MiscController from "./misc.controller";
-import dropsConfig from "../drops/drops.config";
-import itemsConfig from "../items/items.config";
-import config from "../misc/misc.config";
+import MiscMiddleware from './misc.middleware';
+import MiscController from './misc.controller';
+import dropsConfig from '../drops/drops.config';
+import itemsConfig from '../items/items.config';
+import config from '../misc/misc.config';
 
 export default class MiscRouter extends SocketioRouterBase {
 	protected itemsRouter: ItemsRouter;

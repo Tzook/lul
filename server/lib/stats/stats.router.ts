@@ -1,11 +1,11 @@
-'use strict';
+
 import SocketioRouterBase from '../socketio/socketio.router.base';
 import StatsController from './stats.controller';
 import StatsServices from './stats.services';
 import { EQUIPS_SCHEMA } from '../equips/equips.model';
 import { BASE_STATS_SCHEMA } from "./stats.model";
-import config from "./stats.config";
-import roomsConfig from "../rooms/rooms.config";
+import config from './stats.config';
+import roomsConfig from '../rooms/rooms.config';
 
 export default class StatsRouter extends SocketioRouterBase {
     protected controller: StatsController;

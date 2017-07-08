@@ -1,7 +1,7 @@
-'use strict';
+
 import MasterMiddleware from '../master/master.middleware';
 import ItemsServices from './items.services';
-import config from "../items/items.config";
+import config from '../items/items.config';
 
 export const NO_SLOT = -1;
 

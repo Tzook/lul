@@ -1,4 +1,4 @@
-'use strict';
+
 import MasterServices from '../master/master.services';
 import { REQUIRE_SCHEMA } from "./items.model";
 import * as _ from 'underscore';

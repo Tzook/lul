@@ -1,11 +1,11 @@
-'use strict';
+
 import SocketioRouterBase from './socketio.router.base';
 import Emitter = require('events');
-import MasterRouter from "../master/master.router";
+import MasterRouter from '../master/master.router';
 import * as Heroku from 'heroku-client';
 import SocketioMiddleware from './socketio.middleware';
 import SocketioServices from './socketio.services';
-import config from "./socketio.config";
+import config from './socketio.config';
 require('./socketio.fixer');
 import * as passportSocketIo from 'passport.socketio';
 

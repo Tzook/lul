@@ -1,10 +1,10 @@
-'use strict';
+
 import SocketioRouterBase from '../socketio/socketio.router.base';
 import * as _ from 'underscore';
 import RoomsController from './rooms.controller';
-import RoomsMiddleware from "./rooms.middleware";
-import RoomsServices from "./rooms.services";
-import config from "./rooms.config";
+import RoomsMiddleware from './rooms.middleware';
+import RoomsServices from './rooms.services';
+import config from './rooms.config';
 
 export default class RoomsRouter extends SocketioRouterBase {
 	protected middleware: RoomsMiddleware;

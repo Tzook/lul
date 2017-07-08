@@ -1,9 +1,9 @@
-'use strict';
+
 import SocketioRouterBase from '../socketio/socketio.router.base';
-import KnownsServices from "./knowns.services";
+import KnownsServices from './knowns.services';
 import RoomsRouter from '../rooms/rooms.router';
-import config from "../knowns/knowns.config";
-import statsConfig from "../stats/stats.config";
+import config from '../knowns/knowns.config';
+import statsConfig from '../stats/stats.config';
 
 export default class KnownsRouter extends SocketioRouterBase {
     protected services: KnownsServices;

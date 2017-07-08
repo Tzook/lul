@@ -1,8 +1,8 @@
-'use strict';
+
 import MasterController from '../master/master.controller';
-import MiscMiddleware from "./misc.middleware";
-import itemsConfig from "../items/items.config";
-import config from "../misc/misc.config";
+import MiscMiddleware from './misc.middleware';
+import itemsConfig from '../items/items.config';
+import config from '../misc/misc.config';
 
 export default class MiscController extends MasterController {
     protected middleware: MiscMiddleware;

@@ -1,6 +1,6 @@
-'use strict';
+
 import MasterMiddleware from '../master/master.middleware';
-import config from "./party.config";
+import config from './party.config';
 
 export default class PartyMiddleware extends MasterMiddleware {
     public isLeader(name: string, party: PARTY_MODEL): boolean {

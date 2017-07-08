@@ -1,6 +1,6 @@
-'use strict';
+
 import MasterController from '../master/master.controller';
-import UserServices from "./user.services";
+import UserServices from './user.services';
 
 export default class UserController extends MasterController {
     protected services: UserServices;
