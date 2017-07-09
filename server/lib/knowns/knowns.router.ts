@@ -1,21 +1,18 @@
 import SocketioRouterBase from '../socketio/socketio.router.base';
 import KnownsServices from './knowns.services';
-import RoomsRouter from '../rooms/rooms.router';
 import config from '../knowns/knowns.config';
 import statsConfig from '../stats/stats.config';
 
 export default class KnownsRouter extends SocketioRouterBase {
     protected services: KnownsServices;
-    protected roomsRouter: RoomsRouter;
 	
 	init(files, app) {
 		this.services = files.services;
-        this.roomsRouter = files.routers.rooms;
 		super.init(files, app);
 	}
 
     [config.SERVER_INNER.GAIN_LVL.name] (data, socket: GameSocket) {
-        let namespace = this.services.getKnownsNamespace(this.services.getLoggedInKnownsFromList(socket));
+        let namespace = this.services.getKnownsNamespace(this.services.getNotInRoomKnowns(socket));
         if (namespace) {
             namespace.emit(statsConfig.CLIENT_GETS.LEVEL_UP.name, {
                 id: socket.character._id
@@ -40,7 +37,7 @@ export default class KnownsRouter extends SocketioRouterBase {
         let namespace = this.services.getKnownsNamespace(knowns);
         if (namespace) {
             namespace.emit(config.CLIENT_GETS.KNOWN_INFO.name, {
-                character: this.roomsRouter.getPublicCharInfo(socket.character)
+                character: this.services.getKnownCharInfo(socket.character)
             });
         }
 	}
@@ -63,7 +60,7 @@ export default class KnownsRouter extends SocketioRouterBase {
             let namespace = this.services.getKnownsNamespace(knowns);
             if (namespace) {
                 namespace.emit(config.CLIENT_GETS.KNOWN_INFO.name, {
-                    character: this.roomsRouter.getPublicCharInfo(socket.character)
+                    character: this.services.getKnownCharInfo(socket.character)
                 });
                 // we have to get the namespace again because socketio clears it with each emit
                 namespace = this.services.getKnownsNamespace(knowns);
@@ -77,7 +74,7 @@ export default class KnownsRouter extends SocketioRouterBase {
     private notifyKnown(socket: GameSocket, knowns: Set<GameSocket>) {
         for (let knownSocket of knowns) {
             socket.emit(config.CLIENT_GETS.KNOWN_INFO.name, {
-                character: this.roomsRouter.getPublicCharInfo(knownSocket.character)
+                character: this.services.getKnownCharInfo(knownSocket.character)
             });
         }
     }

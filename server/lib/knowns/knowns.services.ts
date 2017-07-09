@@ -40,4 +40,9 @@ export default class KnownsServices extends MasterServices {
         }
         return namespace;
     }
+
+    public getKnownCharInfo(char: Char): KnownChar {
+        let {name, stats, room} = char;
+        return {name, stats, room};
+    }
 };
