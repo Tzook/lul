@@ -65,6 +65,8 @@ export default class KnownsRouter extends SocketioRouterBase {
                 namespace.emit(config.CLIENT_GETS.KNOWN_INFO.name, {
                     character: this.roomsRouter.getPublicCharInfo(socket.character)
                 });
+                // we have to get the namespace again because socketio clears it with each emit
+                namespace = this.services.getKnownsNamespace(knowns);
                 namespace.emit(config.CLIENT_GETS.KNOWN_LOGIN.name, {
                     name: socket.character.name
                 });
