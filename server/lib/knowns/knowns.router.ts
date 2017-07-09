@@ -15,7 +15,7 @@ export default class KnownsRouter extends SocketioRouterBase {
 	}
 
     [config.SERVER_INNER.GAIN_LVL.name] (data, socket: GameSocket) {
-        let namespace = this.services.getKnownsNamespace(this.services.getNotInRoomKnowns(socket));
+        let namespace = this.services.getKnownsNamespace(this.services.getLoggedInKnownsFromList(socket));
         if (namespace) {
             namespace.emit(statsConfig.CLIENT_GETS.LEVEL_UP.name, {
                 id: socket.character._id
