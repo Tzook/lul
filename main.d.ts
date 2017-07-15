@@ -74,7 +74,7 @@ interface PublicChar extends Doc {
     stats: Stats,
 }
 
-interface KnownChar {
+interface KnownChar extends Doc {
     name: string;
     stats: Stats,
     room: string;

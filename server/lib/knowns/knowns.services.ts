@@ -42,7 +42,7 @@ export default class KnownsServices extends MasterServices {
     }
 
     public getKnownCharInfo(char: Char): KnownChar {
-        let {name, stats, room} = char;
-        return {name, stats, room};
+        let {_id, name, stats, room} = char;
+        return {_id, name, stats, room};
     }
 };
