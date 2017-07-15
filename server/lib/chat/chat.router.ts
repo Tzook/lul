@@ -32,6 +32,7 @@ export default class ChatRouter extends SocketioRouterBase {
 		} else {
 			targetSocket.emit(this.CLIENT_GETS.WHISPER.name, {
 				name: socket.character.name,
+				id: socket.character._id,
 				msg: data.msg,
 			});
 		}
@@ -44,6 +45,7 @@ export default class ChatRouter extends SocketioRouterBase {
 		} else {
 			socket.broadcast.to(party.name).emit(this.CLIENT_GETS.PARTY_CHAT.name, {
 				name: socket.character.name,
+				id: socket.character._id,
 				msg: data.msg,
 			});
 		}
