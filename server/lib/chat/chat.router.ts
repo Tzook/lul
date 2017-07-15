@@ -43,7 +43,7 @@ export default class ChatRouter extends SocketioRouterBase {
 			this.sendError(data, socket, "Failed to find party for engaging in party chat");
 		} else {
 			socket.broadcast.to(party.name).emit(this.CLIENT_GETS.PARTY_CHAT.name, {
-				id: socket.character._id,
+				name: socket.character.name,
 				msg: data.msg,
 			});
 		}
