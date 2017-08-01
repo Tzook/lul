@@ -1,9 +1,7 @@
-
 import SocketioRouterBase from '../socketio/socketio.router.base';
 import ItemsRouter from '../items/items.router';
 import MiscMiddleware from './misc.middleware';
 import MiscController from './misc.controller';
-import dropsConfig from '../drops/drops.config';
 import itemsConfig from '../items/items.config';
 import config from '../misc/misc.config';
 
@@ -17,22 +15,20 @@ export default class MiscRouter extends SocketioRouterBase {
 		this.itemsRouter = files.routers.items;
 	}
 
-	[config.SERVER_GETS.ITEM_PICK.name](data, socket: GameSocket) {
-		this.emitter.emit(dropsConfig.SERVER_INNER.ITEM_PICK.name, data, socket, (item: ITEM_INSTANCE): any => {
-            let itemInfo = this.itemsRouter.getItemInfo(item.key);
-            if (!this.middleware.isMisc(itemInfo)) {
-                return;
-            }
-            let slots = this.middleware.getStackSlots(socket, item, itemInfo);
+	[config.SERVER_INNER.ITEM_PICK.name](data: {item: ITEM_INSTANCE, callback: Function}, socket: GameSocket) {
+        let {item, callback} = data;
+        let itemInfo = this.itemsRouter.getItemInfo(item.key);
+        if (!this.middleware.isMisc(itemInfo)) {
+            return;
+        }
+        let slots = this.middleware.getStackSlots(socket, item, itemInfo);
 
-            console.log("picking up item for slots", item, slots);
-            if (slots.length === 0) { 
-                this.sendError(data, socket, itemsConfig.LOGS.INVENTORY_FULL.MSG, true, true);
-            } else {
-                this.controller.pickMiscItem(socket, slots, item, itemInfo);
-                return true;
-            }	
-		});
+        console.log("picking up item for slots", item, slots);
+        if (slots.length === 0) { 
+            return this.sendError(data, socket, itemsConfig.LOGS.INVENTORY_FULL.MSG, true, true);
+        }	
+        this.controller.pickMiscItem(socket, slots, item, itemInfo);
+        callback();
 	}
 
 	[config.SERVER_INNER.ITEM_ADD.name](data: {slots: number[], item: ITEM_INSTANCE}, socket: GameSocket) {

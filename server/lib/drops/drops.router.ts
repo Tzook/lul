@@ -3,13 +3,13 @@ import SocketioRouterBase from '../socketio/socketio.router.base';
 import * as _ from 'underscore';
 import DropsController from './drops.controller';
 import ItemsRouter from '../items/items.router';
+import itemsConfig from '../items/items.config';
 import DropsServices from './drops.services';
 import PartyRouter from '../party/party.router';
 import config from '../drops/drops.config';
 
 export default class DropsRouter extends SocketioRouterBase {
     private dropsMap: Map<string, Map<string, ITEM_DROP>> = new Map();
-	private lastHandledItem: string;
     protected controller: DropsController;
     protected services: DropsServices;
     protected itemsRouter: ItemsRouter;
@@ -37,31 +37,26 @@ export default class DropsRouter extends SocketioRouterBase {
 		});
 	}
 
-    [config.SERVER_INNER.ITEM_PICK.name](data, socket: GameSocket, pickItemFn: (item: ITEM_INSTANCE) => {}) {
+    [config.SERVER_GETS.ITEM_PICK.name](data, socket: GameSocket) {
 		let itemId: string = data.item_id;
 		let map = this.getRoomMap(socket);
 		if (!map.has(itemId)) {
-			if (this.lastHandledItem !== itemId) {
-				// the pickup event happens multiple times so if we are still in the same handling process, don't count it as an error
-				this.sendError(data, socket, "Item does not exist");
-			}
-            return;
+            return this.sendError(data, socket, "Item does not exist");
 		}
         let itemDrop = map.get(itemId);
         let owner = itemDrop.owner;
         if (owner && (owner !== socket.character.name && !this.partyRouter.arePartyMembers(owner, socket.character.name))) {
             return this.sendError(data, socket, `Item owner is ${owner} and you are ${socket.character.name}.`);
         }
-        let picked = pickItemFn(itemDrop.item);
-        if (picked) {
+        let callback = () => {
             console.log('picking item', data.item_id);
             map.delete(itemId);
-            this.lastHandledItem = itemId;
             this.io.to(socket.character.room).emit(this.CLIENT_GETS.ITEM_PICK.name, {
                 id: socket.character._id,
                 item_id: data.item_id,
             });
         }
+        this.emitter.emit(itemsConfig.SERVER_INNER.ITEM_PICK.name, {item: itemDrop.item, callback}, socket);
 	}
 
     [config.SERVER_INNER.GENERATE_DROPS.name](data, socket: GameSocket, drops: DROP_MODEL[]) {

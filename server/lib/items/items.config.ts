@@ -14,10 +14,10 @@ export default {
 	},
 	"SERVER_INNER": {
 		"ITEM_REMOVE": {"name": "remove_item"},
+		"ITEM_PICK": {"name": "picked_item_inner"},
 		"ITEM_ADD": {"name": "add_item"}
 	},
 	"SERVER_GETS": {
-		"ITEM_PICK": {"name": "picked_item", "throttle": 0, "alive": true},
 		"ITEM_DROP": {"name": "dropped_item", "alive": true, "log": true},
 		"ITEM_MOVE": {"name": "moved_item", "alive": true, "log": true}
 	},

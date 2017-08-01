@@ -46,20 +46,18 @@ export default class ItemsRouter extends SocketioRouterBase {
         return this.middleware.hasItem(socket, slot);
     }
 
-	[config.SERVER_GETS.ITEM_PICK.name](data, socket: GameSocket) {
-		this.emitter.emit(dropsConfig.SERVER_INNER.ITEM_PICK.name, data, socket, (item: ITEM_INSTANCE): any => {
-			let itemInfo = this.getItemInfo(item.key);
-            if (itemInfo.cap > 1) {
-                return;
-            }
-            let slot = this.middleware.getFirstAvailableSlot(socket);
-			if (!(slot >= 0)) { 
-				this.sendError(data, socket, config.LOGS.INVENTORY_FULL.MSG, true, true);
-			} else {
-				this[config.SERVER_INNER.ITEM_ADD.name]({slots: [slot], item}, socket);
-				return true;
-			}	
-		});
+	[config.SERVER_INNER.ITEM_PICK.name](data: {item: ITEM_INSTANCE, callback: Function}, socket: GameSocket) {
+        let {item, callback} = data;
+        let itemInfo = this.getItemInfo(item.key);
+        if (itemInfo.cap > 1) {
+            return;
+        }
+        let slot = this.middleware.getFirstAvailableSlot(socket);
+        if (!(slot >= 0)) { 
+            return this.sendError(data, socket, config.LOGS.INVENTORY_FULL.MSG, true, true);
+        }	
+        this[config.SERVER_INNER.ITEM_ADD.name]({slots: [slot], item}, socket);
+        callback();
 	}
 
 	[config.SERVER_INNER.ITEM_ADD.name](data: {slots: number[], item: ITEM_INSTANCE}, socket: GameSocket) {

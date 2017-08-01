@@ -1,10 +1,10 @@
 export default {
 	"SERVER_INNER": {
-		"ITEM_PICK": {"name": "item_pick"},
 		"ITEMS_DROP": {"name": "items_drop"},
 		"GENERATE_DROPS": {"name": "generate_drops"}
 	},
 	"SERVER_GETS": {
+		"ITEM_PICK": {"name": "picked_item", "throttle": 0, "alive": true},
 		"ENTERED_ROOM": {"name": "entered_room"},
 		"ITEMS_LOCATIONS": {"name": "items_locations", "bitch": true}
 	},

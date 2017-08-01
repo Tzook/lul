@@ -1,10 +1,11 @@
+import itemsConfig from "../items/items.config";
 export default {
 	"SERVER_INNER": {
-		"ITEM_REMOVE": {"name": "remove_item"},
-		"ITEM_ADD": {"name": "add_item"}
+		"ITEM_REMOVE": Object.assign({}, itemsConfig.SERVER_INNER.ITEM_REMOVE),
+        "ITEM_PICK": Object.assign({}, itemsConfig.SERVER_INNER.ITEM_PICK),
+		"ITEM_ADD": Object.assign({}, itemsConfig.SERVER_INNER.ITEM_ADD),
 	},
 	"SERVER_GETS": {
-		"ITEM_PICK": {"name": "picked_item", "throttle": 0, "alive": true},
 		"MISC_DROP": {"name": "dropped_misc", "alive": true}
 	},
 	"CLIENT_GETS": {

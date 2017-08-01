@@ -1,4 +1,3 @@
-
 import SocketioRouterBase from '../socketio/socketio.router.base';
 import ItemsRouter from '../items/items.router';
 import GoldMiddleware from './gold.middleware';
@@ -24,20 +23,19 @@ export default class GoldRouter extends SocketioRouterBase {
         return this.services.getGoldItem(gold);
     }
 
-	[config.SERVER_GETS.ITEM_PICK.name](data, socket: GameSocket) {
-		this.emitter.emit(dropsConfig.SERVER_INNER.ITEM_PICK.name, data, socket, (item: ITEM_INSTANCE): any => {
-            let itemInfo = this.itemsRouter.getItemInfo(item.key);
-            if (!this.middleware.isGold(itemInfo)) {
-                return;
-            }
-            let partySockets = this.partyRouter.getPartyMembersInMap(socket);
-            // divide the gold equally among party members in room
-            item.stack = Math.ceil(item.stack / partySockets.length);
-            for (let memberSocket of partySockets) {
-                this[config.SERVER_INNER.ITEM_ADD.name]({item}, memberSocket);
-            }
-            return true;
-		});
+	[config.SERVER_INNER.ITEM_PICK.name](data: {item: ITEM_INSTANCE, callback: Function}, socket: GameSocket) {
+        let {item, callback} = data;
+        let itemInfo = this.itemsRouter.getItemInfo(item.key);
+        if (!this.middleware.isGold(itemInfo)) {
+            return;
+        }
+        let partySockets = this.partyRouter.getPartyMembersInMap(socket);
+        // divide the gold equally among party members in room
+        item.stack = Math.ceil(item.stack / partySockets.length);
+        for (let memberSocket of partySockets) {
+            this[config.SERVER_INNER.ITEM_ADD.name]({item}, memberSocket);
+        }
+        callback();
 	}
 
 	[config.SERVER_INNER.ITEM_ADD.name](data: {item: ITEM_INSTANCE}, socket: GameSocket) {
