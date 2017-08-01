@@ -5,11 +5,18 @@ export default class NpcsServices extends MasterServices {
 
     public updateNpcs(room: string, npcs: any[] = []): Promise<any> {
         let models: NPC_MODEL[] = [];
-        npcs.forEach(npc => {
+        for (let i = 0; i < npcs.length; i++) {
+            let npc = npcs[i];
             let npcModel: NPC_MODEL = {
                 key: npc.npcKey,
                 room,
+            };
+            let existingNpc = this.npcsInfo.get(npcModel.key);
+            if (existingNpc && existingNpc.room !== npcModel.room) {
+                // we have an npc with this key already, in a different room! return an error
+                return Promise.reject(`Npc with key ${existingNpc.key} already exists in room ${existingNpc.room}`);
             }
+
             if (npc.sell && npc.sell.length > 0) {
                 let sell: NPC_ITEM[] = [];
                 npc.sell.forEach(sellItem => {
@@ -21,7 +28,7 @@ export default class NpcsServices extends MasterServices {
                 npcModel.sell = sell;
             }
             models.push(new this.Model(npcModel))
-        });
+        }
         return this.Model.remove({room})
             .then(d => this.Model.insertMany(models));
     }
