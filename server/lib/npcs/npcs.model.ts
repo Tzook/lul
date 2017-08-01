@@ -1,7 +1,11 @@
 import MasterModel from '../master/master.model';
+import NpcsController from "./npcs.controller";
 
 export default class NpcsModel extends MasterModel {
+    protected controller: NpcsController;
+
     init(files, app) {
+        this.controller = files.controller;
         this.schema = {
             key: String,
             room: String,
@@ -17,7 +21,7 @@ export default class NpcsModel extends MasterModel {
 
     createModel() {
         this.setModel('Npcs');
-
+        setTimeout(() => this.controller.warmNpcsInfo()); // timeout so the Model can be set
         return Promise.resolve();
     }
 };
