@@ -29,7 +29,7 @@ export default class ItemsMiddleware extends MasterMiddleware {
     }
 
     isItem(item: ITEM_INSTANCE) {
-        return !!item.key;
+        return !!(item || <any>{}).key;
     }
 
     isMisc(item: ITEM_MODEL) {

@@ -22,15 +22,44 @@ export default class NpcsRouter extends SocketioRouterBase {
     }
 
 	[npcsConfig.SERVER_GETS.ITEM_BUY.name](data, socket: GameSocket) {
+        let {npcKey, index, stack} = data;
+        stack = Math.abs(stack || 1);
+        let npcInfo = this.services.getNpcInfo(npcKey);
+        if (isNaN(stack)) {
+            return this.sendError(data, socket, "Stack value is invalid.");
+        } else if (!npcInfo) {
+            return this.sendError(data, socket, "No npc with such key.");
+        } else if (npcInfo.room !== socket.character.room) {
+            return this.sendError(data, socket, "The npc is in a different room than you!");
+        } else if (!npcInfo.sell || !npcInfo.sell[index]) {
+            return this.sendError(data, socket, "The npc does not sell the item you want.");
+        }
+        let itemInfo = this.itemsRouter.getItemInfo(npcInfo.sell[index].key);
+        let goldValue = itemInfo.gold * stack;
+        if (goldValue > socket.character.gold) {
+            return this.sendError(data, socket, "Not enough money to buy the item.");
+        }
+        let itemInstance = this.itemsRouter.getItemInstance(itemInfo.key);
+        if (itemInfo.cap > 1) {
+            itemInstance.stack = stack;
+        }
+        let callback = () => {
+            let goldItem = this.goldRouter.getGoldItem(goldValue);
+            this.emitter.emit(itemsConfig.SERVER_INNER.ITEM_REMOVE.name, {item: goldItem}, socket);
 
+            socket.emit(npcsConfig.CLIENT_GETS.TRANSACTION.name, {});
+        }
+        this.emitter.emit(itemsConfig.SERVER_INNER.ITEM_PICK.name, {item: itemInstance, callback}, socket);
     }
     
 	[npcsConfig.SERVER_GETS.ITEM_SELL.name](data, socket: GameSocket) {
         let {npcKey, slot, stack} = data;
-        stack = stack || 1;
+        stack = Math.abs(stack || 1);
         let item = socket.character.items[slot];
         let npcInfo = this.services.getNpcInfo(npcKey);
-        if (!npcInfo) {
+        if (isNaN(stack)) {
+            return this.sendError(data, socket, "Stack value is invalid.");
+        } else if (!npcInfo) {
             return this.sendError(data, socket, "No npc with such key.");
         } else if (npcInfo.room !== socket.character.room) {
             return this.sendError(data, socket, "The npc is in a different room than you!");
