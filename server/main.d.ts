@@ -1,5 +1,5 @@
-/// <reference path="node_modules/@types/socket.io/index.d.ts" />
-/// <reference path="node_modules/@types/mongoose/index.d.ts" />
+/// <reference path="../node_modules/@types/socket.io/index.d.ts" />
+/// <reference path="../node_modules/@types/mongoose/index.d.ts" />
 
 interface EVENT {
     name: string;
@@ -252,7 +252,11 @@ interface PARTY_MODEL {
 }
 
 // Npcs
+interface NPC_ITEM {
+    key: string
+}
 interface NPC_MODEL {
     key: string,
     room: string,
+    sell?: NPC_ITEM[]
 }

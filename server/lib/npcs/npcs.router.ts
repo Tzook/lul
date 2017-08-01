@@ -9,7 +9,7 @@ export default class NpcsRouter extends SocketioRouterBase {
 		super.init(files, app);
 	}
 
-    public updateNpcs(room: string, npcs: {npcKey: string}[]): Promise<any> {
+    public updateNpcs(room: string, npcs: any[]): Promise<any> {
         return this.services.updateNpcs(room, npcs);
     }
 };

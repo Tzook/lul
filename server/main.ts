@@ -1,4 +1,4 @@
-/// <reference path="../main.d.ts" />
+/// <reference path="./main.d.ts" />
 
 import Main from './lib/main/main';
 
