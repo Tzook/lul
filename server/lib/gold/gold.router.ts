@@ -5,17 +5,24 @@ import GoldMiddleware from './gold.middleware';
 import PartyRouter from '../party/party.router';
 import dropsConfig from '../drops/drops.config';
 import config from '../gold/gold.config';
+import GoldServices from './gold.services';
 
 export default class GoldRouter extends SocketioRouterBase {
 	protected middleware: GoldMiddleware;
+	protected services: GoldServices;
     protected itemsRouter: ItemsRouter;
     protected partyRouter: PartyRouter;
 
 	init(files, app) {
 		super.init(files, app);
 		this.itemsRouter = files.routers.items;
+		this.services = files.services;
         this.partyRouter = files.routers.party;
-	}
+    }
+    
+    public getGoldItem(gold: number): ITEM_INSTANCE {
+        return this.services.getGoldItem(gold);
+    }
 
 	[config.SERVER_GETS.ITEM_PICK.name](data, socket: GameSocket) {
 		this.emitter.emit(dropsConfig.SERVER_INNER.ITEM_PICK.name, data, socket, (item: ITEM_INSTANCE): any => {

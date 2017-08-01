@@ -25,7 +25,7 @@ export default class ItemsMiddleware extends MasterMiddleware {
     }
 
     hasItem(socket: GameSocket, slot: number): boolean {
-        return this.isItem(socket.character.items[slot]);
+        return !isNaN(slot) && this.isItem(socket.character.items[slot]);
     }
 
     isItem(item: ITEM_INSTANCE) {

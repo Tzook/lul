@@ -409,6 +409,8 @@
                 socket.on("known_login", d => setResult({msg: "known_login", d}));
                 socket.on("known_move_room", d => setResult({msg: "known_move_room", d}));
                 socket.on("known_info", d => setResult({msg: "known_info", d}));
+                
+                socket.on("actor_transaction", d => setResult({msg: "actor_transaction", d}));
 			}
 
 			function move(dX, dY) {

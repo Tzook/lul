@@ -1,4 +1,3 @@
-
 import SocketioRouterBase from '../socketio/socketio.router.base';
 import ItemsMiddleware from './items.middleware';
 import ItemsController from './items.controller';
@@ -41,7 +40,11 @@ export default class ItemsRouter extends SocketioRouterBase {
 
 	public getItemsSlots(socket: GameSocket, items: ITEM_INSTANCE[]): false|{[key: string]: number[]} {
 		return this.middleware.getItemsSlots(socket, items);
-	}
+    }
+    
+    public hasItem(socket: GameSocket, slot: number): boolean {
+        return this.middleware.hasItem(socket, slot);
+    }
 
 	[config.SERVER_GETS.ITEM_PICK.name](data, socket: GameSocket) {
 		this.emitter.emit(dropsConfig.SERVER_INNER.ITEM_PICK.name, data, socket, (item: ITEM_INSTANCE): any => {
@@ -68,11 +71,14 @@ export default class ItemsRouter extends SocketioRouterBase {
 		}
 	}
 
-	[config.SERVER_INNER.ITEM_REMOVE.name](data: {item: ITEM_INSTANCE}, socket: GameSocket) {
-		let {stack, key} = data.item;
+	[config.SERVER_INNER.ITEM_REMOVE.name](data: {item: ITEM_INSTANCE, slot?: number}, socket: GameSocket) {
+		let {item: {stack, key}, slot: forcedSlot} = data;
 		let itemInfo = this.getItemInfo(key);
 		if (!this.middleware.isMisc(itemInfo)) {
-			for (let slot = 0; slot < socket.character.items.length; slot++) {
+            // we want to loop, but if the slot is already provided - start and end with that slot
+            let slot = (forcedSlot || 0) - 1;
+            let length = forcedSlot === undefined ? socket.character.items.length : forcedSlot + 1;
+            while (++slot < length) {
 				let item = socket.character.items[slot];
 				if (item.key === key) {
 					this.deleteItem(socket, slot);

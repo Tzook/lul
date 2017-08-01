@@ -43,11 +43,14 @@ export default class MiscRouter extends SocketioRouterBase {
         }
 	}
 
-	[config.SERVER_INNER.ITEM_REMOVE.name](data: {item: ITEM_INSTANCE}, socket: GameSocket) {
-		let {stack, key} = data.item;
+	[config.SERVER_INNER.ITEM_REMOVE.name](data: {item: ITEM_INSTANCE, slot?: number}, socket: GameSocket) {
+		let {item: {stack, key}, slot: forcedSlot} = data;
 		let itemInfo = this.itemsRouter.getItemInfo(key);
 		if (this.middleware.isMisc(itemInfo)) {
-			for (let slot = 0; slot < socket.character.items.length; slot++) {
+			// we want to loop, but if the slot is already provided - start and end with that slot
+            let slot = (forcedSlot || 0) - 1;
+            let length = forcedSlot === undefined ? socket.character.items.length : forcedSlot + 1;
+            while (++slot < length) {
 				let item = socket.character.items[slot];
 				if (item.key === key) {
                     if (item.stack <= stack) {

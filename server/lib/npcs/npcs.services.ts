@@ -1,4 +1,5 @@
 import MasterServices from '../master/master.services';
+import npcsConfig from "../npcs/npcs.config";
 
 export default class NpcsServices extends MasterServices {
     private npcsInfo: Map<string, NPC_MODEL> = new Map();
@@ -46,5 +47,9 @@ export default class NpcsServices extends MasterServices {
         
 	public getNpcInfo(key: string): NPC_MODEL|undefined {
 		return this.npcsInfo.get(key);
-	}
+    }
+    
+    public getGoldValueForSale(itemInfo: ITEM_MODEL, stack: number) {
+        return Math.ceil(itemInfo.gold * stack * npcsConfig.SELLING_VALUE);
+    }
 }; 
