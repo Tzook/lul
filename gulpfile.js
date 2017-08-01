@@ -7,10 +7,10 @@ const tsProject = ts.createProject("tsconfig.json");
 
 function compile() {
     return tsProject.src()
-        .pipe(sourcemaps.init())
+        // .pipe(sourcemaps.init())
         .pipe(tsProject())
         .js
-        .pipe(sourcemaps.write())
+        // .pipe(sourcemaps.write())
         .pipe(gulp.dest(tsProject.options.outDir));
 }
 

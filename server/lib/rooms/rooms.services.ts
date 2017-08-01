@@ -1,9 +1,16 @@
 
 import MasterServices from '../master/master.services';
+import NpcsRouter from "../npcs/npcs.router";
 
 export default class RoomsServices extends MasterServices {
-	private roomsInfo: Map<string, ROOM_MODEL> = new Map();
+    private roomsInfo: Map<string, ROOM_MODEL> = new Map();
+    protected npcsRouter: NpcsRouter;
 
+	init(files, app) {
+        super.init(files, app);
+		this.npcsRouter = files.routers.npcs;
+    }
+    
     // HTTP functions
 	// =================
 	public generateRoom (scene): Promise<any> {
@@ -34,10 +41,12 @@ export default class RoomsServices extends MasterServices {
 			portals,
 			spawns
 		}
-		let roomModel = new this.Model(room);
+        let roomModel = new this.Model(room);
+
+        let npcsPromise = this.npcsRouter.updateNpcs(scene.name, scene.NPC);
 		
 		let updatedDocPromise = this.Model.findOneAndUpdate({name: room.name}, roomModel, {new: true, upsert: true});
-		return <any>updatedDocPromise;
+		return Promise.all([updatedDocPromise, npcsPromise]);
 	}
 
 	public getRooms(): Promise<Map<string, ROOM_MODEL>> {
@@ -54,4 +63,4 @@ export default class RoomsServices extends MasterServices {
 	public getRoomInfo(room: string): ROOM_MODEL|undefined {
 		return this.roomsInfo.get(room);
 	}
-};
+};  

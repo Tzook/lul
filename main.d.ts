@@ -250,3 +250,9 @@ interface PARTY_MODEL {
     members: Set<string> // list of member names
     invitees: Map<string, NodeJS.Timer> // invitee name to its clear-timeout id
 }
+
+// Npcs
+interface NPC_MODEL {
+    key: string,
+    room: string,
+}

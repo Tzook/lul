@@ -23,7 +23,8 @@
 		"quests",
 		"combat",
 		"knowns",
-		"party"
+		"party",
+		"npcs"
 	],
 	"skip": 	 { "master": 1 }
 }
