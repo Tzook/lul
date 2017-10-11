@@ -3,8 +3,9 @@
   "version": "0.0.1",
   "description": "very lel..",
   "scripts": {
-    "webdriver-watch": "./node_modules/protractor/bin/webdriver-manager update && ./node_modules/protractor/bin/webdriver-manager start",
-    "typescript-watch": "tsc -w",
+    "webdriver-watch": "node_modules/.bin/webdriver-manager update && npm run webdriver-start",
+    "webdriver-start": "node_modules/.bin/webdriver-manager start",
+    "typescript-watch": "node_modules/.bin/tsc -w",
     "start": "npm-run-all -n -p -r webdriver-watch typescript-watch",
     "test": "protractor output/conf.js --suite=socket",
     "test-http": "protractor output/conf.js --suite=http"
@@ -15,6 +16,7 @@
     "@types/jasminewd2": "2.0.2",
     "npm-run-all": "4.0.2",
     "protractor": "5.1.2",
+    "typescript": "2.4.2",
     "protractor-fail-fast": "3.0.2"
   }
 }

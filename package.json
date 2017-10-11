@@ -4,8 +4,9 @@
   "description": "very lel..",
   "main": "main.js",
   "scripts": {
+    "s": "gulp watch",
     "// start-explanation": "1) verify n exists. 2) verify node latest version exists while keeping the machine's original node version installed. 3) start app with node latest version",
-    "start": "INSTALL_V=8.2.1 && ([ -a /usr/local/bin/n ] || sudo npm i -g n) && ([ -d /usr/local/n/versions/node/$INSTALL_V ] || (CURRENT_V=$(node -v) && sudo n $INSTALL_V && sudo n $CURRENT_V)) && n use $INSTALL_V node_modules/.bin/gulp watch --color",
+    "start": "INSTALL_V=8.6.0 && ([ -a /usr/local/bin/n ] || sudo npm i -g n) && ([ -d /usr/local/n/versions/node/$INSTALL_V ] || (CURRENT_V=$(node -v) && sudo n $INSTALL_V && sudo n $CURRENT_V)) && n use $INSTALL_V node_modules/.bin/gulp watch --color",
     "// test-explanation": "1) start app in the background and save its process id. 2) run tests in tests folder. 3) kill app with saved process id.",
     "test": "gulp & SERVER_PID=$!; (cd tests; npm i && node run-tests.js); kill $SERVER_PID",
     "// postinstall-explanation": "this task is run by heroku after deploying, so it compiles the output files",
@@ -40,11 +41,10 @@
     "underscore": "1.8.3"
   },
   "engines": {
-    "node": "8.2.1",
+    "node": "8.6.0",
     "npm": "4.0.2"
   },
   "license": "MIT",
-    "//": "No devDependencies. Everything needed for compilation is in dependencies, because heroku compiles the files",
-  "devDependencies": {
-  }
+  "//": "No devDependencies. Everything needed for compilation is in dependencies, because heroku compiles the files",
+  "devDependencies": {}
 }
