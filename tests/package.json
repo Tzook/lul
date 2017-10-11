@@ -12,11 +12,11 @@
   },
   "license": "MIT",
   "devDependencies": {
-    "@types/jasmine": "2.5.47",
-    "@types/jasminewd2": "2.0.2",
-    "npm-run-all": "4.0.2",
+    "@types/jasmine": "2.6.0",
+    "@types/jasminewd2": "2.0.3",
+    "npm-run-all": "4.1.1",
     "protractor": "5.1.2",
-    "typescript": "2.4.2",
+    "typescript": "2.5.3",
     "protractor-fail-fast": "3.0.2"
   }
 }
