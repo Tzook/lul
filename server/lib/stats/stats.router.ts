@@ -24,7 +24,7 @@ export default class StatsRouter extends SocketioRouterBase {
         let currentLevel = socket.character.stats.lvl;
         this.controller.addExp(socket, exp);
 
-        socket.emit(this.CLIENT_GETS.GAIN_EXP.name, {
+        socket.emit(config.CLIENT_GETS.GAIN_EXP.name, {
             exp,
             now: socket.character.stats.exp
          });
@@ -35,10 +35,10 @@ export default class StatsRouter extends SocketioRouterBase {
     }
 
     [config.SERVER_INNER.GAIN_LVL.name] (data, socket: GameSocket) {
-        this.io.to(socket.character.room).emit(this.CLIENT_GETS.LEVEL_UP.name, {
+        this.io.to(socket.character.room).emit(config.CLIENT_GETS.LEVEL_UP.name, {
             id: socket.character._id,
         });
-        socket.emit(this.CLIENT_GETS.GAIN_STATS.name, {
+        socket.emit(config.CLIENT_GETS.GAIN_STATS.name, {
             stats: socket.character.stats
         });
     }
@@ -48,14 +48,14 @@ export default class StatsRouter extends SocketioRouterBase {
         let hpAfterDmg = this.services.getHpAfterDamage(socket.character.stats.hp.now, dmg);
         let hadFullHp = socket.character.stats.hp.now === socket.maxHp;
         socket.character.stats.hp.now = hpAfterDmg;
-		this.io.to(socket.character.room).emit(this.CLIENT_GETS.TAKE_DMG.name, {
+		this.io.to(socket.character.room).emit(config.CLIENT_GETS.TAKE_DMG.name, {
 			id: socket.character._id,
 			dmg,
 			hp: socket.character.stats.hp.now
 		});
         if (!socket.alive) {
             this.log({}, socket,  "character is ded");
-            this.io.to(socket.character.room).emit(this.CLIENT_GETS.DEATH.name, {
+            this.io.to(socket.character.room).emit(config.CLIENT_GETS.DEATH.name, {
                 id: socket.character._id,
             });
         } else {
@@ -68,7 +68,7 @@ export default class StatsRouter extends SocketioRouterBase {
         let gainedHp = this.controller.addHp(socket, hp);
 
         if (gainedHp) {
-            socket.emit(this.CLIENT_GETS.GAIN_HP.name, {
+            socket.emit(config.CLIENT_GETS.GAIN_HP.name, {
                 hp,
                 now: socket.character.stats.hp.now
             });
@@ -80,7 +80,7 @@ export default class StatsRouter extends SocketioRouterBase {
         let gainedMp = this.controller.addMp(socket, mp);
 
         if (gainedMp) {
-            socket.emit(this.CLIENT_GETS.GAIN_MP.name, {
+            socket.emit(config.CLIENT_GETS.GAIN_MP.name, {
                 mp,
                 now: socket.character.stats.mp.now
             });
@@ -96,14 +96,31 @@ export default class StatsRouter extends SocketioRouterBase {
         this.services.addHp(socket.character.stats, stats.hp || 0);
         this.services.addMp(socket.character.stats, stats.mp || 0);
 
-        socket.emit(this.CLIENT_GETS.GAIN_STATS.name, {
+        socket.emit(config.CLIENT_GETS.GAIN_STATS.name, {
             stats: socket.character.stats
+        });
+    }
+
+    [config.SERVER_INNER.GAIN_CLASS.name] (data, socket: GameSocket) {
+        socket.character.stats.job = data.job;
+        socket.emit(config.CLIENT_GETS.GAIN_CLASS.name, {
+            class: socket.character.stats.job
+        });
+    }
+    
+    [config.SERVER_INNER.GAIN_ABILITY.name] (data, socket: GameSocket) {
+        if (StatsServices.hasAbility(socket, data.ability)) {
+            return this.sendError(data, socket, "Character already has the ability!"); 
+        }
+        socket.character.stats.abilities = socket.character.stats.abilities.concat(data.ability);
+        socket.emit(config.CLIENT_GETS.GAIN_ABILITY.name, {
+            ability: data.ability
         });
     }
 
     [config.SERVER_GETS.RELEASE_DEATH.name] (data, socket: GameSocket) {
         socket.character.stats.hp.now = socket.maxHp;
-        socket.emit(this.CLIENT_GETS.RESURRECT.name, {});
+        socket.emit(config.CLIENT_GETS.RESURRECT.name, {});
         this.emitter.emit(roomsConfig.SERVER_INNER.MOVE_TO_TOWN.name, {}, socket);
     }
 

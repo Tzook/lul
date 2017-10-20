@@ -11,7 +11,7 @@ export default class MasterRouter {
 	}
 
 	protected initRoutes(app) {
-		// TODO inherit
+		// To inherit
 	}
 
 	get connection() {

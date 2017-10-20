@@ -60,7 +60,11 @@ export default class StatsServices extends MasterServices {
 
     public static getMainStat(socket: GameSocket): string {
         return socket.character.stats.primaryAbility === "range" ? "dex" : "str";
-    } 
+    }
+
+    public static hasAbility(socket: GameSocket, ability: string): boolean {
+        return (<any>socket.character.stats.abilities).includes(ability);
+    }
 };
 // cache computations
 StatsServices.prototype.getExp = <any>_.memoize(StatsServices.prototype.getExp);

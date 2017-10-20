@@ -52,7 +52,7 @@ interface Stats {
         total: number,
         regen: number,
     },
-    class: string,
+    job: string,
     abilities: string[],
     primaryAbility: string,
 }
@@ -216,13 +216,13 @@ interface QUEST_CONDITIONS {
     }
 }
 interface QUEST_REQUIREMENTS {
-    class?: string
+    job?: string
     lvl?: number 
     quests?: string[]
 }
 interface QUEST_REWARDS {
     items?: ITEM_INSTANCE[]
-    class?: string
+    job?: string
     exp?: number
     stats?: BASE_STATS_MODEL
     ability?: string

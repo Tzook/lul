@@ -49,12 +49,17 @@ export default class QuestsServices extends MasterServices {
     public questReqUnmetReason(char: Char, questInfo: QUEST_MODEL): string {
         let req = questInfo.req;
         if (req) {
+            // check level requirement
             if (req.lvl && char.stats.lvl < req.lvl) {
                 return `level ${char.stats.lvl} / ${req.lvl}`;
             }
+            
+            // check class requirement
+            if (req.job && char.stats.job !== req.job) {
+                return `class is ${char.stats.job} and not ${req.job}`;
+            }
 
-            // TODO add class check
-
+            // check pre-quests requirements
             for (var i in (req.quests || [])) {
                 let reqQuest = req.quests[i];
                 if (!char.quests.done[reqQuest]) {
@@ -105,7 +110,7 @@ export default class QuestsServices extends MasterServices {
             {
                 let req: QUEST_REQUIREMENTS = {};
                 if (quest.minLevel > 0) req.lvl = +quest.minLevel;
-                if (quest.requiredClass) req.class = quest.requiredClass;
+                if (quest.requiredClass) req.job = quest.requiredClass;
                 let reqQuests = [];
                 (quest.RequiredQuests || []).forEach(reqQuest => {
                     reqQuests.push(reqQuest.key);
@@ -118,7 +123,7 @@ export default class QuestsServices extends MasterServices {
             // rewards
             {
                 let rewards: QUEST_REWARDS = {};
-                if (quest.rewardClass) rewards.class = quest.rewardClass;
+                if (quest.rewardClass) rewards.job = quest.rewardClass;
                 if (quest.rewardExp > 0) rewards.exp = +quest.rewardExp;
                 if (quest.rewardPrimaryAbility) rewards.ability = quest.rewardPrimaryAbility;
 
