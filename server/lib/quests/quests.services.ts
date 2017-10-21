@@ -1,6 +1,7 @@
 
 import MasterServices from '../master/master.services';	
 import * as _ from 'underscore';
+import config from './quests.config';
 
 export default class QuestsServices extends MasterServices {
 	private questsInfo: Map<string, QUEST_MODEL> = new Map();
@@ -75,9 +76,30 @@ export default class QuestsServices extends MasterServices {
 
             // check pre-quests requirements
             for (var i in (req.quests || [])) {
-                let reqQuest = req.quests[i];
-                if (!char.quests.done[reqQuest]) {
-                    return `quest id '${reqQuest}'`;
+                let {key, phase} = req.quests[i];
+                console.log(req.quests, req.quests[i], key, phase)
+                switch (phase) {
+                    case config.REQUIREMENT_PHASE.PROGRESS:
+                        if (!char.quests.progress[key]) {
+                            return `quest '${key}' must be in progress`;
+                        }
+                        break;
+                    case config.REQUIREMENT_PHASE.NOT_PROGRESS:
+                        if (char.quests.progress[key]) {
+                            return `quest '${key}' must not be in progress`;
+                        }
+                        break;
+                    case config.REQUIREMENT_PHASE.NOT_COMPLETED:
+                        if (char.quests.done[key]) {
+                            return `quest '${key}' must not be completed`;
+                        }
+                        break;
+                    default:
+                        if (!char.quests.done[key]) {
+                            return `quest '${key}' must be completed`;
+                        }
+                        break;
+
                 }
             }
         }
@@ -134,7 +156,7 @@ export default class QuestsServices extends MasterServices {
                 if (quest.requiredClass) req.job = quest.requiredClass;
                 let reqQuests = [];
                 (quest.RequiredQuests || []).forEach(reqQuest => {
-                    reqQuests.push(reqQuest.key);
+                    reqQuests.push({key: reqQuest.key, phase: reqQuest.phase});
                     req.quests = reqQuests;
                 });
                 if (!_.isEmpty(req)) {

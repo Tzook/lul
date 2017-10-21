@@ -24,5 +24,11 @@ export default {
 		"QUEST_ABORT": {"name": "quest_abort"},
 		"QUEST_OK_PROGRESS": {"name": "quest_ok_progress"},
 		"QUEST_HUNT_PROGRESS": {"name": "quest_hunt_progress"}
+	},
+	REQUIREMENT_PHASE: {
+		PROGRESS: "InProgress",
+		COMPLETED: "Completed",
+		NOT_PROGRESS: "NotInProgress",
+		NOT_COMPLETED: "NotCompleted"
 	}
 }

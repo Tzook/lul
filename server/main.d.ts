@@ -218,10 +218,14 @@ interface QUEST_CONDITIONS {
         [taskKey: string]: number
     }
 }
+interface REQUIRED_QUEST {
+    key: string
+    phase: string
+}
 interface QUEST_REQUIREMENTS {
     job?: string
     lvl?: number 
-    quests?: string[]
+    quests?: REQUIRED_QUEST[]
 }
 interface QUEST_REWARDS {
     items?: ITEM_INSTANCE[]
