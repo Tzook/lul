@@ -37,6 +37,7 @@ export default class StatsRouter extends SocketioRouterBase {
     [config.SERVER_INNER.GAIN_LVL.name] (data, socket: GameSocket) {
         this.io.to(socket.character.room).emit(config.CLIENT_GETS.LEVEL_UP.name, {
             id: socket.character._id,
+            name: socket.character.name,
         });
         socket.emit(config.CLIENT_GETS.GAIN_STATS.name, {
             stats: socket.character.stats

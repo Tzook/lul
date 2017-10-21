@@ -15,7 +15,8 @@ export default class KnownsRouter extends SocketioRouterBase {
         let namespace = this.services.getKnownsNamespace(this.services.getNotInRoomKnowns(socket));
         if (namespace) {
             namespace.emit(statsConfig.CLIENT_GETS.LEVEL_UP.name, {
-                id: socket.character._id
+                id: socket.character._id,
+                name: socket.character.name
             });
         }
     }
