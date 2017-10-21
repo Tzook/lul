@@ -385,7 +385,7 @@
 				socket.on("actor_perform_attack", d => setResult({msg: "actor_perform_attack", d}))
 				socket.on("actor_change_ability", d => setResult({msg: "actor_change_ability", d}))
 				
-				socket.on("mob_spawn", d => setResult({msg: "mob_spawn", d}));
+				// socket.on("mob_spawn", d => setResult({msg: "mob_spawn", d}));
 				socket.on("mob_die", d => setResult({msg: "mob_die", d}));
 				socket.on("mob_take_dmg", d => setResult({msg: "mob_take_dmg", d}));
 				socket.on("mobs_moved", d => window.test && setResult({msg: "mobs_moved", d}));
@@ -394,7 +394,8 @@
 				socket.on("quest_start", d => setResult({msg: "quest_start", d}));
 				socket.on("quest_complete", d => setResult({msg: "quest_complete", d}));
 				socket.on("quest_abort", d => setResult({msg: "quest_abort", d}));
-				socket.on("quest_progress", d => setResult({msg: "quest_progress", d}));
+				socket.on("quest_ok_progress", d => setResult({msg: "quest_ok_progress", d}));
+				socket.on("quest_hunt_progress", d => setResult({msg: "quest_hunt_progress", d}));
 
 				socket.on("create_party", d => setResult({msg: "create_party", d}));
 				socket.on("party_invitation", d => setResult({msg: "party_invitation", d}));

@@ -214,6 +214,9 @@ interface QUEST_CONDITIONS {
     hunt?: {
         [mobKey: string]: number
     }
+    ok?: {
+        [taskKey: string]: number
+    }
 }
 interface QUEST_REQUIREMENTS {
     job?: string
@@ -238,6 +241,11 @@ interface CHAR_QUESTS {
     }
     hunt: {
         [mobId: string]: {
+            [questKey: string]: number
+        }
+    }
+    ok: {
+        [taskKey: string]: {
             [questKey: string]: number
         }
     }

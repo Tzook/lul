@@ -14,6 +14,13 @@ export default class QuestsServices extends MasterServices {
             quests.hunt[mobKey][questInfo.key] = 0;
             fields.add("hunt");
         }
+
+        for (var taskKey in ((questInfo.cond || {}).ok || {})) {
+            quests.ok[taskKey] = quests.ok[taskKey] || {};
+            quests.ok[taskKey][questInfo.key] = 0;
+            fields.add("ok");
+        }
+
         this.markModified(quests, fields);
     }
 
@@ -36,6 +43,13 @@ export default class QuestsServices extends MasterServices {
                 delete quests.hunt[mobKey];
             }
             fields.add("hunt");
+        }
+        for (var taskKey in ((questInfo.cond || {}).ok || {})) {
+            delete quests.ok[taskKey][questInfo.key];
+            if (_.isEmpty(quests.ok[taskKey])) {
+                delete quests.ok[taskKey];
+            }
+            fields.add("ok");
         }
         this.markModified(quests, fields);
     }
@@ -83,6 +97,13 @@ export default class QuestsServices extends MasterServices {
             let target = questInfo.cond.hunt[mobKey];
             if (progress < target) {
                 return `hunt ${progress} / ${target} ${mobKey}`;
+            }
+        }
+        for (var taskKey in ((questInfo.cond || {}).ok || {})) {
+            let progress = char.quests.ok[taskKey][questInfo.key];
+            let target = questInfo.cond.ok[taskKey];
+            if (progress < target) {
+                return `task ${progress} / ${target} ${taskKey}`;
             }
         }
         return "";

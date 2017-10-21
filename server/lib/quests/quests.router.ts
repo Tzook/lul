@@ -44,7 +44,7 @@ export default class QuestsRouter extends SocketioRouterBase {
 			this.sendError(data, socket, "Character does not meet the quest requirement: " + unmetReason);
 		} else {
 			this.services.startQuest(socket.character.quests, questInfo);
-			socket.emit(this.CLIENT_GETS.QUEST_START.name, { id: questKey });
+			socket.emit(config.CLIENT_GETS.QUEST_START.name, { id: questKey });
 		}
 	}
 
@@ -63,7 +63,7 @@ export default class QuestsRouter extends SocketioRouterBase {
 			this.sendError(data, socket, `There must be ${questInfo.reward.items.length} empty slots for the quest rewards.`);
 		} else {
 			this.services.finishQuest(socket.character.quests, questInfo);
-			socket.emit(this.CLIENT_GETS.QUEST_DONE.name, { id: questKey });
+			socket.emit(config.CLIENT_GETS.QUEST_DONE.name, { id: questKey });
 			
 			_.forEach((questInfo.cond || {}).loot, (stack, key) => {
 				this.emitter.emit(itemsConfig.SERVER_INNER.ITEM_REMOVE.name, {item: { stack, key }}, socket);
@@ -110,25 +110,41 @@ export default class QuestsRouter extends SocketioRouterBase {
 			this.sendError(data, socket, "Quest cannot be aborted, it is not in progress!");
 		} else {
 			this.services.abortQuest(socket.character.quests, questInfo)
-			socket.emit(this.CLIENT_GETS.QUEST_ABORT.name, { id: questKey });
+			socket.emit(config.CLIENT_GETS.QUEST_ABORT.name, { id: questKey });
 		}
 	}
-
+	
 	[config.SERVER_INNER.HUNT_MOB.name](data, socket: GameSocket) {
-        let partySockets = this.partyRouter.getPartyMembersInMap(socket);
+		let partySockets = this.partyRouter.getPartyMembersInMap(socket);
         for (let memberSocket of partySockets) {
-            let quests = memberSocket.character.quests.hunt[data.id] || {};
+			let quests = memberSocket.character.quests.hunt[data.id] || {};
             let fields: Set<string> = new Set();
             for (let questKey in quests) {
-                let questInfo = this.services.getQuestInfo(questKey);
+				let questInfo = this.services.getQuestInfo(questKey);
                 if (quests[questKey] < questInfo.cond.hunt[data.id]) {
-                    quests[questKey]++;
-                    memberSocket.emit(this.CLIENT_GETS.QUEST_HUNT_PROGRESS.name, { id: questKey, mob_id: data.id, value: quests[questKey]});
+					quests[questKey]++;
+                    memberSocket.emit(config.CLIENT_GETS.QUEST_HUNT_PROGRESS.name, { id: questKey, mob_id: data.id, value: quests[questKey]});
                     fields.add("hunt");
                     console.log("Hunt for quest", data.id, questKey, quests[questKey]);
                 }
             }
             this.services.markModified(memberSocket.character.quests, fields);
         }
+	}
+
+	[config.SERVER_GETS.QUEST_OK_PROGRESS.name](data, socket: GameSocket) {
+		let quests = socket.character.quests.ok[data.ok] || {};
+		const increment = data.value > 0 ? data.value : 1;
+		let fields: Set<string> = new Set();
+		for (let questKey in quests) {
+			let questInfo = this.services.getQuestInfo(questKey);
+			if (quests[questKey] < questInfo.cond.ok[data.ok]) {
+				quests[questKey] = Math.min(quests[questKey] + increment, questInfo.cond.ok[data.ok]);
+				socket.emit(config.CLIENT_GETS.QUEST_OK_PROGRESS.name, { id: questKey, ok: data.ok, value: quests[questKey]});
+				fields.add("ok");
+				console.log("Ok for quest", data.ok, questKey, quests[questKey]);
+			}
+		}
+		this.services.markModified(socket.character.quests, fields);
 	}
 };

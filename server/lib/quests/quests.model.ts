@@ -9,6 +9,7 @@ const QUEST_SCHEMA = {
     cond: {
         loot: mongoose.Schema.Types.Mixed,
         hunt: mongoose.Schema.Types.Mixed,
+        ok: mongoose.Schema.Types.Mixed,
     },
     req: {
         job: String,
@@ -28,6 +29,7 @@ const CHAR_QUESTS = {
     progress: {},
     done: {},
     hunt: {},
+    ok: {},
 };
 
 export default class QuestsModel extends MasterModel {
