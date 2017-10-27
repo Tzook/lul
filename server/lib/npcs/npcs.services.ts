@@ -4,6 +4,24 @@ import npcsConfig from "../npcs/npcs.config";
 export default class NpcsServices extends MasterServices {
     private npcsInfo: Map<string, NPC_MODEL> = new Map();
 
+    public doesNpcGiveQuest(npcKey: string, questKey: string): boolean {
+        const npc = this.npcsInfo.get(npcKey);
+        return npc && npc.givingQuests && npc.givingQuests.indexOf(questKey) !== -1;
+    }
+
+    public doesNpcEndQuest(npcKey: string, questKey: string): boolean {
+        const npc = this.npcsInfo.get(npcKey);
+        return npc && npc.endingQuests && npc.endingQuests.indexOf(questKey) !== -1;
+    }
+
+    public isNpcInRoom(npcKey: string, room: string): boolean {
+        const npc = this.npcsInfo.get(npcKey);
+        return npc && npc.room === room;
+    } 
+
+
+    // HTTP functions
+	// =================
     public updateNpcs(room: string, npcs: any[] = []): Promise<any> {
         let models: NPC_MODEL[] = [];
         for (let i = 0; i < npcs.length; i++) {

@@ -21,6 +21,18 @@ export default class NpcsRouter extends SocketioRouterBase {
         return this.services.updateNpcs(room, npcs);
     }
 
+    public doesNpcGiveQuest(npcKey: string, questKey: string): boolean {
+        return this.services.doesNpcGiveQuest(npcKey, questKey);
+    }
+
+    public doesNpcEndQuest(npcKey: string, questKey: string): boolean {
+        return this.services.doesNpcEndQuest(npcKey, questKey);
+    }
+
+    public isNpcInRoom(npcKey: string, room: string): boolean {
+        return this.services.isNpcInRoom(npcKey, room);
+    } 
+
 	[npcsConfig.SERVER_GETS.ITEM_BUY.name](data, socket: GameSocket) {
         let {npcKey, index, stack} = data;
         stack = Math.abs(stack || 1);

@@ -1,4 +1,3 @@
-
 import SocketioRouterBase from '../socketio/socketio.router.base';
 import QuestsMiddleware from './quests.middleware';
 import QuestsController from './quests.controller';
@@ -9,6 +8,7 @@ import PartyRouter from '../party/party.router';
 import config from './quests.config';
 import statsConfig from '../stats/stats.config';
 import itemsConfig from '../items/items.config';
+import NpcsRouter from '../npcs/npcs.router';
 
 export default class QuestsRouter extends SocketioRouterBase {
 	protected middleware: QuestsMiddleware;
@@ -16,11 +16,13 @@ export default class QuestsRouter extends SocketioRouterBase {
 	protected services: QuestsServices;
 	protected itemsRouter: ItemsRouter;
     protected partyRouter: PartyRouter;
+    protected npcsRouter: NpcsRouter;
 
 	init(files, app) {
 		this.services = files.services;
 		this.itemsRouter = files.routers.items;
-        this.partyRouter = files.routers.party;
+		this.partyRouter = files.routers.party;
+		this.npcsRouter = files.routers.npcs;
 		super.init(files, app);
 	}
 
@@ -32,6 +34,7 @@ export default class QuestsRouter extends SocketioRouterBase {
 
 	[config.SERVER_GETS.QUEST_START.name](data, socket: GameSocket) {
 		let questKey = data.id;
+		let npcKey = data.npc;
 		let questInfo = this.services.getQuestInfo(questKey);
 		let unmetReason;
 		if (!questInfo) {
@@ -40,6 +43,10 @@ export default class QuestsRouter extends SocketioRouterBase {
 			this.sendError(data, socket, "Already started this quest!");
 		} else if (socket.character.quests.done[questKey]) {
 			this.sendError(data, socket, "Already finished this quest!");
+		} else if (!this.npcsRouter.doesNpcGiveQuest(npcKey, questKey)) {
+			this.sendError(data, socket, `The NPC ${npcKey} does not have the quest ${questKey}!`);
+		} else if (!this.npcsRouter.isNpcInRoom(npcKey, socket.character.room)) {
+			this.sendError(data, socket, `The NPC ${npcKey} must be in your room!`);
 		} else if (unmetReason = this.services.questReqUnmetReason(socket.character, questInfo)) {
 			this.sendError(data, socket, "Character does not meet the quest requirement: " + unmetReason);
 		} else {
@@ -50,6 +57,7 @@ export default class QuestsRouter extends SocketioRouterBase {
 
 	[config.SERVER_GETS.QUEST_DONE.name](data, socket: GameSocket) {
 		let questKey = data.id;
+		let npcKey = data.npc;
 		let questInfo = this.services.getQuestInfo(questKey);
 		let unmetReason;
 		let slots: {[key: string]: number[]}|false;
@@ -57,6 +65,10 @@ export default class QuestsRouter extends SocketioRouterBase {
 			this.sendError(data, socket, "Could not find a quest with such key so can't complete.");
 		} else if (!socket.character.quests.progress[questKey]) {
 			this.sendError(data, socket, "Quest cannot be completed, it is not in progress!");
+		} else if (!this.npcsRouter.doesNpcEndQuest(npcKey, questKey)) {
+			this.sendError(data, socket, `The NPC ${npcKey} does not have the quest ${questKey}!`);
+		} else if (!this.npcsRouter.isNpcInRoom(npcKey, socket.character.room)) {
+			this.sendError(data, socket, `The NPC ${npcKey} must be in your room!`);
 		} else if (unmetReason = this.services.questFinishUnmetReason(socket.character, this.itemsRouter.getItemsCounts(socket), questInfo)) {
 			this.sendError(data, socket, "Quest does not meet finishing criteria: " + unmetReason);
 		} else if (!(slots = this.itemsRouter.getItemsSlots(socket, (questInfo.reward || {}).items || []))) {
