@@ -270,5 +270,7 @@ interface NPC_ITEM {
 interface NPC_MODEL {
     key: string,
     room: string,
+    givingQuests: string[]
+    endingQuests: string[]
     sell?: NPC_ITEM[]
 }

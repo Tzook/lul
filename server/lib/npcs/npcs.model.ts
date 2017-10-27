@@ -9,7 +9,9 @@ export default class NpcsModel extends MasterModel {
         this.schema = {
             key: String,
             room: String,
-            sell: this.mongoose.Schema.Types.Mixed
+            sell: this.mongoose.Schema.Types.Mixed,
+            givingQuests: this.mongoose.Schema.Types.Mixed,
+            endingQuests: this.mongoose.Schema.Types.Mixed,
         };
         this.hasId = false; // it actually has an id but saved only in the db
         this.strict = false;

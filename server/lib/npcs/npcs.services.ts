@@ -11,6 +11,8 @@ export default class NpcsServices extends MasterServices {
             let npcModel: NPC_MODEL = {
                 key: npc.npcKey,
                 room,
+                givingQuests: npc.GivingQuests,
+                endingQuests: npc.EndingQuests,
             };
             let existingNpc = this.npcsInfo.get(npcModel.key);
             if (existingNpc && existingNpc.room !== npcModel.room) {
