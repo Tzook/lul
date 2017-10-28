@@ -278,4 +278,9 @@ interface NPC_MODEL {
 // Talents
 interface TALENT_MODEL {
     key: string
+    maxPoints: number
+    requiredJob?: string
+    requiredTalents?: {
+        [key: string]: number
+    }
 }

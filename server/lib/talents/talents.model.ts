@@ -1,9 +1,12 @@
 import MasterModel from '../master/master.model';
 import TalentsController from './talents.controller';
-
+import * as mongoose from 'mongoose';
 
 const TALENTS_SCHEMA = {
     key: String,
+    maxPoints: Number,
+    requiredJob: String,
+    requiredTalents: mongoose.Schema.Types.Mixed
 };
 
 const CHAR_TALENTS_SCHEMA = {
