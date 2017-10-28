@@ -24,7 +24,8 @@
 		"combat",
 		"knowns",
 		"party",
-		"npcs"
+		"npcs",
+		"talents"
 	],
 	"skip": 	 { "master": 1 }
 }

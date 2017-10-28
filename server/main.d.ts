@@ -274,3 +274,8 @@ interface NPC_MODEL {
     endingQuests: string[]
     sell?: NPC_ITEM[]
 }
+
+// Talents
+interface TALENT_MODEL {
+    key: string
+}
