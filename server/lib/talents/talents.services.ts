@@ -13,8 +13,13 @@ export default class TalentsServices extends MasterServices {
 				key: talent.key,
 				maxPoints: talent.maxPoints,
 				requiredJob: talent.requiredJob,
-				requiredTalents: talent.requiredTalents,
 			};
+
+			let requiredTalents = {};
+			(talent.requiredTalents || []).forEach(requiredTalent => {
+				requiredTalents[requiredTalent.key] = requiredTalent.points;
+				talentschema.requiredTalents = requiredTalents;
+			});
 
 			let talentModel = new this.Model(talentschema);
 			models.push(talentModel);
