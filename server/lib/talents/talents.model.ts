@@ -13,6 +13,8 @@ const TALENT_SCHEMA = {
     perks: [ABILITY_PERK_SCHEMA],
 };
 
+const CONFIG_PERK_SCHEMA = mongoose.Schema.Types.Mixed;
+
 const CHAR_TALENT_SCHEMA = {
 
 };
@@ -37,6 +39,8 @@ export default class TalentsModel extends MasterModel {
         let CharTalentsModel = this.createNewModel("CharTalents", CHAR_TALENT_SCHEMA, {_id: false, strict: false, minimize: false});
         this.addToSchema("Character", {talents: CharTalentsModel.schema});
         this.listenForFieldAddition("Character", "talents", CHAR_TALENT_SCHEMA);
+        
+        this.addToSchema("Config", { perks: CONFIG_PERK_SCHEMA });
         
         setTimeout(() => this.controller.warmTalentsInfo()); // timeout so the Model can be set
         return Promise.resolve();

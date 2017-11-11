@@ -16,6 +16,7 @@ interface Doc {
 
 interface Config extends Doc {
     beginEquips: BeginEquips
+    perks: {[key: string]: PERK_CONFIG}
 }
 
 interface BeginEquips {
@@ -284,4 +285,10 @@ interface ABILITY_PERK_MODEL {
 interface TALENT_MODEL {
     ability: string,
     perks: ABILITY_PERK_MODEL[],
+}
+
+interface PERK_CONFIG {
+	value: Number,
+	max?: Number,
+	default?: Number, 
 }
