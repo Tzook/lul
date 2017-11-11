@@ -10,7 +10,8 @@ export default {
 		}
 	},
     "SERVER_INNER": {
-        "LEFT_ROOM": {"name": "left_room"}
+        "LEFT_ROOM": {"name": "left_room"},
+        "HURT_MOB": {"name": "hurt_mob"}
     },
 	"SERVER_GETS": {
 		"ENTERED_ROOM": {"name": "entered_room"},

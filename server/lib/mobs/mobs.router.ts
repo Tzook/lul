@@ -60,13 +60,7 @@ export default class MobsRouter extends SocketioRouterBase {
 			let load = socket.lastAttackLoad || 0;
 			let dmg = this.controller.calculateDamage(socket, load);
 			let mob = this.controller.hurtMob(data.mob_id, dmg, socket);
-			this.io.to(socket.character.room).emit(this.CLIENT_GETS.MOB_TAKE_DMG.name, {
-				id: socket.character._id,
-				mob_id: mob.id,
-				dmg,
-				load,
-				hp: mob.hp,
-			});
+			this.emitter.emit(config.SERVER_INNER.HURT_MOB.name, { mob, dmg }, socket);
 			if (mob.hp === 0) {
 				this.controller.despawnMob(mob, socket);
 
@@ -107,6 +101,15 @@ export default class MobsRouter extends SocketioRouterBase {
 		} else {
 			this.sendError(data, socket, "Mob doesn't exist!");
 		}
+	}
+
+	[config.SERVER_INNER.HURT_MOB.name]({dmg, mob}: {dmg: number, mob: MOB_INSTANCE}, socket: GameSocket) {
+		this.io.to(socket.character.room).emit(config.CLIENT_GETS.MOB_TAKE_DMG.name, {
+			id: socket.character._id,
+			mob_id: mob.id,
+			dmg,
+			hp: mob.hp,
+		});
 	}
 
 	[config.SERVER_GETS.MOBS_MOVE.name](data, socket: GameSocket) {

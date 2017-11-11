@@ -14,7 +14,11 @@ export default class StatsRouter extends SocketioRouterBase {
 	init(files, app) {
 		this.services = files.services;
 		super.init(files, app);
-	}
+    }
+    
+    public getExp(level: number) {
+        return this.services.getExp(level);
+    }
 
     [config.SERVER_INNER.GAIN_EXP.name] (data, socket: GameSocket) {
         let exp = data.exp;

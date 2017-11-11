@@ -20,6 +20,15 @@ export default class TalentsServices extends MasterServices {
 			perks: {},
 		};
 	}
+
+	public markAbilityModified(socket: GameSocket) {
+		const ability = socket.character.stats.primaryAbility;
+		socket.character.talents.markModified(ability);		
+	}
+
+	public getAbilityExp(dmg: number) {
+		return dmg * 2; // TODO use a better formula
+	}
 	
     // HTTP functions
 	// =================

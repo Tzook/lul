@@ -86,7 +86,7 @@ interface Char extends PublicChar {
     gold: number;
     items: CHAR_ITEMS,
     quests: CHAR_QUESTS,
-    talents: {[ability: string]: CHAR_ABILITY_TALENT}
+    talents: {markModified: (path) => {}, _doc: {[ability: string]: CHAR_ABILITY_TALENT}}
 }
 
 interface User extends Doc {}
