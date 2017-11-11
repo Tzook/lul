@@ -275,12 +275,13 @@ interface NPC_MODEL {
     sell?: NPC_ITEM[]
 }
 
-// Talents
+interface ABILITY_PERK_MODEL {
+    atLeastLvl: number,
+    perksOffered: number,
+    addToPool: string[]
+}
+
 interface TALENT_MODEL {
-    key: string
-    maxPoints: number
-    requiredJob?: string
-    requiredTalents?: {
-        [key: string]: number
-    }
+    ability: string,
+    perks: ABILITY_PERK_MODEL[],
 }

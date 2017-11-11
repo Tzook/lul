@@ -8,7 +8,7 @@ export default class TalentsController extends MasterController {
     // HTTP functions
 	// =================
 	public generateTalents(req, res, next) {
-        this.services.generateTalents(req.body.talents)
+        this.services.generateTalents(req.body.talents, req.body.perkCollection)
 			.then(d => {
 				this.sendData(res, this.LOGS.GENERATE_TALENTS, d);
 			})

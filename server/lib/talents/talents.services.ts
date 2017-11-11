@@ -3,25 +3,27 @@ import MasterServices from '../master/master.services';
 export default class TalentsServices extends MasterServices {
 	private talentsInfo: Map<string, TALENT_MODEL> = new Map();
 
-    public generateTalents(talents: any[]): Promise<any> {
+    public generateTalents(talents: any[], perkCollection: any[]): Promise<any> {
 		console.log("Generating talents from data:", talents);
 		
 		let models = [];
 
 		(talents || []).forEach(talent => {
-			let talentschema: TALENT_MODEL = {
-				key: talent.key,
-				maxPoints: talent.maxPoints,
-				requiredJob: talent.requiredJob,
+			let talentchema: TALENT_MODEL = {
+				ability: talent.primaryAbility,
+				perks: [],
 			};
 
-			let requiredTalents = {};
-			(talent.requiredTalents || []).forEach(requiredTalent => {
-				requiredTalents[requiredTalent.key] = requiredTalent.points;
-				talentschema.requiredTalents = requiredTalents;
+			(talent.perks || []).forEach(perk => {
+				let perkSchema = {
+					atLeastLvl: perk.atLeastLvl,
+					perksOffered: perk.perksOffered,
+					addToPool: perk.addToPool,
+				};
+				talentchema.perks.push(perkSchema);
 			});
 
-			let talentModel = new this.Model(talentschema);
+			let talentModel = new this.Model(talentchema);
 			models.push(talentModel);
 		});
 
@@ -33,7 +35,7 @@ export default class TalentsServices extends MasterServices {
 		return this.Model.find({}).lean()
 			.then((docs: TALENT_MODEL[]) => {
 				docs.forEach(doc => {
-					this.talentsInfo.set(doc.key, doc);
+					this.talentsInfo.set(doc.ability, doc);
 				});
 				console.log("got talents");
 				return this.talentsInfo;
