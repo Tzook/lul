@@ -1,6 +1,8 @@
 import MasterModel from '../master/master.model';
 import TalentsController from './talents.controller';
+import statsConfig from '../stats/stats.config';
 import * as mongoose from "mongoose"; 
+import TalentsServices from './talents.services';
 
 const ABILITY_PERK_SCHEMA = (<any>mongoose.Schema)({
     atLeastLvl: Number,
@@ -15,15 +17,15 @@ const TALENT_SCHEMA = {
 
 const CONFIG_PERK_SCHEMA = mongoose.Schema.Types.Mixed;
 
-const CHAR_TALENT_SCHEMA = {
-
-};
+const CHAR_TALENT_SCHEMA = mongoose.Schema.Types.Mixed;
 
 export default class TalentsModel extends MasterModel {
     protected controller: TalentsController;
+    protected services: TalentsServices;
 
     init(files, app) {
         this.controller = files.controller;
+        this.services = files.services;
 
         this.schema = TALENT_SCHEMA;
         this.minimize = true;
@@ -38,7 +40,10 @@ export default class TalentsModel extends MasterModel {
 
         let CharTalentsModel = this.createNewModel("CharTalents", CHAR_TALENT_SCHEMA, {_id: false, strict: false, minimize: false});
         this.addToSchema("Character", {talents: CharTalentsModel.schema});
-        this.listenForFieldAddition("Character", "talents", CHAR_TALENT_SCHEMA);
+        const charTalentsInitialValue = {
+            [statsConfig.ABILITY_MELEE]: this.services.getEmptyCharAbility()
+        };
+        this.listenForFieldAddition("Character", "talents", charTalentsInitialValue);
         
         this.addToSchema("Config", { perks: CONFIG_PERK_SCHEMA });
         

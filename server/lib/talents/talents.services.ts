@@ -11,6 +11,17 @@ export default class TalentsServices extends MasterServices {
 		this.socketioRouter = files.routers.socketio;
 	}
 
+	public getEmptyCharAbility(): CHAR_ABILITY_TALENT {
+		return {
+			lvl: 1,
+			exp: 0,
+			pools: [], // the pools to choose from. if lvled without choosing any, there can be several pools
+			perks: {} // the chosen points
+		};
+	}
+	
+    // HTTP functions
+	// =================
     public generateTalents(talents: any[], perkCollection: any[]): Promise<any> {
 		console.log("Generating talents from data:", talents);
 		

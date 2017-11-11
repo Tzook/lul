@@ -85,7 +85,8 @@ interface Char extends PublicChar {
     room: string;
     gold: number;
     items: CHAR_ITEMS,
-    quests: CHAR_QUESTS
+    quests: CHAR_QUESTS,
+    talents: {[ability: string]: CHAR_ABILITY_TALENT}
 }
 
 interface User extends Doc {}
@@ -291,4 +292,11 @@ interface PERK_CONFIG {
 	value: Number,
 	max?: Number,
 	default?: Number, 
+}
+
+interface CHAR_ABILITY_TALENT {
+    lvl: number,
+    exp: number,
+    pools: string[][], // the pools to choose from. if lvled without choosing any, there can be several pools
+    perks: {[perk: string]: number} // the chosen points
 }
