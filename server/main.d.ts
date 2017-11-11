@@ -297,6 +297,7 @@ interface PERK_CONFIG {
 interface CHAR_ABILITY_TALENT {
     lvl: number,
     exp: number,
-    pools: string[][], // the pools to choose from. if lvled without choosing any, there can be several pools
+    points: Number, // available points to lvl
+    pool: string[], 
     perks: {[perk: string]: number} // the chosen points
 }

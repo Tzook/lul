@@ -15,8 +15,9 @@ export default class TalentsServices extends MasterServices {
 		return {
 			lvl: 1,
 			exp: 0,
-			pools: [], // the pools to choose from. if lvled without choosing any, there can be several pools
-			perks: {} // the chosen points
+			points: 0,
+			pool: [],
+			perks: {},
 		};
 	}
 	
