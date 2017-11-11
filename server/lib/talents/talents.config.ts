@@ -1,3 +1,5 @@
+import statsConfig from '../stats/stats.config';
+
 export default {
 	"ROUTES": {
 		"GENERATE": "/talents/generate"
@@ -10,7 +12,7 @@ export default {
 		}
 	},
 	"SERVER_INNER": {
-		
+		GAIN_ABILITY: Object.assign({}, statsConfig.SERVER_INNER.GAIN_ABILITY),
 	},
 	"SERVER_GETS": {
 		
