@@ -76,7 +76,7 @@ export default class TalentsRouter extends SocketioRouterBase {
 	[talentsConfig.SERVER_INNER.GENERATE_PERK_POOL.name]({}, socket: GameSocket) {
 		const ability = socket.character.stats.primaryAbility;
 		const talent = socket.character.talents._doc[ability];
-		const pool = this.services.getPerksPool(talent);
+		const pool = this.services.getPerksPool(ability, talent);
 		this.log({pool}, socket, "Gain perk pool");
 		if (pool.length > 0) {
 			talent.pool = pool;

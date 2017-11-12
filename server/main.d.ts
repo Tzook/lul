@@ -277,6 +277,11 @@ interface NPC_MODEL {
     sell?: NPC_ITEM[]
 }
 
+interface ABILITY_PERK_INSTANCE {
+    perksOffered: number
+    pool: string[]
+}
+
 interface ABILITY_PERK_MODEL {
     atLeastLvl: number,
     perksOffered: number,
@@ -294,10 +299,14 @@ interface PERK_CONFIG {
 	default?: number, 
 }
 
+interface CHAR_ABILITY_PERKS {
+    [perk: string]: number
+}
+
 interface CHAR_ABILITY_TALENT {
     lvl: number,
     exp: number,
     points: number, // available points to lvl
     pool: string[], 
-    perks: {[perk: string]: number} // the chosen points
+    perks: CHAR_ABILITY_PERKS // the chosen points
 }
