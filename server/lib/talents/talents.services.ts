@@ -26,8 +26,8 @@ export default class TalentsServices extends MasterServices {
 		socket.character.talents.markModified(ability);		
 	}
 
-	public getAbilityExp(dmg: number) {
-		return dmg * 2; // TODO use a better formula
+	public getAbilityExp(dmg: number, mob: MOB_MODEL) {
+		return Math.min(dmg / mob.hp, 1) * mob.exp * 2 | 0 || 1;
 	}
 
 	public getPerksPool(talent: CHAR_ABILITY_TALENT): string[] {

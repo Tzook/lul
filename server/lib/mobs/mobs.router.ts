@@ -32,7 +32,11 @@ export default class MobsRouter extends SocketioRouterBase {
 
     public onConnected(socket: GameSocket) {
         socket.threats = new Set();
-    }
+	}
+	
+	public getMobInfo(mobId: string): MOB_MODEL {
+		return this.services.getMobInfo(mobId);
+	}
 
 	[config.SERVER_GETS.ENTERED_ROOM.name](data, socket: GameSocket) {
 		if (!this.controller.hasRoom(socket.character.room)) {

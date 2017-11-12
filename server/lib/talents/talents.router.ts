@@ -5,16 +5,19 @@ import TalentsServices from './talents.services';
 import talentsConfig from '../talents/talents.config';
 import StatsRouter from '../stats/stats.router';
 import StatsServices from '../stats/stats.services';
+import MobsRouter from '../mobs/mobs.router';
 
 export default class TalentsRouter extends SocketioRouterBase {
 	protected middleware: TalentsMiddleware;
 	protected controller: TalentsController;
 	protected services: TalentsServices;
 	protected statsRouter: StatsRouter;
+	protected mobsRouter: MobsRouter;
 
 	init(files, app) {
 		this.services = files.services;
 		this.statsRouter = files.routers.stats;
+		this.mobsRouter = files.routers.mobs;
 		super.init(files, app);
 	}
 
@@ -31,7 +34,8 @@ export default class TalentsRouter extends SocketioRouterBase {
 	}
 	
 	[talentsConfig.SERVER_INNER.HURT_MOB.name]({dmg, mob}: {dmg: number, mob: MOB_INSTANCE}, socket: GameSocket) {
-		const exp = this.services.getAbilityExp(dmg);
+		const mobModel = this.mobsRouter.getMobInfo(mob.mobId);
+		const exp = this.services.getAbilityExp(dmg, mobModel);
 		this.emitter.emit(talentsConfig.SERVER_INNER.GAIN_ABILITY_EXP.name, {exp}, socket);
 	}
 	
