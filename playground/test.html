@@ -412,6 +412,11 @@
                 socket.on("known_info", d => setResult({msg: "known_info", d}));
                 
                 socket.on("actor_transaction", d => setResult({msg: "actor_transaction", d}));
+			   
+				socket.on("ability_gain_exp", d => setResult({msg: "ability_gain_exp", d}));
+                socket.on("ability_lvl_up", d => setResult({msg: "ability_lvl_up", d}));
+                socket.on("ability_choose_perk", d => setResult({msg: "ability_choose_perk", d}));
+                socket.on("ability_gain_perk", d => setResult({msg: "ability_gain_perk", d}));
 			}
 
 			function move(dX, dY) {

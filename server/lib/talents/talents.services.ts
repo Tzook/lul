@@ -29,6 +29,19 @@ export default class TalentsServices extends MasterServices {
 	public getAbilityExp(dmg: number) {
 		return dmg * 2; // TODO use a better formula
 	}
+
+	public getPerksPool(talent: CHAR_ABILITY_TALENT): string[] {
+		return ["temp-bleed", "another-placeholder"]; // TODO implement perks pool
+	}
+
+	public canGetPerk(talent: CHAR_ABILITY_TALENT, perk?: string): boolean {
+		return (<any>talent.pool).includes(perk);
+	}
+
+	public addPerk(talent: CHAR_ABILITY_TALENT, perk: string) {
+		talent.perks[perk] = (talent.perks[perk] || 0) + 1;
+	}
+
 	
     // HTTP functions
 	// =================

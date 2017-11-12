@@ -4,6 +4,7 @@ import TalentsController from './talents.controller';
 import TalentsServices from './talents.services';
 import talentsConfig from '../talents/talents.config';
 import StatsRouter from '../stats/stats.router';
+import StatsServices from '../stats/stats.services';
 
 export default class TalentsRouter extends SocketioRouterBase {
 	protected middleware: TalentsMiddleware;
@@ -30,12 +31,11 @@ export default class TalentsRouter extends SocketioRouterBase {
 	}
 	
 	[talentsConfig.SERVER_INNER.HURT_MOB.name]({dmg, mob}: {dmg: number, mob: MOB_INSTANCE}, socket: GameSocket) {
-		const exp = this.services.getAbilityExp(dmg); // TODO use some formula
+		const exp = this.services.getAbilityExp(dmg);
 		this.emitter.emit(talentsConfig.SERVER_INNER.GAIN_ABILITY_EXP.name, {exp}, socket);
 	}
 	
 	[talentsConfig.SERVER_INNER.GAIN_ABILITY_EXP.name]({exp}: {exp: number}, socket: GameSocket) {
-		this.services.markAbilityModified(socket);
 		const ability = socket.character.stats.primaryAbility;
 		const talent = socket.character.talents._doc[ability];
 		talent.exp += exp;
@@ -53,17 +53,59 @@ export default class TalentsRouter extends SocketioRouterBase {
 		if (shouldLvl) {
 			this.emitter.emit(talentsConfig.SERVER_INNER.GAIN_ABILITY_LVL.name, {}, socket);
 		}
+		this.services.markAbilityModified(socket);
 	}
 	
 	[talentsConfig.SERVER_INNER.GAIN_ABILITY_LVL.name]({}, socket: GameSocket) {
-		this.services.markAbilityModified(socket);
 		const ability = socket.character.stats.primaryAbility;
 		const talent = socket.character.talents._doc[ability];
 		talent.lvl++;
+		talent.points++;
 		socket.emit(talentsConfig.CLIENT_GETS.GAIN_ABILITY_LVL.name, {
 			ability,
 			lvl: talent.lvl,
 		});
-		// TODO add perks
+		this.emitter.emit(talentsConfig.SERVER_INNER.GENERATE_PERK_POOL.name, {}, socket);		
+		this.services.markAbilityModified(socket);
+	}
+	
+	[talentsConfig.SERVER_INNER.GENERATE_PERK_POOL.name]({}, socket: GameSocket) {
+		const ability = socket.character.stats.primaryAbility;
+		const talent = socket.character.talents._doc[ability];
+		const pool = this.services.getPerksPool(talent);
+		this.log({pool}, socket, "Gain perk pool");
+		if (pool.length > 0) {
+			talent.pool = pool;
+			socket.emit(talentsConfig.CLIENT_GETS.CHOOSE_ABILITY_PERK.name, {
+				ability,
+				pool,
+			});
+		} else {
+			// no pool - so just take off a point
+			talent.points--;
+		}
+		this.services.markAbilityModified(socket);
+	}
+	
+	[talentsConfig.SERVER_GETS.CHOOSE_ABILITY_PERK.name](data, socket: GameSocket) {
+		const {ability, perk} = data;
+		if (!StatsServices.hasAbility(socket, ability)) {
+			return this.sendError(data, socket, "Char does not have that primary ability.");
+		}
+		const talent = socket.character.talents._doc[ability];
+		if (!this.services.canGetPerk(talent, perk)) {
+			return this.sendError(data, socket, "Raising points to that perk is not available.");
+		}
+		this.services.addPerk(talent, perk);		
+		talent.points--;
+		talent.pool = [];
+		socket.emit(talentsConfig.CLIENT_GETS.GAIN_ABILITY_PERK.name, {
+			ability,
+			perk,
+		});
+		if (talent.points > 0) {
+			this.emitter.emit(talentsConfig.SERVER_INNER.GENERATE_PERK_POOL.name, {}, socket);		
+		}
+		this.services.markAbilityModified(socket);
 	}
 };
