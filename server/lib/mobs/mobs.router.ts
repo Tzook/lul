@@ -9,6 +9,7 @@ import config from '../mobs/mobs.config';
 import statsConfig from '../stats/stats.config';
 import dropsConfig from '../drops/drops.config';
 import questsConfig from '../quests/quests.config';
+import * as _ from 'underscore';
 
 export default class MobsRouter extends SocketioRouterBase {
 	protected middleware: MobsMiddleware;
@@ -60,50 +61,50 @@ export default class MobsRouter extends SocketioRouterBase {
 	}
 
 	[config.SERVER_GETS.MOB_TAKE_DMG.name](data, socket: GameSocket) {
-		if (this.controller.hasMob(data.mob_id, socket)) {
-			let load = socket.lastAttackLoad || 0;
-			let dmg = this.controller.calculateDamage(socket, load);
-			let mob = this.controller.hurtMob(data.mob_id, dmg, socket);
-			this.emitter.emit(config.SERVER_INNER.HURT_MOB.name, { mob, dmg }, socket);
-			if (mob.hp === 0) {
-				this.controller.despawnMob(mob, socket);
+		const mobId = _.isEmpty(data.mobs) ? data.mob_id : data.mobs[0];
+		if (!this.controller.hasMob(mobId, socket)) {
+			return this.sendError(data, socket, "Mob doesn't exist!");
+		}
+		let load = socket.lastAttackLoad || 0;
+		let dmg = this.controller.calculateDamage(socket, load);
+		let mob = this.controller.hurtMob(mobId, dmg, socket);
+		this.emitter.emit(config.SERVER_INNER.HURT_MOB.name, { mob, dmg }, socket);
+		if (mob.hp === 0) {
+			this.controller.despawnMob(mob, socket);
 
-                let max = {dmg: 0, socket: null};
-                let parties: Map<PARTY_MODEL | GameSocket, {exp: number, socket: GameSocket}> = new Map();
-                for (let [charId, charDmg] of mob.dmgers) {
-                    let charSocket = socket.map.get(charId);
-                    if (charSocket && charSocket.character.room === socket.character.room && charSocket.alive) {
-                        // found char and he's alive in our room
-                        let exp = this.services.getExp(mob, charDmg);
-                        let party = this.partyRouter.getCharParty(charSocket);
-                        if (party) {
-                            let currentPartyExp = (parties.get(party) || {exp: 0}).exp;
-                            parties.set(party, {socket: charSocket, exp: currentPartyExp + exp});
-                        } else {
-				            this.emitter.emit(statsConfig.SERVER_INNER.GAIN_EXP.name, { exp }, charSocket);
-                        }
+			let max = {dmg: 0, socket: null};
+			let parties: Map<PARTY_MODEL | GameSocket, {exp: number, socket: GameSocket}> = new Map();
+			for (let [charId, charDmg] of mob.dmgers) {
+				let charSocket = socket.map.get(charId);
+				if (charSocket && charSocket.character.room === socket.character.room && charSocket.alive) {
+					// found char and he's alive in our room
+					let exp = this.services.getExp(mob, charDmg);
+					let party = this.partyRouter.getCharParty(charSocket);
+					if (party) {
+						let currentPartyExp = (parties.get(party) || {exp: 0}).exp;
+						parties.set(party, {socket: charSocket, exp: currentPartyExp + exp});
+					} else {
+						this.emitter.emit(statsConfig.SERVER_INNER.GAIN_EXP.name, { exp }, charSocket);
+					}
 
-                        if (charDmg > max.dmg) {
-                            max.dmg = charDmg;
-                            max.socket = charSocket;
-                        }
-                    }
-                }
-                for (let [, {socket, exp}] of parties) {
-                    let partySockets = this.partyRouter.getPartyMembersInMap(socket);
-                    // split exp equally among party members
-                    exp = Math.ceil(exp / partySockets.length);
-
-                    for (let memberSocket of partySockets) {
-                        this.emitter.emit(statsConfig.SERVER_INNER.GAIN_EXP.name, { exp }, memberSocket);
-                    }
-                }
-
-                this.emitter.emit(dropsConfig.SERVER_INNER.GENERATE_DROPS.name, {x: mob.x, y: mob.y, owner: max.socket.character.name}, max.socket, mob.drops);
-                this.emitter.emit(questsConfig.SERVER_INNER.HUNT_MOB.name, {id: mob.mobId}, max.socket);
+					if (charDmg > max.dmg) {
+						max.dmg = charDmg;
+						max.socket = charSocket;
+					}
+				}
 			}
-		} else {
-			this.sendError(data, socket, "Mob doesn't exist!");
+			for (let [, {socket, exp}] of parties) {
+				let partySockets = this.partyRouter.getPartyMembersInMap(socket);
+				// split exp equally among party members
+				exp = Math.ceil(exp / partySockets.length);
+
+				for (let memberSocket of partySockets) {
+					this.emitter.emit(statsConfig.SERVER_INNER.GAIN_EXP.name, { exp }, memberSocket);
+				}
+			}
+
+			this.emitter.emit(dropsConfig.SERVER_INNER.GENERATE_DROPS.name, {x: mob.x, y: mob.y, owner: max.socket.character.name}, max.socket, mob.drops);
+			this.emitter.emit(questsConfig.SERVER_INNER.HUNT_MOB.name, {id: mob.mobId}, max.socket);
 		}
 	}
 
@@ -119,7 +120,8 @@ export default class MobsRouter extends SocketioRouterBase {
 	[config.SERVER_GETS.MOBS_MOVE.name](data, socket: GameSocket) {
         (data.mobs || []).forEach(mob => {
             if (!this.controller.hasMob(mob.mob_id, socket)) {
-                this.sendError(mob, socket, "Mob doesn't exist!");
+				// ignore it for now. The client keeps sending it right after a mob dies because it doesn't know it's dead yet
+                // this.sendError(mob, socket, "Mob doesn't exist!");
             } else {
                 this.controller.moveMob(mob.mob_id, mob.x, mob.y, socket);
             }

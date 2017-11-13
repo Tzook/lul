@@ -38,7 +38,6 @@ export default class MobsController extends MasterController {
 
 	protected spawnMobs(spawnInfo: SPAWN_INSTANCE, mobsInSpawn: Map<string, MOB_INSTANCE>, room: string) {
 		let mobsToSpawn = spawnInfo.cap - mobsInSpawn.size;
-		console.log("spawning mob");
 		if (mobsToSpawn > 0) {
 			let mob = this.spawnMob(spawnInfo, room);
 			mob.spawn = spawnInfo; // useful for when we delete the mob
@@ -167,7 +166,6 @@ export default class MobsController extends MasterController {
 	}
 
 	public despawnMob(mob: MOB_INSTANCE, socket: GameSocket) {
-		console.log("despawning mob", mob.id);
 		this.io.to(socket.character.room).emit(config.CLIENT_GETS.MOB_DIE.name, {
 			mob_id: mob.id,
 		});
@@ -185,7 +183,6 @@ export default class MobsController extends MasterController {
 	}
 
 	protected setRespawnTimer(mob: MOB_INSTANCE, room: string) {
-		console.log("setting interval to respawn", mob.id);
 		setTimeout(() => {
 			this.spawnMobs(mob.spawn, mob.spawn.mobs, room);
 		}, mob.spawn.interval * 1000);

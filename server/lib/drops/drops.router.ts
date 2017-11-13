@@ -49,7 +49,6 @@ export default class DropsRouter extends SocketioRouterBase {
             return this.sendError(data, socket, `Item owner is ${owner} and you are ${socket.character.name}.`);
         }
         let callback = () => {
-            console.log('picking item', data.item_id);
             map.delete(itemId);
             this.io.to(socket.character.room).emit(this.CLIENT_GETS.ITEM_PICK.name, {
                 id: socket.character._id,
