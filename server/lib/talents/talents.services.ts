@@ -44,18 +44,24 @@ export default class TalentsServices extends MasterServices {
 		return pool;
 	}
 	
-	protected filterPool(pool: string[], perks: CHAR_ABILITY_PERKS): string[] {
-		const config = this.socketioRouter.getConfig();
+	protected filterPool(pool: string[], charPerks: CHAR_ABILITY_PERKS): string[] {
 		let newPool = [];
 		pool.forEach(perk => {
-			let points = perks[perk] || 0;
-			let perkConfig: any = config.perks[perk] || {};
-			if (!(points >= perkConfig.max)) {
+			const perkConfig = this.getPerkConfig(perk);
+			const charPerkValue = this.getPerkValue(perk, charPerks);
+			if (!perkConfig.max || charPerkValue < perkConfig.max) {
 				newPool.push(perk);
 			}
 		});
 		
 		return newPool;
+	}
+
+	public getPerkValue(perk: string, charPerks: CHAR_ABILITY_PERKS) {
+		const perkConfig = this.getPerkConfig(perk);
+		const perkPoints = charPerks[perk] || 0;
+
+		return (perkConfig.default || 0) + perkPoints * (perkConfig.value || 1);
 	}
 	
 	protected pickPool(pool: string[], perksOffered: number): string[] {
@@ -68,6 +74,12 @@ export default class TalentsServices extends MasterServices {
 
 	public addPerk(talent: CHAR_ABILITY_TALENT, perk: string) {
 		talent.perks[perk] = (talent.perks[perk] || 0) + 1;
+	}
+
+	protected getPerkConfig(perk: string): PERK_CONFIG {
+		const config = this.socketioRouter.getConfig();
+		const perkConfig: PERK_CONFIG = config.perks[perk] || <any>{};
+		return perkConfig;
 	}
 
     // HTTP functions

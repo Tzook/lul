@@ -294,7 +294,7 @@ interface TALENT_MODEL {
 }
 
 interface PERK_CONFIG {
-	value: number,
+	value?: number,
 	max?: number,
 	default?: number, 
 }
