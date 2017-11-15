@@ -65,11 +65,12 @@ export default class TalentsRouter extends SocketioRouterBase {
 		const talent = socket.character.talents._doc[ability];
 		talent.lvl++;
 		talent.points++;
+		this.emitter.emit(talentsConfig.SERVER_INNER.GENERATE_PERK_POOL.name, {}, socket);		
 		socket.emit(talentsConfig.CLIENT_GETS.GAIN_ABILITY_LVL.name, {
 			ability,
 			lvl: talent.lvl,
+			points: talent.points,
 		});
-		this.emitter.emit(talentsConfig.SERVER_INNER.GENERATE_PERK_POOL.name, {}, socket);		
 		this.services.markAbilityModified(socket);
 	}
 	
