@@ -9,7 +9,6 @@ import config from '../mobs/mobs.config';
 import statsConfig from '../stats/stats.config';
 import dropsConfig from '../drops/drops.config';
 import questsConfig from '../quests/quests.config';
-import * as _ from 'underscore';
 
 export default class MobsRouter extends SocketioRouterBase {
 	protected middleware: MobsMiddleware;
@@ -32,7 +31,7 @@ export default class MobsRouter extends SocketioRouterBase {
 	}
 
     public onConnected(socket: GameSocket) {
-        socket.threats = new Set();
+		socket.threats = new Set();
 	}
 	
 	public getMobInfo(mobId: string): MOB_MODEL {
@@ -62,7 +61,7 @@ export default class MobsRouter extends SocketioRouterBase {
 
 	[config.SERVER_GETS.MOBS_TAKE_DMG.name](data, socket: GameSocket) {
 		const mobsInArea = data.mobs || [];
-		const mobsHit = [mobsInArea[0]]; // TODO calculate aoe here
+		const mobsHit = socket.getMobsHit(mobsInArea);
 		for (let i = 0; i < mobsHit.length; i++) {
 			this.emitter.emit(config.SERVER_INNER.MOB_TAKE_DMG.name, {mobId: mobsHit[i]}, socket);			
 		}

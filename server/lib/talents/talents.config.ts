@@ -27,5 +27,11 @@ export default {
 		GAIN_ABILITY_LVL: {name: "ability_lvl_up"},
 		CHOOSE_ABILITY_PERK: {name: "ability_choose_perk"},
 		GAIN_ABILITY_PERK: {name: "ability_gain_perk"},
+		ACTIVATED_BUFF: {name: "buff_activated"},
+		ACTIVATED_PERK: {name: "perk_activated"},
 	},
+	PERKS: {
+		AOE_CHANCE: "aoeChance",
+		AOE_VALUE: "aoeCap",
+	}
 }

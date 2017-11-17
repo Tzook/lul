@@ -1,6 +1,8 @@
 import MasterServices from '../master/master.services';
 import SocketioRouter from '../socketio/socketio.router';
 import * as _ from 'underscore';
+import DropsServices from '../drops/drops.services';
+import talentsConfig from "../talents/talents.config";
 
 export default class TalentsServices extends MasterServices {
 	private talentsInfo: Map<string, ABILITY_PERK_INSTANCE[]> = new Map();
@@ -80,6 +82,35 @@ export default class TalentsServices extends MasterServices {
 		const config = this.socketioRouter.getConfig();
 		const perkConfig: PERK_CONFIG = config.perks[perk] || <any>{};
 		return perkConfig;
+	}
+
+	public getMobsHit(mobs: string[], socket: GameSocket): string[] {
+		if (mobs.length <= 1) {
+			return mobs;
+		}
+		const aoeActivated = this.isAbilityActivated(talentsConfig.PERKS.AOE_CHANCE, socket);
+		if (!aoeActivated) {
+			return [mobs[0]];
+		}
+		const aoeValue = this.getAbilityPerkValue(talentsConfig.PERKS.AOE_VALUE, socket);
+		return mobs.slice(0, aoeValue);
+	}
+	
+	public isAbilityActivated(perk: string, socket: GameSocket) {
+		const value = this.getAbilityPerkValue(perk, socket);
+		const activated = DropsServices.doesChanceWorkFloat(value);
+		if (activated) {
+			socket.emit(talentsConfig.CLIENT_GETS.ACTIVATED_PERK.name, {
+				key: perk,
+			});
+		}
+		return activated;
+	}
+
+	public getAbilityPerkValue(perk: string, socket: GameSocket) {
+		const ability = socket.character.stats.primaryAbility;
+		const charPerks = socket.character.talents._doc[ability].perks;
+		return this.getPerkValue(perk, charPerks)
 	}
 
     // HTTP functions

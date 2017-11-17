@@ -417,6 +417,8 @@
                 socket.on("ability_lvl_up", d => setResult({msg: "ability_lvl_up", d}));
                 socket.on("ability_choose_perk", d => setResult({msg: "ability_choose_perk", d}));
                 socket.on("ability_gain_perk", d => setResult({msg: "ability_gain_perk", d}));
+                socket.on("buff_activated", d => setResult({msg: "buff_activated", d}));
+                socket.on("perk_activated", d => setResult({msg: "perk_activated", d}));
 			}
 
 			function move(dX, dY) {

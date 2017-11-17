@@ -25,8 +25,12 @@ export default class TalentsRouter extends SocketioRouterBase {
 		app.post(this.ROUTES.GENERATE,
 			this.middleware.validateHasSercetKey.bind(this.middleware),
 			this.controller.generateTalents.bind(this.controller));
+	}	
+
+    public onConnected(socket: GameSocket) {
+		socket.getMobsHit = (mobs) => this.services.getMobsHit(mobs, socket);
 	}
-	
+
     [talentsConfig.SERVER_INNER.GAIN_ABILITY.name] (data, socket: GameSocket) {
 		if (!socket.character.talents._doc[data.ability]) {
 			socket.character.talents._doc[data.ability] = this.services.getEmptyCharAbility();
