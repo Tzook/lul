@@ -1,4 +1,5 @@
 import statsConfig from '../stats/stats.config';
+import roomsConfig from '../rooms/rooms.config';
 import mobsConfig from '../mobs/mobs.config';
 
 export default {
@@ -20,6 +21,7 @@ export default {
 		GENERATE_PERK_POOL: {name: "generate_perk_pool", alive: true},
 	},
 	"SERVER_GETS": {
+		ENTERED_ROOM: Object.assign({}, roomsConfig.SERVER_GETS.ENTERED_ROOM),
 		CHOOSE_ABILITY_PERK: {name: "choose_perk", alive: true, log: true},
 	},
 	"CLIENT_GETS": {
@@ -32,6 +34,12 @@ export default {
 	},
 	PERKS: {
 		AOE_CHANCE: "aoeChance",
-		AOE_VALUE: "aoeCap",
+		AOE_CAP: "aoeCap",
+		STUN_CHANCE: "stunChance",
+		STUN_DURATION: "stunDuration",
+		CRIPPLE_CHANCE: "crippleChance",
+		CRIPPLE_DURATION: "crippleDuration",
+		BLEED_CHANCE: "bleedChance",
+		BLEED_DURATION: "bleedDuration",
 	}
 }

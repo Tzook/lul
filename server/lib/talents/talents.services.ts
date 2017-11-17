@@ -92,7 +92,7 @@ export default class TalentsServices extends MasterServices {
 		if (!aoeActivated) {
 			return [mobs[0]];
 		}
-		const aoeValue = this.getAbilityPerkValue(talentsConfig.PERKS.AOE_VALUE, socket);
+		const aoeValue = this.getAbilityPerkValue(talentsConfig.PERKS.AOE_CAP, socket);
 		return mobs.slice(0, aoeValue);
 	}
 	

@@ -31,6 +31,10 @@ export default class TalentsRouter extends SocketioRouterBase {
 		socket.getMobsHit = (mobs) => this.services.getMobsHit(mobs, socket);
 	}
 
+	[talentsConfig.SERVER_GETS.ENTERED_ROOM.name](data, socket: GameSocket) {
+		this.controller.notifyAboutBuffs(socket);
+	}
+
     [talentsConfig.SERVER_INNER.GAIN_ABILITY.name] (data, socket: GameSocket) {
 		if (!socket.character.talents._doc[data.ability]) {
 			socket.character.talents._doc[data.ability] = this.services.getEmptyCharAbility();
@@ -41,6 +45,9 @@ export default class TalentsRouter extends SocketioRouterBase {
 		const mobModel = this.mobsRouter.getMobInfo(mob.mobId);
 		const exp = this.services.getAbilityExp(dmg, mobModel);
 		this.emitter.emit(talentsConfig.SERVER_INNER.GAIN_ABILITY_EXP.name, {exp}, socket);
+		if (mob.hp > 0) {
+			this.controller.applyHurtMobPerks(dmg, mob, socket);
+		}
 	}
 	
 	[talentsConfig.SERVER_INNER.GAIN_ABILITY_EXP.name]({exp}: {exp: number}, socket: GameSocket) {

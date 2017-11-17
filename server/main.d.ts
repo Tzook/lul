@@ -311,3 +311,10 @@ interface CHAR_ABILITY_TALENT {
     pool: string[], 
     perks: CHAR_ABILITY_PERKS // the chosen points
 }
+
+interface BUFF_INSTANCE {
+    clearTimeoutId: NodeJS.Timer,
+    key: string,
+    duration: number,
+    initTime: number,
+}

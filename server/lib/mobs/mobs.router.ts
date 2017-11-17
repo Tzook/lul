@@ -37,6 +37,10 @@ export default class MobsRouter extends SocketioRouterBase {
 	public getMobInfo(mobId: string): MOB_MODEL {
 		return this.services.getMobInfo(mobId);
 	}
+	
+	public hasMob(mobId: string, socket: GameSocket): boolean {
+		return this.controller.hasMob(mobId, socket);
+	}
 
 	[config.SERVER_GETS.ENTERED_ROOM.name](data, socket: GameSocket) {
 		if (!this.controller.hasRoom(socket.character.room)) {
