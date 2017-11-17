@@ -41,11 +41,11 @@ export default class TalentsRouter extends SocketioRouterBase {
 		}
 	}
 	
-	[talentsConfig.SERVER_INNER.HURT_MOB.name]({dmg, mob}: {dmg: number, mob: MOB_INSTANCE}, socket: GameSocket) {
+	[talentsConfig.SERVER_INNER.HURT_MOB.name]({dmg, mob, cause}: {dmg: number, mob: MOB_INSTANCE, cause: string}, socket: GameSocket) {
 		const mobModel = this.mobsRouter.getMobInfo(mob.mobId);
 		const exp = this.services.getAbilityExp(dmg, mobModel);
 		this.emitter.emit(talentsConfig.SERVER_INNER.GAIN_ABILITY_EXP.name, {exp}, socket);
-		if (mob.hp > 0) {
+		if (mob.hp > 0 && cause !== talentsConfig.PERKS.BLEED_DMG_CAUSE) {
 			this.controller.applyHurtMobPerks(dmg, mob, socket);
 		}
 	}

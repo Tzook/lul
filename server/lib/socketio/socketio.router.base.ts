@@ -26,6 +26,10 @@ export default class SocketioRouterBase extends MasterRouter {
 		this.emitter = emitter;
 	}
 
+	getEmitter() {
+		return this.emitter;
+	}
+
 	get connection() {
 		return 'socketio';
 	}

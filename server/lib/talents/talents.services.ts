@@ -113,6 +113,10 @@ export default class TalentsServices extends MasterServices {
 		return this.getPerkValue(perk, charPerks)
 	}
 
+	public getBleedDmg(dmg: number): number {
+		return Math.max(dmg * talentsConfig.PERKS.BLEED_DMG_MODIFIER | 0, 1);
+	}
+
     // HTTP functions
 	// =================
     public generateTalents(talents: any[], perkCollection: any[]): Promise<any> {

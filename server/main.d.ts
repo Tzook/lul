@@ -317,4 +317,5 @@ interface BUFF_INSTANCE {
     key: string,
     duration: number,
     initTime: number,
+    onPerkCleared?: Function,
 }

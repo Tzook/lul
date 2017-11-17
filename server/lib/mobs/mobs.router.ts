@@ -74,13 +74,13 @@ export default class MobsRouter extends SocketioRouterBase {
 	}
 
 	[config.SERVER_INNER.MOB_TAKE_DMG.name](data, socket: GameSocket) {
-		const {mobId, cause} = data;
+		let {mobId, cause, dmg} = data;
 
 		if (!this.controller.hasMob(mobId, socket)) {
 			return this.sendError(data, socket, "Mob doesn't exist!");
 		}
 		let load = socket.lastAttackLoad || 0;
-		let dmg = this.controller.calculateDamage(socket, load);
+		dmg = dmg || this.controller.calculateDamage(socket, load);
 		let mob = this.controller.hurtMob(mobId, dmg, socket);
 		this.emitter.emit(config.SERVER_INNER.HURT_MOB.name, { mob, dmg, cause }, socket);
 		if (mob.hp === 0) {

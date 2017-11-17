@@ -41,5 +41,8 @@ export default {
 		CRIPPLE_DURATION: "crippleDuration",
 		BLEED_CHANCE: "bleedChance",
 		BLEED_DURATION: "bleedDuration",
+		BLEED_DMG_MODIFIER: 0.1,
+		BLEED_TICK_TIME: 1,
+		BLEED_DMG_CAUSE: "bleed",
 	}
 }

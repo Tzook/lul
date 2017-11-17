@@ -1,7 +1,8 @@
 import MasterController from '../master/master.controller';
 import TalentsServices from './talents.services';
-import talentsConfig from '../talents/talents.config';
 import MobsRouter from '../mobs/mobs.router';
+import talentsConfig from '../talents/talents.config';
+import mobsConfig from '../mobs/mobs.config';
 
 export default class TalentsController extends MasterController {
 	protected services: TalentsServices;
@@ -16,10 +17,10 @@ export default class TalentsController extends MasterController {
 	public applyHurtMobPerks(dmg: number, mob: MOB_INSTANCE, socket: GameSocket) {
 		this.tryToApplyPerk(talentsConfig.PERKS.STUN_CHANCE, talentsConfig.PERKS.STUN_DURATION, mob, socket);
 		this.tryToApplyPerk(talentsConfig.PERKS.CRIPPLE_CHANCE, talentsConfig.PERKS.CRIPPLE_DURATION, mob, socket);
-		this.tryToApplyPerk(talentsConfig.PERKS.BLEED_CHANCE, talentsConfig.PERKS.BLEED_DURATION, mob, socket);
+		this.tryToApplyPerk(talentsConfig.PERKS.BLEED_CHANCE, talentsConfig.PERKS.BLEED_DURATION, mob, socket, () => this.triggerBleed(dmg, mob, socket));
 	}
 	
-	public tryToApplyPerk(perkChanceName: string, perkDurationName: string, mob: MOB_INSTANCE, socket: GameSocket) {
+	public tryToApplyPerk(perkChanceName: string, perkDurationName: string, mob: MOB_INSTANCE, socket: GameSocket, onPerkActivated = () => {}) {
 		const activated = this.services.isAbilityActivated(perkChanceName, socket);
 		if (activated) {
 			const room = socket.character.room;
@@ -41,6 +42,7 @@ export default class TalentsController extends MasterController {
 				duration,
 				initTime: Date.now(),
 			});
+			onPerkActivated();
 		}
 	}
 
@@ -69,6 +71,7 @@ export default class TalentsController extends MasterController {
 		let mobsBuff = roomMap.get(mobId);
 		let buffInstance = mobsBuff.get(buffName);
 		clearTimeout(buffInstance.clearTimeoutId);
+		buffInstance.onPerkCleared && buffInstance.onPerkCleared();
 		mobsBuff.delete(buffName);
 		if (mobsBuff.size === 0) {
 			roomMap.delete(mobId);
@@ -96,7 +99,29 @@ export default class TalentsController extends MasterController {
 		}
 		return mobBuffs;
 	}
-    
+
+	protected triggerBleed(dmg: number, mob: MOB_INSTANCE, socket: GameSocket) {
+		let bleedDmg = this.services.getBleedDmg(dmg);
+		let mobBuffs = this.getMobBuffsInstance(socket.character.room, mob);
+		let bleedBuff = mobBuffs.get(talentsConfig.PERKS.BLEED_CHANCE);
+		this.tickBleed(bleedDmg, bleedBuff, mob, socket.character.room, 0, socket);
+	}
+
+	protected tickBleed(dmg: number, bleedBuff: BUFF_INSTANCE, mob: MOB_INSTANCE, room: string, tickIndex: number, socket: GameSocket) {
+		let bleedTimer = setTimeout(() => {
+			if (mob.hp <= 0 || !socket.connected || !socket.alive || socket.character.room !== room) {
+				return this.clearBuff(room, mob.id, talentsConfig.PERKS.BLEED_CHANCE);
+			}
+			this.mobsRouter.getEmitter().emit(mobsConfig.SERVER_INNER.MOB_TAKE_DMG.name, {
+				mobId: mob.id, 
+				dmg,
+				cause: talentsConfig.PERKS.BLEED_DMG_CAUSE
+			}, socket);
+			this.tickBleed(dmg, bleedBuff, mob, room, tickIndex + 1, socket);
+		}, talentsConfig.PERKS.BLEED_TICK_TIME * 1000 - (tickIndex === 0 ? 200 : 0)); // reducing 200 ms so all the ticks will fit in the time
+		bleedBuff.onPerkCleared = () => clearTimeout(bleedTimer);
+	}
+
     // HTTP functions
 	// =================
 	public generateTalents(req, res, next) {
