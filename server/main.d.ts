@@ -314,7 +314,7 @@ interface CHAR_ABILITY_TALENT {
 
 interface BUFF_INSTANCE {
     clearTimeoutId: NodeJS.Timer,
-    key: string,
+    perkName: string,
     duration: number,
     initTime: number,
     onPerkCleared?: Function,
