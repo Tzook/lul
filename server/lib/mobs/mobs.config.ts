@@ -11,11 +11,12 @@ export default {
 	},
     "SERVER_INNER": {
         "LEFT_ROOM": {"name": "left_room"},
+		"MOB_TAKE_DMG": {"name": "mob_took_dmg"},
         "HURT_MOB": {"name": "hurt_mob"}
     },
 	"SERVER_GETS": {
 		"ENTERED_ROOM": {"name": "entered_room"},
-		"MOB_TAKE_DMG": {"name": "mob_took_dmg", "alive": true},
+		"MOBS_TAKE_DMG": {"name": "mobs_took_dmg", "alive": true, log: true},
 		"MOBS_MOVE": {"name": "mobs_moved", "throttle": 0, "bitch": true},
 		"TAKE_DMG": {"name": "took_dmg", "alive": true}
 	},

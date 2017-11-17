@@ -60,8 +60,17 @@ export default class MobsRouter extends SocketioRouterBase {
         socket.threats.clear();
 	}
 
-	[config.SERVER_GETS.MOB_TAKE_DMG.name](data, socket: GameSocket) {
-		const mobId = _.isEmpty(data.mobs) ? data.mob_id : data.mobs[0];
+	[config.SERVER_GETS.MOBS_TAKE_DMG.name](data, socket: GameSocket) {
+		const mobsInArea = data.mobs || [];
+		const mobsHit = [mobsInArea[0]]; // TODO calculate aoe here
+		for (let i = 0; i < mobsHit.length; i++) {
+			this.emitter.emit(config.SERVER_INNER.MOB_TAKE_DMG.name, {mobId: mobsHit[i]}, socket);			
+		}
+	}
+
+	[config.SERVER_INNER.MOB_TAKE_DMG.name](data, socket: GameSocket) {
+		const {mobId} = data;
+
 		if (!this.controller.hasMob(mobId, socket)) {
 			return this.sendError(data, socket, "Mob doesn't exist!");
 		}
