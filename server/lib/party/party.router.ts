@@ -93,6 +93,7 @@ export default class PartyRouter extends SocketioRouterBase {
         process.nextTick(() => process.nextTick(() => {
             let party = this.controller.getCharParty(socket);
             if (party) {
+                socket.join(party.name);
                 this.controller.tellPartyMembers(socket, party);
             }
         }));

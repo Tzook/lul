@@ -6,13 +6,16 @@ import { EQUIPS_SCHEMA } from '../equips/equips.model';
 import { BASE_STATS_SCHEMA } from "./stats.model";
 import config from './stats.config';
 import roomsConfig from '../rooms/rooms.config';
+import PartyRouter from '../party/party.router';
 
 export default class StatsRouter extends SocketioRouterBase {
     protected controller: StatsController;
     protected services: StatsServices;
+    protected partyRouter: PartyRouter;
 
 	init(files, app) {
-		this.services = files.services;
+        this.services = files.services;
+        this.partyRouter = files.routers.party;
 		super.init(files, app);
     }
     
@@ -57,7 +60,15 @@ export default class StatsRouter extends SocketioRouterBase {
 			id: socket.character._id,
 			dmg,
 			hp: socket.character.stats.hp.now
-		});
+        });
+        const party = this.partyRouter.getCharParty(socket);
+        if (party) {
+            this.io.to(party.name).emit(config.CLIENT_GETS.TAKE_DMG.name, {
+                name: socket.character.name,
+                hp: socket.character.stats.hp.now
+            });
+        }
+
         if (!socket.alive) {
             this.log({}, socket,  "character is ded");
             this.io.to(socket.character.room).emit(config.CLIENT_GETS.DEATH.name, {
@@ -73,7 +84,11 @@ export default class StatsRouter extends SocketioRouterBase {
         let gainedHp = this.controller.addHp(socket, hp);
 
         if (gainedHp) {
-            socket.emit(config.CLIENT_GETS.GAIN_HP.name, {
+            const party = this.partyRouter.getCharParty(socket);
+            const to = party ? this.io.to(party.name) : socket;
+            to.emit(config.CLIENT_GETS.GAIN_HP.name, {
+                id: socket.character._id,
+                name: socket.character.name,
                 hp,
                 now: socket.character.stats.hp.now
             });
