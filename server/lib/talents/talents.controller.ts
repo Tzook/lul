@@ -27,7 +27,7 @@ export default class TalentsController extends MasterController {
 			const room = socket.character.room;
 			let mobBuffs = this.getMobBuffsInstance(room, mob);
 			let duration = this.services.getAbilityPerkValue(perkDurationName, socket);
-			socket.emit(talentsConfig.CLIENT_GETS.ACTIVATED_BUFF.name, {
+			this.io.to(socket.character.room).emit(talentsConfig.CLIENT_GETS.ACTIVATED_BUFF.name, {
 				target_id: mob.id,
 				key: perkChanceName,
 				duration,
