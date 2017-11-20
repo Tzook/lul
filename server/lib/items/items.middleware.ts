@@ -41,7 +41,7 @@ export default class ItemsMiddleware extends MasterMiddleware {
     }
 
     public getStackSlots(socket: GameSocket, item: ITEM_INSTANCE, itemInfo: ITEM_MODEL, blacklist: Set<number> = new Set()): number[] { 
-        let {stack} = item;
+        let {stack = 1} = item;
         let slots = [];
         // step 1 : get slots with the same item, and fill them first
         for (let slot = 0; slot < config.MAX_ITEMS; slot++) {
