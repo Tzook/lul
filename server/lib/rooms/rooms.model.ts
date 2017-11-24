@@ -1,6 +1,9 @@
 
 import MasterModel from '../master/master.model';
 import RoomsController from './rooms.controller';
+import { PRIORITY_CHAR } from '../character/character.model';
+
+export const PRIORITY_ROOMS = PRIORITY_CHAR + 10;
 
 export default class RoomsModel extends MasterModel {
     private addToCharacterSchema;
@@ -23,7 +26,7 @@ export default class RoomsModel extends MasterModel {
     }
 
     get priority() {
-        return 20;
+        return PRIORITY_ROOMS;
     }
 
     createModel() {

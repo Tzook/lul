@@ -1,6 +1,8 @@
 import MasterModel from '../master/master.model';
 import NpcsController from "./npcs.controller";
 
+export const PRIORITY_NPCS = 10;
+
 export default class NpcsModel extends MasterModel {
     protected controller: NpcsController;
 
@@ -18,7 +20,7 @@ export default class NpcsModel extends MasterModel {
     }
 
     get priority() {
-        return 15;
+        return PRIORITY_NPCS;
     }
 
     createModel() {

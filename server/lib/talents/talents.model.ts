@@ -3,6 +3,8 @@ import TalentsController from './talents.controller';
 import statsConfig from '../stats/stats.config';
 import * as mongoose from "mongoose"; 
 import TalentsServices from './talents.services';
+import { PRIORITY_CHAR } from '../character/character.model';
+import { PRIORITY_CONFIG } from '../socketio/socketio.model';
 
 const ABILITY_PERK_SCHEMA = (<any>mongoose.Schema)({
     atLeastLvl: Number,
@@ -19,6 +21,8 @@ const CONFIG_PERK_SCHEMA = mongoose.Schema.Types.Mixed;
 
 const CHAR_TALENT_SCHEMA = mongoose.Schema.Types.Mixed;
 
+export const PRIORITY_TALENTS = PRIORITY_CHAR + PRIORITY_CONFIG + 10;
+
 export default class TalentsModel extends MasterModel {
     protected controller: TalentsController;
     protected services: TalentsServices;
@@ -32,7 +36,7 @@ export default class TalentsModel extends MasterModel {
     }
 
     get priority() {
-        return 35;
+        return PRIORITY_TALENTS;
     }
 
     createModel() {

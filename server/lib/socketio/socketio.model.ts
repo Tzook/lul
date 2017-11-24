@@ -2,6 +2,8 @@
 import MasterModel from '../master/master.model';
 import SocketioServices from './socketio.services';
 
+export const PRIORITY_CONFIG = 5;
+
 export default class SocketioModel extends MasterModel {
     protected services: SocketioServices;
 
@@ -12,7 +14,7 @@ export default class SocketioModel extends MasterModel {
     }
 
     get priority() {
-        return 5;
+        return PRIORITY_CONFIG;
     }
 
     createModel() {

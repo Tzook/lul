@@ -3,6 +3,7 @@ import MasterModel from '../master/master.model';
 import QuestsController from './quests.controller';
 import * as mongoose from 'mongoose';
 import { BASE_STATS_SCHEMA } from "../stats/stats.model";
+import { PRIORITY_CHAR } from '../character/character.model';
 
 const QUEST_SCHEMA = {
     key: String,
@@ -32,6 +33,8 @@ const CHAR_QUESTS = {
     ok: {},
 };
 
+export const PRIORITY_QUESTS = PRIORITY_CHAR + 10;
+
 export default class QuestsModel extends MasterModel {
     protected controller: QuestsController;
 
@@ -43,7 +46,7 @@ export default class QuestsModel extends MasterModel {
     }
 
     get priority() {
-        return 35;
+        return PRIORITY_QUESTS;
     }
 
     createModel() {

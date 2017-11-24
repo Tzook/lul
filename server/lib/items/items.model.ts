@@ -3,6 +3,7 @@ import MasterModel from '../master/master.model';
 import ItemsController from './items.controller';
 import { BASE_STATS_SCHEMA } from "../stats/stats.model";
 import config from '../items/items.config';
+import { PRIORITY_CHAR } from '../character/character.model';
 
 export const REQUIRE_SCHEMA = {
     str: Number,
@@ -26,6 +27,8 @@ export const ITEM_INSTANCE_SCHEMA = Object.assign({
     stack: Number,
 }, BASE_STATS_SCHEMA);
 
+export const PRIORITY_ITEM = PRIORITY_CHAR + 10;
+
 export default class ItemsModel extends MasterModel {
     protected controller: ItemsController;
 
@@ -36,7 +39,7 @@ export default class ItemsModel extends MasterModel {
     }
 
     get priority() {
-        return 25;
+        return PRIORITY_ITEM;
     }
 
     createModel() {

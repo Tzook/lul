@@ -3,6 +3,8 @@ import MasterModel from '../master/master.model';
 import StatsServices from './stats.services';
 import * as _ from 'underscore';
 import config from './stats.config';
+import { PRIORITY_CHAR } from '../character/character.model';
+import { EQUIPS_SCHEMA } from '../equips/equips.model';
 
 const BAR_SCHEMA = {
     now: Number,
@@ -29,7 +31,9 @@ const STATS_SCHEMA = {
     abilities: [config.ABILITY_MELEE],
     job: config.CLASS_ADVENTURER,
     primaryAbility: config.ABILITY_MELEE
-}
+};
+
+export const PRIORITY_STATS = PRIORITY_CHAR + 10;
 
 export default class StatsModel extends MasterModel {
     protected services: StatsServices;
@@ -61,7 +65,7 @@ export default class StatsModel extends MasterModel {
     }
 
     get priority() {
-        return 35;
+        return PRIORITY_STATS;
     }
 
     createModel() {
@@ -72,7 +76,7 @@ export default class StatsModel extends MasterModel {
         return Promise.resolve();
     }
 
-    protected addFieldToModel(field, data, obj, reqBody) {
+    protected addFieldToModel(field, data, obj: Char, reqBody) {
         data = _.clone(STATS_SCHEMA);
 
         let str = +reqBody.str;
@@ -83,7 +87,15 @@ export default class StatsModel extends MasterModel {
             data.mag = mag;
             data.dex = dex;
         }
+
+        let bonusHp = 0;
+        for (let type in EQUIPS_SCHEMA) {
+            let equip = obj.equips[type];
+            bonusHp += (equip.hp || 0) + this.services.strToHp(equip.str || 0);
+        }
+
         data.hp.now = data.hp.total = this.services.strToHp(data.str);
+        data.hp.now += bonusHp;
         data.mp.now = data.mp.total = this.services.magToMp(data.mag);
         data.hp.regen = config.BEGIN_HP_REGEN;
         data.mp.regen = config.BEGIN_MP_REGEN

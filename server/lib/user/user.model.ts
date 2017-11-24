@@ -11,10 +11,6 @@ export default class UserModel extends MasterModel {
         this.listenForSchemaAddition('User');
     }
 
-    get priority() {
-        return 1;
-    }
-
     createModel() {
         this.setModel('User');
         

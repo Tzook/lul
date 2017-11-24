@@ -12,6 +12,8 @@ const MOB_SCHEMA = {
     maxDmg: Number
 };
 
+export const PRIORITY_MOBS = 10;
+
 export default class MobsModel extends MasterModel {
 	protected controller: MobsController;
     
@@ -23,7 +25,7 @@ export default class MobsModel extends MasterModel {
     }
 
     get priority() {
-        return 10;
+        return PRIORITY_MOBS;
     }
 
     createModel() {

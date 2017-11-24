@@ -4,6 +4,8 @@ import * as _ from 'underscore';
 import { ITEM_INSTANCE_SCHEMA } from "../items/items.model";
 import SocketioRouter from '../socketio/socketio.router';
 import ItemsRouter from '../items/items.router';
+import { PRIORITY_CONFIG } from '../socketio/socketio.model';
+import { PRIORITY_CHAR } from '../character/character.model';
 
 export const EQUIPS_SCHEMA = {
     head: ITEM_INSTANCE_SCHEMA,
@@ -13,6 +15,8 @@ export const EQUIPS_SCHEMA = {
     shoes: ITEM_INSTANCE_SCHEMA,
     weapon: ITEM_INSTANCE_SCHEMA,
 };
+
+export const PRIORITY_EQUIPS = PRIORITY_CONFIG + PRIORITY_CHAR + 10;
 
 export default class EquipsModel extends MasterModel {
     protected beginSchema;
@@ -32,7 +36,7 @@ export default class EquipsModel extends MasterModel {
     }
 
     get priority() {
-        return 20;
+        return PRIORITY_EQUIPS;
     }
 
     createModel() {
@@ -41,17 +45,19 @@ export default class EquipsModel extends MasterModel {
         this.addToSchema("Character", { equips: this.getModel().schema });
         this.addToSchema("Config", { beginEquips: this.beginSchema });
         
-        this.listenForFieldAddition("Character", "equips", () => {
-            let equips = _.clone(EQUIPS_SCHEMA);
-            let ItemModel = this.getModel("ItemInstance");
-            let config = this.socketioRouter.getConfig();
-            for (let type in equips) {
-                let itemInstance = this.itemsRouter.getItemInstance(config.beginEquips[type]) || {};
-                equips[type] = new ItemModel(itemInstance);
-            }
-            return equips;
-        });
+        this.listenForFieldAddition("Character", "equips");
         
         return Promise.resolve();
+    }
+    
+    protected addFieldToModel(field, data, obj: Char, reqBody) {
+        let equips = _.clone(EQUIPS_SCHEMA);
+        let ItemModel = this.getModel("ItemInstance");
+        let config = this.socketioRouter.getConfig();
+        for (let type in equips) {
+            let itemInstance = this.itemsRouter.getItemInstance(config.beginEquips[type]) || {};
+            equips[type] = new ItemModel(itemInstance);
+        }
+        obj[field] = equips;
     }
 };
