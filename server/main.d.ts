@@ -289,9 +289,16 @@ interface ABILITY_PERK_MODEL {
     addToPool: string[]
 }
 
+interface ABILITY_SPELL_MODEL {
+    key: string,
+    lvl: number,
+    mp: number,
+}
+
 interface TALENT_MODEL {
     ability: string,
     perks: ABILITY_PERK_MODEL[],
+    spells: ABILITY_SPELL_MODEL[],
 }
 
 interface PERK_CONFIG {

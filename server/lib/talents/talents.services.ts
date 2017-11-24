@@ -5,7 +5,9 @@ import DropsServices from '../drops/drops.services';
 import talentsConfig from "../talents/talents.config";
 
 export default class TalentsServices extends MasterServices {
-	private talentsInfo: Map<string, ABILITY_PERK_INSTANCE[]> = new Map();
+	private perksInfo: Map<string, ABILITY_PERK_INSTANCE[]> = new Map();
+	// primary ability => lvl|key => spell
+	private spellsInfo: Map<string, Map<number|string, ABILITY_SPELL_MODEL>> = new Map();
 
 	protected socketioRouter: SocketioRouter;
 	
@@ -35,7 +37,7 @@ export default class TalentsServices extends MasterServices {
 
 	public getPerksPool(ability: string, talent: CHAR_ABILITY_TALENT): string[] {
 		let poolLvl = talent.lvl - (talent.points - 1);
-		let abilityInfo = this.talentsInfo.get(ability);
+		let abilityInfo = this.perksInfo.get(ability);
 		// if surpass max info - reset it
 		if (poolLvl > abilityInfo.length - 1) {
 			poolLvl = abilityInfo.length - 1;
@@ -128,6 +130,7 @@ export default class TalentsServices extends MasterServices {
 			let talentchema: TALENT_MODEL = {
 				ability: talent.primaryAbility,
 				perks: [],
+				spells: [],
 			};
 
 			(talent.perks || []).forEach(perk => {
@@ -137,6 +140,15 @@ export default class TalentsServices extends MasterServices {
 					addToPool: perk.addToPool,
 				};
 				talentchema.perks.push(perkSchema);
+			});
+			
+			(talent.spells || []).forEach(spell => {
+				let spellSchema = {
+					key: spell.key,
+					lvl: spell.level,
+					mp: spell.mana,
+				};
+				talentchema.spells.push(spellSchema);
 			});
 
 			let talentModel = new this.Model(talentchema);
@@ -177,35 +189,50 @@ export default class TalentsServices extends MasterServices {
 			.then((docs: TALENT_MODEL[]) => {
 				docs.forEach(doc => {
 					const perksArray = this.getLvlPerksArray(doc.perks);
-					this.talentsInfo.set(doc.ability, perksArray);
+					this.perksInfo.set(doc.ability, perksArray);
+
+					const spellsArray = this.getSpellsArrayMap(doc.spells);
+					this.spellsInfo.set(doc.ability, spellsArray);
 				});
 				console.log("got talents");
-				return this.talentsInfo;
+				return this.perksInfo;
 			});
 		}
 		
-		protected getLvlPerksArray(perks = []) {
-			let perksLvls: {[lvl: number]: ABILITY_PERK_MODEL} = {};
-			let max = 0;
-			perks.forEach(perk => {
-				max = Math.max(perk.atLeastLvl, max);
-				perksLvls[perk.atLeastLvl] = perk;
-			});
+	protected getLvlPerksArray(perks) {
+		let perksLvls: {[lvl: number]: ABILITY_PERK_MODEL} = {};
+		let max = 0;
+		perks.forEach(perk => {
+			max = Math.max(perk.atLeastLvl, max);
+			perksLvls[perk.atLeastLvl] = perk;
+		});
 
-			let perksArray: ABILITY_PERK_INSTANCE[] = new Array(max + 1);
-			let lastPerk: ABILITY_PERK_INSTANCE = {
-				perksOffered: 0,
-				pool: [],
-			};
-			for (let i = 0; i < perksArray.length; i++) {
-				if (perksLvls[i]) {
-					lastPerk = {
-						perksOffered: perksLvls[i].perksOffered,
-						pool: lastPerk.pool.concat(perksLvls[i].addToPool),
-					};
-				}
-				perksArray[i] = lastPerk;
+		let perksArray: ABILITY_PERK_INSTANCE[] = new Array(max + 1);
+		let lastPerk: ABILITY_PERK_INSTANCE = {
+			perksOffered: 0,
+			pool: [],
+		};
+		for (let i = 0; i < perksArray.length; i++) {
+			if (perksLvls[i]) {
+				lastPerk = {
+					perksOffered: perksLvls[i].perksOffered,
+					pool: lastPerk.pool.concat(perksLvls[i].addToPool),
+				};
 			}
-			return perksArray;
+			perksArray[i] = lastPerk;
+		}
+		return perksArray;
+	}
+
+	protected getSpellsArrayMap(spells: ABILITY_SPELL_MODEL[]){
+		let result = new Map();
+
+		for (let i = 0; i < spells.length; i++) {
+			const spell = spells[i];
+			result.set(spell.lvl, spell);
+			result.set(spell.key, spell);
+		}
+
+		return result;
 	}
 };

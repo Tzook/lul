@@ -12,9 +12,16 @@ const ABILITY_PERK_SCHEMA = (<any>mongoose.Schema)({
     addToPool: [String]
 }, {_id: false});
 
+const ABILITY_SPELL_SCHEMA = (<any>mongoose.Schema)({
+    key: String,
+    lvl: Number,
+    mp: Number
+}, {_id: false});
+
 const TALENT_SCHEMA = {
     ability: String,
     perks: [ABILITY_PERK_SCHEMA],
+    spells: [ABILITY_SPELL_SCHEMA],
 };
 
 const CONFIG_PERK_SCHEMA = mongoose.Schema.Types.Mixed;
