@@ -47,11 +47,11 @@ export default class PartyController extends MasterController {
     public joinParty(socket: GameSocket, party: PARTY_MODEL) {
         socket.join(party.name);
 
+        party.members.add(socket.character.name);
+        this.tellPartyMembers(socket, party);
         this.io.to(party.name).emit(config.CLIENT_GETS.JOIN_PARTY.name, {
             char_name: socket.character.name
         });
-        party.members.add(socket.character.name);
-        this.tellPartyMembers(socket, party);
 
         this.charToParty.set(socket.character.name, party);
         clearTimeout(party.invitees.get(socket.character.name));
