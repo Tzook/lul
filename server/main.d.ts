@@ -46,14 +46,11 @@ interface Stats {
     hp: {
         now: number,
         total: number,
-        regen: number,
     },
     mp: {
         now: number,
         total: number,
-        regen: number,
     },
-    job: string,
     abilities: string[],
     primaryAbility: string,
 }
@@ -226,13 +223,11 @@ interface REQUIRED_QUEST {
     phase: string
 }
 interface QUEST_REQUIREMENTS {
-    job?: string
     lvl?: number 
     quests?: REQUIRED_QUEST[]
 }
 interface QUEST_REWARDS {
     items?: ITEM_INSTANCE[]
-    job?: string
     exp?: number
     stats?: BASE_STATS_MODEL
     ability?: string

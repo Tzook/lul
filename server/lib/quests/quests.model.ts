@@ -13,13 +13,11 @@ const QUEST_SCHEMA = {
         ok: mongoose.Schema.Types.Mixed,
     },
     req: {
-        job: String,
         lvl: Number,
         quests: mongoose.Schema.Types.Mixed
     },
     reward: {
         items: mongoose.Schema.Types.Mixed,
-        job: String,
         exp: Number,
         stats: BASE_STATS_SCHEMA,
         ability: String

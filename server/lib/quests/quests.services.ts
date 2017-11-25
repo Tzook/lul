@@ -68,11 +68,6 @@ export default class QuestsServices extends MasterServices {
             if (req.lvl && char.stats.lvl < req.lvl) {
                 return `level ${char.stats.lvl} / ${req.lvl}`;
             }
-            
-            // check class requirement
-            if (req.job && char.stats.job !== req.job) {
-                return `class is ${char.stats.job} and not ${req.job}`;
-            }
 
             // check pre-quests requirements
             for (var i in (req.quests || [])) {
@@ -153,7 +148,6 @@ export default class QuestsServices extends MasterServices {
             {
                 let req: QUEST_REQUIREMENTS = {};
                 if (quest.minLevel > 0) req.lvl = +quest.minLevel;
-                if (quest.requiredClass) req.job = quest.requiredClass;
                 let reqQuests = [];
                 (quest.RequiredQuests || []).forEach(reqQuest => {
                     reqQuests.push({key: reqQuest.key, phase: reqQuest.phase});
@@ -166,7 +160,6 @@ export default class QuestsServices extends MasterServices {
             // rewards
             {
                 let rewards: QUEST_REWARDS = {};
-                if (quest.rewardClass) rewards.job = quest.rewardClass;
                 if (quest.rewardExp > 0) rewards.exp = +quest.rewardExp;
                 if (quest.rewardPrimaryAbility) rewards.ability = quest.rewardPrimaryAbility;
 

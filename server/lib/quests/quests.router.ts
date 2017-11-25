@@ -85,11 +85,6 @@ export default class QuestsRouter extends SocketioRouterBase {
 			if ((questInfo.reward || {}).exp) {
 				this.emitter.emit(statsConfig.SERVER_INNER.GAIN_EXP.name, { exp: questInfo.reward.exp }, socket);
 			}
-
-			// reward class
-			if ((questInfo.reward || {}).job) {
-				this.emitter.emit(statsConfig.SERVER_INNER.GAIN_CLASS.name, { job: questInfo.reward.job }, socket);
-			}
 			
 			// reward ability
 			if ((questInfo.reward || {}).ability) {

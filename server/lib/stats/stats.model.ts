@@ -9,7 +9,6 @@ import { EQUIPS_SCHEMA } from '../equips/equips.model';
 const BAR_SCHEMA = {
     now: Number,
     total: Number,
-    regen: Number,
 }
 
 export const BASE_STATS_SCHEMA = {
@@ -29,7 +28,6 @@ const STATS_SCHEMA = {
     hp: {},
     mp: {},
     abilities: [config.ABILITY_MELEE],
-    job: config.CLASS_ADVENTURER,
     primaryAbility: config.ABILITY_MELEE
 };
 
@@ -97,8 +95,6 @@ export default class StatsModel extends MasterModel {
         data.hp.now = data.hp.total = this.services.strToHp(data.str);
         data.hp.now += bonusHp;
         data.mp.now = data.mp.total = this.services.magToMp(data.mag);
-        data.hp.regen = config.BEGIN_HP_REGEN;
-        data.mp.regen = config.BEGIN_MP_REGEN
 
         obj[field] = data;
     }

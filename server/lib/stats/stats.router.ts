@@ -131,13 +131,6 @@ export default class StatsRouter extends SocketioRouterBase {
             stats: socket.character.stats
         });
     }
-
-    [config.SERVER_INNER.GAIN_CLASS.name] (data, socket: GameSocket) {
-        socket.character.stats.job = data.job;
-        socket.emit(config.CLIENT_GETS.GAIN_CLASS.name, {
-            class: socket.character.stats.job
-        });
-    }
     
     [config.SERVER_INNER.GAIN_ABILITY.name] (data, socket: GameSocket) {
         if (StatsServices.hasAbility(socket, data.ability)) {
@@ -205,10 +198,11 @@ export default class StatsRouter extends SocketioRouterBase {
             clearTimeout(socket.hpRegenTimer);
             socket.hpRegenTimer = setTimeout(() => {
                 if (socket.connected && socket.alive) {
-                    this.emitter.emit(config.SERVER_INNER.GAIN_HP.name, { hp: socket.character.stats.hp.regen }, socket);
+                    const hp = this.services.getRegenHp(socket);
+                    this.emitter.emit(config.SERVER_INNER.GAIN_HP.name, { hp }, socket);
                     this.regenHpInterval(socket);
                 }
-            }, config.REGEN_INTERVAL);
+            }, config.REGEN_HP_INTERVAL);
         }
     }
     private regenMpInterval(socket: GameSocket) {
@@ -216,10 +210,11 @@ export default class StatsRouter extends SocketioRouterBase {
             clearTimeout(socket.mpRegenTimer);
             socket.mpRegenTimer = setTimeout(() => {
                 if (socket.connected && socket.alive) {
-                    this.emitter.emit(config.SERVER_INNER.GAIN_MP.name, { mp: socket.character.stats.mp.regen }, socket);
+                    const mp = this.services.getRegenMp(socket);
+                    this.emitter.emit(config.SERVER_INNER.GAIN_MP.name, { mp }, socket);
                     this.regenMpInterval(socket);
                 }
-            }, config.REGEN_INTERVAL);
+            }, config.REGEN_MP_INTERVAL);
         }
     }
 };

@@ -61,6 +61,14 @@ export default class StatsServices extends MasterServices {
 	public getMpAfterUsage(mpNow: number, mpToUse: number): number {
 		return Math.max(0, mpNow - mpToUse);
     }
+
+    public getRegenHp(socket: GameSocket): number {
+        return socket.maxHp * config.REGEN_HP_PERCENT | 0;
+    }
+
+    public getRegenMp(socket: GameSocket): number {
+        return socket.maxMp * config.REGEN_MP_PERCENT | 0;
+    }
     
     public static getMainStat(socket: GameSocket): string {
         return socket.character.stats.primaryAbility === "range" ? "dex" : "str";
