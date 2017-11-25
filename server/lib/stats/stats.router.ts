@@ -70,7 +70,7 @@ export default class StatsRouter extends SocketioRouterBase {
         }
 
         if (!socket.alive) {
-            this.log({}, socket,  "character is ded");
+            this.log({}, socket, "character is ded");
             this.io.to(socket.character.room).emit(config.CLIENT_GETS.DEATH.name, {
                 id: socket.character._id,
             });

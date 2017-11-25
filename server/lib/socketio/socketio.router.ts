@@ -8,6 +8,7 @@ import SocketioServices from './socketio.services';
 import config from './socketio.config';
 require('./socketio.fixer');
 import * as passportSocketIo from 'passport.socketio';
+import { isProduction } from '../main/main';
 
 export default class SocketioRouter extends SocketioRouterBase {
 	protected middleware: SocketioMiddleware;
@@ -89,7 +90,7 @@ export default class SocketioRouter extends SocketioRouterBase {
 
 	initListeners() {
 		this.io.on(this.ROUTES.BEGIN_CONNECTION, (socket: GameSocket) => {
-			if (!this.isProduction() && socket.request._query.test === 'true') {
+			if (!isProduction() && socket.request._query.test === 'true') {
 				socket.test = true;
 			}
 			socket.user = socket.client.request.user;
@@ -132,7 +133,7 @@ export default class SocketioRouter extends SocketioRouterBase {
 					if (this.fitThrottle(socket, event, defaultThrottle, routerFn) && 
 						this.fitBitch(socket, event) && 
 						this.fitAlive(socket, event)) {
-                            event.log && this.log(args[0], socket, event.name);
+                            event.log && this.log(args[0], socket, "Event was called", event.name);
 						    routerFn.apply(router, args);
 					}
 				});
@@ -198,7 +199,11 @@ export default class SocketioRouter extends SocketioRouterBase {
 	}
 
     private saveUser(socket: GameSocket) {
-        socket.user.save(e => e && console.error("Saving user error", socket.character.name, e));
+        socket.user.save(error => {
+			if (error)  {
+				this.fatal(socket, error);
+			}
+		});
     }
 
 	private restartServerEvent(app) {
@@ -217,9 +222,5 @@ export default class SocketioRouter extends SocketioRouterBase {
 						console.error("Had an error restarting lul:", e);
 					});
 		});
-	}
-
-	private isProduction(): boolean {
-		return process.env.NODE_ENV === "production";
 	}
  };

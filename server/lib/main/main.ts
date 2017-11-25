@@ -12,6 +12,7 @@ let 	express 		= require('express'),
 
 // Internal
 import Bootstrap from './bootstrap';
+import { setLogger } from './logger';
 
 export default class Main {
 	private app;
@@ -59,12 +60,19 @@ export default class Main {
 		this.app.db = mongoose.connection;
 		this.app.mongoStore = new MongoStore({ mongooseConnection: this.app.db });
 	}
-
+	
 	connectToDbAndBootstrap() {
 		this.app.db.once('open', () => {
+			if (isProduction()) {
+				setLogger(this.app.db.db);
+			}
 			console.info("\t+*+*+ Connected to mongodb! on MongoLab +*+*+");
 			let bootstrap = new Bootstrap(this.app);
 			bootstrap.init();
 		});
 	}
 };
+
+export function isProduction(): boolean {
+	return process.env.NODE_ENV === "production";
+}

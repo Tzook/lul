@@ -2,6 +2,7 @@
 import MasterRouter from '../master/master.router';
 import Emitter = require('events');
 import config from './socketio.config';
+import { logger } from '../main/logger';
 
 export default class SocketioRouterBase extends MasterRouter {
 	protected io: SocketIO.Namespace;
@@ -34,22 +35,37 @@ export default class SocketioRouterBase extends MasterRouter {
 		return 'socketio';
 	}
 
-    protected log(data: any, socket: GameSocket, message: string) {
-        console.info(message, socket.character.name, data);
+    protected log(data: any, socket: GameSocket, message: string, event?: string) {
+		event = event || this.getEventName();
+        logger.info(message, this.getMeta(socket, data, event));
     }
 
 	protected sendError(data: any, socket: GameSocket, error: string, emit = true, display = false) {
-		let event = "";
-		try {
-			// grab event from stack trace
-			event = (new Error()).stack.match(/at (\S+)/g)[1].slice(3).split('.')[1];
-		} catch (e) {}
-		console.error("Sending error to socket %s:", socket.character.name, error, data, event);
+		const event = this.getEventName();
+		logger.warn(error, this.getMeta(socket, data, event));
 		emit && socket.emit(config.CLIENT_GETS.EVENT_ERROR.name, {
 			error,
 			data,
 			event,
 			display,
 		});
+	}
+
+	protected fatal(socket: GameSocket, error: Error, event?: string) {
+		event = event || this.getEventName();
+        logger.error(error.toString(), this.getMeta(socket, error, event));
+	}
+	
+	private getEventName(): string {
+		let event = "";
+		try {
+			// grab event from stack trace
+			event = (new Error()).stack.match(/at (\S+)/g)[2].slice(3).split('.')[1];
+		} catch (e) {}
+		return event;
+	}
+
+	private getMeta(socket: GameSocket, data, event: string) {
+		return Object.assign({name: socket.character.name, event}, data);
 	}
 };
