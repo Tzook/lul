@@ -124,4 +124,23 @@ export default class TalentsRouter extends SocketioRouterBase {
 		}
 		this.services.markAbilityModified(socket);
 	}
+
+	[talentsConfig.SERVER_GETS.USE_SPELL.name](data, socket: GameSocket) {
+		const {target_ids, spell_key} = data;
+		const spell = this.services.getSpell(socket, spell_key);
+		if (!spell) {
+			return this.sendError(data, socket, "The primary ability does not have that spell.");	
+		} else if (!this.services.canUseSpell(socket, spell)) {
+			return this.sendError(data, socket, "Character does not meet the requirements to use that spell.");
+		} else if (socket.character.stats.mp.now < spell.mp) {
+			return this.sendError(data, socket, "Not enough mana to activate the spell.");
+		}
+		// TODO reduce MP
+		target_ids;
+
+		this.io.to(socket.character.room).emit(talentsConfig.CLIENT_GETS.USE_SPELL.name, {
+            char_id: socket.character._id,
+            spell_key,
+        });
+	}
 };

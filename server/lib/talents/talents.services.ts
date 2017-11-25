@@ -119,6 +119,17 @@ export default class TalentsServices extends MasterServices {
 		return Math.max(dmg * talentsConfig.PERKS.BLEED_DMG_MODIFIER | 0, 1);
 	}
 
+	public getSpell(socket: GameSocket, spellKey: string): ABILITY_SPELL_MODEL|undefined {
+		const ability = socket.character.stats.primaryAbility;
+		return this.spellsInfo.get(ability).get(spellKey);
+	}
+
+	public canUseSpell(socket: GameSocket, spell: ABILITY_SPELL_MODEL): boolean {
+		const ability = socket.character.stats.primaryAbility;
+		const talent = socket.character.talents._doc[ability];
+		return talent.lvl >= spell.lvl;
+	}
+
     // HTTP functions
 	// =================
     public generateTalents(talents: any[], perkCollection: any[]): Promise<any> {

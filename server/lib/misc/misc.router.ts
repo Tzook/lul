@@ -35,6 +35,7 @@ export default class MiscRouter extends SocketioRouterBase {
 		let {slots, item} = data;
 		let itemInfo = this.itemsRouter.getItemInfo(item.key);
         if (this.middleware.isMisc(itemInfo)) {
+            item.stack = item.stack || 1;
             this.controller.pickMiscItem(socket, slots, item, itemInfo);
         }
 	}

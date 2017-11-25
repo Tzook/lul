@@ -23,6 +23,7 @@ export default {
 	"SERVER_GETS": {
 		ENTERED_ROOM: Object.assign({}, roomsConfig.SERVER_GETS.ENTERED_ROOM),
 		CHOOSE_ABILITY_PERK: {name: "choose_perk", alive: true, log: true},
+		USE_SPELL: {name: "used_spell", alive: true, log: true},
 	},
 	"CLIENT_GETS": {
 		GAIN_ABILITY_EXP: {name: "ability_gain_exp"},
@@ -31,6 +32,7 @@ export default {
 		GAIN_ABILITY_PERK: {name: "ability_gain_perk"},
 		ACTIVATED_BUFF: {name: "buff_activated"},
 		ACTIVATED_PERK: {name: "perk_activated"},
+		USE_SPELL: {name: "actor_use_spell"},
 	},
 	PERKS: {
 		AOE_CHANCE: "aoeChance",
