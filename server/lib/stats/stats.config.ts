@@ -8,6 +8,7 @@ const CONFIG = {
 		"GAIN_CLASS": {"name": "gain_class", "alive": true, "log": true},
 		"GAIN_ABILITY": {"name": "gain_ability", "alive": true, "log": true},
 		"TAKE_DMG": {"name": "take_dmg", "alive": true, "log": true},
+		"USE_MP": {"name": "use_mp", "alive": true, "log": true},
 		"STATS_ADD": {"name": "stats_add", "alive": true},
 		"STATS_REMOVE": {"name": "stats_remove", "alive": true}
 	},
@@ -22,6 +23,7 @@ const CONFIG = {
 		"GAIN_CLASS": {"name": "actor_gain_class"},
 		"GAIN_ABILITY": {"name": "actor_gain_ability"},
 		"TAKE_DMG": {"name": "actor_take_dmg"},
+		"USE_MP": {"name": "actor_use_mp"},
 		"DEATH": {"name": "actor_ded"},
 		"RESURRECT": {"name": "actor_resurrect"},
 		"LEVEL_UP": {"name": "actor_lvl_up"}

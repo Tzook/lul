@@ -56,8 +56,12 @@ export default class StatsServices extends MasterServices {
 
 	public getHpAfterDamage(hp: number, dmg: number): number {
 		return Math.max(0, Math.floor(hp - dmg));
-	}
+    }
 
+	public getMpAfterUsage(mpNow: number, mpToUse: number): number {
+		return Math.max(0, mpNow - mpToUse);
+    }
+    
     public static getMainStat(socket: GameSocket): string {
         return socket.character.stats.primaryAbility === "range" ? "dex" : "str";
     }

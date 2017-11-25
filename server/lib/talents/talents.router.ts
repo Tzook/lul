@@ -3,6 +3,7 @@ import TalentsMiddleware from './talents.middleware';
 import TalentsController from './talents.controller';
 import TalentsServices from './talents.services';
 import talentsConfig from '../talents/talents.config';
+import statsConfig from '../stats/stats.config';
 import StatsRouter from '../stats/stats.router';
 import StatsServices from '../stats/stats.services';
 import MobsRouter from '../mobs/mobs.router';
@@ -135,7 +136,10 @@ export default class TalentsRouter extends SocketioRouterBase {
 		} else if (socket.character.stats.mp.now < spell.mp) {
 			return this.sendError(data, socket, "Not enough mana to activate the spell.");
 		}
-		// TODO reduce MP
+		this.emitter.emit(statsConfig.SERVER_INNER.USE_MP.name, {
+			mp: spell.mp
+		}, socket);
+
 		target_ids;
 
 		this.io.to(socket.character.room).emit(talentsConfig.CLIENT_GETS.USE_SPELL.name, {

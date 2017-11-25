@@ -79,6 +79,17 @@ export default class StatsRouter extends SocketioRouterBase {
         }
     }
 
+    [config.SERVER_INNER.USE_MP.name] (data, socket: GameSocket) {
+        const {mp} = data;
+        let hadFullMp = socket.character.stats.mp.now === socket.maxMp;
+        const now = this.services.getMpAfterUsage(socket.character.stats.mp.now, mp);
+        socket.character.stats.mp.now = now
+        socket.emit(config.CLIENT_GETS.USE_MP.name, { mp, now });
+        if (hadFullMp) {
+            this.regenMpInterval(socket);
+        }
+    }
+
     [config.SERVER_INNER.GAIN_HP.name] (data, socket: GameSocket) {
         let hp = data.hp;
         let gainedHp = this.controller.addHp(socket, hp);
