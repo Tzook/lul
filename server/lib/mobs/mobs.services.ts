@@ -1,6 +1,8 @@
 
 import MasterServices from '../master/master.services';
 import * as _ from "underscore";
+import { doesChanceWork } from '../drops/drops.services';
+import config from "../mobs/mobs.config";
 
 export default class MobsServices extends MasterServices {
 	private mobsInfo: Map<string, MOB_MODEL> = new Map();
@@ -72,5 +74,11 @@ export default class MobsServices extends MasterServices {
     public getExp(mob: MOB_INSTANCE, charDmg: number): number {
         // we round the exp up for the character :)
         return Math.ceil(mob.exp * (charDmg / mob.dmged));
-    }
+	}
+	
+	public didHitMob(mobLvl, myLvl): boolean {
+		const lvlDifference = myLvl - mobLvl + config.MISS_CHANCE_LVLS;
+		const chance = lvlDifference * config.MISS_CHANCE_PER_LVL;
+		return doesChanceWork(chance);
+	}
 };

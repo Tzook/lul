@@ -1,7 +1,7 @@
 import MasterServices from '../master/master.services';
 import SocketioRouter from '../socketio/socketio.router';
 import * as _ from 'underscore';
-import DropsServices from '../drops/drops.services';
+import { doesChanceWorkFloat } from '../drops/drops.services';
 import talentsConfig from "../talents/talents.config";
 
 export default class TalentsServices extends MasterServices {
@@ -100,7 +100,7 @@ export default class TalentsServices extends MasterServices {
 	
 	public isAbilityActivated(perk: string, socket: GameSocket) {
 		const value = this.getAbilityPerkValue(perk, socket);
-		const activated = DropsServices.doesChanceWorkFloat(value);
+		const activated = doesChanceWorkFloat(value);
 		if (activated) {
 			socket.emit(talentsConfig.CLIENT_GETS.ACTIVATED_PERK.name, {
 				key: perk,

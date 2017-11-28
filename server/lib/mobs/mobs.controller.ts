@@ -21,6 +21,10 @@ export default class MobsController extends MasterController {
 		return this.mobById.has(this.services.getMobRoomId(socket.character.room, mobId));
 	}
 
+	public getMob(mobId: string, socket: GameSocket): MOB_INSTANCE|undefined {
+		return this.mobById.get(this.services.getMobRoomId(socket.character.room, mobId));
+	}
+
 	public startSpawningMobs(roomInfo: ROOM_MODEL) {
 		let roomMobs: ROOM_MOBS = {
 			spawns: []
@@ -86,7 +90,7 @@ export default class MobsController extends MasterController {
 	}
 
 	public moveMob(mobId: string, x: number, y: number, socket: GameSocket) {
-		let mob = this.mobById.get(this.services.getMobRoomId(socket.character.room, mobId));
+		let mob = this.getMob(mobId, socket);
 		mob.x = x;
 		mob.y = y;
 		socket.broadcast.to(socket.character.room).emit(config.CLIENT_GETS.MOB_MOVE.name, {
@@ -107,7 +111,7 @@ export default class MobsController extends MasterController {
 	}
 
 	public hurtMob(mobId: string, dmg: number, socket: GameSocket): MOB_INSTANCE {
-		let mob = this.mobById.get(this.services.getMobRoomId(socket.character.room, mobId));
+		let mob = this.getMob(mobId, socket);
         let actualDmg = this.services.getDamageToHurt(mob.hp, dmg);
 		mob.hp -= actualDmg;
         
@@ -160,7 +164,7 @@ export default class MobsController extends MasterController {
     }
 
 	public getHurtCharDmg(mobId: string, socket: GameSocket): number {
-		let mob = this.mobById.get(this.services.getMobRoomId(socket.character.room, mobId));
+		let mob = this.getMob(mobId, socket);
 		let dmg = this.services.getDamageRange(mob.minDmg, mob.maxDmg);
 		return dmg;
 	}
@@ -186,6 +190,11 @@ export default class MobsController extends MasterController {
 		setTimeout(() => {
 			this.spawnMobs(mob.spawn, mob.spawn.mobs, room);
 		}, mob.spawn.interval * 1000);
+	}
+
+	public didHitMob(mobId: string, socket: GameSocket) {
+		let mob = this.getMob(mobId, socket);
+		return this.services.didHitMob(mob.lvl, socket.character.stats.lvl);
 	}
 
 	// HTTP functions

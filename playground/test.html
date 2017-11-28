@@ -389,6 +389,7 @@
 				// socket.on("mob_spawn", d => setResult({msg: "mob_spawn", d}));
 				socket.on("mob_die", d => setResult({msg: "mob_die", d}));
 				socket.on("mob_take_dmg", d => setResult({msg: "mob_take_dmg", d}));
+				socket.on("mob_take_miss", d => setResult({msg: "mob_take_miss", d}));
 				socket.on("mobs_moved", d => window.test && setResult({msg: "mobs_moved", d}));
 				socket.on("aggro", d => window.test && setResult({msg: "aggro", d}));
 

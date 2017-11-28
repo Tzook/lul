@@ -68,17 +68,31 @@ export default class MobsRouter extends SocketioRouterBase {
 		const mobsHit = socket.getMobsHit(mobsInArea);
 		let cause = "attack";
 		for (let i = 0; i < mobsHit.length; i++) {
-			this.emitter.emit(config.SERVER_INNER.MOB_TAKE_DMG.name, {mobId: mobsHit[i], cause}, socket);
+			let mobHitData = {mobId: mobsHit[i], cause};
+
+			if (!this.controller.hasMob(mobsHit[i], socket)) {
+				this.sendError(data, socket, "Mob doesn't exist!");
+			} else if (this.controller.didHitMob(mobsHit[i], socket)) {
+				this.emitter.emit(config.SERVER_INNER.MOB_TAKE_DMG.name, mobHitData, socket);
+			} else {
+				this.emitter.emit(config.SERVER_INNER.MISS_MOB.name, mobHitData, socket);
+			}
 			cause = "aoe";
 		}
+	}
+
+	[config.SERVER_INNER.MISS_MOB.name](data, socket: GameSocket) {
+		let {mobId, cause} = data;
+		this.io.to(socket.character.room).emit(config.CLIENT_GETS.MOB_TAKE_MISS.name, {
+			id: socket.character._id,
+			mob_id: mobId,
+			cause
+		});
 	}
 
 	[config.SERVER_INNER.MOB_TAKE_DMG.name](data, socket: GameSocket) {
 		let {mobId, cause, dmg} = data;
 
-		if (!this.controller.hasMob(mobId, socket)) {
-			return this.sendError(data, socket, "Mob doesn't exist!");
-		}
 		let load = socket.lastAttackLoad || 0;
 		dmg = dmg || this.controller.calculateDamage(socket, load);
 		let mob = this.controller.hurtMob(mobId, dmg, socket);
