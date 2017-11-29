@@ -46,5 +46,6 @@ export default {
 		BLEED_DMG_MODIFIER: 0.1,
 		BLEED_TICK_TIME: 1,
 		BLEED_DMG_CAUSE: "bleed",
+		CHARGE_MODIFIER_KEY: "fullyChargeBonus",
 	}
 }

@@ -106,6 +106,7 @@ interface GameSocket extends SocketIO.Socket {
     mpRegenTimer: NodeJS.Timer
     getKnownsList: (() => Iterable<string>)[] // List of getters for knowns
     getMobsHit: (mobs: string[]) => string[]
+    getLoadModifier: () => number
 }
 
 // items

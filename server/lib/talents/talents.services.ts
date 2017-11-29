@@ -97,6 +97,11 @@ export default class TalentsServices extends MasterServices {
 		const aoeValue = this.getAbilityPerkValue(talentsConfig.PERKS.AOE_CAP, socket);
 		return mobs.slice(0, aoeValue);
 	}
+
+	public getLoadModifier(socket: GameSocket): number {
+		const chargeModifier = this.getAbilityPerkValue(talentsConfig.PERKS.CHARGE_MODIFIER_KEY, socket);
+		return 1 + chargeModifier;
+	}
 	
 	public isAbilityActivated(perk: string, socket: GameSocket) {
 		const value = this.getAbilityPerkValue(perk, socket);
