@@ -3,6 +3,7 @@ import TalentsServices from './talents.services';
 import MobsRouter from '../mobs/mobs.router';
 import talentsConfig from '../talents/talents.config';
 import mobsConfig from '../mobs/mobs.config';
+import statsConfig from '../stats/stats.config';
 
 export default class TalentsController extends MasterController {
 	protected services: TalentsServices;
@@ -13,6 +14,19 @@ export default class TalentsController extends MasterController {
 	init(files, app) {
 		this.mobsRouter = files.routers.mobs;
 		super.init(files, app);
+	}
+
+	public applySelfPerks(dmg: number, socket: GameSocket) {
+		const lifeSteal = this.services.getAbilityPerkValue(talentsConfig.PERKS.LIFE_STEAL_KEY, socket);
+		const hp = this.services.getStealValue(dmg, lifeSteal);
+		if (hp > 0) {
+			this.mobsRouter.getEmitter().emit(statsConfig.SERVER_INNER.GAIN_HP.name, { hp }, socket);
+		}
+		const manaSteal = this.services.getAbilityPerkValue(talentsConfig.PERKS.MANA_STEAL_KEY, socket);
+		const mp = this.services.getStealValue(dmg, manaSteal);
+		if (mp > 0) {
+			this.mobsRouter.getEmitter().emit(statsConfig.SERVER_INNER.GAIN_MP.name, { mp }, socket);
+		}
 	}
 
 	public applyHurtMobPerks(dmg: number, mob: MOB_INSTANCE, socket: GameSocket) {

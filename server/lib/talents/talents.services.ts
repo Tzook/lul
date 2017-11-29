@@ -135,6 +135,10 @@ export default class TalentsServices extends MasterServices {
 		return talent.lvl >= spell.lvl;
 	}
 
+	public getStealValue(value, percent): number {
+		return value * percent | 0;
+	}
+
     // HTTP functions
 	// =================
     public generateTalents(talents: any[], perkCollection: any[]): Promise<any> {

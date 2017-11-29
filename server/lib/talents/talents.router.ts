@@ -50,6 +50,7 @@ export default class TalentsRouter extends SocketioRouterBase {
 		if (mob.hp > 0 && cause !== talentsConfig.PERKS.BLEED_DMG_CAUSE) {
 			this.controller.applyHurtMobPerks(dmg, mob, socket);
 		}
+		this.controller.applySelfPerks(dmg, socket);
 	}
 	
 	[talentsConfig.SERVER_INNER.GAIN_ABILITY_EXP.name]({exp}: {exp: number}, socket: GameSocket) {

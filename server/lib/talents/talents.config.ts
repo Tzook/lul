@@ -47,5 +47,7 @@ export default {
 		BLEED_TICK_TIME: 1,
 		BLEED_DMG_CAUSE: "bleed",
 		CHARGE_MODIFIER_KEY: "fullyChargeBonus",
+		LIFE_STEAL_KEY: "lifeSteal",
+		MANA_STEAL_KEY: "manaSteal",
 	}
 }
