@@ -117,6 +117,7 @@ export default class TalentsController extends MasterController {
 	}
 
 	protected tickBleed(dmg: number, bleedBuff: BUFF_INSTANCE, mob: MOB_INSTANCE, room: string, tickIndex: number, socket: GameSocket) {
+		let crit = socket.isCrit;
 		let bleedTimer = setTimeout(() => {
 			if (mob.hp <= 0 || !socket.connected || !socket.alive || socket.character.room !== room) {
 				return this.clearBuff(room, mob.id, bleedBuff);
@@ -124,7 +125,8 @@ export default class TalentsController extends MasterController {
 			this.mobsRouter.getEmitter().emit(mobsConfig.SERVER_INNER.MOB_TAKE_DMG.name, {
 				mobId: mob.id, 
 				dmg,
-				cause: talentsConfig.PERKS.BLEED_DMG_CAUSE
+				cause: talentsConfig.PERKS.BLEED_DMG_CAUSE,
+				crit,
 			}, socket);
 			this.tickBleed(dmg, bleedBuff, mob, room, tickIndex + 1, socket);
 		}, talentsConfig.PERKS.BLEED_TICK_TIME * 1000 - (tickIndex === 0 ? 200 : 0)); // reducing 200 ms so all the ticks will fit in the time

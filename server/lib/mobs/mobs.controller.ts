@@ -104,7 +104,7 @@ export default class MobsController extends MasterController {
 		let mainStat = StatsServices.getMainStat(socket);
 		let baseDmg = socket.character.stats[mainStat] + socket.bonusStats[mainStat]; 
 		let bonusDmg = socket.getLoadModifier() * load * baseDmg / 100;
-		let maxDmg = baseDmg + bonusDmg;
+		let maxDmg = (baseDmg + bonusDmg) * socket.getDmgModifier();
 		let minDmg = maxDmg / 2;
 		let dmg = this.services.getDamageRange(minDmg, maxDmg);
 		return dmg;

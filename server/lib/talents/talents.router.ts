@@ -31,6 +31,7 @@ export default class TalentsRouter extends SocketioRouterBase {
     public onConnected(socket: GameSocket) {
 		socket.getMobsHit = (mobs) => this.services.getMobsHit(mobs, socket);
 		socket.getLoadModifier = () => this.services.getLoadModifier(socket);
+		socket.getDmgModifier = () => this.services.getDmgModifier(socket);
 	}
 
 	[talentsConfig.SERVER_GETS.ENTERED_ROOM.name](data, socket: GameSocket) {

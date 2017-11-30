@@ -91,12 +91,13 @@ export default class MobsRouter extends SocketioRouterBase {
 	}
 
 	[config.SERVER_INNER.MOB_TAKE_DMG.name](data, socket: GameSocket) {
-		let {mobId, cause, dmg} = data;
+		let {mobId, cause, dmg, crit} = data;
 
 		let load = socket.lastAttackLoad || 0;
 		dmg = dmg || this.controller.calculateDamage(socket, load);
 		let mob = this.controller.hurtMob(mobId, dmg, socket);
-		this.emitter.emit(config.SERVER_INNER.HURT_MOB.name, { mob, dmg, cause }, socket);
+		crit = crit === undefined ? socket.isCrit : crit;
+		this.emitter.emit(config.SERVER_INNER.HURT_MOB.name, { mob, dmg, cause, crit }, socket);
 		if (mob.hp === 0) {
 			this.controller.despawnMob(mob, socket);
 
@@ -136,13 +137,14 @@ export default class MobsRouter extends SocketioRouterBase {
 		}
 	}
 
-	[config.SERVER_INNER.HURT_MOB.name]({dmg, mob, cause}: {dmg: number, mob: MOB_INSTANCE, cause: string}, socket: GameSocket) {
+	[config.SERVER_INNER.HURT_MOB.name]({dmg, mob, cause, crit}: {dmg: number, mob: MOB_INSTANCE, cause: string, crit: boolean}, socket: GameSocket) {
 		this.io.to(socket.character.room).emit(config.CLIENT_GETS.MOB_TAKE_DMG.name, {
 			id: socket.character._id,
 			mob_id: mob.id,
 			dmg,
 			hp: mob.hp,
-			cause
+			cause,
+			crit,
 		});
 	}
 

@@ -49,5 +49,8 @@ export default {
 		CHARGE_MODIFIER_KEY: "fullyChargeBonus",
 		LIFE_STEAL_KEY: "lifeSteal",
 		MANA_STEAL_KEY: "manaSteal",
+		DMG_MODIFIER_KEY: "bonusDamage",
+		CRIT_CHANCE: "critChance",
+		CRIT_MODIFIER_KEY: "critDamageBonus",
 	}
 }

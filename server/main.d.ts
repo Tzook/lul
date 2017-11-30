@@ -107,6 +107,8 @@ interface GameSocket extends SocketIO.Socket {
     getKnownsList: (() => Iterable<string>)[] // List of getters for knowns
     getMobsHit: (mobs: string[]) => string[]
     getLoadModifier: () => number
+    getDmgModifier: () => number
+    isCrit?: boolean
 }
 
 // items
