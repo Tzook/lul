@@ -63,7 +63,7 @@ export default class MobsController extends MasterController {
         mob.threat = {
             top: "",
             map: new Map()
-        };
+		};
         mob.dmged = 0;
 
 		this.mobById.set(this.services.getMobRoomId(room, mob.id), mob);
@@ -131,11 +131,8 @@ export default class MobsController extends MasterController {
         threat += mob.threat.map.get(socket.character.name) || 0;
         mob.threat.map.set(socket.character.name, threat);
 
+		socket.threats.add(mob);
         if (!mob.threat.top || (mob.threat.top !== socket.character.name && threat > mob.threat.map.get(mob.threat.top))) {
-            if (mob.threat.top) {
-                socket.map.get(mob.threat.top).threats.delete(mob);
-            }
-            socket.threats.add(mob);
             mob.threat.top = socket.character.name;
             this.aggroChanged(mob, socket.character.room, socket.character._id);
         }
@@ -152,15 +149,18 @@ export default class MobsController extends MasterController {
     public removeThreat(mob: MOB_INSTANCE, socket: GameSocket) {
         let maxSocket: GameSocket;
         let maxThreat = 0;
-        mob.threat.map.delete(socket.character.name);
-        for (let [char, threat] of mob.threat.map) {
-            let charSocket = socket.map.get(char);
-            if (charSocket && charSocket.character.room === socket.character.room && threat > maxThreat) {
-                [maxSocket, maxThreat] = [charSocket, threat];
-            }
-        }
-        mob.threat.top = maxSocket ? maxSocket.character.name : undefined;
-        this.aggroChanged(mob, socket.character.room, maxSocket ? maxSocket.character._id : undefined)
+		mob.threat.map.delete(socket.character.name);
+		// pick a new top threat
+		if (mob.threat.top === socket.character.name) {
+			for (let [char, threat] of mob.threat.map) {
+				let charSocket = socket.map.get(char);
+				if (threat > maxThreat) {
+					[maxSocket, maxThreat] = [charSocket, threat];
+				}
+			}
+			mob.threat.top = maxSocket ? maxSocket.character.name : undefined;
+			this.aggroChanged(mob, socket.character.room, maxSocket ? maxSocket.character._id : undefined)
+		}
     }
 
 	public getHurtCharDmg(mobId: string, socket: GameSocket): number {
@@ -174,9 +174,9 @@ export default class MobsController extends MasterController {
 			mob_id: mob.id,
 		});
 		// remove mob references
-        if (mob.threat.top) {
-            socket.map.get(mob.threat.top).threats.delete(mob);
-        }
+		for (let [char,] of mob.threat.map) {
+			socket.map.get(char).threats.delete(mob);
+		}
 		mob.spawn.mobs.delete(mob.id);
 		this.mobById.delete(this.services.getMobRoomId(socket.character.room, mob.id));
 
