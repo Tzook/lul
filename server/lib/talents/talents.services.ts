@@ -133,7 +133,6 @@ export default class TalentsServices extends MasterServices {
 		if (socket.currentSpell) {
 			// send the higher value - perk or spell
 			let spellPerkValue = socket.currentSpell.perks[perk] || 0;
-			console.log("Has current spell", perk, perkValue, spellPerkValue, Math.max(spellPerkValue, perkValue));
 			perkValue = Math.max(spellPerkValue, perkValue);
 		}
 		return perkValue;
