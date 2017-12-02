@@ -129,7 +129,14 @@ export default class TalentsServices extends MasterServices {
 	public getAbilityPerkValue(perk: string, socket: GameSocket) {
 		const ability = socket.character.stats.primaryAbility;
 		const charPerks = socket.character.talents._doc[ability].perks;
-		return this.getPerkValue(perk, charPerks)
+		let perkValue = this.getPerkValue(perk, charPerks);
+		if (socket.currentSpell) {
+			// send the higher value - perk or spell
+			let spellPerkValue = socket.currentSpell.perks[perk] || 0;
+			console.log("Has current spell", perk, perkValue, spellPerkValue, Math.max(spellPerkValue, perkValue));
+			perkValue = Math.max(spellPerkValue, perkValue);
+		}
+		return perkValue;
 	}
 
 	public getBleedDmg(dmg: number): number {
@@ -175,11 +182,15 @@ export default class TalentsServices extends MasterServices {
 			});
 			
 			(talent.spells || []).forEach(spell => {
-				let spellSchema = {
+				let spellSchema: ABILITY_SPELL_MODEL = {
 					key: spell.key,
 					lvl: spell.level,
 					mp: spell.mana,
+					perks: {},
 				};
+				(spell.perks || []).forEach(perk => {
+					spellSchema.perks[perk.key] = +perk.value;
+				});
 				talentchema.spells.push(spellSchema);
 			});
 

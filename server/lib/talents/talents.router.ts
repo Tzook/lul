@@ -7,6 +7,7 @@ import statsConfig from '../stats/stats.config';
 import StatsRouter from '../stats/stats.router';
 import StatsServices from '../stats/stats.services';
 import MobsRouter from '../mobs/mobs.router';
+import mobsConfig from '../mobs/mobs.config';
 
 export default class TalentsRouter extends SocketioRouterBase {
 	protected middleware: TalentsMiddleware;
@@ -139,15 +140,21 @@ export default class TalentsRouter extends SocketioRouterBase {
 		} else if (socket.character.stats.mp.now < spell.mp) {
 			return this.sendError(data, socket, "Not enough mana to activate the spell.");
 		}
+
+		socket.currentSpell = spell;
+		
 		this.emitter.emit(statsConfig.SERVER_INNER.USE_MP.name, {
 			mp: spell.mp
 		}, socket);
-
-		target_ids;
-
+		
+		// TODO only take dmg if spell actually does dmg
+		this.emitter.emit(mobsConfig.SERVER_GETS.MOBS_TAKE_DMG.name, {mobs: target_ids}, socket);		
+		
 		this.io.to(socket.character.room).emit(talentsConfig.CLIENT_GETS.USE_SPELL.name, {
-            char_id: socket.character._id,
+			char_id: socket.character._id,
             spell_key,
-        });
+		});
+		
+		socket.currentSpell = null;
 	}
 };

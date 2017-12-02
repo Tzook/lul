@@ -109,6 +109,7 @@ interface GameSocket extends SocketIO.Socket {
     getLoadModifier: () => number
     getDmgModifier: () => number
     isCrit?: boolean
+    currentSpell?: ABILITY_SPELL_MODEL
 }
 
 // items
@@ -291,6 +292,9 @@ interface ABILITY_SPELL_MODEL {
     key: string,
     lvl: number,
     mp: number,
+    perks: {
+        [spellKey: string]: number,
+    }
 }
 
 interface TALENT_MODEL {

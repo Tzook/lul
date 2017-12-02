@@ -15,7 +15,8 @@ const ABILITY_PERK_SCHEMA = (<any>mongoose.Schema)({
 const ABILITY_SPELL_SCHEMA = (<any>mongoose.Schema)({
     key: String,
     lvl: Number,
-    mp: Number
+    mp: Number,
+    perks: mongoose.Schema.Types.Mixed
 }, {_id: false});
 
 const TALENT_SCHEMA = {
