@@ -115,18 +115,13 @@ export default class TalentsServices extends MasterServices {
 		return modifier;
 	}
 	
-	public isAbilityActivated(perk: string, socket: GameSocket) {
+	public isAbilityActivated(perk: string, socket: GameSocket): boolean {
 		const value = this.getAbilityPerkValue(perk, socket);
 		const activated = doesChanceWorkFloat(value);
-		if (activated) {
-			socket.emit(talentsConfig.CLIENT_GETS.ACTIVATED_PERK.name, {
-				key: perk,
-			});
-		}
 		return activated;
 	}
 
-	public getAbilityPerkValue(perk: string, socket: GameSocket) {
+	public getAbilityPerkValue(perk: string, socket: GameSocket): number {
 		const ability = socket.character.stats.primaryAbility;
 		const charPerks = socket.character.talents._doc[ability].perks;
 		let perkValue = this.getPerkValue(perk, charPerks);

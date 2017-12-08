@@ -72,7 +72,6 @@ export default class QuestsServices extends MasterServices {
             // check pre-quests requirements
             for (var i in (req.quests || [])) {
                 let {key, phase} = req.quests[i];
-                console.log(req.quests, req.quests[i], key, phase)
                 switch (phase) {
                     case config.REQUIREMENT_PHASE.PROGRESS:
                         if (!char.quests.progress[key]) {
