@@ -36,7 +36,7 @@ export default {
 		GAIN_ABILITY_PERK: {name: "ability_gain_perk"},
 		ACTIVATED_BUFF: {name: "buff_activated"},
 		ACTIVATED_PERK: {name: "perk_activated"},
-		USE_SPELL: {name: "actor_use_spell"},
+		USE_SPELL: {name: "spell_activated"},
 	},
 	PERKS: {
 		AOE_CHANCE: "aoeChance",

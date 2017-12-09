@@ -164,8 +164,8 @@ export default class TalentsRouter extends SocketioRouterBase {
 		// TODO only take dmg if spell actually does dmg
 		this.emitter.emit(mobsConfig.SERVER_GETS.MOBS_TAKE_DMG.name, {mobs: target_ids}, socket);		
 		
-		this.io.to(socket.character.room).emit(talentsConfig.CLIENT_GETS.USE_SPELL.name, {
-			char_id: socket.character._id,
+		socket.broadcast.to(socket.character.room).emit(talentsConfig.CLIENT_GETS.USE_SPELL.name, {
+			activator_id: socket.character._id,
             spell_key,
 		});
 		
@@ -184,6 +184,11 @@ export default class TalentsRouter extends SocketioRouterBase {
 
 		// TODO only take dmg if spell actually does dmg
 		this.emitter.emit(mobsConfig.SERVER_GETS.PLAYER_TAKE_DMG.name, data, socket);
+		
+		this.io.to(socket.character.room).emit(talentsConfig.CLIENT_GETS.USE_SPELL.name, {
+			activator_id: mob_id,
+            spell_key,
+		});
 
 		mob.currentSpell = null;
 	}
