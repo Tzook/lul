@@ -186,9 +186,30 @@ export default class TalentsController extends MasterController {
 		bleedBuff.onPerkCleared = () => clearTimeout(bleedTimer);
 	}
 
+	protected isMobInBuff(room: string, mobId: string, buff: string): boolean {
+		// TODO use a more efficient way to check buffs
+		const roomBuffs = this.roomToBuff.get(room);
+		if (roomBuffs) {
+			const mobBuffs = roomBuffs.get(mobId);
+			if (mobBuffs) {
+				for (let buffInstace of mobBuffs) {
+					if (buffInstace.perkName === buff) {
+						return true;
+					}
+				}
+			}
+		}
+		return false;
+	}
+
 	public mobStartSpellsPicker(mob: MOB_INSTANCE, room: string) {
 		const time = this.services.getMobSpellRestTime();
 		const timerId = setTimeout(() => {
+			if (this.isMobInBuff(room, mob.id, talentsConfig.PERKS.STUN_CHANCE)) {
+				setTimeout(() => this.mobStartSpellsPicker(mob, room), 5000);
+				return;
+			}
+			
 			const spellKey = this.services.getMobSpellUsed(mob);
 
 			this.io.to(room).emit(talentsConfig.CLIENT_GETS.USE_SPELL.name, {
