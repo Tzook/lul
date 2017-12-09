@@ -205,7 +205,6 @@ export default class TalentsController extends MasterController {
 				activator_id: mob.id,
 				spell_key: spellKey,
 			});
-			console.log("Activating SPELL:", mob.id, spellKey);
 
 			// recursively pick another spell
 			this.mobSpellsPickerTimer(mob, room);
