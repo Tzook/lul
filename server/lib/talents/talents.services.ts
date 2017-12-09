@@ -273,3 +273,18 @@ export default class TalentsServices extends MasterServices {
 		return result;
 	}
 };
+
+export function extendMobSchemaWithTalents(mob: any, mobSchema: MOB_MODEL): void {
+	(mob.perks || []).forEach(perk => {
+		mobSchema.perks = mobSchema.perks || {};
+		mobSchema.perks[perk.key] = +perk.value;
+	});
+
+	(mob.spells || []).forEach(spell => {
+		mobSchema.spells = mobSchema.spells || {};
+		mobSchema.spells[spell.key] = {};
+		spell.perks.forEach(perk => {
+			mobSchema.spells[spell.key][perk.key] = +perk.value;
+		});
+	});
+}

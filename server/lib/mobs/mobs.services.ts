@@ -3,10 +3,41 @@ import MasterServices from '../master/master.services';
 import * as _ from "underscore";
 import { doesChanceWork } from '../drops/drops.services';
 import config from "../mobs/mobs.config";
+import { extendMobSchemaWithTalents } from '../talents/talents.services';
 
 export default class MobsServices extends MasterServices {
 	private mobsInfo: Map<string, MOB_MODEL> = new Map();
 
+	public getMobInfo(mobId: string): MOB_MODEL {
+		// always return a copy of the mob, so it can be modified freely
+		return Object.assign({}, this.mobsInfo.get(mobId));
+	}
+
+	public getMobRoomId(room: string, mobId: string): string {
+		return `${room}-${mobId}`;
+	}
+
+	public getDamageRange(min: number, max: number): number {
+		return _.random(Math.floor(min) || 1, Math.floor(max));
+	}
+
+	public getDamageToHurt(hp: number, dmg: number): number {
+		return Math.min(hp, dmg);
+	}
+
+    public getExp(mob: MOB_INSTANCE, charDmg: number): number {
+        // we round the exp up for the character :)
+        return Math.ceil(mob.exp * (charDmg / mob.dmged));
+	}
+	
+	public didHitMob(mobLvl, myLvl): boolean {
+		const lvlDifference = myLvl - mobLvl + config.MISS_CHANCE_LVLS;
+		const chance = lvlDifference * config.MISS_CHANCE_PER_LVL;
+		return doesChanceWork(chance);
+	}
+
+    // HTTP functions
+	// =================
 	public generateMobs(mobs: any[]): Promise<any> {
 		console.log("Generating mobs from data:", mobs);
 		
@@ -35,6 +66,8 @@ export default class MobsServices extends MasterServices {
 				drops,
 			};
 
+			extendMobSchemaWithTalents(mob, mobSchema);
+
 			let mobModel = new this.Model(mobSchema);
 			mobModels.push(mobModel);
 		});
@@ -52,33 +85,5 @@ export default class MobsServices extends MasterServices {
 				console.log("got mobs");
 				return this.mobsInfo;
 			});
-	}
-
-	public getMobInfo(mobId: string): MOB_MODEL {
-		// always return a copy of the mob, so it can be modified freely
-		return Object.assign({}, this.mobsInfo.get(mobId));
-	}
-
-	public getMobRoomId(room: string, mobId: string): string {
-		return `${room}-${mobId}`;
-	}
-
-	public getDamageRange(min: number, max: number): number {
-		return _.random(Math.floor(min) || 1, Math.floor(max));
-	}
-
-	public getDamageToHurt(hp: number, dmg: number): number {
-		return Math.min(hp, dmg);
-	}
-
-    public getExp(mob: MOB_INSTANCE, charDmg: number): number {
-        // we round the exp up for the character :)
-        return Math.ceil(mob.exp * (charDmg / mob.dmged));
-	}
-	
-	public didHitMob(mobLvl, myLvl): boolean {
-		const lvlDifference = myLvl - mobLvl + config.MISS_CHANCE_LVLS;
-		const chance = lvlDifference * config.MISS_CHANCE_PER_LVL;
-		return doesChanceWork(chance);
 	}
 };

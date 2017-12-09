@@ -5,6 +5,7 @@ import * as mongoose from "mongoose";
 import TalentsServices from './talents.services';
 import { PRIORITY_CHAR } from '../character/character.model';
 import { PRIORITY_CONFIG } from '../socketio/socketio.model';
+import { PRIORITY_MOBS } from '../mobs/mobs.model';
 
 const ABILITY_PERK_SCHEMA = (<any>mongoose.Schema)({
     atLeastLvl: Number,
@@ -29,7 +30,12 @@ const CONFIG_PERK_SCHEMA = mongoose.Schema.Types.Mixed;
 
 const CHAR_TALENT_SCHEMA = mongoose.Schema.Types.Mixed;
 
-export const PRIORITY_TALENTS = PRIORITY_CHAR + PRIORITY_CONFIG + 10;
+const MOB_PERKS_SPELLS_SCHEMA = {
+    perks: mongoose.Schema.Types.Mixed,
+    spells: mongoose.Schema.Types.Mixed,
+};
+
+export const PRIORITY_TALENTS = PRIORITY_CHAR + PRIORITY_MOBS + PRIORITY_CONFIG + 10;
 
 export default class TalentsModel extends MasterModel {
     protected controller: TalentsController;
@@ -56,6 +62,8 @@ export default class TalentsModel extends MasterModel {
             [statsConfig.ABILITY_MELEE]: this.services.getEmptyCharAbility()
         };
         this.listenForFieldAddition("Character", "talents", charTalentsInitialValue);
+        
+        this.addToSchema("Mobs", MOB_PERKS_SPELLS_SCHEMA);
         
         this.addToSchema("Config", { perks: CONFIG_PERK_SCHEMA });
         

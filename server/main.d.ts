@@ -187,6 +187,10 @@ interface MOB_MODEL {
     minDmg: number,
     maxDmg: number,
     drops: DROP_MODEL[],
+    perks?: PERK_MAP,
+    spells?: {
+        [spellKey: string]: PERK_MAP
+    }
 }
 interface MOB_INSTANCE extends MOB_MODEL {
     id?: string, // a unique id for this specific mob
@@ -288,13 +292,15 @@ interface ABILITY_PERK_MODEL {
     addToPool: string[]
 }
 
+interface PERK_MAP {
+    [spellKey: string]: number
+}
+
 interface ABILITY_SPELL_MODEL {
     key: string,
     lvl: number,
     mp: number,
-    perks: {
-        [spellKey: string]: number,
-    }
+    perks: PERK_MAP
 }
 
 interface TALENT_MODEL {
