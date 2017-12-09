@@ -170,6 +170,14 @@ export default class TalentsServices extends MasterServices {
 		return value * percent | 0;
 	}
 
+	public getMobSpellRestTime(): number {
+		return _.random(6000, 15000);
+	}
+
+	public getMobSpellUsed(mob: MOB_INSTANCE): string {
+		return <any>_.sample(Object.keys(mob.spells), 1);
+	}
+
     // HTTP functions
 	// =================
     public generateTalents(talents: any[], perkCollection: any[]): Promise<any> {

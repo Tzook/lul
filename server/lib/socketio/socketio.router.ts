@@ -130,9 +130,9 @@ export default class SocketioRouter extends SocketioRouterBase {
 			for (let j in listeners) {
 				listeners[j].on(event.name, (...args) => {
 					let socket: GameSocket = args[1];
-					if (this.fitThrottle(socket, event, defaultThrottle, routerFn) && 
+					if (!socket || (this.fitThrottle(socket, event, defaultThrottle, routerFn) && 
 						this.fitBitch(socket, event) && 
-						this.fitAlive(socket, event)) {
+						this.fitAlive(socket, event))) {
                             event.log && this.log(args[0], socket, "Event was called", event.name);
 						    routerFn.apply(router, args);
 					}

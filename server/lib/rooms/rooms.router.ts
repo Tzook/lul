@@ -28,7 +28,11 @@ export default class RoomsRouter extends SocketioRouterBase {
 
     public getPublicCharInfo(char: Char) {
         return this.middleware.getPublicCharInfo(char);
-    }
+	}
+	
+	public isEmpty(room): boolean {
+		return !this.io.sockets.adapter.rooms[room];
+	}
 
 	[config.SERVER_GETS.ENTERED_ROOM.name](data, socket: GameSocket) {
 		socket.broadcast.to(socket.character.room).emit(this.CLIENT_GETS.JOIN_ROOM.name, {

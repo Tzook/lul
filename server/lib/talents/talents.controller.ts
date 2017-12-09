@@ -11,6 +11,9 @@ export default class TalentsController extends MasterController {
 	protected mobsRouter: MobsRouter;
 	// room => mob => buff instance[]
 	protected roomToBuff: Map<string, Map<string, Set<BUFF_INSTANCE>>> = new Map();
+	// room -> mob -> timer
+	protected mobsSpellsPickers: Map<string, Map<MOB_INSTANCE, NodeJS.Timer>> = new Map();
+	protected pausedSpellsPickersRooms: Set<string> = new Set();
 
 	init(files, app) {
 		this.mobsRouter = files.routers.mobs;
@@ -183,6 +186,68 @@ export default class TalentsController extends MasterController {
 			this.tickSocketBleed(dmg, bleedBuff, tickIndex + 1, socket);
 		}, talentsConfig.PERKS.BLEED_TICK_TIME * 1000 - (tickIndex === 0 ? 200 : 0)); // reducing 200 ms so all the ticks will fit in the time
 		bleedBuff.onPerkCleared = () => clearTimeout(bleedTimer);
+	}
+
+	public mobStartSpellsPicker(mob: MOB_INSTANCE, room: string, isRoomEmpty: boolean) {
+		const timerId = this.mobSpellsPickerTimer(mob, room);
+		if (isRoomEmpty) {
+			// room is empty - so we don't want the spell to actually trigger
+			clearTimeout(timerId);
+		}
+	}
+
+	public mobSpellsPickerTimer(mob: MOB_INSTANCE, room: string): NodeJS.Timer {
+		const time = this.services.getMobSpellRestTime();
+		const timerId = setTimeout(() => {
+			const spellKey = this.services.getMobSpellUsed(mob);
+
+			this.io.to(room).emit(talentsConfig.CLIENT_GETS.USE_SPELL.name, {
+				activator_id: mob.id,
+				spell_key: spellKey,
+			});
+			console.log("Activating SPELL:", mob.id, spellKey);
+
+			// recursively pick another spell
+			this.mobSpellsPickerTimer(mob, room);
+		}, time);
+
+		let roomSpellsPickers = this.mobsSpellsPickers.get(room) || this.mobsSpellsPickers.set(room, new Map()).get(room);
+
+		roomSpellsPickers.set(mob, timerId);
+		return timerId
+	}
+	
+	public mobStopSpellsPicker(mob: MOB_INSTANCE, room: string) {
+		let roomSpellsPickers = this.mobsSpellsPickers.get(room);
+		const timerId = roomSpellsPickers.get(mob);
+		clearTimeout(timerId);
+		roomSpellsPickers.delete(mob);
+		// clear room object if it has no more mobs
+		if (roomSpellsPickers.size === 0) {
+			this.mobsSpellsPickers.delete(room);
+		}
+	}
+	
+	public pauseMobsSpellsPickers(room) {
+		let roomSpellsPickers = this.mobsSpellsPickers.get(room);
+		if (roomSpellsPickers) {
+			for (let [, timerId] of roomSpellsPickers) {
+				clearTimeout(timerId);	
+			}
+			this.pausedSpellsPickersRooms.add(room);
+		}
+	}
+
+	public isMobsSpellsPickersPaused(room): boolean {
+		return this.pausedSpellsPickersRooms.has(room);
+	}
+	
+	public continueMobsSpellsPickers(room) {
+		this.pausedSpellsPickersRooms.delete(room);
+		let roomSpellsPickers = this.mobsSpellsPickers.get(room);
+		for (let [mob, ] of roomSpellsPickers) {
+			this.mobSpellsPickerTimer(mob, room);
+		}
 	}
 
 	protected getRoomBuffsInstance(room: string) {

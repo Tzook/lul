@@ -103,7 +103,7 @@ export default class MobsRouter extends SocketioRouterBase {
 		crit = crit === undefined ? socket.isCrit : crit;
 		this.emitter.emit(config.SERVER_INNER.HURT_MOB.name, { mob, dmg, cause, crit }, socket);
 		if (mob.hp === 0) {
-			this.controller.despawnMob(mob, socket);
+			this.emitter.emit(config.SERVER_INNER.MOB_DESPAWN.name, { mob }, socket);	
 
 			let max = {dmg: 0, socket: null};
 			let parties: Map<PARTY_MODEL | GameSocket, {exp: number, socket: GameSocket}> = new Map();
@@ -170,5 +170,14 @@ export default class MobsRouter extends SocketioRouterBase {
 		}
 		let dmg = this.controller.getHurtCharDmg(mob, socket);
 		this.emitter.emit(statsConfig.SERVER_INNER.TAKE_DMG.name, { dmg, mob, cause: config.DMG_CAUSE_ATK }, socket);
+	}
+	
+	[config.SERVER_INNER.MOB_SPAWNED.name](data) {
+		// do nothing :)
+	}
+	
+	[config.SERVER_INNER.MOB_DESPAWN.name](data, socket: GameSocket) {
+		let {mob} = data;
+		this.controller.despawnMob(mob, socket);
 	}
 };

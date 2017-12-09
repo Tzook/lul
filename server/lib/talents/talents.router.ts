@@ -8,6 +8,7 @@ import StatsRouter from '../stats/stats.router';
 import StatsServices from '../stats/stats.services';
 import MobsRouter from '../mobs/mobs.router';
 import mobsConfig from '../mobs/mobs.config';
+import RoomsRouter from '../rooms/rooms.router';
 
 export default class TalentsRouter extends SocketioRouterBase {
 	protected middleware: TalentsMiddleware;
@@ -15,11 +16,13 @@ export default class TalentsRouter extends SocketioRouterBase {
 	protected services: TalentsServices;
 	protected statsRouter: StatsRouter;
 	protected mobsRouter: MobsRouter;
+	protected roomsRouter: RoomsRouter;
 
 	init(files, app) {
 		this.services = files.services;
 		this.statsRouter = files.routers.stats;
 		this.mobsRouter = files.routers.mobs;
+		this.roomsRouter = files.routers.rooms;
 		super.init(files, app);
 	}
 
@@ -42,6 +45,16 @@ export default class TalentsRouter extends SocketioRouterBase {
 
 	[talentsConfig.SERVER_GETS.ENTERED_ROOM.name](data, socket: GameSocket) {
 		this.controller.notifyAboutBuffs(socket);
+		
+		if (this.controller.isMobsSpellsPickersPaused(socket.character.room)) {
+			this.controller.continueMobsSpellsPickers(socket.character.room);
+		}
+	}
+
+	[talentsConfig.SERVER_INNER.LEFT_ROOM.name](data, socket: GameSocket) {
+		if (this.roomsRouter.isEmpty(socket.character.room)) {
+			this.controller.pauseMobsSpellsPickers(socket.character.room);
+		}
 	}
 
     [talentsConfig.SERVER_INNER.GAIN_ABILITY.name] (data, socket: GameSocket) {
@@ -184,12 +197,22 @@ export default class TalentsRouter extends SocketioRouterBase {
 
 		// TODO only take dmg if spell actually does dmg
 		this.emitter.emit(mobsConfig.SERVER_GETS.PLAYER_TAKE_DMG.name, data, socket);
-		
-		this.io.to(socket.character.room).emit(talentsConfig.CLIENT_GETS.USE_SPELL.name, {
-			activator_id: mob_id,
-            spell_key,
-		});
 
 		mob.currentSpell = null;
+	}
+	
+	[talentsConfig.SERVER_INNER.MOB_SPAWNED.name](data) {
+		let {mob, room}: {mob: MOB_INSTANCE, room: string} = data;
+		if (mob.spells) {
+			const isRoomEmpty = this.roomsRouter.isEmpty(room);
+			this.controller.mobStartSpellsPicker(mob, room, isRoomEmpty);
+		}
+	}
+	
+	[talentsConfig.SERVER_INNER.MOB_DESPAWN.name](data, socket: GameSocket) {
+		let {mob} = data;
+		if (mob.spells) {
+			this.controller.mobStopSpellsPicker(mob, socket.character.room);
+		}
 	}
 };

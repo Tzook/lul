@@ -5,11 +5,18 @@ import * as _ from 'underscore';
 import StatsServices from '../stats/stats.services';
 import config from '../mobs/mobs.config';
 import statsConfig from '../stats/stats.config';
+import MobsRouter from './mobs.router';
 
 export default class MobsController extends MasterController {
 	protected services: MobsServices;
+	protected router: MobsRouter;
 	private roomsMobs: Map<string, ROOM_MOBS> = new Map();
 	private mobById: Map<string, MOB_INSTANCE> = new Map();
+
+	init(files, app) {
+        this.router = files.router;
+		super.init(files, app);
+	}
 
 	// Socket functions
 	// =================
@@ -46,11 +53,12 @@ export default class MobsController extends MasterController {
 			let mob = this.spawnMob(spawnInfo, room);
 			mob.spawn = spawnInfo; // useful for when we delete the mob
 			mobsInSpawn.set(mob.id, mob);
-
+			
 			if (mobsToSpawn > 1) {
 				// we still have a mob to spawn - set an interval
 				this.setRespawnTimer(mob, room);
 			}
+			this.router.getEmitter().emit(config.SERVER_INNER.MOB_SPAWNED.name, { mob, room });			
 		}
 	}
 
@@ -139,7 +147,6 @@ export default class MobsController extends MasterController {
     }
 
     private aggroChanged(mob: MOB_INSTANCE, room: string, id) {
-        console.log("Changing aggro", mob.id);
 		this.io.to(room).emit(config.CLIENT_GETS.AGGRO.name, {
 			id,
             mob_id: mob.id,
