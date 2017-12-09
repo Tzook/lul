@@ -163,8 +163,7 @@ export default class MobsController extends MasterController {
 		}
     }
 
-	public getHurtCharDmg(mobId: string, socket: GameSocket): number {
-		let mob = this.getMob(mobId, socket);
+	public getHurtCharDmg(mob: MOB_INSTANCE, socket: GameSocket): number {
 		let dmg = this.services.getDamageRange(mob.minDmg, mob.maxDmg);
 		return dmg;
 	}

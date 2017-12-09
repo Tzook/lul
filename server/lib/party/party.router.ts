@@ -4,6 +4,7 @@ import PartyController from './party.controller';
 import PartyMiddleware from './party.middleware';
 import partyConfig from '../party/party.config';
 import knownsConfig from '../knowns/knowns.config';
+import statsConfig from '../stats/stats.config';
 
 export default class PartyRouter extends SocketioRouterBase {
     protected controller: PartyController;
@@ -86,7 +87,17 @@ export default class PartyRouter extends SocketioRouterBase {
             return this.sendError(data, socket, "Cannot kick - character not in party", true, true);
         }
         this.controller.kickFromParty(socket, data.char_name, party);
-	}
+    }
+
+    [partyConfig.SERVER_INNER.TOOK_DMG.name] (data, socket: GameSocket) {
+        const party = this.getCharParty(socket);
+        if (party) {
+            this.io.to(party.name).emit(statsConfig.CLIENT_GETS.TAKE_DMG.name, {
+                name: socket.character.name,
+                hp: socket.character.stats.hp.now
+            });
+        }
+    }
 
     public onConnected(socket: GameSocket) {
         // wait 2 ticks - one tick so the user gets his known list and then 2nd tick to tell him about his party members

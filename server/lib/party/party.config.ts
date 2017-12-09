@@ -1,4 +1,9 @@
+import statsConfig from '../stats/stats.config';
+
 export default {
+	SERVER_INNER: {
+		TOOK_DMG: Object.assign({}, statsConfig.SERVER_INNER.TOOK_DMG),		
+	},
 	"SERVER_GETS": {
         "CREATE_PARTY": {"name": "create_party", "log": true},
         "INVITE_TO_PARTY": {"name": "invite_to_party", "log": true},

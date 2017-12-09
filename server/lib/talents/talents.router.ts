@@ -55,6 +55,10 @@ export default class TalentsRouter extends SocketioRouterBase {
 		this.controller.applySelfPerks(dmg, socket);
 	}
 	
+    [talentsConfig.SERVER_INNER.TOOK_DMG.name] (data, socket: GameSocket) {
+        // let dmg, mob = {data};
+    }
+	
 	[talentsConfig.SERVER_INNER.GAIN_ABILITY_EXP.name]({exp}: {exp: number}, socket: GameSocket) {
 		const ability = socket.character.stats.primaryAbility;
 		const talent = socket.character.talents._doc[ability];

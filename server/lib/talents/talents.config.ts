@@ -16,6 +16,7 @@ export default {
 	"SERVER_INNER": {
 		GAIN_ABILITY: Object.assign({}, statsConfig.SERVER_INNER.GAIN_ABILITY),
 		HURT_MOB: Object.assign({}, mobsConfig.SERVER_INNER.HURT_MOB),
+		TOOK_DMG: Object.assign({}, statsConfig.SERVER_INNER.TOOK_DMG),		
 		GAIN_ABILITY_EXP: {name: "gain_ability_exp", alive: true, log: true},
 		GAIN_ABILITY_LVL: {name: "gain_ability_lvl", alive: true, log: true},
 		GENERATE_PERK_POOL: {name: "generate_perk_pool", alive: true},

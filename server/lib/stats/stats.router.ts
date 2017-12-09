@@ -56,18 +56,8 @@ export default class StatsRouter extends SocketioRouterBase {
         let hpAfterDmg = this.services.getHpAfterDamage(socket.character.stats.hp.now, dmg);
         let hadFullHp = socket.character.stats.hp.now === socket.maxHp;
         socket.character.stats.hp.now = hpAfterDmg;
-		this.io.to(socket.character.room).emit(config.CLIENT_GETS.TAKE_DMG.name, {
-			id: socket.character._id,
-			dmg,
-			hp: socket.character.stats.hp.now
-        });
-        const party = this.partyRouter.getCharParty(socket);
-        if (party) {
-            this.io.to(party.name).emit(config.CLIENT_GETS.TAKE_DMG.name, {
-                name: socket.character.name,
-                hp: socket.character.stats.hp.now
-            });
-        }
+        
+        this.emitter.emit(config.SERVER_INNER.TOOK_DMG.name, data, socket);
 
         if (!socket.alive) {
             this.log({}, socket, "character is ded");
@@ -77,6 +67,15 @@ export default class StatsRouter extends SocketioRouterBase {
         } else {
             hadFullHp && this.regenHpInterval(socket);
         }
+    }
+
+    [config.SERVER_INNER.TOOK_DMG.name] (data, socket: GameSocket) {
+        let {dmg} = data;
+		this.io.to(socket.character.room).emit(config.CLIENT_GETS.TAKE_DMG.name, {
+			id: socket.character._id,
+			dmg,
+			hp: socket.character.stats.hp.now
+        });
     }
 
     [config.SERVER_INNER.USE_MP.name] (data, socket: GameSocket) {
