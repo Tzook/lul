@@ -17,13 +17,12 @@ export default {
 	"SERVER_INNER": {
 		GAIN_ABILITY: Object.assign({}, statsConfig.SERVER_INNER.GAIN_ABILITY),
 		HURT_MOB: Object.assign({}, mobsConfig.SERVER_INNER.HURT_MOB),
-		MOB_SPAWNED: Object.assign({}, mobsConfig.SERVER_INNER.MOB_SPAWNED),
+		MOB_AGGRO_CHANGED: Object.assign({}, mobsConfig.SERVER_INNER.MOB_AGGRO_CHANGED),
 		MOB_DESPAWN: Object.assign({}, mobsConfig.SERVER_INNER.MOB_DESPAWN),
 		TOOK_DMG: Object.assign({}, statsConfig.SERVER_INNER.TOOK_DMG),		
 		GAIN_ABILITY_EXP: {name: "gain_ability_exp", alive: true, log: true},
 		GAIN_ABILITY_LVL: {name: "gain_ability_lvl", alive: true, log: true},
 		GENERATE_PERK_POOL: {name: "generate_perk_pool", alive: true},
-		LEFT_ROOM: Object.assign({}, roomsConfig.SERVER_INNER.LEFT_ROOM),
 	},
 	"SERVER_GETS": {
 		DISCONNECT: Object.assign({}, socketioConfig.SERVER_GETS.DISCONNECT),

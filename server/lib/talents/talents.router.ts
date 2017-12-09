@@ -45,16 +45,6 @@ export default class TalentsRouter extends SocketioRouterBase {
 
 	[talentsConfig.SERVER_GETS.ENTERED_ROOM.name](data, socket: GameSocket) {
 		this.controller.notifyAboutBuffs(socket);
-		
-		if (this.controller.isMobsSpellsPickersPaused(socket.character.room)) {
-			this.controller.continueMobsSpellsPickers(socket.character.room);
-		}
-	}
-
-	[talentsConfig.SERVER_INNER.LEFT_ROOM.name](data, socket: GameSocket) {
-		if (this.roomsRouter.isEmpty(socket.character.room)) {
-			this.controller.pauseMobsSpellsPickers(socket.character.room);
-		}
 	}
 
     [talentsConfig.SERVER_INNER.GAIN_ABILITY.name] (data, socket: GameSocket) {
@@ -201,12 +191,15 @@ export default class TalentsRouter extends SocketioRouterBase {
 		mob.currentSpell = null;
 	}
 	
-	[talentsConfig.SERVER_INNER.MOB_SPAWNED.name](data) {
-		let {mob, room}: {mob: MOB_INSTANCE, room: string} = data;
+	[talentsConfig.SERVER_INNER.MOB_AGGRO_CHANGED.name](data) {
+		let {id, mob, room}: {mob: MOB_INSTANCE, room: string, id?: string} = data;	
 		if (mob.spells) {
-			const isRoomEmpty = this.roomsRouter.isEmpty(room);
-			this.controller.mobStartSpellsPicker(mob, room, isRoomEmpty);
-		}
+			if (!id) {
+				this.controller.mobStopSpellsPicker(mob, room);
+			} else if (!this.controller.hasMobSpellsPicker(mob)) {
+				this.controller.mobStartSpellsPicker(mob, room);
+			}
+		}		
 	}
 	
 	[talentsConfig.SERVER_INNER.MOB_DESPAWN.name](data, socket: GameSocket) {

@@ -172,8 +172,12 @@ export default class MobsRouter extends SocketioRouterBase {
 		this.emitter.emit(statsConfig.SERVER_INNER.TAKE_DMG.name, { dmg, mob, cause: config.DMG_CAUSE_ATK }, socket);
 	}
 	
-	[config.SERVER_INNER.MOB_SPAWNED.name](data) {
-		// do nothing :)
+	[config.SERVER_INNER.MOB_AGGRO_CHANGED.name](data) {
+		let {room, id, mob} = data;			
+		this.io.to(room).emit(config.CLIENT_GETS.AGGRO.name, {
+			id,
+            mob_id: mob.id,
+		});
 	}
 	
 	[config.SERVER_INNER.MOB_DESPAWN.name](data, socket: GameSocket) {

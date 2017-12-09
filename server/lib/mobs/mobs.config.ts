@@ -14,8 +14,8 @@ export default {
 		"MOB_TAKE_DMG": {"name": "mob_took_dmg"},
         "HURT_MOB": {"name": "hurt_mob"},
         "MISS_MOB": {"name": "miss_mob"},
-        "MOB_SPAWNED": {"name": "mob_spawned"},
-        "MOB_DESPAWN": {"name": "mob_despawn"},
+		"MOB_DESPAWN": {"name": "mob_despawn"},
+		"MOB_AGGRO_CHANGED": {"name": "mob_aggro_changed"},
     },
 	"SERVER_GETS": {
 		"ENTERED_ROOM": {"name": "entered_room"},

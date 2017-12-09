@@ -58,7 +58,6 @@ export default class MobsController extends MasterController {
 				// we still have a mob to spawn - set an interval
 				this.setRespawnTimer(mob, room);
 			}
-			this.router.getEmitter().emit(config.SERVER_INNER.MOB_SPAWNED.name, { mob, room });			
 		}
 	}
 
@@ -141,16 +140,17 @@ export default class MobsController extends MasterController {
 
 		socket.threats.add(mob);
         if (!mob.threat.top || (mob.threat.top !== socket.character.name && threat > mob.threat.map.get(mob.threat.top))) {
-            mob.threat.top = socket.character.name;
+			mob.threat.top = socket.character.name;
             this.aggroChanged(mob, socket.character.room, socket.character._id);
         }
     }
-
-    private aggroChanged(mob: MOB_INSTANCE, room: string, id) {
-		this.io.to(room).emit(config.CLIENT_GETS.AGGRO.name, {
+	
+    private aggroChanged(mob: MOB_INSTANCE, room: string, id?: string) {
+		this.router.getEmitter().emit(config.SERVER_INNER.MOB_AGGRO_CHANGED.name, { 
+			mob, 
+			room, 
 			id,
-            mob_id: mob.id,
-		});
+		});	
     }
 
     public removeThreat(mob: MOB_INSTANCE, socket: GameSocket) {
