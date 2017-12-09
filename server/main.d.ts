@@ -204,6 +204,7 @@ interface MOB_INSTANCE extends MOB_MODEL {
     }
     dmged?: number
     spawn?: SPAWN_INSTANCE,
+    currentSpell?: PERK_MAP
 }
 interface ROOM_MOBS {
     spawns: SPAWN_INSTANCE[],

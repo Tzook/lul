@@ -171,4 +171,20 @@ export default class TalentsRouter extends SocketioRouterBase {
 		
 		socket.currentSpell = null;
 	}
+
+	[talentsConfig.SERVER_GETS.MOB_USE_SPELL.name](data, socket: GameSocket) {
+		let {mob_id, spell_key} = data;
+		let mob = this.mobsRouter.getMob(mob_id, socket);
+		if (!mob) {
+			return this.sendError(data, socket, "Mob doesn't exist!");
+		} else if (!(mob.spells || {})[spell_key]) {
+			return this.sendError(data, socket, "Mob doesn't have that spell!");
+		}
+		mob.currentSpell = mob.spells[spell_key];
+
+		// TODO only take dmg if spell actually does dmg
+		this.emitter.emit(mobsConfig.SERVER_GETS.PLAYER_TAKE_DMG.name, data, socket);
+
+		mob.currentSpell = null;
+	}
 };

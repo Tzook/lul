@@ -70,10 +70,11 @@ export default class StatsRouter extends SocketioRouterBase {
     }
 
     [config.SERVER_INNER.TOOK_DMG.name] (data, socket: GameSocket) {
-        let {dmg} = data;
+        let {dmg, cause} = data;
 		this.io.to(socket.character.room).emit(config.CLIENT_GETS.TAKE_DMG.name, {
 			id: socket.character._id,
-			dmg,
+            dmg,
+            cause,
 			hp: socket.character.stats.hp.now
         });
     }

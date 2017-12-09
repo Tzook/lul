@@ -142,7 +142,11 @@ export default class TalentsServices extends MasterServices {
 	public getMobPerkValue(perk: string, mob: MOB_INSTANCE): number {
 		let perkValue = this.getPerkValue(perk, mob.perks || {});
 		
-		// TODO spells
+		if (mob.currentSpell) {
+			// send the higher value - perk or spell
+			let spellPerkValue = mob.currentSpell[perk] || 0;
+			perkValue = Math.max(spellPerkValue, perkValue);
+		}
 		
 		return perkValue;
 	}

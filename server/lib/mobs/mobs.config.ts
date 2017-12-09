@@ -32,4 +32,6 @@ export default {
 	"MEELE_THREAT": 1.2,
 	MISS_CHANCE_PER_LVL: 20,
 	MISS_CHANCE_LVLS: 5,
+	DMG_CAUSE_ATK: "attack",
+	DMG_CAUSE_AOE: "aoe",
 }

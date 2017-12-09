@@ -41,6 +41,10 @@ export default class MobsRouter extends SocketioRouterBase {
 	public hasMob(mobId: string, socket: GameSocket): boolean {
 		return this.controller.hasMob(mobId, socket);
 	}
+	
+	public getMob(mobId: string, socket: GameSocket): MOB_INSTANCE|undefined {
+		return this.controller.getMob(mobId, socket);
+	}
 
 	[config.SERVER_GETS.ENTERED_ROOM.name](data, socket: GameSocket) {
 		if (!this.controller.hasRoom(socket.character.room)) {
@@ -66,7 +70,7 @@ export default class MobsRouter extends SocketioRouterBase {
 	[config.SERVER_GETS.MOBS_TAKE_DMG.name](data, socket: GameSocket) {
 		const mobsInArea = data.mobs || [];
 		const mobsHit = socket.getMobsHit(mobsInArea);
-		let cause = "attack";
+		let cause = config.DMG_CAUSE_ATK;
 		for (let i = 0; i < mobsHit.length; i++) {
 			let mobHitData = {mobId: mobsHit[i], cause};
 
@@ -77,7 +81,7 @@ export default class MobsRouter extends SocketioRouterBase {
 			} else {
 				this.emitter.emit(config.SERVER_INNER.MISS_MOB.name, mobHitData, socket);
 			}
-			cause = "aoe";
+			cause = config.DMG_CAUSE_AOE;
 		}
 	}
 
@@ -165,6 +169,6 @@ export default class MobsRouter extends SocketioRouterBase {
 			return this.sendError(data, socket, "Mob doesn't exist!");
 		}
 		let dmg = this.controller.getHurtCharDmg(mob, socket);
-		this.emitter.emit(statsConfig.SERVER_INNER.TAKE_DMG.name, { dmg, mob }, socket);
+		this.emitter.emit(statsConfig.SERVER_INNER.TAKE_DMG.name, { dmg, mob, cause: config.DMG_CAUSE_ATK }, socket);
 	}
 };
