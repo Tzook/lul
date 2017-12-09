@@ -48,7 +48,7 @@ export default class TalentsServices extends MasterServices {
 		return pool;
 	}
 	
-	protected filterPool(pool: string[], charPerks: CHAR_ABILITY_PERKS): string[] {
+	protected filterPool(pool: string[], charPerks: PERK_MAP): string[] {
 		let newPool = [];
 		pool.forEach(perk => {
 			const perkConfig = this.getPerkConfig(perk);
@@ -61,7 +61,7 @@ export default class TalentsServices extends MasterServices {
 		return newPool;
 	}
 
-	public getPerkValue(perk: string, charPerks: CHAR_ABILITY_PERKS) {
+	public getPerkValue(perk: string, charPerks: PERK_MAP) {
 		const perkConfig = this.getPerkConfig(perk);
 		const perkPoints = charPerks[perk] || 0;
 
@@ -120,7 +120,7 @@ export default class TalentsServices extends MasterServices {
 		const activated = doesChanceWorkFloat(value);
 		return activated;
 	}
-
+	
 	public getAbilityPerkValue(perk: string, socket: GameSocket): number {
 		const ability = socket.character.stats.primaryAbility;
 		const charPerks = socket.character.talents._doc[ability].perks;
@@ -130,6 +130,20 @@ export default class TalentsServices extends MasterServices {
 			let spellPerkValue = socket.currentSpell.perks[perk] || 0;
 			perkValue = Math.max(spellPerkValue, perkValue);
 		}
+		return perkValue;
+	}
+
+	public isMobPerkActivated(perk: string, mob: MOB_INSTANCE): boolean {
+		const value = this.getMobPerkValue(perk, mob);
+		const activated = doesChanceWorkFloat(value);
+		return activated;
+	}
+
+	public getMobPerkValue(perk: string, mob: MOB_INSTANCE): number {
+		let perkValue = this.getPerkValue(perk, mob.perks || {});
+		
+		// TODO spells
+		
 		return perkValue;
 	}
 

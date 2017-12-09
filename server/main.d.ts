@@ -110,6 +110,7 @@ interface GameSocket extends SocketIO.Socket {
     getDmgModifier: () => number
     isCrit?: boolean
     currentSpell?: ABILITY_SPELL_MODEL
+    buffs: Set<BUFF_INSTANCE>
 }
 
 // items
@@ -293,7 +294,7 @@ interface ABILITY_PERK_MODEL {
 }
 
 interface PERK_MAP {
-    [spellKey: string]: number
+    [perkKey: string]: number
 }
 
 interface ABILITY_SPELL_MODEL {
@@ -315,16 +316,12 @@ interface PERK_CONFIG {
 	default?: number, 
 }
 
-interface CHAR_ABILITY_PERKS {
-    [perk: string]: number
-}
-
 interface CHAR_ABILITY_TALENT {
     lvl: number,
     exp: number,
     points: number, // available points to lvl
     pool: string[], 
-    perks: CHAR_ABILITY_PERKS // the chosen points
+    perks: PERK_MAP // the chosen points
 }
 
 interface BUFF_INSTANCE {

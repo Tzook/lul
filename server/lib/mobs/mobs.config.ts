@@ -19,7 +19,7 @@ export default {
 		"ENTERED_ROOM": {"name": "entered_room"},
 		"MOBS_TAKE_DMG": {"name": "mobs_took_dmg", "alive": true, log: true},
 		"MOBS_MOVE": {"name": "mobs_moved", "throttle": 0, "bitch": true},
-		"TAKE_DMG": {"name": "took_dmg", "alive": true}
+		"PLAYER_TAKE_DMG": {"name": "took_dmg", "alive": true, log: true}
 	},
 	"CLIENT_GETS": {
 		"MOB_SPAWN": {"name": "mob_spawn"},

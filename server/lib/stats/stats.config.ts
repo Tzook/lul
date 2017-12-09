@@ -6,7 +6,7 @@ const CONFIG = {
 		"GAIN_MP": {"name": "gain_mp", "alive": true, "log": true},
 		"GAIN_STATS": {"name": "gain_stats", "alive": true, "log": true},
 		"GAIN_ABILITY": {"name": "gain_ability", "alive": true, "log": true},
-		"TAKE_DMG": {"name": "take_dmg", "alive": true, "log": true},
+		"TAKE_DMG": {"name": "take_dmg", "alive": true},
 		"TOOK_DMG": {"name": "took_actual_dmg"},
 		"USE_MP": {"name": "use_mp", "alive": true, "log": true},
 		"STATS_ADD": {"name": "stats_add", "alive": true},

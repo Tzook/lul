@@ -1,6 +1,7 @@
 import statsConfig from '../stats/stats.config';
 import roomsConfig from '../rooms/rooms.config';
 import mobsConfig from '../mobs/mobs.config';
+import socketioConfig from '../socketio/socketio.config';
 
 export default {
 	"ROUTES": {
@@ -22,6 +23,7 @@ export default {
 		GENERATE_PERK_POOL: {name: "generate_perk_pool", alive: true},
 	},
 	"SERVER_GETS": {
+		DISCONNECT: Object.assign({}, socketioConfig.SERVER_GETS.DISCONNECT),
 		ENTERED_ROOM: Object.assign({}, roomsConfig.SERVER_GETS.ENTERED_ROOM),
 		CHOOSE_ABILITY_PERK: {name: "choose_perk", alive: true, log: true},
 		USE_SPELL: {name: "used_spell", alive: true, log: true},

@@ -33,6 +33,11 @@ export default class TalentsRouter extends SocketioRouterBase {
 		socket.getMobsHit = (mobs) => this.services.getMobsHit(mobs, socket);
 		socket.getLoadModifier = () => this.services.getLoadModifier(socket);
 		socket.getDmgModifier = () => this.services.getDmgModifier(socket);
+		socket.buffs = new Set();
+	}
+	
+	[talentsConfig.SERVER_GETS.DISCONNECT.name](data, socket: GameSocket) {
+		this.controller.clearSocketBuffs(socket);		
 	}
 
 	[talentsConfig.SERVER_GETS.ENTERED_ROOM.name](data, socket: GameSocket) {
@@ -56,7 +61,12 @@ export default class TalentsRouter extends SocketioRouterBase {
 	}
 	
     [talentsConfig.SERVER_INNER.TOOK_DMG.name] (data, socket: GameSocket) {
-        // let dmg, mob = {data};
+		let {dmg, mob, cause} = data;
+		if (!socket.alive) {
+			this.controller.clearSocketBuffs(socket);
+		} else if (cause !== talentsConfig.PERKS.BLEED_DMG_CAUSE) {
+			this.controller.applyMobHurtPerks(dmg, mob, socket);
+		}
     }
 	
 	[talentsConfig.SERVER_INNER.GAIN_ABILITY_EXP.name]({exp}: {exp: number}, socket: GameSocket) {
