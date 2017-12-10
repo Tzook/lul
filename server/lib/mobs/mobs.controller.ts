@@ -4,7 +4,6 @@ import MobsServices from './mobs.services';
 import * as _ from 'underscore';
 import StatsServices from '../stats/stats.services';
 import config from '../mobs/mobs.config';
-import statsConfig from '../stats/stats.config';
 import MobsRouter from './mobs.router';
 
 export default class MobsController extends MasterController {
@@ -132,9 +131,7 @@ export default class MobsController extends MasterController {
 	}
 
     private addThreat(mob: MOB_INSTANCE, threat: number, socket: GameSocket) {
-        if (socket.character.stats.primaryAbility === statsConfig.ABILITY_MELEE) {
-            threat *= config.MEELE_THREAT;
-        }
+		threat *= socket.threatModifier();
         threat += mob.threat.map.get(socket.character.name) || 0;
         mob.threat.map.set(socket.character.name, threat);
 
@@ -172,6 +169,11 @@ export default class MobsController extends MasterController {
 
 	public getHurtCharDmg(mob: MOB_INSTANCE, socket: GameSocket): number {
 		let dmg = this.services.getDamageRange(mob.minDmg, mob.maxDmg);
+		console.log("DMG Before:", dmg);
+		dmg *= socket.getDefenceModifier();
+		console.log("DMG Mid:", dmg);
+		dmg = Math.ceil(dmg); // make sure we are always rounded
+		console.log("DMG After:", dmg);
 		return dmg;
 	}
 

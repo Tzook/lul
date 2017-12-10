@@ -169,7 +169,11 @@ export default class MobsRouter extends SocketioRouterBase {
 			return this.sendError(data, socket, "Mob doesn't exist!");
 		}
 		let dmg = this.controller.getHurtCharDmg(mob, socket);
-		this.emitter.emit(statsConfig.SERVER_INNER.TAKE_DMG.name, { dmg, mob, cause: config.DMG_CAUSE_ATK }, socket);
+		if (dmg === 0) {
+			socket.emit(config.CLIENT_GETS.ATTACK_BLOCK.name, { id: socket.character._id });
+		} else {
+			this.emitter.emit(statsConfig.SERVER_INNER.TAKE_DMG.name, { dmg, mob, cause: config.DMG_CAUSE_ATK }, socket);
+		}
 	}
 	
 	[config.SERVER_INNER.MOB_AGGRO_CHANGED.name](data) {

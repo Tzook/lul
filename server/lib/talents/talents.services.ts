@@ -114,6 +114,21 @@ export default class TalentsServices extends MasterServices {
 		socket.isCrit = critActivated;
 		return modifier;
 	}
+
+	public getThreatModifier(socket: GameSocket): number {
+		const threatModifier = this.getAbilityPerkValue(talentsConfig.PERKS.THREAT_MODIFIER_KEY, socket);
+		return 1 + threatModifier;
+	}
+
+	public getDefenceModifier(socket: GameSocket): number {
+		const isBlock = this.isAbilityActivated(talentsConfig.PERKS.BLOCK_CHANCE, socket);
+		let defenceModifier = 0; // complete block
+		if (!isBlock) {
+			let dmgReduction = this.getAbilityPerkValue(talentsConfig.PERKS.DAMAGE_REDUCTION, socket);
+			defenceModifier = 1 - dmgReduction;
+		}
+		return defenceModifier;
+	}
 	
 	public isAbilityActivated(perk: string, socket: GameSocket): boolean {
 		const value = this.getAbilityPerkValue(perk, socket);

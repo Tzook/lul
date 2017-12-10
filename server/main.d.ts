@@ -108,6 +108,8 @@ interface GameSocket extends SocketIO.Socket {
     getMobsHit: (mobs: string[]) => string[]
     getLoadModifier: () => number
     getDmgModifier: () => number
+    threatModifier: () => number
+    getDefenceModifier: () => number
     isCrit?: boolean
     currentSpell?: ABILITY_SPELL_MODEL
     buffs: Set<BUFF_INSTANCE>

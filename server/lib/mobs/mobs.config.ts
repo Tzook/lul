@@ -29,9 +29,9 @@ export default {
 		"MOB_TAKE_DMG": {"name": "mob_take_dmg"},
 		"MOB_TAKE_MISS": {"name": "mob_take_miss"},
 		"MOB_MOVE": {"name": "mob_move"},
-		"AGGRO": {"name": "aggro"}
+		"AGGRO": {"name": "aggro"},
+		"ATTACK_BLOCK": {"name": "actor_blocked"},
 	},
-	"MEELE_THREAT": 1.2,
 	MISS_CHANCE_PER_LVL: 20,
 	MISS_CHANCE_LVLS: 5,
 	DMG_CAUSE_ATK: "attack",
