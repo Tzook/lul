@@ -169,11 +169,8 @@ export default class MobsController extends MasterController {
 
 	public getHurtCharDmg(mob: MOB_INSTANCE, socket: GameSocket): number {
 		let dmg = this.services.getDamageRange(mob.minDmg, mob.maxDmg);
-		console.log("DMG Before:", dmg);
 		dmg *= socket.getDefenceModifier();
-		console.log("DMG Mid:", dmg);
 		dmg = Math.ceil(dmg); // make sure we are always rounded
-		console.log("DMG After:", dmg);
 		return dmg;
 	}
 

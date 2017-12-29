@@ -124,9 +124,11 @@ export default class RoomsRouter extends SocketioRouterBase {
 	}
 
     public onConnected(socket: GameSocket) {
-        socket.emit(this.CLIENT_GETS.MOVE_ROOM.name, {
-			room: socket.character.room,
-			character: socket.character,
+		process.nextTick(() => {
+			socket.emit(this.CLIENT_GETS.MOVE_ROOM.name, {
+				room: socket.character.room,
+				character: socket.character,
+			});
 		});
-    }
+	}
 };

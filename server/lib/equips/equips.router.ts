@@ -6,10 +6,12 @@ import EquipsController from './equips.controller';
 import config from '../equips/equips.config';
 import dropsConfig from '../drops/drops.config';
 import statsConfig from '../stats/stats.config';
+import EquipsServices from './equips.services';
 
 export default class EquipsRouter extends SocketioRouterBase {
 	protected controller: EquipsController;
 	protected middleware: EquipsMiddleware;
+	protected services: EquipsServices;
 	protected mongoose;
 	protected itemsRouter: ItemsRouter;
 	
@@ -17,12 +19,17 @@ export default class EquipsRouter extends SocketioRouterBase {
 		super.init(files, app);
 		this.mongoose = files.model.mongoose;
 		this.itemsRouter = files.routers.items;
+		this.services = files.services;
 	}
 
 	protected initRoutes(app) {
 		app.post(this.ROUTES.BEGIN,
 			this.middleware.validateHasSercetKey.bind(this.middleware),
 			this.controller.beginEquips.bind(this.controller));
+	}
+
+	public onConnected(socket: GameSocket) {
+		this.services.clearInvalidEquips(socket);
 	}
 
 	[config.SERVER_GETS.EQUIP_ITEM.name](data, socket: GameSocket) {

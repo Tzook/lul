@@ -3,11 +3,13 @@ import MasterServices from '../master/master.services';
 import ItemsRouter from '../items/items.router';
 import EquipsMiddleware from './equips.middleware';
 import SocketioRouter from '../socketio/socketio.router';
+import { EQUIPS_SCHEMA } from './equips.model';
 
 export default class EquipsServices extends MasterServices {
     protected itemsRouter: ItemsRouter;
     protected middleware: EquipsMiddleware;
     protected socketioRouter: SocketioRouter;
+
 	init(files, app) {
 		super.init(files, app);
         this.middleware = files.middleware;
@@ -41,5 +43,19 @@ export default class EquipsServices extends MasterServices {
                 config.beginEquips = equips;
                 return config.save();
             });
+    }
+    
+	public clearInvalidEquips(socket: GameSocket) {
+		let equips = socket.character.equips;
+		for (let type in EQUIPS_SCHEMA) {
+			let equip = equips[type];
+			if (this.middleware.isItem(equip) && !this.itemsRouter.getItemInfo(equip.key)) {
+				this.deleteEquip(socket, type);
+			}	
+		}
 	}
+
+    public deleteEquip(socket: GameSocket, slot: string) {
+        socket.character.equips[slot] = {};
+    }
 };

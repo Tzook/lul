@@ -99,11 +99,15 @@ export default class QuestsRouter extends SocketioRouterBase {
 			// reward items
 			_.forEach((questInfo.reward || {}).items, item => {
 				let instance = this.itemsRouter.getItemInstance(item.key);
-				if (item.stack > 0) {
-					instance.stack = item.stack;
+				if (instance) {
+					if (item.stack > 0) {
+						instance.stack = item.stack;
+					}
+					let itemSlots = slots[item.key];
+					this.emitter.emit(itemsConfig.SERVER_INNER.ITEM_ADD.name, { slots: itemSlots, item: instance }, socket);
+				} else {
+					this.sendError({key: item.key}, socket, "No item info! cannot reward item.");
 				}
-				let itemSlots = slots[item.key];
-				this.emitter.emit(itemsConfig.SERVER_INNER.ITEM_ADD.name, { slots: itemSlots, item: instance }, socket);
 			});
 		}
 	}

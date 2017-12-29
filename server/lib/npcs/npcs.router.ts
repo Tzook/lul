@@ -47,6 +47,9 @@ export default class NpcsRouter extends SocketioRouterBase {
             return this.sendError(data, socket, "The npc does not sell the item you want.");
         }
         let itemInfo = this.itemsRouter.getItemInfo(npcInfo.sell[index].key);
+        if (!itemInfo) {
+            return this.sendError(data, socket, "No item info! cannot buy item.");
+        }
         let goldValue = itemInfo.gold * stack;
         if (goldValue > socket.character.gold) {
             return this.sendError(data, socket, "Not enough money to buy the item.");

@@ -3,9 +3,16 @@ import MasterServices from '../master/master.services';
 import { REQUIRE_SCHEMA } from "./items.model";
 import * as _ from 'underscore';
 import { BASE_STATS_SCHEMA } from "../stats/stats.model";
+import ItemsMiddleware from './items.middleware';
 
 export default class ItemsServices extends MasterServices {
 	private itemsInfo: Map<string, ITEM_MODEL> = new Map();
+	protected middleware: ItemsMiddleware;
+	
+	init(files, app) {
+		this.middleware = files.middleware;
+		super.init(files, app);
+	}
 
     public generateItems(items: any[]): Promise<any> {
 		console.log("Generating items from data:", items);
@@ -75,5 +82,19 @@ export default class ItemsServices extends MasterServices {
 			}
 		}
 		return instance
+	}
+
+	public clearInvalidItems(socket: GameSocket) {
+		let items = socket.character.items;
+		for (let i = 0; i < items.length; i++) {
+			let item = items[i];
+			if (this.middleware.isItem(item) && !this.getItemInfo(item.key)) {
+				this.deleteItem(socket, i);
+			}	
+		}
+	}
+
+	public deleteItem(socket: GameSocket, slot: number) {
+		socket.character.items.set(slot, {});
 	}
 };

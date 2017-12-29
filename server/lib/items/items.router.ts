@@ -21,6 +21,10 @@ export default class ItemsRouter extends SocketioRouterBase {
 			this.controller.generateItems.bind(this.controller));
 	}
 
+	public onConnected(socket: GameSocket) {
+		this.services.clearInvalidItems(socket);
+	}
+
 	public getItemInfo(key: string): ITEM_MODEL|undefined {
 		return this.services.getItemInfo(key);
 	}
@@ -89,8 +93,8 @@ export default class ItemsRouter extends SocketioRouterBase {
 	}
 
 	public deleteItem(socket: GameSocket, slot: number) {
-		socket.character.items.set(slot, {});
-		socket.emit(this.CLIENT_GETS.ITEM_DELETE.name, { slot });
+		this.services.deleteItem(socket, slot);
+		socket.emit(config.CLIENT_GETS.ITEM_DELETE.name, { slot });
 	}
 
 	[config.SERVER_GETS.ITEM_DROP.name](data, socket: GameSocket) {
