@@ -29,7 +29,8 @@ export default {
 		ENTERED_ROOM: Object.assign({}, roomsConfig.SERVER_GETS.ENTERED_ROOM),
 		CHOOSE_ABILITY_PERK: {name: "choose_perk", alive: true, log: true},
 		USE_SPELL: {name: "used_spell", alive: true, log: true},
-		MOB_USE_SPELL: {name: "mob_used_spell", log: true},
+		HIT_SPELL: {name: "hit_spell", alive: true, log: true},
+		HURT_BY_SPELL: {name: "took_spell_dmg", log: true},
 	},
 	"CLIENT_GETS": {
 		GAIN_ABILITY_EXP: {name: "ability_gain_exp"},
@@ -37,8 +38,8 @@ export default {
 		CHOOSE_ABILITY_PERK: {name: "ability_choose_perk"},
 		GAIN_ABILITY_PERK: {name: "ability_gain_perk"},
 		ACTIVATED_BUFF: {name: "buff_activated"},
-		ACTIVATED_PERK: {name: "perk_activated"},
 		USE_SPELL: {name: "spell_activated"},
+		MOB_USE_SPELL: {name: "mob_spell_activated"},
 	},
 	PERKS: {
 		AOE_CHANCE: "aoeChance",

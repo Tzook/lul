@@ -212,8 +212,8 @@ export default class TalentsController extends MasterController {
 			
 			const spellKey = this.services.getMobSpellUsed(mob);
 
-			this.io.to(room).emit(talentsConfig.CLIENT_GETS.USE_SPELL.name, {
-				activator_id: mob.id,
+			this.io.to(room).emit(talentsConfig.CLIENT_GETS.MOB_USE_SPELL.name, {
+				mob_id: mob.id,
 				spell_key: spellKey,
 			});
 

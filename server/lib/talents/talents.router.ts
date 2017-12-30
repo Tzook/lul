@@ -150,7 +150,7 @@ export default class TalentsRouter extends SocketioRouterBase {
 	}
 
 	[talentsConfig.SERVER_GETS.USE_SPELL.name](data, socket: GameSocket) {
-		const {target_ids, spell_key} = data;
+		const {spell_key} = data;
 		const spell = this.services.getSpell(socket, spell_key);
 		if (!spell) {
 			return this.sendError(data, socket, "The primary ability does not have that spell.");	
@@ -160,24 +160,33 @@ export default class TalentsRouter extends SocketioRouterBase {
 			return this.sendError(data, socket, "Not enough mana to activate the spell.");
 		}
 
-		socket.currentSpell = spell;
-		
 		this.emitter.emit(statsConfig.SERVER_INNER.USE_MP.name, {
 			mp: spell.mp
 		}, socket);
 		
-		// TODO only take dmg if spell actually does dmg
-		this.emitter.emit(mobsConfig.SERVER_GETS.MOBS_TAKE_DMG.name, {mobs: target_ids}, socket);		
-		
 		socket.broadcast.to(socket.character.room).emit(talentsConfig.CLIENT_GETS.USE_SPELL.name, {
-			activator_id: socket.character._id,
+			char_id: socket.character._id,
             spell_key,
 		});
+	}
+
+	[talentsConfig.SERVER_GETS.HIT_SPELL.name](data, socket: GameSocket) {
+		const {target_ids, spell_key} = data;
+		const spell = this.services.getSpell(socket, spell_key);
+		if (!spell) {
+			return this.sendError(data, socket, "The primary ability does not have that spell.");	
+		} else if (!this.services.canUseSpell(socket, spell)) {
+			return this.sendError(data, socket, "Character does not meet the requirements to use that spell.");
+		}
+
+		socket.currentSpell = spell;
+		
+		this.emitter.emit(mobsConfig.SERVER_GETS.MOBS_TAKE_DMG.name, {mobs: target_ids}, socket);		
 		
 		socket.currentSpell = null;
 	}
 
-	[talentsConfig.SERVER_GETS.MOB_USE_SPELL.name](data, socket: GameSocket) {
+	[talentsConfig.SERVER_GETS.HURT_BY_SPELL.name](data, socket: GameSocket) {
 		let {mob_id, spell_key} = data;
 		let mob = this.mobsRouter.getMob(mob_id, socket);
 		if (!mob) {
@@ -185,9 +194,9 @@ export default class TalentsRouter extends SocketioRouterBase {
 		} else if (!(mob.spells || {})[spell_key]) {
 			return this.sendError(data, socket, "Mob doesn't have that spell!");
 		}
+		
 		mob.currentSpell = mob.spells[spell_key];
 
-		// TODO only take dmg if spell actually does dmg
 		this.emitter.emit(mobsConfig.SERVER_GETS.PLAYER_TAKE_DMG.name, data, socket);
 
 		mob.currentSpell = null;
