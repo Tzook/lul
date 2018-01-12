@@ -14,6 +14,7 @@ export default class NpcsModel extends MasterModel {
             sell: this.mongoose.Schema.Types.Mixed,
             givingQuests: this.mongoose.Schema.Types.Mixed,
             endingQuests: this.mongoose.Schema.Types.Mixed,
+            teleportRooms: this.mongoose.Schema.Types.Mixed
         };
         this.hasId = false; // it actually has an id but saved only in the db
         this.strict = false;

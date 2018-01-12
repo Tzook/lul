@@ -283,6 +283,11 @@ interface NPC_MODEL {
     givingQuests: string[]
     endingQuests: string[]
     sell?: NPC_ITEM[]
+    teleportRooms: {
+        [room: string]: {
+            portal: string
+        }
+    }
 }
 
 interface ABILITY_PERK_INSTANCE {
