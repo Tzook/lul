@@ -283,7 +283,7 @@ interface NPC_MODEL {
     givingQuests: string[]
     endingQuests: string[]
     sell?: NPC_ITEM[]
-    teleportRooms: {
+    teleportRooms?: {
         [room: string]: {
             portal: string
         }

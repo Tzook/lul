@@ -31,7 +31,6 @@ export default class NpcsServices extends MasterServices {
                 room,
                 givingQuests: npc.GivingQuests,
                 endingQuests: npc.EndingQuests,
-                teleportRooms: {}
             };
             let existingNpc = this.npcsInfo.get(npcModel.key);
             if (existingNpc && existingNpc.room !== npcModel.room) {
@@ -51,6 +50,7 @@ export default class NpcsServices extends MasterServices {
             }
 
             (npc.teleportRooms || []).forEach(teleportRoom => {
+                npcModel.teleportRooms = npcModel.teleportRooms || {};
                 let {room, portal} = teleportRoom;
                 npcModel.teleportRooms[room] = {portal};   
             });

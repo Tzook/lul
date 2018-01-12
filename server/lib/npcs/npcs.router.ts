@@ -108,7 +108,7 @@ export default class NpcsRouter extends SocketioRouterBase {
             return this.sendError(data, socket, "The npc is in a different room than you.");
         } 
 
-        let wantedRoom = npcInfo.teleportRooms[room];
+        let wantedRoom = (npcInfo.teleportRooms || {})[room];
         let roomInfo = this.roomsRouter.getRoomInfo(room);
         if (!wantedRoom) {
             return this.sendError(data, socket, "The npc does not teleport to that room.");
