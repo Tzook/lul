@@ -4,16 +4,20 @@ import npcsConfig from "../npcs/npcs.config";
 import ItemsRouter from '../items/items.router';
 import itemsConfig from '../items/items.config';
 import GoldRouter from '../gold/gold.router';
+import roomsConfig from '../rooms/rooms.config';
+import RoomsRouter from '../rooms/rooms.router';
 
 export default class NpcsRouter extends SocketioRouterBase {
     protected services: NpcsServices;
     protected itemsRouter: ItemsRouter;
     protected goldRouter: GoldRouter;
+    protected roomsRouter: RoomsRouter;
 
 	init(files, app) {
         this.services = files.services;
         this.itemsRouter = files.routers.items;
         this.goldRouter = files.routers.gold;
+        this.roomsRouter = files.routers.rooms;
 		super.init(files, app);
 	}
 
@@ -94,4 +98,32 @@ export default class NpcsRouter extends SocketioRouterBase {
 
         socket.emit(npcsConfig.CLIENT_GETS.TRANSACTION.name, {});
 	}
+    
+	[npcsConfig.SERVER_GETS.NPC_TELEPORT.name](data, socket: GameSocket) {
+        let {npcKey, room} = data;
+        let npcInfo = this.services.getNpcInfo(npcKey);
+        if (!npcInfo) {
+            return this.sendError(data, socket, "No npc with such key.");
+        } else if (npcInfo.room !== socket.character.room) {
+            return this.sendError(data, socket, "The npc is in a different room than you.");
+        } 
+
+        let wantedRoom = npcInfo.teleportRooms[room];
+        let roomInfo = this.roomsRouter.getRoomInfo(room);
+        if (!wantedRoom) {
+            return this.sendError(data, socket, "The npc does not teleport to that room.");
+        } else if (!roomInfo) {
+            return this.sendError(data, socket, "The wanted room does not exist.");
+        }
+        
+        let targetPortal = roomInfo.portals[wantedRoom.portal];
+        if (!targetPortal) {
+            return this.sendError(data, socket, "The wanted portal in the room does not exist.");
+        }
+
+        this.emitter.emit(roomsConfig.SERVER_INNER.MOVE_ROOM.name, {
+            room,
+            targetPortal,
+        }, socket);
+    }
 };
