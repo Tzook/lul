@@ -15,7 +15,7 @@ export default {
 		}
 	},
 	"SERVER_INNER": {
-		GAIN_ABILITY: Object.assign({}, statsConfig.SERVER_INNER.GAIN_ABILITY),
+		GAIN_ABILITY: {name: "gain_ability", alive: true, log: true},
 		HURT_MOB: Object.assign({}, mobsConfig.SERVER_INNER.HURT_MOB),
 		MOB_AGGRO_CHANGED: Object.assign({}, mobsConfig.SERVER_INNER.MOB_AGGRO_CHANGED),
 		MOB_DESPAWN: Object.assign({}, mobsConfig.SERVER_INNER.MOB_DESPAWN),
@@ -40,6 +40,7 @@ export default {
 		ACTIVATED_BUFF: {name: "buff_activated"},
 		USE_SPELL: {name: "spell_activated"},
 		MOB_USE_SPELL: {name: "mob_spell_activated"},
+		GAIN_ABILITY: {name: "actor_gain_ability"},
 	},
 	PERKS: {
 		AOE_CHANCE: "aoeChance",

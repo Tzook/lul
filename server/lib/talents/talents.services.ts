@@ -329,3 +329,11 @@ export function extendMobSchemaWithTalents(mob: any, mobSchema: MOB_MODEL): void
 		});
 	});
 }
+
+export function getTalent(socket: GameSocket, ability: string): CHAR_ABILITY_TALENT {
+	return socket.character.talents._doc[ability];
+}
+
+export function hasAbility(socket: GameSocket, ability: string): boolean {
+	return !!getTalent(socket, ability);
+}

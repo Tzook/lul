@@ -1,6 +1,6 @@
 
 import MasterMiddleware from '../master/master.middleware';
-import StatsServices from '../stats/stats.services';
+import { hasAbility } from '../talents/talents.services';
 
 export default class CombatMiddleware extends MasterMiddleware {
     public getValidLoad(load): number {
@@ -8,6 +8,6 @@ export default class CombatMiddleware extends MasterMiddleware {
     }
 
     public canChangeAbility(socket: GameSocket, ability: string): boolean {
-        return StatsServices.hasAbility(socket, ability);
+        return hasAbility(socket, ability);
     }
 };

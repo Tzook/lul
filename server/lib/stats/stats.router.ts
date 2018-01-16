@@ -131,16 +131,6 @@ export default class StatsRouter extends SocketioRouterBase {
             stats: socket.character.stats
         });
     }
-    
-    [config.SERVER_INNER.GAIN_ABILITY.name] (data, socket: GameSocket) {
-        if (StatsServices.hasAbility(socket, data.ability)) {
-            return this.sendError(data, socket, "Character already has the ability!"); 
-        }
-        socket.character.stats.abilities = socket.character.stats.abilities.concat(data.ability);
-        socket.emit(config.CLIENT_GETS.GAIN_ABILITY.name, {
-            ability: data.ability
-        });
-    }
 
     [config.SERVER_GETS.RELEASE_DEATH.name] (data, socket: GameSocket) {
         socket.character.stats.hp.now = socket.maxHp;

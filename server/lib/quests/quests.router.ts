@@ -9,6 +9,7 @@ import config from './quests.config';
 import statsConfig from '../stats/stats.config';
 import itemsConfig from '../items/items.config';
 import NpcsRouter from '../npcs/npcs.router';
+import talentsConfig from '../talents/talents.config';
 
 export default class QuestsRouter extends SocketioRouterBase {
 	protected middleware: QuestsMiddleware;
@@ -88,7 +89,7 @@ export default class QuestsRouter extends SocketioRouterBase {
 			
 			// reward ability
 			if ((questInfo.reward || {}).ability) {
-				this.emitter.emit(statsConfig.SERVER_INNER.GAIN_ABILITY.name, { ability: questInfo.reward.ability }, socket);
+				this.emitter.emit(talentsConfig.SERVER_INNER.GAIN_ABILITY.name, { ability: questInfo.reward.ability }, socket);
 			}
 			
 			// reward stats

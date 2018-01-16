@@ -51,7 +51,6 @@ interface Stats {
         now: number,
         total: number,
     },
-    abilities: string[],
     primaryAbility: string,
 }
 

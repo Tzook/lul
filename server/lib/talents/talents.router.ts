@@ -1,11 +1,10 @@
 import SocketioRouterBase from '../socketio/socketio.router.base';
 import TalentsMiddleware from './talents.middleware';
 import TalentsController from './talents.controller';
-import TalentsServices from './talents.services';
+import TalentsServices, { getTalent, hasAbility } from './talents.services';
 import talentsConfig from '../talents/talents.config';
 import statsConfig from '../stats/stats.config';
 import StatsRouter from '../stats/stats.router';
-import StatsServices from '../stats/stats.services';
 import MobsRouter from '../mobs/mobs.router';
 import mobsConfig from '../mobs/mobs.config';
 import RoomsRouter from '../rooms/rooms.router';
@@ -50,8 +49,13 @@ export default class TalentsRouter extends SocketioRouterBase {
 	}
 
     [talentsConfig.SERVER_INNER.GAIN_ABILITY.name] (data, socket: GameSocket) {
-		if (!socket.character.talents._doc[data.ability]) {
-			socket.character.talents._doc[data.ability] = this.services.getEmptyCharAbility();
+		const {ability} = data;
+		if (!hasAbility(socket, ability)) {
+			socket.character.talents._doc[ability] = this.services.getEmptyCharAbility();
+			
+			socket.emit(talentsConfig.CLIENT_GETS.GAIN_ABILITY.name, {
+				ability
+			});
 		}
 	}
 	
@@ -129,10 +133,10 @@ export default class TalentsRouter extends SocketioRouterBase {
 	
 	[talentsConfig.SERVER_GETS.CHOOSE_ABILITY_PERK.name](data, socket: GameSocket) {
 		const {ability, perk} = data;
-		if (!StatsServices.hasAbility(socket, ability)) {
+		const talent = getTalent(socket, ability);
+		if (!talent) {
 			return this.sendError(data, socket, "Char does not have that primary ability.");
 		}
-		const talent = socket.character.talents._doc[ability];
 		if (!this.services.canGetPerk(talent, perk)) {
 			return this.sendError(data, socket, "Raising points to that perk is not available.");
 		}
