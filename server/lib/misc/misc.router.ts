@@ -23,7 +23,6 @@ export default class MiscRouter extends SocketioRouterBase {
         }
         let slots = this.middleware.getStackSlots(socket, item, itemInfo);
 
-        console.log("picking up item for slots", item, slots);
         if (slots.length === 0) { 
             return this.sendError(data, socket, itemsConfig.LOGS.INVENTORY_FULL.MSG, true, true);
         }	

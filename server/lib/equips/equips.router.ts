@@ -94,7 +94,7 @@ export default class EquipsRouter extends SocketioRouterBase {
 	[config.SERVER_GETS.USE_EQUIP.name](data, socket: GameSocket) {
 		let slot = this.middleware.getFirstAvailableSlot(socket);
 		if (slot >= 0) {
-			this[config.SERVER_GETS.UNEQUIP_ITEM.name]({
+			this.emitter.emit(config.SERVER_GETS.UNEQUIP_ITEM.name, {
 				from: data.slot,
 				to: slot
 			}, socket);
@@ -103,24 +103,14 @@ export default class EquipsRouter extends SocketioRouterBase {
 		}
 	}
 
-	[config.SERVER_GETS.USE_ITEM.name](data, socket: GameSocket) {
-		let itemSlot: number = data.slot;
-		if (this.middleware.isValidItemSlot(itemSlot)) {
-			let item = socket.character.items[itemSlot];
-			let itemInfo = this.itemsRouter.getItemInfo(item.key);
-			if (!itemInfo) {
-				this.sendError(data, socket, "Could not find item info for item " + item.key);
-			} else if (this.middleware.isValidEquipItem(itemInfo)) {
-				this[config.SERVER_GETS.EQUIP_ITEM.name]({
-					from: itemSlot,
-					to: itemInfo.type
-				}, socket);
-			} else {
-				this.sendError(data, socket, "Item not equipable!");
-			}
-		} else {
-			this.sendError(data, socket, "Invalid slot!");
-		}
+	[config.SERVER_INNER.ITEM_USE.name](data: {itemSlot: number, itemInfo: ITEM_MODEL}, socket: GameSocket) {
+		let {itemSlot, itemInfo} = data;
+		if (this.middleware.isValidEquipItem(itemInfo)) {
+		   this.emitter.emit(config.SERVER_GETS.EQUIP_ITEM.name, {
+			   from: itemSlot,
+			   to: itemInfo.type
+		   }, socket);
+	   }
 	}
 
 	[config.SERVER_GETS.DROP_EQUIP.name](data, socket: GameSocket) {

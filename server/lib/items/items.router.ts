@@ -125,4 +125,24 @@ export default class ItemsRouter extends SocketioRouterBase {
 			});
 		}
 	}
+	
+	[config.SERVER_GETS.ITEM_USE.name](data, socket: GameSocket) {
+		let itemSlot: number = data.slot;
+		if (!this.middleware.isValidItemSlot(itemSlot)) {
+			return this.sendError(data, socket, "Invalid slot!");
+		}
+		let item = socket.character.items[itemSlot];
+		let itemInfo = this.services.getItemInfo(item.key);
+		if (!itemInfo) {
+			return this.sendError(data, socket, "Could not find item info for item " + item.key);
+		} 
+		this.emitter.emit(config.SERVER_INNER.ITEM_USE.name, {
+			itemSlot,
+			itemInfo,
+		}, socket);		
+	}
+	
+	[config.SERVER_INNER.ITEM_USE.name](data: {itemSlot: number, itemInfo: ITEM_MODEL}, socket: GameSocket) {
+		// do nothing, each place handles it
+	}
 };
