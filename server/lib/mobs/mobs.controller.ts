@@ -1,19 +1,20 @@
-
 import MasterController from '../master/master.controller';
 import MobsServices from './mobs.services';
 import * as _ from 'underscore';
-import StatsServices from '../stats/stats.services';
 import config from '../mobs/mobs.config';
 import MobsRouter from './mobs.router';
+import TalentsRouter from '../talents/talents.router';
 
 export default class MobsController extends MasterController {
 	protected services: MobsServices;
 	protected router: MobsRouter;
+	private talentsRouter: TalentsRouter;
 	private roomsMobs: Map<string, ROOM_MOBS> = new Map();
 	private mobById: Map<string, MOB_INSTANCE> = new Map();
 
 	init(files, app) {
         this.router = files.router;
+        this.talentsRouter = files.routers.talents;
 		super.init(files, app);
 	}
 
@@ -107,7 +108,7 @@ export default class MobsController extends MasterController {
 	}
 
 	public calculateDamage(socket: GameSocket, load: number): number {
-		let mainStat = StatsServices.getMainStat(socket);
+		let mainStat = this.talentsRouter.getTalentInfo(socket).stat;
 		let baseDmg = socket.character.stats[mainStat] + socket.bonusStats[mainStat]; 
 		let bonusDmg = socket.getLoadModifier() * load * baseDmg / 100;
 		let maxDmg = (baseDmg + bonusDmg) * socket.getDmgModifier();

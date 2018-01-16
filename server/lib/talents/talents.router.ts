@@ -39,6 +39,10 @@ export default class TalentsRouter extends SocketioRouterBase {
 		socket.getDefenceModifier = () => this.services.getDefenceModifier(socket);
 		socket.buffs = new Set();
 	}
+
+	public getTalentInfo(socket: GameSocket): TALENT_INFO|undefined {
+		return this.services.getTalentInfo(socket.character.stats.primaryAbility);
+	}
 	
 	[talentsConfig.SERVER_GETS.DISCONNECT.name](data, socket: GameSocket) {
 		this.controller.clearSocketBuffs(socket);		

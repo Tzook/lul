@@ -24,6 +24,9 @@ const TALENT_SCHEMA = {
     ability: String,
     perks: [ABILITY_PERK_SCHEMA],
     spells: [ABILITY_SPELL_SCHEMA],
+    info: {
+        stat: String
+    }
 };
 
 const CONFIG_PERK_SCHEMA = mongoose.Schema.Types.Mixed;

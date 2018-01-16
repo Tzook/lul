@@ -315,10 +315,15 @@ interface ABILITY_SPELL_MODEL {
     perks: PERK_MAP
 }
 
+interface TALENT_INFO {
+    stat: "str"|"dex"|"mag"
+}
+
 interface TALENT_MODEL {
     ability: string,
     perks: ABILITY_PERK_MODEL[],
     spells: ABILITY_SPELL_MODEL[],
+    info: TALENT_INFO
 }
 
 interface PERK_CONFIG {

@@ -5,6 +5,7 @@ import { doesChanceWorkFloat } from '../drops/drops.services';
 import talentsConfig from "../talents/talents.config";
 
 export default class TalentsServices extends MasterServices {
+	private abilitiesInfo: Map<string, TALENT_INFO> = new Map();
 	private perksInfo: Map<string, ABILITY_PERK_INSTANCE[]> = new Map();
 	// primary ability => lvl|key => spell
 	private spellsInfo: Map<string, Map<number|string, ABILITY_SPELL_MODEL>> = new Map();
@@ -193,6 +194,10 @@ export default class TalentsServices extends MasterServices {
 		return <any>_.sample(Object.keys(mob.spells), 1);
 	}
 
+	public getTalentInfo(ability: string): TALENT_INFO|undefined {
+		return this.abilitiesInfo.get(ability);
+	}
+
     // HTTP functions
 	// =================
     public generateTalents(talents: any[], perkCollection: any[]): Promise<any> {
@@ -205,6 +210,9 @@ export default class TalentsServices extends MasterServices {
 				ability: talent.primaryAbility,
 				perks: [],
 				spells: [],
+				info: {
+					stat: talent.mainStat
+				}
 			};
 
 			(talent.perks || []).forEach(perk => {
@@ -271,6 +279,8 @@ export default class TalentsServices extends MasterServices {
 
 					const spellsArray = this.getSpellsArrayMap(doc.spells);
 					this.spellsInfo.set(doc.ability, spellsArray);
+
+					this.abilitiesInfo.set(doc.ability, doc.info);
 				});
 				console.log("got talents");
 				return this.perksInfo;
