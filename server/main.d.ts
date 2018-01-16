@@ -136,6 +136,10 @@ interface ITEM_MODEL {
         dex?: number,
         lvl?: number,
     }
+    use?: {
+        hp?: number
+        mp?: number
+    }
 }
 interface ITEM_DROP {
     x: number, 

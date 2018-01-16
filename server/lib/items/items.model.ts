@@ -35,6 +35,8 @@ export default class ItemsModel extends MasterModel {
     init(files, app) {
         this.controller = files.controller;
 
+        this.listenForSchemaAddition('Item');
+        this.minimize = true;
         this.schema = ITEM_SCHEMA;
     }
 
@@ -54,6 +56,7 @@ export default class ItemsModel extends MasterModel {
         this.listenForFieldAddition("Character", "items", items);
         
         setTimeout(() => this.controller.warmItemsInfo()); // timeout so the Model can be set
+        this.removeListen('Item');
         return Promise.resolve();
     }
 };

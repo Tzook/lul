@@ -4,6 +4,7 @@ import { REQUIRE_SCHEMA } from "./items.model";
 import * as _ from 'underscore';
 import { BASE_STATS_SCHEMA } from "../stats/stats.model";
 import ItemsMiddleware from './items.middleware';
+import { USE_SCHEMA } from '../use/use.model';
 
 export default class ItemsServices extends MasterServices {
 	private itemsInfo: Map<string, ITEM_MODEL> = new Map();
@@ -30,6 +31,9 @@ export default class ItemsServices extends MasterServices {
 
 			this.pushStats(itemSchema, item, "req", REQUIRE_SCHEMA);
 			this.pushStats(itemSchema, item, "stats", BASE_STATS_SCHEMA);
+			if (this.middleware.isMisc(itemSchema)) {
+				this.pushStats(itemSchema, item, "use", USE_SCHEMA);
+			}
 
 			let itemModel = new this.Model(itemSchema);
 			models.push(itemModel);

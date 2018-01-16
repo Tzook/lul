@@ -25,7 +25,8 @@
 		"knowns",
 		"party",
 		"npcs",
-		"talents"
+		"talents",
+		"use"
 	],
 	"skip": 	 { "master": 1 }
 }
