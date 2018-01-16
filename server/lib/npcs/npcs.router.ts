@@ -74,6 +74,7 @@ export default class NpcsRouter extends SocketioRouterBase {
 	[npcsConfig.SERVER_GETS.ITEM_SELL.name](data, socket: GameSocket) {
         let {npcKey, slot, stack} = data;
         stack = Math.abs(stack || 1);
+        slot = +slot || 0;
         let item = socket.character.items[slot];
         let npcInfo = this.services.getNpcInfo(npcKey);
         if (isNaN(stack)) {
