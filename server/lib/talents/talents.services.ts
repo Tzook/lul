@@ -62,11 +62,16 @@ export default class TalentsServices extends MasterServices {
 		return newPool;
 	}
 
-	public getPerkValue(perk: string, charPerks: PERK_MAP) {
+	public getPerkValue(perk: string, perksMap: PERK_MAP) {
+		const level = perksMap[perk] || 0;
+		return this.getPerkLevelValue(perk, level);
+	}
+	
+	protected getPerkLevelValue(perk: string, level: number) {
 		const perkConfig = this.getPerkConfig(perk);
-		const perkPoints = charPerks[perk] || 0;
-
-		return (perkConfig.default || 0) + perkPoints * (perkConfig.value || 1);
+		const initialValue = perkConfig.default || 0;
+		const valueModifier = perkConfig.value || 1;
+		return initialValue + level * valueModifier;
 	}
 	
 	protected pickPool(pool: string[], perksOffered: number): string[] {
@@ -156,7 +161,8 @@ export default class TalentsServices extends MasterServices {
 	}
 
 	public getMobPerkValue(perk: string, mob: MOB_INSTANCE): number {
-		let perkValue = this.getPerkValue(perk, mob.perks || {});
+		// get the perk if exists, otherwise get its default
+		let perkValue = (mob.perks || {})[perk] || this.getPerkLevelValue(perk, 0);
 		
 		if (mob.currentSpell) {
 			// send the higher value - perk or spell
