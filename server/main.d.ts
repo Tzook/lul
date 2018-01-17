@@ -317,6 +317,7 @@ interface ABILITY_SPELL_MODEL {
 
 interface TALENT_INFO {
     stat: "str"|"dex"|"mag"
+    initPerks?: PERK_MAP
 }
 
 interface TALENT_MODEL {

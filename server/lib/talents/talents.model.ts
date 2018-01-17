@@ -25,7 +25,8 @@ const TALENT_SCHEMA = {
     perks: [ABILITY_PERK_SCHEMA],
     spells: [ABILITY_SPELL_SCHEMA],
     info: {
-        stat: String
+        stat: String,
+        initPerks: mongoose.Schema.Types.Mixed
     }
 };
 
@@ -61,9 +62,9 @@ export default class TalentsModel extends MasterModel {
 
         let CharTalentsModel = this.createNewModel("CharTalents", CHAR_TALENT_SCHEMA, {_id: false, strict: false, minimize: false});
         this.addToSchema("Character", {talents: CharTalentsModel.schema});
-        const charTalentsInitialValue = {
-            [statsConfig.ABILITY_MELEE]: this.services.getEmptyCharAbility()
-        };
+        const charTalentsInitialValue = () => ({
+            [statsConfig.ABILITY_MELEE]: this.services.getEmptyCharAbility(statsConfig.ABILITY_MELEE)
+        });
         this.listenForFieldAddition("Character", "talents", charTalentsInitialValue);
         
         this.addToSchema("Mobs", MOB_PERKS_SPELLS_SCHEMA);

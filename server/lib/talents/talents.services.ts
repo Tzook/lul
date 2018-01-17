@@ -17,13 +17,15 @@ export default class TalentsServices extends MasterServices {
 		this.socketioRouter = files.routers.socketio;
 	}
 
-	public getEmptyCharAbility(): CHAR_ABILITY_TALENT {
+	public getEmptyCharAbility(ability: string): CHAR_ABILITY_TALENT {
+		let talentInfo = this.getTalentInfo(ability);
+		let perks = Object.assign({}, talentInfo.initPerks);
 		return {
 			lvl: 1,
 			exp: 0,
 			points: 0,
 			pool: [],
-			perks: {},
+			perks,
 		};
 	}
 
@@ -217,7 +219,8 @@ export default class TalentsServices extends MasterServices {
 				perks: [],
 				spells: [],
 				info: {
-					stat: talent.mainStat
+					stat: talent.mainStat,
+					initPerks: {}
 				}
 			};
 
@@ -241,6 +244,10 @@ export default class TalentsServices extends MasterServices {
 					spellSchema.perks[perk.key] = +perk.value;
 				});
 				talentchema.spells.push(spellSchema);
+			});
+			
+			(talent.initialPerks || []).forEach(perk => {
+				talentchema.info.initPerks[perk.key] = +perk.value;
 			});
 
 			let talentModel = new this.Model(talentchema);

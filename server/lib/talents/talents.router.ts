@@ -55,7 +55,7 @@ export default class TalentsRouter extends SocketioRouterBase {
     [talentsConfig.SERVER_INNER.GAIN_ABILITY.name] (data, socket: GameSocket) {
 		const {ability} = data;
 		if (!hasAbility(socket, ability)) {
-			socket.character.talents._doc[ability] = this.services.getEmptyCharAbility();
+			socket.character.talents._doc[ability] = this.services.getEmptyCharAbility(ability);
 			
 			socket.emit(talentsConfig.CLIENT_GETS.GAIN_ABILITY.name, {
 				ability
