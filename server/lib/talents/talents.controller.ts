@@ -228,11 +228,11 @@ export default class TalentsController extends MasterController {
 		return this.mobsSpellsPickers.has(mob.id);
 	}
 	
-	public mobStopSpellsPicker(mob: MOB_INSTANCE, room: string) {
+	public mobStopSpellsPicker(mob: MOB_INSTANCE) {
 		const timerId = this.mobsSpellsPickers.get(mob.id);
 		if (timerId) {
 			clearTimeout(timerId);
-			this.mobsSpellsPickers.delete(room);
+			this.mobsSpellsPickers.delete(mob.id);
 		}
 	}
 

@@ -214,7 +214,7 @@ export default class TalentsRouter extends SocketioRouterBase {
 		let {id, mob, room}: {mob: MOB_INSTANCE, room: string, id?: string} = data;	
 		if (mob.spells) {
 			if (!id) {
-				this.controller.mobStopSpellsPicker(mob, room);
+				this.controller.mobStopSpellsPicker(mob);
 			} else if (!this.controller.hasMobSpellsPicker(mob)) {
 				this.controller.mobStartSpellsPicker(mob, room);
 			}
@@ -224,7 +224,7 @@ export default class TalentsRouter extends SocketioRouterBase {
 	[talentsConfig.SERVER_INNER.MOB_DESPAWN.name](data, socket: GameSocket) {
 		let {mob} = data;
 		if (mob.spells) {
-			this.controller.mobStopSpellsPicker(mob, socket.character.room);
+			this.controller.mobStopSpellsPicker(mob);
 		}
 	}
 };
