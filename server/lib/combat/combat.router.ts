@@ -3,9 +3,18 @@ import SocketioRouterBase from '../socketio/socketio.router.base';
 import CombatMiddleware from './combat.middleware';
 import config from '../combat/combat.config';
 import mobsConfig from '../mobs/mobs.config';
+import TalentsRouter from '../talents/talents.router';
+import talentsConfig from '../talents/talents.config';
+import statsConfig from '../stats/stats.config';
 
 export default class CombatRouter extends SocketioRouterBase {
 	protected middleware: CombatMiddleware;
+	protected talentsRouter: TalentsRouter;
+	
+	init(files, app) {
+		this.talentsRouter = files.routers.talents;
+		super.init(files, app);
+	}
 
 	[config.SERVER_GETS.LOAD_ATTACK.name](data, socket: GameSocket) {
 		socket.broadcast.to(socket.character.room).emit(this.CLIENT_GETS.LOAD_ATTACK.name, {
@@ -45,7 +54,21 @@ export default class CombatRouter extends SocketioRouterBase {
 		const targetsInArea = data.target_ids || [];
 		const targetsHit = socket.getTargetsHit(targetsInArea);
 
-		// TODO support other types of primary abilities
-		this.emitter.emit(mobsConfig.SERVER_INNER.MOBS_TAKE_DMG.name, {mobs: targetsHit}, socket);		
+		const talentInfo = this.talentsRouter.getPrimaryTalentInfo(socket);
+
+		const mp = talentInfo.mp;
+		if (mp) {
+			if (socket.character.stats.mp.now < mp) {
+				return this.sendError(data, socket, "Not enough mana to use the ability");
+			}
+			this.emitter.emit(statsConfig.SERVER_INNER.USE_MP.name, {mp}, socket);
+		}
+
+		if (talentInfo.hitType == talentsConfig.HIT_TYPE_ATTACK) {
+			this.emitter.emit(mobsConfig.SERVER_INNER.MOBS_TAKE_DMG.name, {mobs: targetsHit}, socket);		
+		} else {
+			// TODO support other types of primary abilities
+			console.log("Doing a heal!");
+		}
 	}
 };

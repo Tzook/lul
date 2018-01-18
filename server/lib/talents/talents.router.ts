@@ -41,7 +41,7 @@ export default class TalentsRouter extends SocketioRouterBase {
 		socket.buffs = new Set();
 	}
 
-	public getTalentInfo(socket: GameSocket): TALENT_INFO|undefined {
+	public getPrimaryTalentInfo(socket: GameSocket): TALENT_INFO|undefined {
 		return this.services.getTalentInfo(socket.character.stats.primaryAbility);
 	}
 	

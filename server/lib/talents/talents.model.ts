@@ -26,6 +26,8 @@ const TALENT_SCHEMA = {
     spells: [ABILITY_SPELL_SCHEMA],
     info: {
         stat: String,
+        hitType: String,
+        mp: Number,
         initPerks: mongoose.Schema.Types.Mixed
     }
 };

@@ -317,6 +317,8 @@ interface ABILITY_SPELL_MODEL {
 
 interface TALENT_INFO {
     stat: "str"|"dex"|"mag"
+    hitType: "atk"|"heal"
+    mp?: number
     initPerks?: PERK_MAP
 }
 

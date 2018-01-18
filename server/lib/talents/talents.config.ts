@@ -63,5 +63,7 @@ export default {
 		THREAT_MODIFIER_KEY: "threatModifier",
 		BLOCK_CHANCE: "blockChance",
 		DAMAGE_REDUCTION: "damageReduction",
-	}
+	},
+	HIT_TYPE_ATTACK: "atk",
+	HIT_TYPE_HEAL: "heal",
 }

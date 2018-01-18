@@ -225,6 +225,7 @@ export default class TalentsServices extends MasterServices {
 				spells: [],
 				info: {
 					stat: talent.mainStat,
+					hitType: talent.hitType,
 					initPerks: {}
 				}
 			};
@@ -254,6 +255,10 @@ export default class TalentsServices extends MasterServices {
 			(talent.initialPerks || []).forEach(perk => {
 				talentchema.info.initPerks[perk.key] = +perk.value;
 			});
+
+			if (talent.manaCost > 0) {
+				talentchema.info.mp = +talent.manaCost;
+			}
 
 			let talentModel = new this.Model(talentchema);
 			models.push(talentModel);
