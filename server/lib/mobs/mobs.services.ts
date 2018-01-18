@@ -17,10 +17,6 @@ export default class MobsServices extends MasterServices {
 		return `${room}-${mobId}`;
 	}
 
-	public getDamageRange(min: number, max: number): number {
-		return _.random(Math.floor(min) || 1, Math.floor(max));
-	}
-
 	public getDamageToHurt(hp: number, dmg: number): number {
 		return Math.min(hp, dmg);
 	}
@@ -87,3 +83,7 @@ export default class MobsServices extends MasterServices {
 			});
 	}
 };
+
+export function getDamageRange(min: number, max: number): number {
+	return _.random(Math.floor(min) || 1, Math.floor(max));
+}

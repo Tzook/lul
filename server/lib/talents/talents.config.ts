@@ -2,6 +2,7 @@ import statsConfig from '../stats/stats.config';
 import roomsConfig from '../rooms/rooms.config';
 import mobsConfig from '../mobs/mobs.config';
 import socketioConfig from '../socketio/socketio.config';
+import combatConfig from '../combat/combat.config';
 
 export default {
 	"ROUTES": {
@@ -17,6 +18,7 @@ export default {
 	"SERVER_INNER": {
 		GAIN_ABILITY: {name: "gain_ability", alive: true, log: true},
 		HURT_MOB: Object.assign({}, mobsConfig.SERVER_INNER.HURT_MOB),
+		HEAL_CHAR: Object.assign({}, combatConfig.SERVER_INNER.HEAL_CHAR),
 		MOB_AGGRO_CHANGED: Object.assign({}, mobsConfig.SERVER_INNER.MOB_AGGRO_CHANGED),
 		MOB_DESPAWN: Object.assign({}, mobsConfig.SERVER_INNER.MOB_DESPAWN),
 		TOOK_DMG: Object.assign({}, statsConfig.SERVER_INNER.TOOK_DMG),		
@@ -53,7 +55,6 @@ export default {
 		BLEED_DURATION: "bleedDuration",
 		BLEED_DMG_MODIFIER: 0.1,
 		BLEED_TICK_TIME: 1,
-		BLEED_DMG_CAUSE: "bleed",
 		CHARGE_MODIFIER_KEY: "fullyChargeModifier",
 		LIFE_STEAL_KEY: "lifeSteal",
 		MANA_STEAL_KEY: "manaSteal",

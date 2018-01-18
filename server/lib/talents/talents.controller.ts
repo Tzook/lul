@@ -5,6 +5,7 @@ import talentsConfig from '../talents/talents.config';
 import mobsConfig from '../mobs/mobs.config';
 import statsConfig from '../stats/stats.config';
 import * as _ from 'underscore';
+import combatConfig from '../combat/combat.config';
 
 export default class TalentsController extends MasterController {
 	protected services: TalentsServices;
@@ -162,7 +163,7 @@ export default class TalentsController extends MasterController {
 			this.mobsRouter.getEmitter().emit(mobsConfig.SERVER_INNER.MOB_TAKE_DMG.name, {
 				mobId: mob.id, 
 				dmg,
-				cause: talentsConfig.PERKS.BLEED_DMG_CAUSE,
+				cause: combatConfig.HIT_CAUSE.BLEED,
 				crit,
 			}, socket);
 			this.tickMobBleed(dmg, bleedBuff, mob, room, tickIndex + 1, socket);
@@ -179,7 +180,7 @@ export default class TalentsController extends MasterController {
 		let bleedTimer = setTimeout(() => {
 			this.mobsRouter.getEmitter().emit(statsConfig.SERVER_INNER.TAKE_DMG.name, { 
 				dmg,
-				cause: talentsConfig.PERKS.BLEED_DMG_CAUSE,
+				cause: combatConfig.HIT_CAUSE.BLEED,
 			}, socket);
 			this.tickSocketBleed(dmg, bleedBuff, tickIndex + 1, socket);
 		}, talentsConfig.PERKS.BLEED_TICK_TIME * 1000 - (tickIndex === 0 ? 200 : 0)); // reducing 200 ms so all the ticks will fit in the time

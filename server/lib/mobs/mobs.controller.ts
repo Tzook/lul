@@ -1,20 +1,17 @@
 import MasterController from '../master/master.controller';
-import MobsServices from './mobs.services';
+import MobsServices, { getDamageRange } from './mobs.services';
 import * as _ from 'underscore';
 import config from '../mobs/mobs.config';
 import MobsRouter from './mobs.router';
-import TalentsRouter from '../talents/talents.router';
 
 export default class MobsController extends MasterController {
 	protected services: MobsServices;
 	protected router: MobsRouter;
-	private talentsRouter: TalentsRouter;
 	private roomsMobs: Map<string, ROOM_MOBS> = new Map();
 	private mobById: Map<string, MOB_INSTANCE> = new Map();
 
 	init(files, app) {
         this.router = files.router;
-        this.talentsRouter = files.routers.talents;
 		super.init(files, app);
 	}
 
@@ -107,16 +104,6 @@ export default class MobsController extends MasterController {
 		});
 	}
 
-	public calculateDamage(socket: GameSocket, load: number): number {
-		let mainStat = this.talentsRouter.getPrimaryTalentInfo(socket).stat;
-		let baseDmg = socket.character.stats[mainStat] + socket.bonusStats[mainStat]; 
-		let bonusDmg = socket.getLoadModifier() * load * baseDmg / 100;
-		let maxDmg = (baseDmg + bonusDmg) * socket.getDmgModifier();
-		let minDmg = maxDmg / 2;
-		let dmg = this.services.getDamageRange(minDmg, maxDmg);
-		return dmg;
-	}
-
 	public hurtMob(mobId: string, dmg: number, socket: GameSocket): MOB_INSTANCE {
 		let mob = this.getMob(mobId, socket);
         let actualDmg = this.services.getDamageToHurt(mob.hp, dmg);
@@ -169,7 +156,7 @@ export default class MobsController extends MasterController {
     }
 
 	public getHurtCharDmg(mob: MOB_INSTANCE, socket: GameSocket): number {
-		let dmg = this.services.getDamageRange(mob.minDmg, mob.maxDmg);
+		let dmg = getDamageRange(mob.minDmg, mob.maxDmg);
 		dmg *= socket.getDefenceModifier();
 		dmg = Math.ceil(dmg); // make sure we are always rounded
 		return dmg;

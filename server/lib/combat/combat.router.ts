@@ -6,14 +6,21 @@ import mobsConfig from '../mobs/mobs.config';
 import TalentsRouter from '../talents/talents.router';
 import talentsConfig from '../talents/talents.config';
 import statsConfig from '../stats/stats.config';
+import CombatServices from './combat.services';
 
 export default class CombatRouter extends SocketioRouterBase {
+	protected services: CombatServices;
 	protected middleware: CombatMiddleware;
 	protected talentsRouter: TalentsRouter;
 	
 	init(files, app) {
+		this.services = files.services;
 		this.talentsRouter = files.routers.talents;
 		super.init(files, app);
+	}
+
+	public calculateDamage(socket: GameSocket): number {
+		return this.services.calculateDamage(socket);
 	}
 
 	[config.SERVER_GETS.LOAD_ATTACK.name](data, socket: GameSocket) {
@@ -67,8 +74,38 @@ export default class CombatRouter extends SocketioRouterBase {
 		if (talentInfo.hitType == talentsConfig.HIT_TYPE_ATTACK) {
 			this.emitter.emit(mobsConfig.SERVER_INNER.MOBS_TAKE_DMG.name, {mobs: targetsHit}, socket);		
 		} else {
-			// TODO support other types of primary abilities
-			console.log("Doing a heal!");
+			this.emitter.emit(config.SERVER_INNER.HEAL_CHARS.name, {charNames: targetsHit}, socket);		
 		}
+	}
+
+	[config.SERVER_INNER.HEAL_CHARS.name](data, socket: GameSocket) {
+		const {charNames} = data;
+
+		let cause = config.HIT_CAUSE.HEAL;
+		for (let i = 0; i < charNames.length; i++) {
+			const charName = charNames[i];
+			const healedSocket = socket.map.get(charName);
+			if (!healedSocket || !healedSocket.connected) {
+				this.sendError({charName}, socket, "No such char id");
+			} else if (healedSocket.character.room !== socket.character.room) {
+				this.sendError({charName}, socket, "Cannot heal someone in a different room");
+			} else if (!healedSocket.alive) {
+				this.sendError({charName}, socket, "Cannot heal dead people. You ain't jesus");
+			} else {
+				const dmg = this.calculateDamage(socket);
+				this.emitter.emit(config.SERVER_INNER.HEAL_CHAR.name, {
+					healedSocket,
+					cause,
+					dmg
+				}, socket);
+			}
+			cause = config.HIT_CAUSE.AOE;
+		}
+	}
+	
+	[config.SERVER_INNER.HEAL_CHAR.name](data, socket: GameSocket) {
+		let {healedSocket, dmg} = data;
+		
+		this.emitter.emit(statsConfig.SERVER_INNER.GAIN_HP.name, { hp: dmg }, healedSocket);
 	}
 };

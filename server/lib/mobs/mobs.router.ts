@@ -9,17 +9,21 @@ import config from '../mobs/mobs.config';
 import statsConfig from '../stats/stats.config';
 import dropsConfig from '../drops/drops.config';
 import questsConfig from '../quests/quests.config';
+import combatConfig from '../combat/combat.config';
+import CombatRouter from '../combat/combat.router';
 
 export default class MobsRouter extends SocketioRouterBase {
 	protected middleware: MobsMiddleware;
 	protected controller: MobsController;
     protected services: MobsServices;
 	protected roomsRouter: RoomsRouter;
-    protected partyRouter: PartyRouter;
+	protected partyRouter: PartyRouter;
+	protected combatRouter: CombatRouter;
 	
 	init(files, app) {
 		this.roomsRouter = files.routers.rooms;
         this.partyRouter = files.routers.party;
+        this.combatRouter = files.routers.combat;
         this.services = files.services;
 		super.init(files, app);
 	}
@@ -69,10 +73,9 @@ export default class MobsRouter extends SocketioRouterBase {
 
 	[config.SERVER_INNER.MOBS_TAKE_DMG.name](data, socket: GameSocket) {
 		const mobsHit = data.mobs;
-		let cause = config.DMG_CAUSE_ATK;
+		let cause = combatConfig.HIT_CAUSE.ATK;
 		for (let i = 0; i < mobsHit.length; i++) {
 			let mobHitData = {mobId: mobsHit[i], cause};
-
 			if (!this.controller.hasMob(mobsHit[i], socket)) {
 				this.sendError(data, socket, "Mob doesn't exist!");
 			} else if (this.controller.didHitMob(mobsHit[i], socket)) {
@@ -80,7 +83,7 @@ export default class MobsRouter extends SocketioRouterBase {
 			} else {
 				this.emitter.emit(config.SERVER_INNER.MISS_MOB.name, mobHitData, socket);
 			}
-			cause = config.DMG_CAUSE_AOE;
+			cause = combatConfig.HIT_CAUSE.AOE;
 		}
 	}
 
@@ -96,8 +99,7 @@ export default class MobsRouter extends SocketioRouterBase {
 	[config.SERVER_INNER.MOB_TAKE_DMG.name](data, socket: GameSocket) {
 		let {mobId, cause, dmg, crit} = data;
 
-		let load = socket.lastAttackLoad || 0;
-		dmg = dmg || this.controller.calculateDamage(socket, load);
+		dmg = dmg || this.combatRouter.calculateDamage(socket);
 		let mob = this.controller.hurtMob(mobId, dmg, socket);
 		crit = crit === undefined ? socket.isCrit : crit;
 		this.emitter.emit(config.SERVER_INNER.HURT_MOB.name, { mob, dmg, cause, crit }, socket);
@@ -171,7 +173,7 @@ export default class MobsRouter extends SocketioRouterBase {
 		if (dmg === 0) {
 			socket.emit(config.CLIENT_GETS.ATTACK_BLOCK.name, { id: socket.character._id });
 		} else {
-			this.emitter.emit(statsConfig.SERVER_INNER.TAKE_DMG.name, { dmg, mob, cause: config.DMG_CAUSE_ATK }, socket);
+			this.emitter.emit(statsConfig.SERVER_INNER.TAKE_DMG.name, { dmg, mob, cause: combatConfig.HIT_CAUSE.ATK }, socket);
 		}
 	}
 	
