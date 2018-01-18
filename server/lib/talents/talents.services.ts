@@ -94,16 +94,16 @@ export default class TalentsServices extends MasterServices {
 		return perkConfig;
 	}
 
-	public getMobsHit(mobs: string[], socket: GameSocket): string[] {
-		if (mobs.length <= 1) {
-			return mobs;
+	public getTargetsHit(targetIds: string[], socket: GameSocket): string[] {
+		if (targetIds.length <= 1) {
+			return targetIds;
 		}
 		const aoeActivated = this.isAbilityActivated(talentsConfig.PERKS.AOE_CHANCE, socket);
 		if (!aoeActivated) {
-			return [mobs[0]];
+			return [targetIds[0]];
 		}
 		const aoeValue = this.getAbilityPerkValue(talentsConfig.PERKS.AOE_CAP, socket);
-		return mobs.slice(0, aoeValue);
+		return targetIds.slice(0, aoeValue);
 	}
 
 	public getLoadModifier(socket: GameSocket): number {

@@ -67,9 +67,8 @@ export default class MobsRouter extends SocketioRouterBase {
         socket.threats.clear();
 	}
 
-	[config.SERVER_GETS.MOBS_TAKE_DMG.name](data, socket: GameSocket) {
-		const mobsInArea = data.mobs || [];
-		const mobsHit = socket.getMobsHit(mobsInArea);
+	[config.SERVER_INNER.MOBS_TAKE_DMG.name](data, socket: GameSocket) {
+		const mobsHit = data.mobs;
 		let cause = config.DMG_CAUSE_ATK;
 		for (let i = 0; i < mobsHit.length; i++) {
 			let mobHitData = {mobId: mobsHit[i], cause};

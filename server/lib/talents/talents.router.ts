@@ -8,6 +8,7 @@ import StatsRouter from '../stats/stats.router';
 import MobsRouter from '../mobs/mobs.router';
 import mobsConfig from '../mobs/mobs.config';
 import RoomsRouter from '../rooms/rooms.router';
+import combatConfig from '../combat/combat.config';
 
 export default class TalentsRouter extends SocketioRouterBase {
 	protected middleware: TalentsMiddleware;
@@ -32,7 +33,7 @@ export default class TalentsRouter extends SocketioRouterBase {
 	}	
 
     public onConnected(socket: GameSocket) {
-		socket.getMobsHit = (mobs) => this.services.getMobsHit(mobs, socket);
+		socket.getTargetsHit = (targetIds) => this.services.getTargetsHit(targetIds, socket);
 		socket.getLoadModifier = () => this.services.getLoadModifier(socket);
 		socket.getDmgModifier = () => this.services.getDmgModifier(socket);
 		socket.threatModifier = () => this.services.getThreatModifier(socket);
@@ -189,7 +190,7 @@ export default class TalentsRouter extends SocketioRouterBase {
 
 		socket.currentSpell = spell;
 		
-		this.emitter.emit(mobsConfig.SERVER_GETS.MOBS_TAKE_DMG.name, {mobs: target_ids}, socket);		
+		this.emitter.emit(combatConfig.SERVER_GETS.USE_ABILITY.name, {target_ids}, socket);		
 		
 		socket.currentSpell = null;
 	}

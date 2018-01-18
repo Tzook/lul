@@ -2,6 +2,7 @@
 import SocketioRouterBase from '../socketio/socketio.router.base';
 import CombatMiddleware from './combat.middleware';
 import config from '../combat/combat.config';
+import mobsConfig from '../mobs/mobs.config';
 
 export default class CombatRouter extends SocketioRouterBase {
 	protected middleware: CombatMiddleware;
@@ -38,5 +39,13 @@ export default class CombatRouter extends SocketioRouterBase {
 				ability: socket.character.stats.primaryAbility,
 			});
 		}
+	}
+
+	[config.SERVER_GETS.USE_ABILITY.name](data, socket: GameSocket) {
+		const targetsInArea = data.target_ids || [];
+		const targetsHit = socket.getTargetsHit(targetsInArea);
+
+		// TODO support other types of primary abilities
+		this.emitter.emit(mobsConfig.SERVER_INNER.MOBS_TAKE_DMG.name, {mobs: targetsHit}, socket);		
 	}
 };

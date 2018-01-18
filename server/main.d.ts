@@ -104,7 +104,7 @@ interface GameSocket extends SocketIO.Socket {
     hpRegenTimer: NodeJS.Timer
     mpRegenTimer: NodeJS.Timer
     getKnownsList: (() => Iterable<string>)[] // List of getters for knowns
-    getMobsHit: (mobs: string[]) => string[]
+    getTargetsHit: (targetIds: string[]) => string[]
     getLoadModifier: () => number
     getDmgModifier: () => number
     threatModifier: () => number

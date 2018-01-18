@@ -15,11 +15,11 @@ export default {
         "HURT_MOB": {"name": "hurt_mob"},
         "MISS_MOB": {"name": "miss_mob"},
 		"MOB_DESPAWN": {"name": "mob_despawn"},
+		"MOBS_TAKE_DMG": {"name": "mobs_took_dmg", "alive": true, log: true},
 		"MOB_AGGRO_CHANGED": {"name": "mob_aggro_changed"},
     },
 	"SERVER_GETS": {
 		"ENTERED_ROOM": {"name": "entered_room"},
-		"MOBS_TAKE_DMG": {"name": "mobs_took_dmg", "alive": true, log: true},
 		"MOBS_MOVE": {"name": "mobs_moved", "throttle": 0, "bitch": true},
 		"PLAYER_TAKE_DMG": {"name": "took_dmg", "alive": true, log: true}
 	},
