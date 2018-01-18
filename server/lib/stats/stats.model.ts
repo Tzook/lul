@@ -86,14 +86,17 @@ export default class StatsModel extends MasterModel {
         }
 
         let bonusHp = 0;
+        let bonusMp = 0;
         for (let type in EQUIPS_SCHEMA) {
             let equip = obj.equips[type];
             bonusHp += (equip.hp || 0) + this.services.strToHp(equip.str || 0);
+            bonusMp += (equip.mp || 0) + this.services.magToMp(equip.mag || 0);
         }
 
         data.hp.now = data.hp.total = this.services.strToHp(data.str);
         data.hp.now += bonusHp;
         data.mp.now = data.mp.total = this.services.magToMp(data.mag);
+        data.mp.now += bonusMp;
 
         obj[field] = data;
     }
