@@ -57,7 +57,7 @@ export default class CombatRouter extends SocketioRouterBase {
 		const talentInfo = this.talentsRouter.getPrimaryTalentInfo(socket);
 
 		const mp = talentInfo.mp;
-		if (mp) {
+		if (mp && !socket.currentSpell) {
 			if (socket.character.stats.mp.now < mp) {
 				return this.sendError(data, socket, "Not enough mana to use the ability");
 			}
