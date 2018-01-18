@@ -206,6 +206,11 @@ export default class TalentsServices extends MasterServices {
 		return this.abilitiesInfo.get(ability);
 	}
 
+	public addAbility(socket: GameSocket, ability: string) {
+		socket.character.talents._doc[ability] = this.getEmptyCharAbility(ability);
+		this.markAbilityModified(socket);
+	}
+
     // HTTP functions
 	// =================
     public generateTalents(talents: any[], perkCollection: any[]): Promise<any> {
