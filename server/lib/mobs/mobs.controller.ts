@@ -104,8 +104,7 @@ export default class MobsController extends MasterController {
 		});
 	}
 
-	public hurtMob(mobId: string, dmg: number, socket: GameSocket): MOB_INSTANCE {
-		let mob = this.getMob(mobId, socket);
+	public hurtMob(mob: MOB_INSTANCE, dmg: number, socket: GameSocket) {
         let actualDmg = this.services.getDamageToHurt(mob.hp, dmg);
 		mob.hp -= actualDmg;
         
@@ -114,11 +113,9 @@ export default class MobsController extends MasterController {
         mob.dmged += actualDmg;
         
         this.addThreat(mob, actualDmg, socket);
-		
-        return mob;
 	}
 
-    private addThreat(mob: MOB_INSTANCE, threat: number, socket: GameSocket) {
+    public addThreat(mob: MOB_INSTANCE, threat: number, socket: GameSocket) {
 		threat *= socket.threatModifier();
         threat += mob.threat.map.get(socket.character.name) || 0;
         mob.threat.map.set(socket.character.name, threat);
@@ -155,9 +152,16 @@ export default class MobsController extends MasterController {
 		}
     }
 
-	public getHurtCharDmg(mob: MOB_INSTANCE, socket: GameSocket): number {
+	public getHurtCharDmg(mob: MOB_INSTANCE, socket: GameSocket): DMG_RESULT {
 		let dmg = getDamageRange(mob.minDmg, mob.maxDmg);
-		dmg *= socket.getDefenceModifier();
+		let dmgResult = socket.getDmgModifier(mob);
+		dmg *= dmgResult.dmg;
+		dmg = this.applyDefenceModifier(dmg, socket);
+		return {dmg, crit: dmgResult.crit};
+	}
+	
+	public applyDefenceModifier(dmg: number, socket: GameSocket, target?: MOB_INSTANCE) {
+		dmg *= socket.getDefenceModifier(target);
 		dmg = Math.ceil(dmg); // make sure we are always rounded
 		return dmg;
 	}

@@ -111,16 +111,15 @@ export default class TalentsServices extends MasterServices {
 		return chargeModifier;
 	}
 
-	public getDmgModifier(socket: GameSocket): number {
-		const dmgModifier = this.getAbilityPerkValue(talentsConfig.PERKS.DMG_MODIFIER_KEY, socket);
+	public getDmgModifier(target: GameSocket|MOB_INSTANCE): DMG_RESULT {
+		const dmgModifier = this.getAbilityPerkValue(talentsConfig.PERKS.DMG_MODIFIER_KEY, target);
 		let modifier = dmgModifier;
-		const critActivated = this.isAbilityActivated(talentsConfig.PERKS.CRIT_CHANCE, socket);
+		const critActivated = this.isAbilityActivated(talentsConfig.PERKS.CRIT_CHANCE, target);
 		if (critActivated) {
-			const critModifier = this.getAbilityPerkValue(talentsConfig.PERKS.CRIT_MODIFIER_KEY, socket);
+			const critModifier = this.getAbilityPerkValue(talentsConfig.PERKS.CRIT_MODIFIER_KEY, target);
 			modifier *= critModifier;
 		}
-		socket.isCrit = critActivated;
-		return modifier;
+		return {dmg: modifier, crit: critActivated};
 	}
 
 	public getThreatModifier(socket: GameSocket): number {
@@ -128,23 +127,29 @@ export default class TalentsServices extends MasterServices {
 		return threatModifier;
 	}
 
-	public getDefenceModifier(socket: GameSocket): number {
-		const isBlock = this.isAbilityActivated(talentsConfig.PERKS.BLOCK_CHANCE, socket);
+	public getDefenceModifier(target: GameSocket|MOB_INSTANCE): number {
+		const isBlock = this.isAbilityActivated(talentsConfig.PERKS.BLOCK_CHANCE, target);
 		let defenceModifier = 0; // complete block
 		if (!isBlock) {
-			let dmgReduction = this.getAbilityPerkValue(talentsConfig.PERKS.DAMAGE_REDUCTION, socket);
+			let dmgReduction = this.getAbilityPerkValue(talentsConfig.PERKS.DAMAGE_REDUCTION, target);
 			defenceModifier = 1 - dmgReduction;
 		}
 		return defenceModifier;
 	}
 	
-	public isAbilityActivated(perk: string, socket: GameSocket): boolean {
-		const value = this.getAbilityPerkValue(perk, socket);
+	public isAbilityActivated(perk: string, target: GameSocket|MOB_INSTANCE): boolean {
+		const value = this.getAbilityPerkValue(perk, target);
 		const activated = doesChanceWorkFloat(value);
 		return activated;
 	}
 	
-	public getAbilityPerkValue(perk: string, socket: GameSocket): number {
+	public getAbilityPerkValue(perk: string, target: GameSocket|MOB_INSTANCE): number {
+		return typeof (<MOB_INSTANCE>target).mobId === "undefined" 
+			? this.getCharPerkValue(perk, <GameSocket>target)
+			: this.getMobPerkValue(perk, <MOB_INSTANCE>target); 
+	}
+	
+	protected getCharPerkValue(perk: string, socket: GameSocket): number {
 		const ability = socket.character.stats.primaryAbility;
 		const charPerks = socket.character.talents._doc[ability].perks;
 		let perkValue = this.getPerkValue(perk, charPerks);
@@ -156,13 +161,7 @@ export default class TalentsServices extends MasterServices {
 		return perkValue;
 	}
 
-	public isMobPerkActivated(perk: string, mob: MOB_INSTANCE): boolean {
-		const value = this.getMobPerkValue(perk, mob);
-		const activated = doesChanceWorkFloat(value);
-		return activated;
-	}
-
-	public getMobPerkValue(perk: string, mob: MOB_INSTANCE): number {
+	protected getMobPerkValue(perk: string, mob: MOB_INSTANCE): number {
 		// get the perk if exists, otherwise get its default
 		let perkValue = (mob.perks || {})[perk] || this.getPerkLevelValue(perk, 0);
 		

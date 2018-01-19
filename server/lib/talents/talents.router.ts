@@ -35,9 +35,9 @@ export default class TalentsRouter extends SocketioRouterBase {
     public onConnected(socket: GameSocket) {
 		socket.getTargetsHit = (targetIds) => this.services.getTargetsHit(targetIds, socket);
 		socket.getLoadModifier = () => this.services.getLoadModifier(socket);
-		socket.getDmgModifier = () => this.services.getDmgModifier(socket);
+		socket.getDmgModifier = (target?: MOB_INSTANCE) => this.services.getDmgModifier(target || socket);
 		socket.threatModifier = () => this.services.getThreatModifier(socket);
-		socket.getDefenceModifier = () => this.services.getDefenceModifier(socket);
+		socket.getDefenceModifier = (target?: MOB_INSTANCE) => this.services.getDefenceModifier(target || socket);
 		socket.buffs = new Set();
 	}
 
@@ -64,12 +64,12 @@ export default class TalentsRouter extends SocketioRouterBase {
 		}
 	}
 	
-	[talentsConfig.SERVER_INNER.HURT_MOB.name]({dmg, mob, cause}: {dmg: number, mob: MOB_INSTANCE, cause: string}, socket: GameSocket) {
+	[talentsConfig.SERVER_INNER.HURT_MOB.name]({dmg, mob, cause, crit}: {dmg: number, mob: MOB_INSTANCE, cause: string, crit: boolean}, socket: GameSocket) {
 		const mobModel = this.mobsRouter.getMobInfo(mob.mobId);
 		const exp = this.services.getAbilityExp(dmg, mobModel);
 		this.emitter.emit(talentsConfig.SERVER_INNER.GAIN_ABILITY_EXP.name, {exp}, socket);
 		if (mob.hp > 0 && cause !== combatConfig.HIT_CAUSE.BLEED) {
-			this.controller.applyHurtMobPerks(dmg, mob, socket);
+			this.controller.applyHurtMobPerks(dmg, crit, mob, socket);
 		}
 		this.controller.applySelfPerks(dmg, socket);
 	}
@@ -85,11 +85,11 @@ export default class TalentsRouter extends SocketioRouterBase {
 	}
 	
     [talentsConfig.SERVER_INNER.TOOK_DMG.name] (data, socket: GameSocket) {
-		let {dmg, mob, cause} = data;
+		let {dmg, mob, cause, crit} = data;
 		if (!socket.alive) {
 			this.controller.clearSocketBuffs(socket);
 		} else if (cause !== combatConfig.HIT_CAUSE.BLEED) {
-			this.controller.applyMobHurtPerks(dmg, mob, socket);
+			this.controller.applyMobHurtPerks(dmg, crit, mob, socket);
 		}
     }
 	

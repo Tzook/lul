@@ -106,12 +106,16 @@ interface GameSocket extends SocketIO.Socket {
     getKnownsList: (() => Iterable<string>)[] // List of getters for knowns
     getTargetsHit: (targetIds: string[]) => string[]
     getLoadModifier: () => number
-    getDmgModifier: () => number
+    getDmgModifier: (target?: MOB_INSTANCE) => DMG_RESULT
     threatModifier: () => number
-    getDefenceModifier: () => number
-    isCrit?: boolean
+    getDefenceModifier: (target?: MOB_INSTANCE) => number
     currentSpell?: ABILITY_SPELL_MODEL
     buffs: Set<BUFF_INSTANCE>
+}
+
+interface DMG_RESULT {
+    dmg: number
+    crit: boolean
 }
 
 // items

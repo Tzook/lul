@@ -89,19 +89,34 @@ export default class MobsRouter extends SocketioRouterBase {
 
 	[config.SERVER_INNER.MISS_MOB.name](data, socket: GameSocket) {
 		let {mobId, cause} = data;
+		const mob = this.getMob(mobId, socket);
+		this.controller.addThreat(mob, 1, socket);
 		this.io.to(socket.character.room).emit(config.CLIENT_GETS.MOB_TAKE_MISS.name, {
 			id: socket.character._id,
 			mob_id: mobId,
 			cause
 		});
 	}
-
-	[config.SERVER_INNER.MOB_TAKE_DMG.name](data, socket: GameSocket) {
+	
+	[config.SERVER_INNER.MOB_TAKE_DMG.name](data, socket: GameSocket): any {
 		let {mobId, cause, dmg, crit} = data;
+		
+		const mob = this.getMob(mobId, socket);
+		if (!dmg) {
+			let dmgResult = this.combatRouter.calculateDamage(socket);
+			dmg = this.controller.applyDefenceModifier(dmgResult.dmg, socket, mob);
+			crit = dmgResult.crit;
+		}
+		if (dmg === 0) {
+			this.controller.addThreat(mob, 1, socket);
+			return this.io.to(socket.character.room).emit(config.CLIENT_GETS.MOB_ATTACK_BLOCK.name, {
+				mob_id: mobId,
+				hp: mob.hp,
+				id: socket.character._id
+			});
+		}
 
-		dmg = dmg || this.combatRouter.calculateDamage(socket);
-		let mob = this.controller.hurtMob(mobId, dmg, socket);
-		crit = crit === undefined ? socket.isCrit : crit;
+		this.controller.hurtMob(mob, dmg, socket);
 		this.emitter.emit(config.SERVER_INNER.HURT_MOB.name, { mob, dmg, cause, crit }, socket);
 		if (mob.hp === 0) {
 			this.emitter.emit(config.SERVER_INNER.MOB_DESPAWN.name, { mob }, socket);	
@@ -169,11 +184,16 @@ export default class MobsRouter extends SocketioRouterBase {
 		if (!mob) {
 			return this.sendError(data, socket, "Mob doesn't exist!");
 		}
-		let dmg = this.controller.getHurtCharDmg(mob, socket);
-		if (dmg === 0) {
-			socket.emit(config.CLIENT_GETS.ATTACK_BLOCK.name, { id: socket.character._id });
+		let dmgResult = this.controller.getHurtCharDmg(mob, socket);
+		if (dmgResult.dmg === 0) {
+			this.io.to(socket.character.room).emit(config.CLIENT_GETS.ATTACK_BLOCK.name, { id: socket.character._id });
 		} else {
-			this.emitter.emit(statsConfig.SERVER_INNER.TAKE_DMG.name, { dmg, mob, cause: combatConfig.HIT_CAUSE.ATK }, socket);
+			this.emitter.emit(statsConfig.SERVER_INNER.TAKE_DMG.name, { 
+				dmg: dmgResult.dmg, 
+				mob, 
+				cause: combatConfig.HIT_CAUSE.ATK,
+				crit: dmgResult.crit
+			}, socket);
 		}
 	}
 	

@@ -31,6 +31,7 @@ export default {
 		"MOB_MOVE": {"name": "mob_move"},
 		"AGGRO": {"name": "aggro"},
 		"ATTACK_BLOCK": {"name": "actor_blocked"},
+		"MOB_ATTACK_BLOCK": {"name": "mob_blocked"},
 	},
 	MISS_CHANCE_PER_LVL: 20,
 	MISS_CHANCE_LVLS: 5,

@@ -19,7 +19,7 @@ export default class CombatRouter extends SocketioRouterBase {
 		super.init(files, app);
 	}
 
-	public calculateDamage(socket: GameSocket): number {
+	public calculateDamage(socket: GameSocket): DMG_RESULT {
 		return this.services.calculateDamage(socket);
 	}
 
@@ -92,11 +92,12 @@ export default class CombatRouter extends SocketioRouterBase {
 			} else if (!healedSocket.alive) {
 				this.sendError({charName}, socket, "Cannot heal dead people. You ain't jesus");
 			} else {
-				const dmg = this.calculateDamage(socket);
+				const dmgResult = this.calculateDamage(socket);
 				this.emitter.emit(config.SERVER_INNER.HEAL_CHAR.name, {
 					healedSocket,
 					cause,
-					dmg
+					dmg: dmgResult.dmg,
+					crit: dmgResult.crit
 				}, socket);
 			}
 			cause = config.HIT_CAUSE.AOE;
@@ -104,8 +105,11 @@ export default class CombatRouter extends SocketioRouterBase {
 	}
 	
 	[config.SERVER_INNER.HEAL_CHAR.name](data, socket: GameSocket) {
-		let {healedSocket, dmg} = data;
+		let {healedSocket, dmg, crit} = data;
 		
-		this.emitter.emit(statsConfig.SERVER_INNER.GAIN_HP.name, { hp: dmg }, healedSocket);
+		this.emitter.emit(statsConfig.SERVER_INNER.GAIN_HP.name, { 
+			hp: dmg, 
+			crit,
+		}, healedSocket);
 	}
 };

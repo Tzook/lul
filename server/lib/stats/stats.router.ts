@@ -70,11 +70,12 @@ export default class StatsRouter extends SocketioRouterBase {
     }
 
     [config.SERVER_INNER.TOOK_DMG.name] (data, socket: GameSocket) {
-        let {dmg, cause} = data;
+        let {dmg, cause, crit} = data;
 		this.io.to(socket.character.room).emit(config.CLIENT_GETS.TAKE_DMG.name, {
 			id: socket.character._id,
             dmg,
             cause,
+            crit,
 			hp: socket.character.stats.hp.now
         });
     }
@@ -91,7 +92,7 @@ export default class StatsRouter extends SocketioRouterBase {
     }
 
     [config.SERVER_INNER.GAIN_HP.name] (data, socket: GameSocket) {
-        let hp = data.hp;
+        let {hp, crit} = data;
         let gainedHp = this.controller.addHp(socket, hp);
 
         if (gainedHp) {
@@ -101,6 +102,7 @@ export default class StatsRouter extends SocketioRouterBase {
                 id: socket.character._id,
                 name: socket.character.name,
                 hp,
+                crit,
                 now: socket.character.stats.hp.now
             });
         }

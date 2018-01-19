@@ -32,16 +32,16 @@ export default class TalentsController extends MasterController {
 		}
 	}
 
-	public applyHurtMobPerks(dmg: number, mob: MOB_INSTANCE, socket: GameSocket) {
+	public applyHurtMobPerks(dmg: number, crit: boolean, mob: MOB_INSTANCE, socket: GameSocket) {
 		this.tryToApplySocketPerk(talentsConfig.PERKS.STUN_CHANCE, talentsConfig.PERKS.STUN_DURATION, mob, socket);
 		this.tryToApplySocketPerk(talentsConfig.PERKS.CRIPPLE_CHANCE, talentsConfig.PERKS.CRIPPLE_DURATION, mob, socket);
-		this.tryToApplySocketPerk(talentsConfig.PERKS.BLEED_CHANCE, talentsConfig.PERKS.BLEED_DURATION, mob, socket, (buffInstace) => this.triggerMobBleed(dmg, mob, buffInstace, socket));
+		this.tryToApplySocketPerk(talentsConfig.PERKS.BLEED_CHANCE, talentsConfig.PERKS.BLEED_DURATION, mob, socket, (buffInstace) => this.triggerMobBleed(dmg, crit, mob, buffInstace, socket));
 	}
 	
-	public applyMobHurtPerks(dmg: number, mob: MOB_INSTANCE, socket: GameSocket) {
+	public applyMobHurtPerks(dmg: number, crit: boolean, mob: MOB_INSTANCE, socket: GameSocket) {
 		this.tryToApplyMobPerk(talentsConfig.PERKS.STUN_CHANCE, talentsConfig.PERKS.STUN_DURATION, mob, socket);
 		this.tryToApplyMobPerk(talentsConfig.PERKS.CRIPPLE_CHANCE, talentsConfig.PERKS.CRIPPLE_DURATION, mob, socket);
-		this.tryToApplyMobPerk(talentsConfig.PERKS.BLEED_CHANCE, talentsConfig.PERKS.BLEED_DURATION, mob, socket, (buffInstace) => this.triggerSocketBleed(dmg, buffInstace, socket));
+		this.tryToApplyMobPerk(talentsConfig.PERKS.BLEED_CHANCE, talentsConfig.PERKS.BLEED_DURATION, mob, socket, (buffInstace) => this.triggerSocketBleed(dmg, crit, buffInstace, socket));
 	}
 	
 	public tryToApplySocketPerk(perkChanceName: string, perkDurationName: string, mob: MOB_INSTANCE, socket: GameSocket, onPerkActivated = (buffInstace: BUFF_INSTANCE) => {}) {
@@ -68,9 +68,9 @@ export default class TalentsController extends MasterController {
 	}
 	
 	public tryToApplyMobPerk(perkChanceName: string, perkDurationName: string, mob: MOB_INSTANCE, socket: GameSocket, onPerkActivated = (buffInstace: BUFF_INSTANCE) => {}) {
-		const activated = this.services.isMobPerkActivated(perkChanceName, mob);
+		const activated = this.services.isAbilityActivated(perkChanceName, mob);
 		if (activated) {
-			let duration = this.services.getMobPerkValue(perkDurationName, mob);
+			let duration = this.services.getAbilityPerkValue(perkDurationName, mob);
 			this.io.to(socket.character.room).emit(talentsConfig.CLIENT_GETS.ACTIVATED_BUFF.name, {
 				target_id: socket.character._id,
 				key: perkChanceName,
@@ -149,13 +149,12 @@ export default class TalentsController extends MasterController {
 		socket.buffs.forEach(buffInstance => this.clearSocketBuff(socket, buffInstance));
 	}
 
-	protected triggerMobBleed(dmg: number, mob: MOB_INSTANCE, buffInstace: BUFF_INSTANCE, socket: GameSocket) {
+	protected triggerMobBleed(dmg: number, crit: boolean, mob: MOB_INSTANCE, buffInstace: BUFF_INSTANCE, socket: GameSocket) {
 		let bleedDmg = this.services.getBleedDmg(dmg);
-		this.tickMobBleed(bleedDmg, buffInstace, mob, socket.character.room, 0, socket);
+		this.tickMobBleed(bleedDmg, crit, buffInstace, mob, socket.character.room, 0, socket);
 	}
 
-	protected tickMobBleed(dmg: number, bleedBuff: BUFF_INSTANCE, mob: MOB_INSTANCE, room: string, tickIndex: number, socket: GameSocket) {
-		let crit = socket.isCrit;
+	protected tickMobBleed(dmg: number, crit: boolean, bleedBuff: BUFF_INSTANCE, mob: MOB_INSTANCE, room: string, tickIndex: number, socket: GameSocket) {
 		let bleedTimer = setTimeout(() => {
 			if (mob.hp <= 0 || !socket.connected || !socket.alive || socket.character.room !== room) {
 				return this.clearBuff(room, mob.id, bleedBuff);
@@ -166,23 +165,24 @@ export default class TalentsController extends MasterController {
 				cause: combatConfig.HIT_CAUSE.BLEED,
 				crit,
 			}, socket);
-			this.tickMobBleed(dmg, bleedBuff, mob, room, tickIndex + 1, socket);
+			this.tickMobBleed(dmg, crit, bleedBuff, mob, room, tickIndex + 1, socket);
 		}, talentsConfig.PERKS.BLEED_TICK_TIME * 1000 - (tickIndex === 0 ? 200 : 0)); // reducing 200 ms so all the ticks will fit in the time
 		bleedBuff.onPerkCleared = () => clearTimeout(bleedTimer);
 	}
 
-	protected triggerSocketBleed(dmg: number, buffInstace: BUFF_INSTANCE, socket: GameSocket) {
+	protected triggerSocketBleed(dmg: number, crit: boolean, buffInstace: BUFF_INSTANCE, socket: GameSocket) {
 		let bleedDmg = this.services.getBleedDmg(dmg);
-		this.tickSocketBleed(bleedDmg, buffInstace, 0, socket);
+		this.tickSocketBleed(bleedDmg, crit, buffInstace, 0, socket);
 	}
 
-	protected tickSocketBleed(dmg: number, bleedBuff: BUFF_INSTANCE, tickIndex: number, socket: GameSocket) {
+	protected tickSocketBleed(dmg: number, crit: boolean, bleedBuff: BUFF_INSTANCE, tickIndex: number, socket: GameSocket) {
 		let bleedTimer = setTimeout(() => {
 			this.mobsRouter.getEmitter().emit(statsConfig.SERVER_INNER.TAKE_DMG.name, { 
 				dmg,
 				cause: combatConfig.HIT_CAUSE.BLEED,
+				crit
 			}, socket);
-			this.tickSocketBleed(dmg, bleedBuff, tickIndex + 1, socket);
+			this.tickSocketBleed(dmg, crit, bleedBuff, tickIndex + 1, socket);
 		}, talentsConfig.PERKS.BLEED_TICK_TIME * 1000 - (tickIndex === 0 ? 200 : 0)); // reducing 200 ms so all the ticks will fit in the time
 		bleedBuff.onPerkCleared = () => clearTimeout(bleedTimer);
 	}

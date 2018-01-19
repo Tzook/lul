@@ -11,14 +11,15 @@ export default class CombatServices extends MasterServices {
 		super.init(files, app);
 	}
 
-	public calculateDamage(socket: GameSocket): number {
+	public calculateDamage(socket: GameSocket): DMG_RESULT {
 		let mainStat = this.talentsRouter.getPrimaryTalentInfo(socket).stat;
         let baseDmg = socket.character.stats[mainStat] + socket.bonusStats[mainStat]; 
         let load = socket.lastAttackLoad || 0;
 		let bonusDmg = socket.getLoadModifier() * load * baseDmg / 100;
-		let maxDmg = (baseDmg + bonusDmg) * socket.getDmgModifier();
+		let dmgModifier = socket.getDmgModifier();
+		let maxDmg = (baseDmg + bonusDmg) * dmgModifier.dmg;
 		let minDmg = maxDmg / 2;
 		let dmg = getDamageRange(minDmg, maxDmg);
-		return dmg;
+		return {dmg, crit: dmgModifier.crit};
 	}
 };
