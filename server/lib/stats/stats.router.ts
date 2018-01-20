@@ -173,6 +173,9 @@ export default class StatsRouter extends SocketioRouterBase {
         Object.defineProperty(socket, 'alive', {get: () => socket.character.stats.hp.now > 0});
         Object.defineProperty(socket, 'maxHp', {get: () => socket.character.stats.hp.total + socket.bonusStats.hp});
         Object.defineProperty(socket, 'maxMp', {get: () => socket.character.stats.mp.total + socket.bonusStats.mp});
+        Object.defineProperty(socket, 'totalStr', {get: () => socket.character.stats.str + socket.bonusStats.str});
+        Object.defineProperty(socket, 'totalDex', {get: () => socket.character.stats.dex + socket.bonusStats.dex});
+        Object.defineProperty(socket, 'totalMag', {get: () => socket.character.stats.mag + socket.bonusStats.mag});
         socket.bonusStats = {};
         for (var stat in BASE_STATS_SCHEMA) {
             socket.bonusStats[stat] = 0;
