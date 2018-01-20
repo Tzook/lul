@@ -107,8 +107,12 @@ interface GameSocket extends SocketIO.Socket {
     getTargetsHit: (targetIds: string[]) => string[]
     getLoadModifier: () => number
     getDmgModifier: (target?: MOB_INSTANCE) => DMG_RESULT
-    threatModifier: () => number
+    getThreatModifier: () => number
     getDefenceModifier: (target?: MOB_INSTANCE) => number
+    getHpRegenModifier: () => number
+    getMpRegenModifier: () => number
+    getHpRegenInterval: () => number
+    getMpRegenInterval: () => number
     currentSpell?: ABILITY_SPELL_MODEL
     buffs: Set<BUFF_INSTANCE>
 }

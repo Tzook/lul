@@ -26,10 +26,6 @@ const CONFIG = {
 		"LEVEL_UP": {"name": "actor_lvl_up"}
 	},
 	"BEGIN_STATS_SUM": 7,
-	"REGEN_MP_INTERVAL": 5000,
-	"REGEN_HP_INTERVAL": 5000,
-	"REGEN_MP_PERCENT": 0.1,
-	"REGEN_HP_PERCENT": 0.1,
 	"ABILITY_MELEE": "melee",
 	ABILITY_RANGE: "range",
 	"MAG_TO_MP_RATIO": 6,

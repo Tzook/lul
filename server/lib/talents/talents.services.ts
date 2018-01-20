@@ -137,6 +137,22 @@ export default class TalentsServices extends MasterServices {
 		return defenceModifier;
 	}
 	
+	public getHpRegenModifier(socket: GameSocket): number {
+		return this.getAbilityPerkValue(talentsConfig.PERKS.HP_REGEN_MODIFIER, socket);
+	}
+	
+	public getMpRegenModifier(socket: GameSocket): number {
+		return this.getAbilityPerkValue(talentsConfig.PERKS.MP_REGEN_MODIFIER, socket);
+	}
+	
+	public getHpRegenInterval(socket: GameSocket): number {
+		return this.getAbilityPerkValue(talentsConfig.PERKS.HP_REGEN_INTERVAL, socket) * 1000;
+	}
+	
+	public getMpRegenInterval(socket: GameSocket): number {
+		return this.getAbilityPerkValue(talentsConfig.PERKS.MP_REGEN_INTERVAL, socket) * 1000;
+	}
+	
 	public isAbilityActivated(perk: string, target: GameSocket|MOB_INSTANCE): boolean {
 		const value = this.getAbilityPerkValue(perk, target);
 		const activated = doesChanceWorkFloat(value);

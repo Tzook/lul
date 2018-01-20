@@ -181,8 +181,10 @@ export default class StatsRouter extends SocketioRouterBase {
         for (var itemKey in EQUIPS_SCHEMA) {
             this[config.SERVER_INNER.STATS_ADD.name]({stats: socket.character.equips[itemKey], validate: false}, socket);
         }
-        this.regenHpInterval(socket);
-        this.regenMpInterval(socket);
+        process.nextTick(() => {
+            this.regenHpInterval(socket);
+            this.regenMpInterval(socket);
+        });
     }
 
     private regenHpInterval(socket: GameSocket) {
@@ -194,7 +196,7 @@ export default class StatsRouter extends SocketioRouterBase {
                     this.emitter.emit(config.SERVER_INNER.GAIN_HP.name, { hp }, socket);
                     this.regenHpInterval(socket);
                 }
-            }, config.REGEN_HP_INTERVAL);
+            }, socket.getHpRegenInterval());
         }
     }
     private regenMpInterval(socket: GameSocket) {
@@ -206,7 +208,7 @@ export default class StatsRouter extends SocketioRouterBase {
                     this.emitter.emit(config.SERVER_INNER.GAIN_MP.name, { mp }, socket);
                     this.regenMpInterval(socket);
                 }
-            }, config.REGEN_MP_INTERVAL);
+            }, socket.getMpRegenInterval());
         }
     }
 };

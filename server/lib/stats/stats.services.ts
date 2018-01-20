@@ -63,11 +63,11 @@ export default class StatsServices extends MasterServices {
     }
 
     public getRegenHp(socket: GameSocket): number {
-        return socket.maxHp * config.REGEN_HP_PERCENT | 0;
+        return socket.maxHp * socket.getHpRegenModifier() | 0;
     }
 
     public getRegenMp(socket: GameSocket): number {
-        return socket.maxMp * config.REGEN_MP_PERCENT | 0;
+        return socket.maxMp * socket.getMpRegenModifier() | 0;
     }
     
     public static getMainStat(socket: GameSocket): string {

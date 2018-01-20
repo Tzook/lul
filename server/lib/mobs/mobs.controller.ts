@@ -116,7 +116,7 @@ export default class MobsController extends MasterController {
 	}
 
     public addThreat(mob: MOB_INSTANCE, threat: number, socket: GameSocket) {
-		threat *= socket.threatModifier();
+		threat *= socket.getThreatModifier();
         threat += mob.threat.map.get(socket.character.name) || 0;
         mob.threat.map.set(socket.character.name, threat);
 
