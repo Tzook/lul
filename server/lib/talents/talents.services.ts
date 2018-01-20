@@ -56,7 +56,7 @@ export default class TalentsServices extends MasterServices {
 		pool.forEach(perk => {
 			const perkConfig = this.getPerkConfig(perk);
 			const charPerkValue = this.getPerkValue(perk, charPerks);
-			if (!perkConfig.max || charPerkValue < perkConfig.max) {
+			if (!perkConfig.max || (perkConfig.value > 0 ? charPerkValue < perkConfig.max : charPerkValue > perkConfig.max)) {
 				newPool.push(perk);
 			}
 		});
