@@ -1,4 +1,3 @@
-
 import MasterController from '../master/master.controller';
 import * as _ from 'underscore';
 import RoomsServices from './rooms.services';
@@ -24,6 +23,9 @@ export default class RoomsController extends MasterController {
 	public socketLeaveRoom(socket: GameSocket, room: string) {
 		if (socket.bitch) {
 			this.removeBitch(socket, room);
+			clearTimeout(this.roomBitchTimeouts.get(room));
+			this.roomBitchTimeouts.delete(room);
+            this.roomBitchKeys.delete(room);
 			let roomObject = socket.adapter.rooms[room];
 			if (roomObject && roomObject.length) {
 				// Since our bitch left, we want to set a random socket as the bitch immediately
@@ -49,19 +51,16 @@ export default class RoomsController extends MasterController {
 
 	protected askForBitch(room: string) {
 		clearTimeout(this.roomBitchTimeouts.get(room));
-		let sockets = (<any>this.io.sockets).adapter.rooms[room];
-		if (sockets && sockets.length > 1) {
-			let key = _.uniqueId("bitch-");
-			this.roomBitchKeys.set(room, key);
-			console.log("asking bitch please. key %s, room:", key, room);
-			this.io.to(room).emit(config.CLIENT_GETS.BITCH_PLEASE.name, {
-				key
-			});
-			let timeout = setTimeout(() => {
-				this.askForBitch(room);
-			}, config.BITCH_INTERVAL);
-			this.roomBitchTimeouts.set(room, timeout);
-		}
+		let key = _.uniqueId("bitch-");
+		this.roomBitchKeys.set(room, key);
+		console.log("asking bitch please. key %s, room:", key, room);
+		this.io.to(room).emit(config.CLIENT_GETS.BITCH_PLEASE.name, {
+			key
+		});
+		let timeout = setTimeout(() => {
+			this.askForBitch(room);
+		}, config.BITCH_INTERVAL);
+		this.roomBitchTimeouts.set(room, timeout);
 	}
 
 	public newBitchRequest(socket: GameSocket, key: string) {
