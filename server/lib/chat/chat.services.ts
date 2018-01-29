@@ -5,14 +5,18 @@ import StatsRouter from '../stats/stats.router';
 import RoomsRouter from '../rooms/rooms.router';
 import roomsConfig from '../rooms/rooms.config';
 import talentsConfig from '../talents/talents.config';
+import itemsConfig from '../items/items.config';
+import GoldRouter from '../gold/gold.router';
 
 export default class ChatServices extends MasterServices {
     protected statsRouter: StatsRouter;
     protected roomsRouter: RoomsRouter;
+    protected goldRouter: GoldRouter;
 
 	init(files, app) {
         this.statsRouter = files.routers.stats;
         this.roomsRouter = files.routers.rooms;
+        this.goldRouter = files.routers.gold;
 		super.init(files, app);
     }
 
@@ -32,15 +36,16 @@ export default class ChatServices extends MasterServices {
             return false;
         }
         
+        let emitter = this.statsRouter.getEmitter();
         switch (parts[0]) {
             case "/lvl":
-                return this.statsRouter.getEmitter().emit(statsConfig.SERVER_INNER.GAIN_EXP.name, {
+                return emitter.emit(statsConfig.SERVER_INNER.GAIN_EXP.name, {
                     exp: this.statsRouter.getExp(targetSocket.character.stats.lvl)
                 }, targetSocket);
 
             case "/lvlpa":
                 let abilityLvl = targetSocket.character.talents._doc[targetSocket.character.stats.primaryAbility].lvl;
-                return this.statsRouter.getEmitter().emit(talentsConfig.SERVER_INNER.GAIN_ABILITY_EXP.name, {
+                return emitter.emit(talentsConfig.SERVER_INNER.GAIN_ABILITY_EXP.name, {
                     exp: this.statsRouter.getExp(abilityLvl)
                 }, targetSocket);
             
@@ -52,9 +57,16 @@ export default class ChatServices extends MasterServices {
                     return false;
                 }
                 
-                return this.roomsRouter.getEmitter().emit(roomsConfig.SERVER_INNER.MOVE_ROOM.name, {
+                return emitter.emit(roomsConfig.SERVER_INNER.MOVE_ROOM.name, {
                     room, 
                 }, targetSocket);
+
+            case "/gold":
+                const amount = +parts[2] > 0 ? +parts[2] : 10000;
+                let goldItem = this.goldRouter.getGoldItem(amount);
+                return emitter.emit(itemsConfig.SERVER_INNER.ITEM_ADD.name, { 
+                    item: goldItem
+                 }, targetSocket); 
         }
 
         return false;
