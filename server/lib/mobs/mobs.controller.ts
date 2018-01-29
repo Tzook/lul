@@ -184,9 +184,11 @@ export default class MobsController extends MasterController {
 	}
 
 	protected setRespawnTimer(mob: MOB_INSTANCE, room: string) {
-		setTimeout(() => {
-			this.spawnMobs(mob.spawn, mob.spawn.mobs, room);
-		}, mob.spawn.interval * 1000);
+		if (mob.spawn.interval >= 0) {
+			setTimeout(() => {
+				this.spawnMobs(mob.spawn, mob.spawn.mobs, room);
+			}, mob.spawn.interval * 1000);
+		}
 	}
 
 	public didHitMob(mobId: string, socket: GameSocket) {
