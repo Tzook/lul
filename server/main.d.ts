@@ -85,7 +85,9 @@ interface Char extends PublicChar {
     talents: {markModified: (path) => {}, _doc: {[ability: string]: CHAR_ABILITY_TALENT}}
 }
 
-interface User extends Doc {}
+interface User extends Doc {
+    boss?: boolean // user with extended priviledges
+}
 
 interface GameSocket extends SocketIO.Socket {
     test?: boolean;

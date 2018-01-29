@@ -87,17 +87,16 @@ export default class RoomsRouter extends SocketioRouterBase {
 			if (!targetRoomInfo) {
 				this.sendError(data, socket, "No target room info available for " + roomInfo.town);
 			} else {
-				let targetPortal = this.controller.pickRandomPortal(targetRoomInfo);
                 this.emitter.emit(config.SERVER_INNER.MOVE_ROOM.name, {
                     room: targetRoomInfo.name, 
-                    targetPortal
                 }, socket);
 			}
 		}
 	}
 
-	[config.SERVER_INNER.MOVE_ROOM.name](data: {room: string, targetPortal: PORTAL_MODEL}, socket: GameSocket) {
-        let {room, targetPortal} = data;
+	[config.SERVER_INNER.MOVE_ROOM.name](data: {room: string, targetPortal?: PORTAL_MODEL}, socket: GameSocket) {
+		let {room, targetPortal} = data;
+		targetPortal = targetPortal || this.controller.pickRandomPortal(this.services.getRoomInfo(room));
 		socket.leave(socket.character.room);
 
         this.emitter.emit(config.SERVER_INNER.LEFT_ROOM.name, {}, socket);

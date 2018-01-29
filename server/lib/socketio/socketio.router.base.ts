@@ -35,12 +35,12 @@ export default class SocketioRouterBase extends MasterRouter {
 		return 'socketio';
 	}
 
-    protected log(data: any, socket: GameSocket, message: string, event?: string) {
+    public log(data: any, socket: GameSocket, message: string, event?: string) {
 		event = event || this.getEventName();
         logger.info(message, this.getMeta(socket, data, event));
     }
 
-	protected sendError(data: any, socket: GameSocket, error: string, emit = true, display = false) {
+	public sendError(data: any, socket: GameSocket, error: string, emit = true, display = false) {
 		const event = this.getEventName();
 		logger.warn(error, this.getMeta(socket, data, event));
 		emit && socket.emit(config.CLIENT_GETS.EVENT_ERROR.name, {
@@ -51,7 +51,7 @@ export default class SocketioRouterBase extends MasterRouter {
 		});
 	}
 
-	protected fatal(socket: GameSocket, error: Error, event?: string) {
+	public fatal(socket: GameSocket, error: Error, event?: string) {
 		event = event || this.getEventName();
         logger.error(error.toString(), this.getMeta(socket, error, event));
 	}

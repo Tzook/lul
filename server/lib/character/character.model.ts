@@ -1,5 +1,6 @@
 
 import MasterModel from '../master/master.model';
+import { PRIORITY_USER } from '../user/user.model';
 
 export const PRIORITY_CHAR = 10;
 
@@ -22,7 +23,7 @@ export default class CharacterModel extends MasterModel {
     }
 
     get priority() {
-        return PRIORITY_CHAR;
+        return PRIORITY_USER + PRIORITY_CHAR;
     }
 
     createModel() {

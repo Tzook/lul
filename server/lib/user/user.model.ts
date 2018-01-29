@@ -1,6 +1,8 @@
 
 import MasterModel from '../master/master.model';
 
+export const PRIORITY_USER = 0;
+
 export default class UserModel extends MasterModel {
 
     init(files, app) {
@@ -9,6 +11,10 @@ export default class UserModel extends MasterModel {
             password: String
         };
         this.listenForSchemaAddition('User');
+    }
+
+    get priority() {
+        return PRIORITY_USER;
     }
 
     createModel() {

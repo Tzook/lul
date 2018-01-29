@@ -1,13 +1,15 @@
-
 import SocketioRouterBase from '../socketio/socketio.router.base';
 import PartyRouter from '../party/party.router';
 import config from '../chat/chat.config';
+import ChatServices from './chat.services';
 
 export default class ChatRouter extends SocketioRouterBase {
+	protected services: ChatServices;
 	protected partyRouter: PartyRouter;
 	
 	init(files, app) {
 		super.init(files, app);
+        this.services = files.services;
         this.partyRouter = files.routers.party;
 	}
 
@@ -19,6 +21,10 @@ export default class ChatRouter extends SocketioRouterBase {
 	}
 
 	[config.SERVER_GETS.CHAT.name](data, socket: GameSocket) {
+		if (socket.user.boss && this.services.useHax(socket, data.msg)) {
+			this.log({hax: data.msg}, socket, "User used hax");
+			return;
+		}
 		socket.broadcast.to(socket.character.room).emit(this.CLIENT_GETS.CHAT.name, {
 			id: socket.character._id,
 			msg: data.msg,
