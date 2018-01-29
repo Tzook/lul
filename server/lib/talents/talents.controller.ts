@@ -237,17 +237,19 @@ export default class TalentsController extends MasterController {
 		}
 	}
 
-	protected getRoomBuffsInstance(room: string) {
+	protected getRoomBuffsInstance(room: string, createIfMissing: boolean = false) {
 		let roomBuffs = this.roomToBuff.get(room);
 		if (!roomBuffs) {
 			roomBuffs = new Map();
-			this.roomToBuff.set(room, roomBuffs);
+			if (createIfMissing) {
+				this.roomToBuff.set(room, roomBuffs);
+			}
 		}
 		return roomBuffs;
 	}
 
 	protected getMobBuffsInstance(room: string, mob: MOB_INSTANCE) {
-		let roomBuffs = this.getRoomBuffsInstance(room);
+		let roomBuffs = this.getRoomBuffsInstance(room, true);
 		let mobBuffs = roomBuffs.get(mob.id);
 		if (!mobBuffs) {
 			mobBuffs = new Set();
