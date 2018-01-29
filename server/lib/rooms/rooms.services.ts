@@ -1,6 +1,9 @@
 
 import MasterServices from '../master/master.services';
 import NpcsRouter from "../npcs/npcs.router";
+import * as _ from 'underscore';
+
+const ROOM_NAME_INSTANCE_SEPARATOR = "~~";
 
 export default class RoomsServices extends MasterServices {
     private roomsInfo: Map<string, ROOM_MODEL> = new Map();
@@ -40,7 +43,7 @@ export default class RoomsServices extends MasterServices {
 			town: scene.nearestTownScene,
 			portals,
 			spawns
-		}
+		};
         let roomModel = new this.Model(room);
 
         let npcsPromise = this.npcsRouter.updateNpcs(scene.name, scene.NPC);
@@ -63,4 +66,17 @@ export default class RoomsServices extends MasterServices {
 	public getRoomInfo(room: string): ROOM_MODEL|undefined {
 		return this.roomsInfo.get(room);
 	}
+
 };  
+
+export function getRoomInstance(room: string) {
+	return _.uniqueId(room + ROOM_NAME_INSTANCE_SEPARATOR);
+};
+
+export function getRoomName(socket: GameSocket) {
+	return socket.character.room.split(ROOM_NAME_INSTANCE_SEPARATOR)[0];
+};
+
+export function isInInstance(socket: GameSocket) {
+	return socket.character.room.includes(ROOM_NAME_INSTANCE_SEPARATOR);
+}

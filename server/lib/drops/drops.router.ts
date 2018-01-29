@@ -113,6 +113,7 @@ export default class DropsRouter extends SocketioRouterBase {
 			map.set(itemId, itemData);
 			itemsData[itemsData.length] = itemData;
 
+			// TODO clear the timeouts when item is picked / room closes
 			setTimeout(() => {
 				if (map.has(itemId)) {
 					this.removeItem(room, itemId);

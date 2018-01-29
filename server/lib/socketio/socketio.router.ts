@@ -184,18 +184,20 @@ export default class SocketioRouter extends SocketioRouterBase {
 	}
 
 	[config.SERVER_GETS.DISCONNECT.name](data, socket: GameSocket) {
-		if (!this.map.has(socket.id)) {
-			return;
-		}
-        this.log({}, socket, "Disconnected");
-		// automations should not be saved afterwards - we want it to reset every time
-		if (!socket.test) {
-            clearInterval(socket.saveTimer);
-            this.saveUser(socket);
-		}
-		this.map.delete(socket.user._id.toString());
-		this.map.delete(socket.character.name);
-		this.map.delete(socket.id);
+		process.nextTick(() => {
+			if (!this.map.has(socket.id)) {
+				return;
+			}
+			this.log({}, socket, "Disconnected");
+			// automations should not be saved afterwards - we want it to reset every time
+			if (!socket.test) {
+				clearInterval(socket.saveTimer);
+				this.saveUser(socket);
+			}
+			this.map.delete(socket.user._id.toString());
+			this.map.delete(socket.character.name);
+			this.map.delete(socket.id);
+		});
 	}
 
     private saveUser(socket: GameSocket) {

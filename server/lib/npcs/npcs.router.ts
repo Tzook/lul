@@ -6,6 +6,7 @@ import itemsConfig from '../items/items.config';
 import GoldRouter from '../gold/gold.router';
 import roomsConfig from '../rooms/rooms.config';
 import RoomsRouter from '../rooms/rooms.router';
+import { getRoomInstance, getRoomName } from '../rooms/rooms.services';
 
 export default class NpcsRouter extends SocketioRouterBase {
     protected services: NpcsServices;
@@ -45,7 +46,7 @@ export default class NpcsRouter extends SocketioRouterBase {
             return this.sendError(data, socket, "Stack value is invalid.");
         } else if (!npcInfo) {
             return this.sendError(data, socket, "No npc with such key.");
-        } else if (npcInfo.room !== socket.character.room) {
+        } else if (npcInfo.room !== getRoomName(socket)) {
             return this.sendError(data, socket, "The npc is in a different room than you!");
         } else if (!npcInfo.sell || !npcInfo.sell[index]) {
             return this.sendError(data, socket, "The npc does not sell the item you want.");
@@ -81,7 +82,7 @@ export default class NpcsRouter extends SocketioRouterBase {
             return this.sendError(data, socket, "Stack value is invalid.");
         } else if (!npcInfo) {
             return this.sendError(data, socket, "No npc with such key.");
-        } else if (npcInfo.room !== socket.character.room) {
+        } else if (npcInfo.room !== getRoomName(socket)) {
             return this.sendError(data, socket, "The npc is in a different room than you!");
         } else if (!npcInfo.sell) {
             return this.sendError(data, socket, "The npc is not a vendor, he's just a peasant.");
@@ -101,11 +102,11 @@ export default class NpcsRouter extends SocketioRouterBase {
 	}
     
 	[npcsConfig.SERVER_GETS.NPC_TELEPORT.name](data, socket: GameSocket) {
-        let {npcKey, room} = data;
+        let {npcKey, room, instance} = data;
         let npcInfo = this.services.getNpcInfo(npcKey);
         if (!npcInfo) {
             return this.sendError(data, socket, "No npc with such key.");
-        } else if (npcInfo.room !== socket.character.room) {
+        } else if (npcInfo.room !== getRoomName(socket)) {
             return this.sendError(data, socket, "The npc is in a different room than you.");
         } 
 
@@ -120,6 +121,11 @@ export default class NpcsRouter extends SocketioRouterBase {
         let targetPortal = roomInfo.portals[wantedRoom.portal];
         if (!targetPortal) {
             return this.sendError(data, socket, "The wanted portal in the room does not exist.");
+        }
+
+        // TODO check if room can even be an instance
+        if (instance) {
+            room = getRoomInstance(room);
         }
 
         this.emitter.emit(roomsConfig.SERVER_INNER.MOVE_ROOM.name, {

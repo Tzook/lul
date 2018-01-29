@@ -3,7 +3,7 @@ import SocketioRouterBase from '../socketio/socketio.router.base';
 import * as _ from 'underscore';
 import RoomsController from './rooms.controller';
 import RoomsMiddleware from './rooms.middleware';
-import RoomsServices from './rooms.services';
+import RoomsServices, { getRoomInstance, isInInstance, getRoomName } from './rooms.services';
 import config from './rooms.config';
 
 export default class RoomsRouter extends SocketioRouterBase {
@@ -51,7 +51,7 @@ export default class RoomsRouter extends SocketioRouterBase {
 	}
 
 	[config.SERVER_GETS.ENTER_PORTAL.name](data, socket: GameSocket) {
-		let roomInfo = this.services.getRoomInfo(socket.character.room);
+		let roomInfo = this.services.getRoomInfo(getRoomName(socket));
 		if (!roomInfo) {
 			this.sendError(data, socket, "No room info available!");
 		} else if (!roomInfo.portals[data.portal]) {
@@ -65,16 +65,21 @@ export default class RoomsRouter extends SocketioRouterBase {
 				this.sendError(data, socket, "No target portal in room!");
 			} else {
 				let targetPortal = targetRoomInfo.portals[portal.targetPortal];
+				// TODO check if room can even be an instance
+				let room = portal.targetRoom;
+				if (data.instance) {
+					room = getRoomInstance(room);
+				}
                 this.emitter.emit(config.SERVER_INNER.MOVE_ROOM.name, {
-                    room: portal.targetRoom, 
-                    targetPortal
+                    room, 
+					targetPortal,
                 }, socket);
 			}
 		}
 	}
 
 	[config.SERVER_INNER.MOVE_TO_TOWN.name] (data, socket: GameSocket) {
-		let roomInfo = this.services.getRoomInfo(socket.character.room);
+		let roomInfo = this.services.getRoomInfo(getRoomName(socket));
 		if (!roomInfo) {
 			this.sendError(data, socket, "No room info available for " + socket.character.room);
 		} else {
@@ -96,18 +101,19 @@ export default class RoomsRouter extends SocketioRouterBase {
 		socket.leave(socket.character.room);
 
         this.emitter.emit(config.SERVER_INNER.LEFT_ROOM.name, {}, socket);
-		
+
 		socket.character.room = room;
 		socket.character.position.x = targetPortal.x;
 		socket.character.position.y = targetPortal.y;
-		socket.emit(this.CLIENT_GETS.MOVE_ROOM.name, {
-			room,
-			character: socket.character
-		});
+		this.notifyAboutRoom(socket);
 	}
 
 	[config.SERVER_GETS.DISCONNECT.name](data, socket: GameSocket) {
 		this.emitter.emit(config.SERVER_INNER.LEFT_ROOM.name, {}, socket);
+		if (isInInstance(socket)) {
+			// make sure you don't login in a room instance
+			this.emitter.emit(config.SERVER_INNER.MOVE_TO_TOWN.name, {}, socket);
+		}
 	}
 
 	[config.SERVER_INNER.LEFT_ROOM.name](data, socket: GameSocket) {
@@ -124,11 +130,13 @@ export default class RoomsRouter extends SocketioRouterBase {
 	}
 
     public onConnected(socket: GameSocket) {
-		process.nextTick(() => {
-			socket.emit(this.CLIENT_GETS.MOVE_ROOM.name, {
-				room: socket.character.room,
-				character: socket.character,
-			});
+		process.nextTick(() => this.notifyAboutRoom(socket));
+	}
+	
+	protected notifyAboutRoom(socket: GameSocket) {
+		socket.emit(this.CLIENT_GETS.MOVE_ROOM.name, {
+			room: getRoomName(socket),
+			character: socket.character,
 		});
 	}
 };

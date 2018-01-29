@@ -11,6 +11,7 @@ import dropsConfig from '../drops/drops.config';
 import questsConfig from '../quests/quests.config';
 import combatConfig from '../combat/combat.config';
 import CombatRouter from '../combat/combat.router';
+import { isInInstance, getRoomName } from '../rooms/rooms.services';
 
 export default class MobsRouter extends SocketioRouterBase {
 	protected middleware: MobsMiddleware;
@@ -53,9 +54,9 @@ export default class MobsRouter extends SocketioRouterBase {
 	[config.SERVER_GETS.ENTERED_ROOM.name](data, socket: GameSocket) {
 		if (!this.controller.hasRoom(socket.character.room)) {
 			// we must spawn new mobs
-			let roomInfo = this.roomsRouter.getRoomInfo(socket.character.room);
+			let roomInfo = this.roomsRouter.getRoomInfo(getRoomName(socket));
 			if (roomInfo) {
-				this.controller.startSpawningMobs(roomInfo);
+				this.controller.startSpawningMobs(roomInfo, socket.character.room);
 			} else {
 				this.sendError({charRoom: socket.character.room}, socket, "No room info! cannot spawn any mobs.");
 			}
@@ -68,7 +69,11 @@ export default class MobsRouter extends SocketioRouterBase {
 		for (let mob of socket.threats) {
             this.controller.removeThreat(mob, socket);
         }
-        socket.threats.clear();
+		socket.threats.clear();
+		let peopleLeftInRoom = socket.adapter.rooms[socket.character.room];
+		if (isInInstance(socket) && !peopleLeftInRoom) {
+			this.controller.clearRoom(socket);
+		}
 	}
 
 	[config.SERVER_INNER.MOBS_TAKE_DMG.name](data, socket: GameSocket) {

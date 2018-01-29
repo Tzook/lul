@@ -10,6 +10,7 @@ import statsConfig from '../stats/stats.config';
 import itemsConfig from '../items/items.config';
 import NpcsRouter from '../npcs/npcs.router';
 import talentsConfig from '../talents/talents.config';
+import { getRoomName } from '../rooms/rooms.services';
 
 export default class QuestsRouter extends SocketioRouterBase {
 	protected middleware: QuestsMiddleware;
@@ -46,7 +47,7 @@ export default class QuestsRouter extends SocketioRouterBase {
 			this.sendError(data, socket, "Already finished this quest!");
 		} else if (!this.npcsRouter.doesNpcGiveQuest(npcKey, questKey)) {
 			this.sendError(data, socket, `The NPC ${npcKey} does not have the quest ${questKey}!`);
-		} else if (!this.npcsRouter.isNpcInRoom(npcKey, socket.character.room)) {
+		} else if (!this.npcsRouter.isNpcInRoom(npcKey, getRoomName(socket))) {
 			this.sendError(data, socket, `The NPC ${npcKey} must be in your room!`);
 		} else if (unmetReason = this.services.questReqUnmetReason(socket.character, questInfo)) {
 			this.sendError(data, socket, "Character does not meet the quest requirement: " + unmetReason);
@@ -68,7 +69,7 @@ export default class QuestsRouter extends SocketioRouterBase {
 			this.sendError(data, socket, "Quest cannot be completed, it is not in progress!");
 		} else if (!this.npcsRouter.doesNpcEndQuest(npcKey, questKey)) {
 			this.sendError(data, socket, `The NPC ${npcKey} does not have the quest ${questKey}!`);
-		} else if (!this.npcsRouter.isNpcInRoom(npcKey, socket.character.room)) {
+		} else if (!this.npcsRouter.isNpcInRoom(npcKey, getRoomName(socket))) {
 			this.sendError(data, socket, `The NPC ${npcKey} must be in your room!`);
 		} else if (unmetReason = this.services.questFinishUnmetReason(socket.character, this.itemsRouter.getItemsCounts(socket), questInfo)) {
 			this.sendError(data, socket, "Quest does not meet finishing criteria: " + unmetReason);
