@@ -22,24 +22,34 @@ export default class DropsRouter extends SocketioRouterBase {
 		super.init(files, app);
 	}
 
-	private getRoomMap(socket: GameSocket) {
-		let map = this.dropsMap.get(socket.character.room);
+	private getRoomMap(room: string, createIfMissing: boolean = false) {
+		let map = this.dropsMap.get(room);
 		if (!map) {
 			map = new Map();
-			this.dropsMap.set(socket.character.room, map);
+			if (createIfMissing) {
+				this.dropsMap.set(room, map);
+			}
 		}
 		return map;
 	}
 
+	private removeItem(room: string, itemId: string) {
+		let map = this.getRoomMap(room);
+		map.delete(itemId);
+		if (map.size === 0) {
+			this.dropsMap.delete(room);
+		}
+	}
+
 	[config.SERVER_GETS.ENTERED_ROOM.name](data, socket: GameSocket) {
-		this.getRoomMap(socket).forEach(itemData => {
+		this.getRoomMap(socket.character.room).forEach(itemData => {
 			socket.emit(this.CLIENT_GETS.ITEMS_DROP.name, [itemData]);
 		});
 	}
 
     [config.SERVER_GETS.ITEM_PICK.name](data, socket: GameSocket) {
 		let itemId: string = data.item_id;
-		let map = this.getRoomMap(socket);
+		let map = this.getRoomMap(socket.character.room);
 		if (!map.has(itemId)) {
             return this.sendError(data, socket, "Item does not exist");
 		}
@@ -49,7 +59,7 @@ export default class DropsRouter extends SocketioRouterBase {
             return this.sendError(data, socket, `Item owner is ${owner} and you are ${socket.character.name}.`);
         }
         let callback = () => {
-            map.delete(itemId);
+            this.removeItem(socket.character.room, itemId);
             this.io.to(socket.character.room).emit(this.CLIENT_GETS.ITEM_PICK.name, {
                 id: socket.character._id,
                 item_id: data.item_id,
@@ -85,10 +95,13 @@ export default class DropsRouter extends SocketioRouterBase {
     [config.SERVER_INNER.ITEMS_DROP.name](data, socket: GameSocket, items: ITEM_INSTANCE[]) {
 		let room = socket.character.room;
 		let itemsData = [];
-		let map = this.getRoomMap(socket);
 		// convert the items to plain objects
 		items = JSON.parse(JSON.stringify(items));
+		if (items.length === 0) {
+			return;
+		}
 		
+		let map = this.getRoomMap(room, true);
 		items.forEach(item => {
 			let itemId = _.uniqueId("item-");
 			let itemData: ITEM_DROP = {
@@ -102,7 +115,7 @@ export default class DropsRouter extends SocketioRouterBase {
 
 			setTimeout(() => {
 				if (map.has(itemId)) {
-					map.delete(itemId);
+					this.removeItem(room, itemId);
 					console.log('removing item', itemId);
 					this.io.to(room).emit(this.CLIENT_GETS.ITEM_DISAPPEAR.name, {
 						item_id: itemId
@@ -137,7 +150,7 @@ export default class DropsRouter extends SocketioRouterBase {
 			return this.sendError(data, socket, "Must provide an array of items to update locations");
 		}
 		let updatedItems = [];
-		let map = this.getRoomMap(socket);
+		let map = this.getRoomMap(socket.character.room);
 		items.forEach(item => {
 			let itemData;
 			if (!_.isObject(item)) {
