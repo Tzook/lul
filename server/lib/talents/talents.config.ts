@@ -54,7 +54,7 @@ export default {
 		BLEED_CHANCE: "bleedChance",
 		BLEED_DURATION: "bleedDuration",
 		BLEED_DMG_MODIFIER: 0.1,
-		BLEED_TICK_TIME: 1,
+		BLEED_TICK_TIME: 0.5,
 		CHARGE_MODIFIER_KEY: "fullyChargeModifier",
 		LIFE_STEAL_KEY: "lifeSteal",
 		MANA_STEAL_KEY: "manaSteal",
