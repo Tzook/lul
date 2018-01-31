@@ -63,7 +63,8 @@ export default class TalentsRouter extends SocketioRouterBase {
 			this.services.addAbility(socket, ability);
 			
 			socket.emit(talentsConfig.CLIENT_GETS.GAIN_ABILITY.name, {
-				ability: socket.character.talents._doc[ability]
+                ability: socket.character.talents._doc[ability],
+                key: ability
 			});
 		}
 	}
