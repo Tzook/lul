@@ -115,7 +115,7 @@ export default class TalentsRouter extends SocketioRouterBase {
 		if (shouldLvl) {
 			this.emitter.emit(talentsConfig.SERVER_INNER.GAIN_ABILITY_LVL.name, {}, socket);
 		}
-		this.services.markAbilityModified(socket);
+		this.services.markAbilityModified(socket, ability);
 	}
 	
 	[talentsConfig.SERVER_INNER.GAIN_ABILITY_LVL.name]({}, socket: GameSocket) {
@@ -129,7 +129,7 @@ export default class TalentsRouter extends SocketioRouterBase {
 			lvl: talent.lvl,
 			points: talent.points,
 		});
-		this.services.markAbilityModified(socket);
+		this.services.markAbilityModified(socket, ability);
 	}
 	
 	[talentsConfig.SERVER_INNER.GENERATE_PERK_POOL.name]({}, socket: GameSocket) {
@@ -147,7 +147,7 @@ export default class TalentsRouter extends SocketioRouterBase {
 			// no pool - so just take off a point
 			talent.points--;
 		}
-		this.services.markAbilityModified(socket);
+		this.services.markAbilityModified(socket, ability);
 	}
 	
 	[talentsConfig.SERVER_GETS.CHOOSE_ABILITY_PERK.name](data, socket: GameSocket) {
@@ -169,7 +169,7 @@ export default class TalentsRouter extends SocketioRouterBase {
 		if (talent.points > 0) {
 			this.emitter.emit(talentsConfig.SERVER_INNER.GENERATE_PERK_POOL.name, {}, socket);		
 		}
-		this.services.markAbilityModified(socket);
+		this.services.markAbilityModified(socket, ability);
 	}
 
 	[talentsConfig.SERVER_GETS.USE_SPELL.name](data, socket: GameSocket) {

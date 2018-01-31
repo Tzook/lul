@@ -419,6 +419,7 @@
                 socket.on("ability_lvl_up", d => setResult({msg: "ability_lvl_up", d}));
                 socket.on("ability_choose_perk", d => setResult({msg: "ability_choose_perk", d}));
                 socket.on("ability_gain_perk", d => setResult({msg: "ability_gain_perk", d}));
+                socket.on("actor_gain_ability", d => setResult({msg: "actor_gain_ability", d}));
                 socket.on("buff_activated", d => setResult({msg: "buff_activated", d}));
                 socket.on("perk_activated", d => setResult({msg: "perk_activated", d}));
                 socket.on("actor_use_spell", d => setResult({msg: "actor_use_spell", d}));

@@ -29,8 +29,7 @@ export default class TalentsServices extends MasterServices {
 		};
 	}
 
-	public markAbilityModified(socket: GameSocket) {
-		const ability = socket.character.stats.primaryAbility;
+	public markAbilityModified(socket: GameSocket, ability) {
 		socket.character.talents.markModified(ability);		
 	}
 
@@ -223,7 +222,7 @@ export default class TalentsServices extends MasterServices {
 
 	public addAbility(socket: GameSocket, ability: string) {
 		socket.character.talents._doc[ability] = this.getEmptyCharAbility(ability);
-		this.markAbilityModified(socket);
+		this.markAbilityModified(socket, ability);
 	}
 
     // HTTP functions
@@ -234,7 +233,7 @@ export default class TalentsServices extends MasterServices {
 		let models = [];
 
 		(talents || []).forEach(talent => {
-			let talentchema: TALENT_MODEL = {
+			let talentSchema: TALENT_MODEL = {
 				ability: talent.primaryAbility,
 				perks: [],
 				spells: [],
@@ -251,7 +250,7 @@ export default class TalentsServices extends MasterServices {
 					perksOffered: perk.perksOffered,
 					addToPool: perk.addToPool,
 				};
-				talentchema.perks.push(perkSchema);
+				talentSchema.perks.push(perkSchema);
 			});
 			
 			(talent.spells || []).forEach(spell => {
@@ -264,18 +263,18 @@ export default class TalentsServices extends MasterServices {
 				(spell.perks || []).forEach(perk => {
 					spellSchema.perks[perk.key] = +perk.value;
 				});
-				talentchema.spells.push(spellSchema);
+				talentSchema.spells.push(spellSchema);
 			});
 			
 			(talent.initialPerks || []).forEach(perk => {
-				talentchema.info.initPerks[perk.key] = +perk.value;
+				talentSchema.info.initPerks[perk.key] = +perk.value;
 			});
 
 			if (talent.manaCost > 0) {
-				talentchema.info.mp = +talent.manaCost;
+				talentSchema.info.mp = +talent.manaCost;
 			}
 
-			let talentModel = new this.Model(talentchema);
+			let talentModel = new this.Model(talentSchema);
 			models.push(talentModel);
 		});
 
