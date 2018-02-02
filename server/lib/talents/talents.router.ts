@@ -59,14 +59,17 @@ export default class TalentsRouter extends SocketioRouterBase {
 
     [talentsConfig.SERVER_INNER.GAIN_ABILITY.name] (data, socket: GameSocket) {
 		const {ability} = data;
-		if (!hasAbility(socket, ability)) {
-			this.services.addAbility(socket, ability);
-			
-			socket.emit(talentsConfig.CLIENT_GETS.GAIN_ABILITY.name, {
-                ability: socket.character.talents._doc[ability],
-                key: ability
-			});
+		if (hasAbility(socket, ability)) {
+			return this.sendError(data, socket, "Cannot gain ability - Already has that primary ability.");
+		} else if (!this.services.getTalentInfo(ability)) {
+			return this.sendError(data, socket, "Cannot gain ability - No ability information.", true, true);
 		}
+		this.services.addAbility(socket, ability);
+		
+		socket.emit(talentsConfig.CLIENT_GETS.GAIN_ABILITY.name, {
+			ability: socket.character.talents._doc[ability],
+			key: ability
+		});
 	}
 	
 	[talentsConfig.SERVER_INNER.HURT_MOB.name]({dmg, mob, cause, crit}: {dmg: number, mob: MOB_INSTANCE, cause: string, crit: boolean}, socket: GameSocket) {

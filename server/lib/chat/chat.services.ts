@@ -48,6 +48,11 @@ export default class ChatServices extends MasterServices {
                 return emitter.emit(talentsConfig.SERVER_INNER.GAIN_ABILITY_EXP.name, {
                     exp: this.statsRouter.getExp(abilityLvl)
                 }, targetSocket);
+                
+            case "/gainpa":
+                return emitter.emit(talentsConfig.SERVER_INNER.GAIN_ABILITY.name, {
+                    ability: parts[2]
+                }, targetSocket);
             
             case "/tp":
                 let room = parts[2];
