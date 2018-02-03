@@ -53,7 +53,6 @@ export default class RoomsController extends MasterController {
 		clearTimeout(this.roomBitchTimeouts.get(room));
 		let key = _.uniqueId("bitch-");
 		this.roomBitchKeys.set(room, key);
-		console.log("asking bitch please. key %s, room:", key, room);
 		this.io.to(room).emit(config.CLIENT_GETS.BITCH_PLEASE.name, {
 			key
 		});

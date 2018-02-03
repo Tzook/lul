@@ -372,8 +372,9 @@
 				socket.on("actor_join_room", d => setResult({msg: "actor_join_room", d}))
 				socket.on("actor_move_room", d => setResult({msg: "actor_move_room", d}))
 				socket.on("actor_leave_room", d => setResult({msg: "actor_leave_room", d}))
-				socket.on("bitch_please", d => setResult({msg: "bitch_please", d}))
+				// socket.on("bitch_please", d => setResult({msg: "bitch_please", d}))
 				socket.on("actor_bitch", d => setResult({msg: "actor_bitch", d}))
+				socket.on("room_state", d => setResult({msg: "room_state", d}))
 
 				// socket.on("actor_gain_exp", d => setResult({msg: "actor_gain_exp", d}))
 				// socket.on("actor_gain_hp", d => setResult({msg: "actor_gain_hp", d}))

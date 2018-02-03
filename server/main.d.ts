@@ -363,3 +363,5 @@ interface BUFF_INSTANCE {
     initTime: number,
     onPerkCleared?: Function,
 }
+
+interface ROOM_STATE extends Map<string, string> {}

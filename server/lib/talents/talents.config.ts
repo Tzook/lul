@@ -28,7 +28,7 @@ export default {
 	},
 	"SERVER_GETS": {
 		DISCONNECT: Object.assign({}, socketioConfig.SERVER_GETS.DISCONNECT),
-		ENTERED_ROOM: Object.assign({}, roomsConfig.SERVER_GETS.ENTERED_ROOM),
+		ENTERED_ROOM: Object.assign({}, roomsConfig.SERVER_GETS.ENTERED_ROOM, {log: false}),
 		CHOOSE_ABILITY_PERK: {name: "choose_perk", alive: true, log: true},
 		USE_SPELL: {name: "used_spell", alive: true, log: true},
 		HIT_SPELL: {name: "hit_spell", alive: true, log: true},

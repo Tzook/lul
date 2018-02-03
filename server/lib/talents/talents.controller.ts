@@ -102,8 +102,7 @@ export default class TalentsController extends MasterController {
 		}
 		
 		// tell the room about the current buffs the user has
-		let broadcast = socket.broadcast.to(socket.character.room);
-		socket.buffs.forEach(buffInstance => this.tellRemainingBuff(broadcast, buffInstance, socket.character._id));
+		socket.buffs.forEach(buffInstance => this.tellRemainingBuff(socket.broadcast.to(socket.character.room), buffInstance, socket.character._id));
 		
 		// tell the user about the current socket room buffs
 		let roomObject = socket.adapter.rooms[socket.character.room];
