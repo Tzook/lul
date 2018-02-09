@@ -254,7 +254,7 @@ export default class TalentsServices extends MasterServices {
 
 		(talents || []).forEach(talent => {
 			let talentSchema: TALENT_MODEL = {
-				ability: talent.primaryAbility,
+				ability: talent.ability,
 				perks: [],
 				spells: [],
 				info: {
