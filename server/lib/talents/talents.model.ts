@@ -6,6 +6,7 @@ import TalentsServices from './talents.services';
 import { PRIORITY_CHAR } from '../character/character.model';
 import { PRIORITY_CONFIG } from '../socketio/socketio.model';
 import { PRIORITY_MOBS } from '../mobs/mobs.model';
+import talentsConfig from './talents.config';
 
 const ABILITY_PERK_SCHEMA = (<any>mongoose.Schema)({
     atLeastLvl: Number,
@@ -34,7 +35,7 @@ const TALENT_SCHEMA = {
 
 const CONFIG_PERK_SCHEMA = mongoose.Schema.Types.Mixed;
 
-const CHAR_TALENT_SCHEMA = mongoose.Schema.Types.Mixed;
+const CHAR_TALENTS_SCHEMA = mongoose.Schema.Types.Mixed;
 
 const MOB_PERKS_SPELLS_SCHEMA = {
     perks: mongoose.Schema.Types.Mixed,
@@ -62,12 +63,17 @@ export default class TalentsModel extends MasterModel {
     createModel() {
         this.setModel("Talent");
 
-        let CharTalentsModel = this.createNewModel("CharTalents", CHAR_TALENT_SCHEMA, {_id: false, strict: false, minimize: false});
+        let CharTalentsModel = this.createNewModel("CharTalents", CHAR_TALENTS_SCHEMA, {_id: false, strict: false, minimize: false});
         this.addToSchema("Character", {talents: CharTalentsModel.schema});
         const charTalentsInitialValue = () => ({
             [statsConfig.ABILITY_MELEE]: this.services.getEmptyCharAbility(statsConfig.ABILITY_MELEE)
         });
         this.listenForFieldAddition("Character", "talents", charTalentsInitialValue);
+        
+        this.addToSchema("Character", {charTalents: CharTalentsModel.schema});
+        this.listenForFieldAddition("Character", "charTalents", () => ({
+            [talentsConfig.CHAR_TALENT]: this.services.getEmptyCharAbility(talentsConfig.CHAR_TALENT)
+        }));
         
         this.addToSchema("Mobs", MOB_PERKS_SPELLS_SCHEMA);
         

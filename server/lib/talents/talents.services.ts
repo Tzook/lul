@@ -29,8 +29,12 @@ export default class TalentsServices extends MasterServices {
 		};
 	}
 
-	public markAbilityModified(socket: GameSocket, ability) {
-		socket.character.talents.markModified(ability);		
+	public markAbilityModified(socket: GameSocket, ability: string) {
+		if (isCharAbility(ability)) {
+			socket.character.charTalents.markModified(ability);		
+		} else {
+			socket.character.talents.markModified(ability);		
+		}
 	}
 
 	public getAbilityExp(dmg: number, mob: MOB_MODEL) {
@@ -54,8 +58,9 @@ export default class TalentsServices extends MasterServices {
 		let newPool = [];
 		pool.forEach(perk => {
 			const perkConfig = this.getPerkConfig(perk);
-			const charPerkValue = this.getPerkValue(perk, charPerks);
-			if (!perkConfig.max || (perkConfig.value > 0 ? charPerkValue < perkConfig.max : charPerkValue > perkConfig.max)) {
+			const level = charPerks[perk] || 0;
+			const charPerkValue = this.getPerkLevelValue(perk, level);
+			if (this.isBelowMax(perkConfig, charPerkValue)) {
 				newPool.push(perk);
 			}
 		});
@@ -63,16 +68,24 @@ export default class TalentsServices extends MasterServices {
 		return newPool;
 	}
 
-	public getPerkValue(perk: string, perksMap: PERK_MAP) {
-		const level = perksMap[perk] || 0;
-		return this.getPerkLevelValue(perk, level);
+	protected isBelowMax(perkConfig: PERK_CONFIG, value: number): boolean {
+		return !perkConfig.max || (perkConfig.value > 0 ? value < perkConfig.max : value > perkConfig.max);
 	}
 	
-	protected getPerkLevelValue(perk: string, level: number) {
+	protected getPerkLevelValue(perk: string, level: number): number {
 		const perkConfig = this.getPerkConfig(perk);
 		const initialValue = perkConfig.default || 0;
 		const valueModifier = perkConfig.value || 1;
 		return initialValue + level * valueModifier;
+	}
+	
+	protected getSafePerkLevelValue(perk: string, level: number) {
+		let perkLevelValue = this.getPerkLevelValue(perk, level);
+		const perkConfig = this.getPerkConfig(perk);
+		if (!this.isBelowMax(perkConfig, perkLevelValue)) {
+			perkLevelValue = perkConfig.max;
+		}
+		return perkLevelValue;
 	}
 	
 	protected pickPool(pool: string[], perksOffered: number): string[] {
@@ -167,11 +180,12 @@ export default class TalentsServices extends MasterServices {
 	protected getCharPerkValue(perk: string, socket: GameSocket): number {
 		const ability = socket.character.stats.primaryAbility;
 		const charPerks = socket.character.talents._doc[ability].perks;
-		let perkValue = this.getPerkValue(perk, charPerks);
+		const level = (charPerks[perk] || 0) + (socket.character.charTalents._doc[talentsConfig.CHAR_TALENT].perks[perk] || 0);
+		let perkValue = this.getSafePerkLevelValue(perk, level);
 		if (socket.currentSpell) {
 			// send the higher value - perk or spell
 			let spellPerkValue = socket.currentSpell.perks[perk] || 0;
-			perkValue = Math.max(spellPerkValue, perkValue);
+			perkValue = this.getBetterPerkValue(spellPerkValue, perkValue, perk);
 		}
 		return perkValue;
 	}
@@ -183,10 +197,16 @@ export default class TalentsServices extends MasterServices {
 		if (mob.currentSpell) {
 			// send the higher value - perk or spell
 			let spellPerkValue = mob.currentSpell[perk] || 0;
-			perkValue = Math.max(spellPerkValue, perkValue);
+			perkValue = this.getBetterPerkValue(spellPerkValue, perkValue, perk);
 		}
 		
 		return perkValue;
+	}
+
+	protected getBetterPerkValue(value1: number, value2: number, perk: string): number {
+		const perkConfig = this.getPerkConfig(perk);
+		return perkConfig.value > 0 ? Math.max(value1, value2) : Math.min(value1, value2);
+		
 	}
 
 	public getBleedDmg(dmg: number): number {
@@ -377,10 +397,14 @@ export function extendMobSchemaWithTalents(mob: any, mobSchema: MOB_MODEL): void
 	});
 }
 
+export function isCharAbility(ability: string): boolean {
+	return ability === talentsConfig.CHAR_TALENT;
+}
+
 export function getTalent(socket: GameSocket, ability: string): CHAR_ABILITY_TALENT {
-	return socket.character.talents._doc[ability];
+	return isCharAbility(ability) ? socket.character.charTalents._doc[ability] : socket.character.talents._doc[ability];
 }
 
 export function hasAbility(socket: GameSocket, ability: string): boolean {
-	return !!getTalent(socket, ability);
+	return !!socket.character.talents._doc[ability];
 }

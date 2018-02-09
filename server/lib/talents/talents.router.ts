@@ -117,17 +117,15 @@ export default class TalentsRouter extends SocketioRouterBase {
 			now: talent.exp
 		});
 		if (shouldLvl) {
-			this.emitter.emit(talentsConfig.SERVER_INNER.GAIN_ABILITY_LVL.name, {}, socket);
+			this.emitter.emit(talentsConfig.SERVER_INNER.GAIN_ABILITY_LVL.name, {talent, ability}, socket);
 		}
 		this.services.markAbilityModified(socket, ability);
 	}
 	
-	[talentsConfig.SERVER_INNER.GAIN_ABILITY_LVL.name]({}, socket: GameSocket) {
-		const ability = socket.character.stats.primaryAbility;
-		const talent = socket.character.talents._doc[ability];
+	[talentsConfig.SERVER_INNER.GAIN_ABILITY_LVL.name]({talent, ability}: {talent: CHAR_ABILITY_TALENT, ability: string}, socket: GameSocket) {
 		talent.lvl++;
 		talent.points++;
-		this.emitter.emit(talentsConfig.SERVER_INNER.GENERATE_PERK_POOL.name, {}, socket);		
+		this.emitter.emit(talentsConfig.SERVER_INNER.GENERATE_PERK_POOL.name, {talent, ability}, socket);		
 		socket.emit(talentsConfig.CLIENT_GETS.GAIN_ABILITY_LVL.name, {
 			ability,
 			lvl: talent.lvl,
@@ -136,9 +134,7 @@ export default class TalentsRouter extends SocketioRouterBase {
 		this.services.markAbilityModified(socket, ability);
 	}
 	
-	[talentsConfig.SERVER_INNER.GENERATE_PERK_POOL.name]({}, socket: GameSocket) {
-		const ability = socket.character.stats.primaryAbility;
-		const talent = socket.character.talents._doc[ability];
+	[talentsConfig.SERVER_INNER.GENERATE_PERK_POOL.name]({talent, ability}: {talent: CHAR_ABILITY_TALENT, ability: string}, socket: GameSocket) {
 		const pool = this.services.getPerksPool(ability, talent);
 		this.log({pool}, socket, "Gain perk pool");
 		if (pool.length > 0) {
@@ -175,6 +171,10 @@ export default class TalentsRouter extends SocketioRouterBase {
 		}
 		this.services.markAbilityModified(socket, ability);
 	}
+	
+    [talentsConfig.SERVER_INNER.GAIN_LVL.name] (data, socket: GameSocket) {
+		this.emitter.emit(talentsConfig.SERVER_INNER.GAIN_ABILITY_LVL.name, {talent: socket.character.charTalents._doc[talentsConfig.CHAR_TALENT], ability: talentsConfig.CHAR_TALENT}, socket);
+    }
 
 	[talentsConfig.SERVER_GETS.USE_SPELL.name](data, socket: GameSocket) {
 		const {spell_key} = data;

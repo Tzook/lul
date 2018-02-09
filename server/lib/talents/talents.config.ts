@@ -25,6 +25,7 @@ export default {
 		GAIN_ABILITY_EXP: {name: "gain_ability_exp", alive: true, log: true},
 		GAIN_ABILITY_LVL: {name: "gain_ability_lvl", alive: true, log: true},
 		GENERATE_PERK_POOL: {name: "generate_perk_pool", alive: true},
+		GAIN_LVL: Object.assign({}, statsConfig.SERVER_INNER.GAIN_LVL, {log: false}),
 	},
 	"SERVER_GETS": {
 		DISCONNECT: Object.assign({}, socketioConfig.SERVER_GETS.DISCONNECT),
@@ -71,4 +72,5 @@ export default {
 	},
 	HIT_TYPE_ATTACK: "atk",
 	HIT_TYPE_HEAL: "heal",
+	CHAR_TALENT: "charTalent"
 }

@@ -27,7 +27,6 @@ const CONFIG = {
 	},
 	"BEGIN_STATS_SUM": 7,
 	"ABILITY_MELEE": "melee",
-	ABILITY_RANGE: "range",
 	"MAG_TO_MP_RATIO": 6,
 	"STR_TO_HP_RATIO": 5,
 	"LEVEL_UP_STAT_BONUS": 1

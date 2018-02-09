@@ -82,11 +82,18 @@ interface Char extends PublicChar {
     gold: number;
     items: CHAR_ITEMS,
     quests: CHAR_QUESTS,
-    talents: {markModified: (path) => {}, _doc: {[ability: string]: CHAR_ABILITY_TALENT}}
+    charTalents: CHAR_TALENT_OBJECT
+    talents: CHAR_TALENT_OBJECT
+}
+
+interface CHAR_TALENT_OBJECT {
+    markModified: (path) => {}, 
+    _doc: {[ability: string]: CHAR_ABILITY_TALENT}
 }
 
 interface User extends Doc {
     boss?: boolean // user with extended priviledges
+    characters: Char[]
 }
 
 interface GameSocket extends SocketIO.Socket {
