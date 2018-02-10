@@ -12,7 +12,7 @@ export default class TalentsController extends MasterController {
 	protected mobsRouter: MobsRouter;
 	// room => mob => buff instance[]
 	protected roomToBuff: Map<string, Map<string, Set<BUFF_INSTANCE>>> = new Map();
-	protected mobsSpellsPickers: Map<string, NodeJS.Timer> = new Map();
+	protected mobsSpellsPickers: Map<string, Map<string, NodeJS.Timer>> = new Map();
 
 	init(files, app) {
 		this.mobsRouter = files.routers.mobs;
@@ -203,25 +203,27 @@ export default class TalentsController extends MasterController {
 	}
 
 	public mobStartSpellsPicker(mob: MOB_INSTANCE, room: string) {
-		const time = this.services.getMobSpellRestTime();
-		const timerId = setTimeout(() => {
-			if (this.isMobInBuff(room, mob.id, talentsConfig.PERKS.STUN_CHANCE)) {
-				setTimeout(() => this.mobStartSpellsPicker(mob, room), 5000);
-				return;
-			}
-			
-			const spellKey = this.services.getMobSpellUsed(mob);
+		let timersMap: Map<string, NodeJS.Timer> = new Map();
+		
+		for (let spellKey in mob.spells) {
+			this.activateMobSpellTimer(room, mob, spellKey, timersMap);
+		}
 
+
+		this.mobsSpellsPickers.set(mob.id, timersMap);
+	}
+
+	private activateMobSpellTimer(room: string, mob: MOB_INSTANCE, spellKey: string, timersMap: Map<string, NodeJS.Timer>) {
+		const time = this.services.getMobSpellRestTime(4, 10); // TODO change numbers to mob numbers
+		const timerId = setTimeout(() => {
 			this.io.to(room).emit(talentsConfig.CLIENT_GETS.MOB_USE_SPELL.name, {
 				mob_id: mob.id,
 				spell_key: spellKey,
 			});
-
-			// recursively pick another spell
-			this.mobStartSpellsPicker(mob, room);
+			// recursively use the spell
+			this.activateMobSpellTimer(room, mob, spellKey, timersMap);
 		}, time);
-
-		this.mobsSpellsPickers.set(mob.id, timerId);
+		timersMap.set(spellKey, timerId);
 	}
 
 	public hasMobSpellsPicker(mob: MOB_INSTANCE): boolean {
@@ -229,9 +231,11 @@ export default class TalentsController extends MasterController {
 	}
 	
 	public mobStopSpellsPicker(mob: MOB_INSTANCE) {
-		const timerId = this.mobsSpellsPickers.get(mob.id);
-		if (timerId) {
-			clearTimeout(timerId);
+		const timersMap = this.mobsSpellsPickers.get(mob.id);
+		if (timersMap) {
+			for (let [,timerId] of timersMap) {
+				clearTimeout(timerId);
+			}
 			this.mobsSpellsPickers.delete(mob.id);
 		}
 	}

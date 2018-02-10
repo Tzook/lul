@@ -228,12 +228,8 @@ export default class TalentsServices extends MasterServices {
 		return value * percent | 0;
 	}
 
-	public getMobSpellRestTime(): number {
-		return _.random(4000, 10000);
-	}
-
-	public getMobSpellUsed(mob: MOB_INSTANCE): string {
-		return <any>_.sample(Object.keys(mob.spells), 1)[0];
+	public getMobSpellRestTime(min: number, max: number): number {
+		return _.random(min * 1000, max * 1000);
 	}
 
 	public getTalentInfo(ability: string): TALENT_INFO|undefined {
