@@ -11,17 +11,20 @@ import chatConfig from './chat.config';
 import * as _ from 'underscore';
 import ItemsRouter from '../items/items.router';
 import dropsConfig from '../drops/drops.config';
+import TalentsRouter from '../talents/talents.router';
 
 export default class ChatServices extends MasterServices {
     protected statsRouter: StatsRouter;
     protected roomsRouter: RoomsRouter;
     protected itemsRouter: ItemsRouter;
+    protected talentsRouter: TalentsRouter;
     protected goldRouter: GoldRouter;
 
 	init(files, app) {
         this.statsRouter = files.routers.stats;
         this.roomsRouter = files.routers.rooms;
         this.itemsRouter = files.routers.items;
+        this.talentsRouter = files.routers.talents;
         this.goldRouter = files.routers.gold;
 		super.init(files, app);
     }
@@ -44,30 +47,52 @@ export default class ChatServices extends MasterServices {
         
         let emitter = this.statsRouter.getEmitter();
         switch (parts[0]) {
-            case chatConfig.HAX.HELP:
+            case chatConfig.HAX.HELP.code: {
+                let haxStrings = _.map(chatConfig.HAX, ({code, param}: {code: string, param?: string}) => {
+                        return code + " {name?}" + (param ? ` ${param}` : "");
+                    });
                 return targetSocket.emit(chatConfig.CLIENT_GETS.WHISPER.name, {
                     name: socket.character.name,
                     id: socket.character._id,
-                    msg: "Available hax: " + _.values(chatConfig.HAX).join(", "),
+                    msg: "Available hax:\n" + haxStrings.join("\n"),
                 });
-
-            case chatConfig.HAX.LVL:
+            }
+                
+            case chatConfig.HAX.LVL.code: {
                 return emitter.emit(statsConfig.SERVER_INNER.GAIN_EXP.name, {
                     exp: this.statsRouter.getExp(targetSocket.character.stats.lvl)
                 }, targetSocket);
-
-            case chatConfig.HAX.LVLPA:
-                let abilityLvl = targetSocket.character.talents._doc[targetSocket.character.stats.primaryAbility].lvl;
-                return emitter.emit(talentsConfig.SERVER_INNER.GAIN_ABILITY_EXP.name, {
+            }
+                
+            case chatConfig.HAX.LVLPA.code: {
+                const ability = targetSocket.character.stats.primaryAbility;
+                const talent = targetSocket.character.talents._doc[ability];
+                let abilityLvl = talent.lvl;
+                emitter.emit(talentsConfig.SERVER_INNER.GAIN_ABILITY_EXP.name, {
                     exp: this.statsRouter.getExp(abilityLvl)
                 }, targetSocket);
+                if (parts[2]) {
+                    emitter.emit(talentsConfig.SERVER_GETS.CHOOSE_ABILITY_PERK.name, {
+                        ability,
+                        perk: _.sample(talent.pool)
+                    }, targetSocket);
+                }
+                return true;
+            }
                 
-            case chatConfig.HAX.GAINPA:
+            case chatConfig.HAX.GAINPA.code: {
+                const ability = parts[2];
+                const abilityInfo = this.talentsRouter.getAbilityInfo(ability);
+                if (!abilityInfo) {
+                    this.statsRouter.sendError({msg}, socket, "Cannot hax - ability not found", true, true);
+                    return false;
+                }
                 return emitter.emit(talentsConfig.SERVER_INNER.GAIN_ABILITY.name, {
-                    ability: parts[2]
+                    ability
                 }, targetSocket);
-            
-            case chatConfig.HAX.TP:
+            }
+                
+            case chatConfig.HAX.TP.code: {
                 let room = parts[2];
                 let roomInfo = this.roomsRouter.getRoomInfo(room);
                 if (!roomInfo) {
@@ -78,15 +103,17 @@ export default class ChatServices extends MasterServices {
                 return emitter.emit(roomsConfig.SERVER_INNER.MOVE_ROOM.name, {
                     room, 
                 }, targetSocket);
-
-            case chatConfig.HAX.GOLD:
+            }
+                
+            case chatConfig.HAX.GOLD.code: {
                 const amount = +parts[2] > 0 ? +parts[2] : 10000;
                 let goldItem = this.goldRouter.getGoldItem(amount);
                 return emitter.emit(itemsConfig.SERVER_INNER.ITEM_ADD.name, { 
                     item: goldItem
                 }, targetSocket); 
+            }
                 
-            case chatConfig.HAX.DROP:
+            case chatConfig.HAX.DROP.code: {
                 let itemInfo = this.itemsRouter.getItemInfo(parts[2]);
                 if (!itemInfo) {
                     this.statsRouter.sendError({msg}, socket, "Cannot hax - Item not found", true, true);
@@ -100,6 +127,7 @@ export default class ChatServices extends MasterServices {
                 }
                 
                 return emitter.emit(dropsConfig.SERVER_INNER.ITEMS_DROP.name, {}, socket, [itemInstance]);
+            }
         }
 
         return false;

@@ -12,12 +12,31 @@ export default {
 		"PARTY_CHAT": {"name": "party_chat"}
 	},
 	HAX: {
-		HELP: "/help",
-		LVL: "/lvl",
-		LVLPA: "/lvlpa",
-		GAINPA: "/gainpa",
-		TP: "/tp",
-		GOLD: "/gold",
-		DROP: "/drop",
+		HELP: {
+			code: "/help",
+		},
+		LVL: {
+			code: "/lvl",
+		},
+		LVLPA: {
+			code: "/lvlpa",
+			param: "{auto?}"
+		},
+		GAINPA: {
+			code: "/gainpa",
+			param: "{ability}"
+		},
+		TP: {
+			code: "/tp",
+			param: "{scene}"
+		},
+		GOLD: {
+			code: "/gold",
+			param: "{amount?}"
+		},
+		DROP: {
+			code: "/drop",
+			param: "{item} {stack?}"
+		},
 	}
 }
