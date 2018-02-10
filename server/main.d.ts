@@ -215,8 +215,13 @@ interface MOB_MODEL {
     drops: DROP_MODEL[],
     perks?: PERK_MAP,
     spells?: {
-        [spellKey: string]: PERK_MAP
+        [spellKey: string]: MOB_SPELL
     }
+}
+interface MOB_SPELL {
+    perks: PERK_MAP
+    minTime: number
+    maxTime: number
 }
 interface MOB_INSTANCE extends MOB_MODEL {
     id?: string, // a unique id for this specific mob
@@ -229,7 +234,7 @@ interface MOB_INSTANCE extends MOB_MODEL {
     }
     dmged?: number
     spawn?: SPAWN_INSTANCE,
-    currentSpell?: PERK_MAP
+    currentSpell?: MOB_SPELL
 }
 interface ROOM_MOBS {
     spawns: SPAWN_INSTANCE[],

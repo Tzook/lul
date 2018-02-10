@@ -209,12 +209,12 @@ export default class TalentsController extends MasterController {
 			this.activateMobSpellTimer(room, mob, spellKey, timersMap);
 		}
 
-
 		this.mobsSpellsPickers.set(mob.id, timersMap);
 	}
 
 	private activateMobSpellTimer(room: string, mob: MOB_INSTANCE, spellKey: string, timersMap: Map<string, NodeJS.Timer>) {
-		const time = this.services.getMobSpellRestTime(4, 10); // TODO change numbers to mob numbers
+		const {minTime, maxTime} = mob.spells[spellKey];
+		const time = this.services.getMobSpellRestTime(minTime, maxTime);
 		const timerId = setTimeout(() => {
 			this.io.to(room).emit(talentsConfig.CLIENT_GETS.MOB_USE_SPELL.name, {
 				mob_id: mob.id,

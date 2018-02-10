@@ -196,7 +196,7 @@ export default class TalentsServices extends MasterServices {
 		
 		if (mob.currentSpell) {
 			// send the higher value - perk or spell
-			let spellPerkValue = mob.currentSpell[perk] || 0;
+			let spellPerkValue = mob.currentSpell.perks[perk] || 0;
 			perkValue = this.getBetterPerkValue(spellPerkValue, perkValue, perk);
 		}
 		
@@ -386,9 +386,14 @@ export function extendMobSchemaWithTalents(mob: any, mobSchema: MOB_MODEL): void
 
 	(mob.spells || []).forEach(spell => {
 		mobSchema.spells = mobSchema.spells || {};
-		mobSchema.spells[spell.key] = {};
+		let mobPerks = {};
+		mobSchema.spells[spell.key] = {
+			perks: mobPerks,
+			minTime: spell.minTime,
+			maxTime: spell.maxTime,
+		};
 		spell.perks.forEach(perk => {
-			mobSchema.spells[spell.key][perk.key] = +perk.value;
+			mobPerks[perk.key] = +perk.value;
 		});
 	});
 }
