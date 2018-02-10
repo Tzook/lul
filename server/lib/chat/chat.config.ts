@@ -10,5 +10,14 @@ export default {
 		"CHAT": {"name": "chat"},
 		"WHISPER": {"name": "whisper"},
 		"PARTY_CHAT": {"name": "party_chat"}
+	},
+	HAX: {
+		HELP: "/help",
+		LVL: "/lvl",
+		LVLPA: "/lvlpa",
+		GAINPA: "/gainpa",
+		TP: "/tp",
+		GOLD: "/gold",
+		DROP: "/drop",
 	}
 }
