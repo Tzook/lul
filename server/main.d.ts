@@ -126,7 +126,7 @@ interface GameSocket extends SocketIO.Socket {
     getHpRegenInterval: () => number
     getMpRegenInterval: () => number
     currentSpell?: ABILITY_SPELL_MODEL
-    buffs: Set<BUFF_INSTANCE>
+    buffs: Map<string, Set<BUFF_INSTANCE>>
 }
 
 interface DMG_RESULT {

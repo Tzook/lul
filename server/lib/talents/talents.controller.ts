@@ -10,15 +10,15 @@ import combatConfig from '../combat/combat.config';
 export default class TalentsController extends MasterController {
 	protected services: TalentsServices;
 	protected mobsRouter: MobsRouter;
-	// room => mob => buff instance[]
-	protected roomToBuff: Map<string, Map<string, Set<BUFF_INSTANCE>>> = new Map();
+	// room => mob => perk name => buff instance[]
+	protected roomToBuff: Map<string, Map<string, Map<string, Set<BUFF_INSTANCE>>>> = new Map();
 	protected mobsSpellsPickers: Map<string, Map<string, NodeJS.Timer>> = new Map();
 
 	init(files, app) {
 		this.mobsRouter = files.routers.mobs;
 		super.init(files, app);
 	}
-
+	
 	public applySelfPerks(dmg: number, socket: GameSocket) {
 		const lifeSteal = this.services.getAbilityPerkValue(talentsConfig.PERKS.LIFE_STEAL_KEY, socket);
 		const hp = this.services.getStealValue(dmg, lifeSteal);
@@ -52,21 +52,20 @@ export default class TalentsController extends MasterController {
 		const activated = this.services.isAbilityActivated(perkChanceName, socket);
 		if (activated) {
 			const room = socket.character.room;
-			let mobBuffs = this.getMobBuffsInstance(room, mob);
 			let duration = this.services.getAbilityPerkValue(perkDurationName, socket);
 			this.io.to(socket.character.room).emit(talentsConfig.CLIENT_GETS.ACTIVATED_BUFF.name, {
 				target_id: mob.id,
 				key: perkChanceName,
 				duration,
 			});
-			let clearTimeoutId = setTimeout(() => this.clearBuff(room, mob.id, buffInstace), duration * 1000);
+			let clearTimeoutId = setTimeout(() => this.clearMobBuff(room, mob.id, buffInstace), duration * 1000);
 			var buffInstace = {
 				clearTimeoutId,
 				perkName: perkChanceName,
 				duration,
 				initTime: Date.now(),
 			};
-			mobBuffs.add(buffInstace);
+			this.addMobBuff(room, mob, buffInstace);
 			onPerkActivated(buffInstace);
 		}
 	}
@@ -87,7 +86,8 @@ export default class TalentsController extends MasterController {
 				duration,
 				initTime: Date.now(),
 			};
-			socket.buffs.add(buffInstace);
+			let perkBuffs = this.getSocketPerkBuffs(socket, buffInstace.perkName, true);
+			perkBuffs.add(buffInstace);
 			onPerkActivated(buffInstace);
 		}
 	}
@@ -95,25 +95,22 @@ export default class TalentsController extends MasterController {
 	public notifyAboutBuffs(socket: GameSocket) {
 		let roomMap = this.getRoomBuffsInstance(socket.character.room);
 		for (let [mobId, mobBuffs] of roomMap) {
-			let hasMob = this.mobsRouter.hasMob(mobId, socket);
-			for (let buffInstance of mobBuffs) {
-				if (hasMob) {
+			for (let [,perkBuffs] of mobBuffs) {
+				for (let buffInstance of perkBuffs) {
 					this.tellRemainingBuff(socket, buffInstance, mobId);
-				} else {
-					this.clearBuff(socket.character.room, mobId, buffInstance);
 				}
 			}
 		}
 		
 		// tell the room about the current buffs the user has
-		socket.buffs.forEach(buffInstance => this.tellRemainingBuff(socket.broadcast.to(socket.character.room), buffInstance, socket.character._id));
+		socket.buffs.forEach(perkBuffs => perkBuffs.forEach(buffInstance => this.tellRemainingBuff(socket.broadcast.to(socket.character.room), buffInstance, socket.character._id)));
 		
 		// tell the user about the current socket room buffs
 		let roomObject = socket.adapter.rooms[socket.character.room];
 		if (roomObject) {
 			_.each(roomObject.sockets, (value, socketId: string) => {
 				let otherSocket = socket.map.get(socketId);
-				otherSocket.buffs.forEach(buffInstance => this.tellRemainingBuff(socket, buffInstance, socketId));
+				otherSocket.buffs.forEach(perkBuffs => perkBuffs.forEach(buffInstance => this.tellRemainingBuff(socket, buffInstance, socketId)));
 			});
 		}
 	}
@@ -128,12 +125,19 @@ export default class TalentsController extends MasterController {
 		});
 	}
 
-	protected clearBuff(room: string, mobId: string, buffInstance: BUFF_INSTANCE) {
-		let roomMap = this.roomToBuff.get(room);
-		let mobsBuff = roomMap.get(mobId);
+	protected clearMobBuff(room: string, mobId: string, buffInstance: BUFF_INSTANCE) {
 		clearTimeout(buffInstance.clearTimeoutId);
 		buffInstance.onPerkCleared && buffInstance.onPerkCleared();
-		mobsBuff.delete(buffInstance);
+		
+		let roomMap = this.getRoomBuffsInstance(room);
+		let mobsBuff = this.getMobBuffsInstance(room, mobId);
+		
+		let perkBuffs = mobsBuff.get(buffInstance.perkName);
+		perkBuffs.delete(buffInstance);
+		if (perkBuffs.size === 0) {
+			mobsBuff.delete(buffInstance.perkName);
+		}
+		
 		if (mobsBuff.size === 0) {
 			roomMap.delete(mobId);
 		}
@@ -142,14 +146,38 @@ export default class TalentsController extends MasterController {
 		}
 	} 
 	
+	public clearMobBuffs(room: string, mobId: string) {
+		let mobsBuff = this.getMobBuffsInstance(room, mobId);
+		for (let [,perkBuffs] of mobsBuff) {
+			for (let buffInstance of perkBuffs) {
+				this.clearMobBuff(room, mobId, buffInstance);
+			}
+		}
+	}
+	
 	protected clearSocketBuff(socket: GameSocket, buffInstance: BUFF_INSTANCE): void {
 		clearTimeout(buffInstance.clearTimeoutId);
 		buffInstance.onPerkCleared && buffInstance.onPerkCleared();
-		socket.buffs.delete(buffInstance);
+		let perkBuffs = this.getSocketPerkBuffs(socket, buffInstance.perkName);
+		perkBuffs.delete(buffInstance);
+		if (perkBuffs.size === 0) {
+			socket.buffs.delete(buffInstance.perkName);
+		}
 	}
-
+	
 	public clearSocketBuffs(socket: GameSocket): void {
-		socket.buffs.forEach(buffInstance => this.clearSocketBuff(socket, buffInstance));
+		socket.buffs.forEach(perkBuffs => perkBuffs.forEach(buffInstance => this.clearSocketBuff(socket, buffInstance)));
+	}
+	
+	protected getSocketPerkBuffs(socket: GameSocket, perkName: string, createIfMissing: boolean = false) {
+		let perkBuffs = socket.buffs.get(perkName);
+		if (!perkBuffs) {
+			perkBuffs = new Set();
+			if (createIfMissing) {
+				socket.buffs.set(perkName, perkBuffs);
+			}
+		}
+		return perkBuffs;
 	}
 
 	protected triggerMobBleed(dmg: number, crit: boolean, mob: MOB_INSTANCE, buffInstace: BUFF_INSTANCE, socket: GameSocket) {
@@ -164,17 +192,18 @@ export default class TalentsController extends MasterController {
 
 	protected tickMobDmg(dmg: number, crit: boolean, buffInstance: BUFF_INSTANCE, mob: MOB_INSTANCE, room: string, cause: string, interval: number, tickIndex: number, socket: GameSocket) {
 		let buffTimer = setTimeout(() => {
-			if (mob.hp <= 0 || !socket.connected || !socket.alive || socket.character.room !== room) {
-				return this.clearBuff(room, mob.id, buffInstance);
+			if (!socket.connected || !socket.alive || socket.character.room !== room) {
+				return this.clearMobBuff(room, mob.id, buffInstance);
 			}
+			this.tickMobDmg(dmg, crit, buffInstance, mob, room, cause, interval, tickIndex + 1, socket);
 			this.mobsRouter.getEmitter().emit(mobsConfig.SERVER_INNER.MOB_TAKE_DMG.name, {
 				mobId: mob.id, 
 				dmg,
 				cause,
 				crit,
 			}, socket);
-			this.tickMobDmg(dmg, crit, buffInstance, mob, room, cause, interval, tickIndex + 1, socket);
-		}, interval * 1000 - (tickIndex === 0 ? 100 : 0)); // reducing 200 ms so all the ticks will fit in the time
+		}, interval * 1000 - (tickIndex === 0 ? 100 : 0)); // reducing 100 ms so all the ticks will fit in the time
+		
 		buffInstance.onPerkCleared = () => clearTimeout(buffTimer);
 	}
 
@@ -190,30 +219,20 @@ export default class TalentsController extends MasterController {
 
 	protected tickSocketDmg(dmg: number, crit: boolean, buffInstance: BUFF_INSTANCE, cause: string, interval: number, tickIndex: number, socket: GameSocket) {
 		let buffTimer = setTimeout(() => {
+			this.tickSocketDmg(dmg, crit, buffInstance, cause, interval, tickIndex + 1, socket);
 			this.mobsRouter.getEmitter().emit(statsConfig.SERVER_INNER.TAKE_DMG.name, { 
 				dmg,
 				cause,
 				crit
 			}, socket);
-			this.tickSocketDmg(dmg, crit, buffInstance, cause, interval, tickIndex + 1, socket);
 		}, interval * 1000 - (tickIndex === 0 ? 100 : 0)); // reducing 200 ms so all the ticks will fit in the time
 		buffInstance.onPerkCleared = () => clearTimeout(buffTimer);
 	}
 
-	protected isMobInBuff(room: string, mobId: string, buff: string): boolean {
-		// TODO use a more efficient way to check buffs
-		const roomBuffs = this.roomToBuff.get(room);
-		if (roomBuffs) {
-			const mobBuffs = roomBuffs.get(mobId);
-			if (mobBuffs) {
-				for (let buffInstace of mobBuffs) {
-					if (buffInstace.perkName === buff) {
-						return true;
-					}
-				}
-			}
-		}
-		return false;
+	protected isMobInBuff(room: string, mobId: string, perkName: string): boolean {
+		const mobBuffs = this.getMobBuffsInstance(room, mobId);
+		const hasBuff = mobBuffs.has(perkName);
+		return hasBuff;
 	}
 
 	public mobStartSpellsPicker(mob: MOB_INSTANCE, room: string) {
@@ -265,14 +284,26 @@ export default class TalentsController extends MasterController {
 		return roomBuffs;
 	}
 
-	protected getMobBuffsInstance(room: string, mob: MOB_INSTANCE) {
-		let roomBuffs = this.getRoomBuffsInstance(room, true);
-		let mobBuffs = roomBuffs.get(mob.id);
+	protected getMobBuffsInstance(room: string, mobId: string, createIfMissing: boolean = false) {
+		let roomBuffs = this.getRoomBuffsInstance(room, createIfMissing);
+		let mobBuffs = roomBuffs.get(mobId);
 		if (!mobBuffs) {
-			mobBuffs = new Set();
-			roomBuffs.set(mob.id, mobBuffs);
+			mobBuffs = new Map();
+			if (createIfMissing) {
+				roomBuffs.set(mobId, mobBuffs);
+			}
 		}
 		return mobBuffs;
+	}
+
+	protected addMobBuff(room: string, mob: MOB_INSTANCE, buffInstace: BUFF_INSTANCE) {
+		let mobBuffs = this.getMobBuffsInstance(room, mob.id, true);
+		let perkBuffs = mobBuffs.get(buffInstace.perkName);
+		if (!perkBuffs) {
+			perkBuffs = new Set();
+			mobBuffs.set(buffInstace.perkName, perkBuffs);
+		}
+		perkBuffs.add(buffInstace);
 	}
 
     // HTTP functions

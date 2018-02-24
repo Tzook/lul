@@ -42,7 +42,7 @@ export default class TalentsRouter extends SocketioRouterBase {
 		socket.getMpRegenModifier = () => this.services.getMpRegenModifier(socket);
 		socket.getHpRegenInterval = () => this.services.getHpRegenInterval(socket);
 		socket.getMpRegenInterval = () => this.services.getMpRegenInterval(socket);
-		socket.buffs = new Set();
+		socket.buffs = new Map();
 	}
 
 	public getAbilityInfo(ability: string): TALENT_INFO|undefined {
@@ -244,10 +244,11 @@ export default class TalentsRouter extends SocketioRouterBase {
 		}		
 	}
 	
-	[talentsConfig.SERVER_INNER.MOB_DESPAWN.name](data, socket: GameSocket) {
+	[talentsConfig.SERVER_INNER.MOB_DESPAWN.name](data: {mob: MOB_INSTANCE}, socket: GameSocket) {
 		let {mob} = data;
 		if (mob.spells) {
 			this.controller.mobStopSpellsPicker(mob);
 		}
+		this.controller.clearMobBuffs(socket.character.room, mob.id);
 	}
 };
