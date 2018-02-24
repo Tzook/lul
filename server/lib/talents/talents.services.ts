@@ -213,6 +213,10 @@ export default class TalentsServices extends MasterServices {
 		return Math.max(dmg * talentsConfig.PERKS.BLEED_DMG_MODIFIER | 0, 1);
 	}
 
+	public getBurnDmg(dmg: number): number {
+		return Math.max(dmg * talentsConfig.PERKS.BURN_DMG_MODIFIER | 0, 1);
+	}
+
 	public getSpell(socket: GameSocket, spellKey: string): ABILITY_SPELL_MODEL|undefined {
 		const ability = socket.character.stats.primaryAbility;
 		return this.spellsInfo.get(ability).get(spellKey);

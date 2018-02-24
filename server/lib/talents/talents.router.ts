@@ -80,7 +80,7 @@ export default class TalentsRouter extends SocketioRouterBase {
 		const mobModel = this.mobsRouter.getMobInfo(mob.mobId);
 		const exp = this.services.getAbilityExp(dmg, mobModel);
 		this.emitter.emit(talentsConfig.SERVER_INNER.GAIN_ABILITY_EXP.name, {exp}, socket);
-		if (mob.hp > 0 && cause !== combatConfig.HIT_CAUSE.BLEED) {
+		if (mob.hp > 0 && cause !== combatConfig.HIT_CAUSE.BLEED && cause !== combatConfig.HIT_CAUSE.BURN) {
 			this.controller.applyHurtMobPerks(dmg, crit, mob, socket);
 		}
 		this.controller.applySelfPerks(dmg, socket);
@@ -100,7 +100,7 @@ export default class TalentsRouter extends SocketioRouterBase {
 		let {dmg, mob, cause, crit} = data;
 		if (!socket.alive) {
 			this.controller.clearSocketBuffs(socket);
-		} else if (cause !== combatConfig.HIT_CAUSE.BLEED) {
+		} else if (cause !== combatConfig.HIT_CAUSE.BLEED && cause !== combatConfig.HIT_CAUSE.BURN) {
 			this.controller.applyMobHurtPerks(dmg, crit, mob, socket);
 		}
     }

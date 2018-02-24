@@ -48,29 +48,51 @@ export default {
 	PERKS: {
 		AOE_CHANCE: "aoeChance",
 		AOE_CAP: "aoeCap",
+		
 		STUN_CHANCE: "stunChance",
 		STUN_DURATION: "stunDuration",
+		
 		CRIPPLE_CHANCE: "crippleChance",
 		CRIPPLE_DURATION: "crippleDuration",
+		
 		BLEED_CHANCE: "bleedChance",
 		BLEED_DURATION: "bleedDuration",
 		BLEED_DMG_MODIFIER: 0.1,
 		BLEED_TICK_TIME: 0.5,
+		
 		CHARGE_MODIFIER_KEY: "fullyChargeModifier",
-		LIFE_STEAL_KEY: "lifeSteal",
-		MANA_STEAL_KEY: "manaSteal",
 		DMG_MODIFIER_KEY: "damageModifier",
+		
 		CRIT_CHANCE: "critChance",
 		CRIT_MODIFIER_KEY: "critDamageModifier",
+		
+		BLOCK_CHANCE: "blockChance",
+		DAMAGE_REDUCTION: "damageReduction",
 		THREAT_MODIFIER_KEY: "threatModifier",
+
+		LIFE_STEAL_KEY: "lifeSteal",
+		MANA_STEAL_KEY: "manaSteal",
 		HP_REGEN_MODIFIER: "hpRegenModifier",
 		MP_REGEN_MODIFIER: "mpRegenModifier",
 		HP_REGEN_INTERVAL: "hpRegenInterval",
 		MP_REGEN_INTERVAL: "mpRegenInterval",
-		BLOCK_CHANCE: "blockChance",
-		DAMAGE_REDUCTION: "damageReduction",
+		
+		FREEZE_CHANCE: "freezeChance",
+		FREEZE_DURATION: "freezeDuration",
+		FROZEN_TARGET_MODIFIER_KEY: "frozenTargetModifier",
+		
+		BURN_CHANCE: "burnChance",
+		BURN_DURATION: "burnDuration",
+		BURNT_TARGET_MODIFIER_KEY: "burntTargetModifier",
+		BURN_DMG_MODIFIER: 0.05,
+		BURN_TICK_TIME: 0.25,
 	},
 	HIT_TYPE_ATTACK: "atk",
 	HIT_TYPE_HEAL: "heal",
 	CHAR_TALENT: "charTalent"
 }
+
+
+
+
+

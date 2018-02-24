@@ -19,5 +19,6 @@ export default {
 		HEAL: "heal",
 		AOE: "aoe",
 		BLEED: "bleed",
+		BURN: "burn",
 	}
 }
