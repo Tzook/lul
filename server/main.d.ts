@@ -118,9 +118,9 @@ interface GameSocket extends SocketIO.Socket {
     getKnownsList: (() => Iterable<string>)[] // List of getters for knowns
     getTargetsHit: (targetIds: string[]) => string[]
     getLoadModifier: () => number
-    getDmgModifier: (target?: MOB_INSTANCE) => DMG_RESULT
+    getDmgModifier: (attacker: GameSocket|MOB_INSTANCE, target: GameSocket|MOB_INSTANCE) => DMG_RESULT
     getThreatModifier: () => number
-    getDefenceModifier: (target?: MOB_INSTANCE) => number
+    getDefenceModifier: (attacker: GameSocket|MOB_INSTANCE, target: GameSocket|MOB_INSTANCE) => number
     getHpRegenModifier: () => number
     getMpRegenModifier: () => number
     getHpRegenInterval: () => number
@@ -227,6 +227,7 @@ interface MOB_INSTANCE extends MOB_MODEL {
     id?: string, // a unique id for this specific mob
     x?: number,
     y?: number,
+    room?: string,
     dmgers?: Map<string, number>
     threat?: {
         top?: string

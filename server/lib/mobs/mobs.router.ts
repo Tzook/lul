@@ -108,8 +108,8 @@ export default class MobsRouter extends SocketioRouterBase {
 		
 		const mob = this.getMob(mobId, socket);
 		if (!dmg) {
-			let dmgResult = this.combatRouter.calculateDamage(socket);
-			dmg = this.controller.applyDefenceModifier(dmgResult.dmg, socket, mob);
+			let dmgResult = this.combatRouter.calculateDamage(socket, mob);
+			dmg = this.controller.applyDefenceModifier(dmgResult.dmg, socket, socket, mob);
 			crit = dmgResult.crit;
 		}
 		if (dmg === 0) {
@@ -202,9 +202,9 @@ export default class MobsRouter extends SocketioRouterBase {
 		}
 	}
 	
-	[config.SERVER_INNER.MOB_AGGRO_CHANGED.name](data) {
-		let {room, id, mob} = data;			
-		this.io.to(room).emit(config.CLIENT_GETS.AGGRO.name, {
+	[config.SERVER_INNER.MOB_AGGRO_CHANGED.name](data: {mob: MOB_INSTANCE, id?: string}) {
+		let {id, mob} = data;			
+		this.io.to(mob.room).emit(config.CLIENT_GETS.AGGRO.name, {
 			id,
             mob_id: mob.id,
 		});

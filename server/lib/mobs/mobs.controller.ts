@@ -68,7 +68,8 @@ export default class MobsController extends MasterController {
             top: "",
             map: new Map()
 		};
-        mob.dmged = 0;
+		mob.dmged = 0;
+		mob.room = room;
 
 		this.mobById.set(this.services.getMobRoomId(room, mob.id), mob);
 		this.notifyAboutMob(mob, this.io.to(room));
@@ -123,14 +124,13 @@ export default class MobsController extends MasterController {
 		socket.threats.add(mob);
         if (!mob.threat.top || (mob.threat.top !== socket.character.name && threat > mob.threat.map.get(mob.threat.top))) {
 			mob.threat.top = socket.character.name;
-            this.aggroChanged(mob, socket.character.room, socket.character._id);
+            this.aggroChanged(mob, socket.character._id);
         }
     }
 	
-    private aggroChanged(mob: MOB_INSTANCE, room: string, id?: string) {
+    private aggroChanged(mob: MOB_INSTANCE, id?: string) {
 		this.router.getEmitter().emit(config.SERVER_INNER.MOB_AGGRO_CHANGED.name, { 
 			mob, 
-			room, 
 			id,
 		});	
     }
@@ -148,20 +148,20 @@ export default class MobsController extends MasterController {
 				}
 			}
 			mob.threat.top = maxSocket ? maxSocket.character.name : undefined;
-			this.aggroChanged(mob, socket.character.room, maxSocket ? maxSocket.character._id : undefined)
+			this.aggroChanged(mob, maxSocket ? maxSocket.character._id : undefined)
 		}
     }
 
 	public getHurtCharDmg(mob: MOB_INSTANCE, socket: GameSocket): DMG_RESULT {
 		let dmg = getDamageRange(mob.minDmg, mob.maxDmg);
-		let dmgResult = socket.getDmgModifier(mob);
+		let dmgResult = socket.getDmgModifier(mob, socket);
 		dmg *= dmgResult.dmg;
-		dmg = this.applyDefenceModifier(dmg, socket);
+		dmg = this.applyDefenceModifier(dmg, socket, mob, socket);
 		return {dmg, crit: dmgResult.crit};
 	}
 	
-	public applyDefenceModifier(dmg: number, socket: GameSocket, target?: MOB_INSTANCE) {
-		dmg *= socket.getDefenceModifier(target);
+	public applyDefenceModifier(dmg: number, socket: GameSocket, attacker: GameSocket|MOB_INSTANCE, target: GameSocket|MOB_INSTANCE) {
+		dmg *= socket.getDefenceModifier(attacker, target);
 		dmg = Math.ceil(dmg); // make sure we are always rounded
 		return dmg;
 	}

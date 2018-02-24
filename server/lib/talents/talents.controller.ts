@@ -65,7 +65,7 @@ export default class TalentsController extends MasterController {
 				duration,
 				initTime: Date.now(),
 			};
-			this.addMobBuff(room, mob, buffInstace);
+			this.addMobBuff(mob, buffInstace);
 			onPerkActivated(buffInstace);
 		}
 	}
@@ -182,20 +182,20 @@ export default class TalentsController extends MasterController {
 
 	protected triggerMobBleed(dmg: number, crit: boolean, mob: MOB_INSTANCE, buffInstace: BUFF_INSTANCE, socket: GameSocket) {
 		let bleedDmg = this.services.getBleedDmg(dmg);
-		this.tickMobDmg(bleedDmg, crit, buffInstace, mob, socket.character.room, combatConfig.HIT_CAUSE.BLEED, talentsConfig.PERKS.BLEED_TICK_TIME, 0, socket);
+		this.tickMobDmg(bleedDmg, crit, buffInstace, mob, combatConfig.HIT_CAUSE.BLEED, talentsConfig.PERKS.BLEED_TICK_TIME, 0, socket);
 	}
 
 	protected triggerMobBurn(dmg: number, crit: boolean, mob: MOB_INSTANCE, buffInstace: BUFF_INSTANCE, socket: GameSocket) {
 		let burnDmg = this.services.getBurnDmg(dmg);
-		this.tickMobDmg(burnDmg, crit, buffInstace, mob, socket.character.room, combatConfig.HIT_CAUSE.BURN, talentsConfig.PERKS.BURN_TICK_TIME, 0, socket);
+		this.tickMobDmg(burnDmg, crit, buffInstace, mob, combatConfig.HIT_CAUSE.BURN, talentsConfig.PERKS.BURN_TICK_TIME, 0, socket);
 	}
 
-	protected tickMobDmg(dmg: number, crit: boolean, buffInstance: BUFF_INSTANCE, mob: MOB_INSTANCE, room: string, cause: string, interval: number, tickIndex: number, socket: GameSocket) {
+	protected tickMobDmg(dmg: number, crit: boolean, buffInstance: BUFF_INSTANCE, mob: MOB_INSTANCE, cause: string, interval: number, tickIndex: number, socket: GameSocket) {
 		let buffTimer = setTimeout(() => {
-			if (!socket.connected || !socket.alive || socket.character.room !== room) {
-				return this.clearMobBuff(room, mob.id, buffInstance);
+			if (!socket.connected || !socket.alive || socket.character.room !== mob.room) {
+				return this.clearMobBuff(mob.room, mob.id, buffInstance);
 			}
-			this.tickMobDmg(dmg, crit, buffInstance, mob, room, cause, interval, tickIndex + 1, socket);
+			this.tickMobDmg(dmg, crit, buffInstance, mob, cause, interval, tickIndex + 1, socket);
 			this.mobsRouter.getEmitter().emit(mobsConfig.SERVER_INNER.MOB_TAKE_DMG.name, {
 				mobId: mob.id, 
 				dmg,
@@ -229,32 +229,37 @@ export default class TalentsController extends MasterController {
 		buffInstance.onPerkCleared = () => clearTimeout(buffTimer);
 	}
 
-	protected isMobInBuff(room: string, mobId: string, perkName: string): boolean {
+	public isMobInBuff(room: string, mobId: string, perkName: string): boolean {
 		const mobBuffs = this.getMobBuffsInstance(room, mobId);
 		const hasBuff = mobBuffs.has(perkName);
 		return hasBuff;
 	}
 
-	public mobStartSpellsPicker(mob: MOB_INSTANCE, room: string) {
+	public isSocketInBuff(socket: GameSocket, perkName: string): boolean {
+		const hasBuff = socket.buffs.has(perkName);
+		return hasBuff;
+	}
+
+	public mobStartSpellsPicker(mob: MOB_INSTANCE) {
 		let timersMap: Map<string, NodeJS.Timer> = new Map();
 		
 		for (let spellKey in mob.spells) {
-			this.activateMobSpellTimer(room, mob, spellKey, timersMap);
+			this.activateMobSpellTimer(mob, spellKey, timersMap);
 		}
 
 		this.mobsSpellsPickers.set(mob.id, timersMap);
 	}
 
-	private activateMobSpellTimer(room: string, mob: MOB_INSTANCE, spellKey: string, timersMap: Map<string, NodeJS.Timer>) {
+	private activateMobSpellTimer(mob: MOB_INSTANCE, spellKey: string, timersMap: Map<string, NodeJS.Timer>) {
 		const {minTime, maxTime} = mob.spells[spellKey];
 		const time = this.services.getMobSpellRestTime(minTime, maxTime);
 		const timerId = setTimeout(() => {
-			this.io.to(room).emit(talentsConfig.CLIENT_GETS.MOB_USE_SPELL.name, {
+			this.io.to(mob.room).emit(talentsConfig.CLIENT_GETS.MOB_USE_SPELL.name, {
 				mob_id: mob.id,
 				spell_key: spellKey,
 			});
 			// recursively use the spell
-			this.activateMobSpellTimer(room, mob, spellKey, timersMap);
+			this.activateMobSpellTimer(mob, spellKey, timersMap);
 		}, time);
 		timersMap.set(spellKey, timerId);
 	}
@@ -296,8 +301,8 @@ export default class TalentsController extends MasterController {
 		return mobBuffs;
 	}
 
-	protected addMobBuff(room: string, mob: MOB_INSTANCE, buffInstace: BUFF_INSTANCE) {
-		let mobBuffs = this.getMobBuffsInstance(room, mob.id, true);
+	protected addMobBuff(mob: MOB_INSTANCE, buffInstace: BUFF_INSTANCE) {
+		let mobBuffs = this.getMobBuffsInstance(mob.room, mob.id, true);
 		let perkBuffs = mobBuffs.get(buffInstace.perkName);
 		if (!perkBuffs) {
 			perkBuffs = new Set();

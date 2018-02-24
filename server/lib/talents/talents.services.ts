@@ -3,8 +3,10 @@ import SocketioRouter from '../socketio/socketio.router';
 import * as _ from 'underscore';
 import { doesChanceWorkFloat } from '../drops/drops.services';
 import talentsConfig from "../talents/talents.config";
+import TalentsController from './talents.controller';
 
 export default class TalentsServices extends MasterServices {
+	private controller: TalentsController;
 	private abilitiesInfo: Map<string, TALENT_INFO> = new Map();
 	private perksInfo: Map<string, ABILITY_PERK_INSTANCE[]> = new Map();
 	// primary ability => lvl|key => spell
@@ -13,6 +15,7 @@ export default class TalentsServices extends MasterServices {
 	protected socketioRouter: SocketioRouter;
 	
 	init(files, app) {
+		this.controller = files.controller;
 		super.init(files, app);
 		this.socketioRouter = files.routers.socketio;
 	}
@@ -123,13 +126,21 @@ export default class TalentsServices extends MasterServices {
 		return chargeModifier;
 	}
 
-	public getDmgModifier(target: GameSocket|MOB_INSTANCE): DMG_RESULT {
-		const dmgModifier = this.getAbilityPerkValue(talentsConfig.PERKS.DMG_MODIFIER_KEY, target);
+	public getDmgModifier(attacker: GameSocket|MOB_INSTANCE, target: GameSocket|MOB_INSTANCE): DMG_RESULT {
+		const dmgModifier = this.getAbilityPerkValue(talentsConfig.PERKS.DMG_MODIFIER_KEY, attacker);
 		let modifier = dmgModifier;
-		const critActivated = this.isAbilityActivated(talentsConfig.PERKS.CRIT_CHANCE, target);
+		const critActivated = this.isAbilityActivated(talentsConfig.PERKS.CRIT_CHANCE, attacker);
 		if (critActivated) {
-			const critModifier = this.getAbilityPerkValue(talentsConfig.PERKS.CRIT_MODIFIER_KEY, target);
-			modifier *= critModifier;
+			let perkModifier = this.getAbilityPerkValue(talentsConfig.PERKS.CRIT_MODIFIER_KEY, attacker);
+			modifier *= perkModifier;
+		}
+		if (this.isFrozen(target)) {
+			let perkModifier = this.getAbilityPerkValue(talentsConfig.PERKS.FROZEN_TARGET_MODIFIER_KEY, attacker);
+			modifier *= perkModifier;
+		}
+		if (this.isBurnt(target)) {
+			let perkModifier = this.getAbilityPerkValue(talentsConfig.PERKS.BURNT_TARGET_MODIFIER_KEY, attacker);
+			modifier *= perkModifier;
 		}
 		return {dmg: modifier, crit: critActivated};
 	}
@@ -139,7 +150,7 @@ export default class TalentsServices extends MasterServices {
 		return threatModifier;
 	}
 
-	public getDefenceModifier(target: GameSocket|MOB_INSTANCE): number {
+	public getDefenceModifier(attacker: GameSocket|MOB_INSTANCE, target: GameSocket|MOB_INSTANCE): number {
 		const isBlock = this.isAbilityActivated(talentsConfig.PERKS.BLOCK_CHANCE, target);
 		let defenceModifier = 0; // complete block
 		if (!isBlock) {
@@ -172,9 +183,13 @@ export default class TalentsServices extends MasterServices {
 	}
 	
 	public getAbilityPerkValue(perk: string, target: GameSocket|MOB_INSTANCE): number {
-		return typeof (<MOB_INSTANCE>target).mobId === "undefined" 
+		return this.isSocket(target) 
 			? this.getCharPerkValue(perk, <GameSocket>target)
 			: this.getMobPerkValue(perk, <MOB_INSTANCE>target); 
+	}
+
+	protected isSocket(target: GameSocket|MOB_INSTANCE): boolean {
+		return typeof (<MOB_INSTANCE>target).mobId === "undefined";
 	}
 	
 	protected getCharPerkValue(perk: string, socket: GameSocket): number {
@@ -206,7 +221,20 @@ export default class TalentsServices extends MasterServices {
 	protected getBetterPerkValue(value1: number, value2: number, perk: string): number {
 		const perkConfig = this.getPerkConfig(perk);
 		return perkConfig.value > 0 ? Math.max(value1, value2) : Math.min(value1, value2);
-		
+	}
+
+	protected isFrozen(target: GameSocket|MOB_INSTANCE): boolean {
+		return this.hasBuff(target, talentsConfig.PERKS.FREEZE_CHANCE);
+	}
+
+	protected isBurnt(target: GameSocket|MOB_INSTANCE): boolean {
+		return this.hasBuff(target, talentsConfig.PERKS.BURN_CHANCE);
+	}
+
+	protected hasBuff(target: GameSocket|MOB_INSTANCE, perkName: string): boolean {
+		return this.isSocket(target) 
+			? this.controller.isSocketInBuff(<GameSocket>target, perkName)
+			: this.controller.isMobInBuff((<MOB_INSTANCE>target).room, (<MOB_INSTANCE>target).id, perkName);
 	}
 
 	public getBleedDmg(dmg: number): number {

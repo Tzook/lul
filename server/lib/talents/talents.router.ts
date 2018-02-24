@@ -35,9 +35,9 @@ export default class TalentsRouter extends SocketioRouterBase {
     public onConnected(socket: GameSocket) {
 		socket.getTargetsHit = (targetIds) => this.services.getTargetsHit(targetIds, socket);
 		socket.getLoadModifier = () => this.services.getLoadModifier(socket);
-		socket.getDmgModifier = (target?: MOB_INSTANCE) => this.services.getDmgModifier(target || socket);
+		socket.getDmgModifier = (attacker: GameSocket|MOB_INSTANCE, target: GameSocket|MOB_INSTANCE) => this.services.getDmgModifier(attacker, target);
 		socket.getThreatModifier = () => this.services.getThreatModifier(socket);
-		socket.getDefenceModifier = (target?: MOB_INSTANCE) => this.services.getDefenceModifier(target || socket);
+		socket.getDefenceModifier = (attacker: GameSocket|MOB_INSTANCE, target: GameSocket|MOB_INSTANCE) => this.services.getDefenceModifier(attacker, target);
 		socket.getHpRegenModifier = () => this.services.getHpRegenModifier(socket);
 		socket.getMpRegenModifier = () => this.services.getMpRegenModifier(socket);
 		socket.getHpRegenInterval = () => this.services.getHpRegenInterval(socket);
@@ -234,12 +234,12 @@ export default class TalentsRouter extends SocketioRouterBase {
 	}
 	
 	[talentsConfig.SERVER_INNER.MOB_AGGRO_CHANGED.name](data) {
-		let {id, mob, room}: {mob: MOB_INSTANCE, room: string, id?: string} = data;	
+		let {id, mob}: {mob: MOB_INSTANCE, id?: string} = data;	
 		if (mob.spells) {
 			if (!id) {
 				this.controller.mobStopSpellsPicker(mob);
 			} else if (!this.controller.hasMobSpellsPicker(mob)) {
-				this.controller.mobStartSpellsPicker(mob, room);
+				this.controller.mobStartSpellsPicker(mob);
 			}
 		}		
 	}
