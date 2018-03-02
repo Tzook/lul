@@ -42,6 +42,7 @@ export default {
 		CHOOSE_ABILITY_PERK: {name: "ability_choose_perk"},
 		GAIN_ABILITY_PERK: {name: "ability_gain_perk"},
 		ACTIVATED_BUFF: {name: "buff_activated"},
+		RESISTED_BUFF: {name: "buff_resisted"},
 		USE_SPELL: {name: "spell_activated"},
 		MOB_USE_SPELL: {name: "mob_spell_activated"},
 		GAIN_ABILITY: {name: "actor_gain_ability"},
@@ -52,12 +53,15 @@ export default {
 		
 		STUN_CHANCE: "stunChance",
 		STUN_DURATION: "stunDuration",
+		STUN_RESISTANCE: "stunResistance",
 		
 		CRIPPLE_CHANCE: "crippleChance",
 		CRIPPLE_DURATION: "crippleDuration",
+		CRIPPLE_RESISTANCE: "crippleResistance",
 		
 		BLEED_CHANCE: "bleedChance",
 		BLEED_DURATION: "bleedDuration",
+		BLEED_RESISTANCE: "bleedResistance",
 		BLEED_DMG_MODIFIER: 0.1,
 		BLEED_TICK_TIME: 0.5,
 		
@@ -82,10 +86,12 @@ export default {
 		
 		FREEZE_CHANCE: "freezeChance",
 		FREEZE_DURATION: "freezeDuration",
+		FREEZE_RESISTANCE: "freezeResistance",
 		FROZEN_TARGET_MODIFIER_KEY: "frozenTargetModifier",
 		
 		BURN_CHANCE: "burnChance",
 		BURN_DURATION: "burnDuration",
+		BURN_RESISTANCE: "burnResistance",
 		BURNT_TARGET_MODIFIER_KEY: "burntTargetModifier",
 		BURN_DMG_MODIFIER: 0.05,
 		BURN_TICK_TIME: 0.25,
