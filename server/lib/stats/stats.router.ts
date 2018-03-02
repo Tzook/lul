@@ -151,6 +151,7 @@ export default class StatsRouter extends SocketioRouterBase {
     private toggleStats(stats: ITEM_INSTANCE, socket: GameSocket, on: boolean, validate = true) {
         const sign = on ? 1 : -1;
         const hadFullHp = socket.character.stats.hp.now === socket.maxHp;
+        const hadFullMp = socket.character.stats.mp.now === socket.maxMp;
         for (var stat in BASE_STATS_SCHEMA) {
             if (stats[stat]) {
                 socket.bonusStats[stat] += stats[stat] * sign;
@@ -165,7 +166,12 @@ export default class StatsRouter extends SocketioRouterBase {
             if (socket.character.stats.mp.now > socket.maxMp) {
                 socket.character.stats.mp.now = socket.maxMp;
             }
-            hadFullHp && this.regenHpInterval(socket);
+            if (hadFullHp && !socket.hpRegenTimer) {
+                this.regenHpInterval(socket);
+            };
+            if (hadFullMp && !socket.mpRegenTimer) {
+                this.regenMpInterval(socket);
+            };
         }
     }
 
@@ -200,6 +206,8 @@ export default class StatsRouter extends SocketioRouterBase {
                     this.regenHpInterval(socket);
                 }
             }, socket.getHpRegenInterval());
+        } else {
+            socket.hpRegenTimer = null;
         }
     }
     private regenMpInterval(socket: GameSocket) {
@@ -212,6 +220,8 @@ export default class StatsRouter extends SocketioRouterBase {
                     this.regenMpInterval(socket);
                 }
             }, socket.getMpRegenInterval());
+        } else {
+            socket.mpRegenTimer = null;
         }
     }
 };

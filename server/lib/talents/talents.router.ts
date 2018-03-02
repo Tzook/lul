@@ -43,6 +43,7 @@ export default class TalentsRouter extends SocketioRouterBase {
 		socket.getHpRegenInterval = () => this.services.getHpRegenInterval(socket);
 		socket.getMpRegenInterval = () => this.services.getMpRegenInterval(socket);
 		socket.buffs = new Map();
+		process.nextTick(() => this.addStats(socket));
 	}
 
 	public getAbilityInfo(ability: string): TALENT_INFO|undefined {
@@ -163,7 +164,9 @@ export default class TalentsRouter extends SocketioRouterBase {
 		if (!this.services.canGetPerk(talent, perk)) {
 			return this.sendError(data, socket, "Raising points to that perk is not available.");
 		}
+		this.removeStats(socket);
 		this.services.addPerk(talent, perk);		
+		this.addStats(socket);
 		talent.points--;
 		talent.pool = [];
 		socket.emit(talentsConfig.CLIENT_GETS.GAIN_ABILITY_PERK.name, {
@@ -250,5 +253,28 @@ export default class TalentsRouter extends SocketioRouterBase {
 			this.controller.mobStopSpellsPicker(mob);
 		}
 		this.controller.clearMobBuffs(socket.character.room, mob.id);
+	}
+	
+	[talentsConfig.SERVER_INNER.CHANGED_ABILITY.name](data, socket: GameSocket) {
+		let {previousAbility} = data;
+
+		this.removeStats(socket, previousAbility);
+		this.addStats(socket);
+	}
+	
+	private addStats(socket: GameSocket, ability?: string) {
+		const stats = {
+			hp: this.services.getHpBonus(socket, ability),
+			mp: this.services.getMpBonus(socket, ability),
+		};
+		this.emitter.emit(statsConfig.SERVER_INNER.STATS_ADD.name, { stats }, socket);
+	}
+
+	private removeStats(socket: GameSocket, ability?: string) {
+		const stats = {
+			hp: this.services.getHpBonus(socket, ability),
+			mp: this.services.getMpBonus(socket, ability),
+		};
+		this.emitter.emit(statsConfig.SERVER_INNER.STATS_REMOVE.name, { stats }, socket);
 	}
 };

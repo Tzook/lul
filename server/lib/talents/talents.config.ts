@@ -26,6 +26,7 @@ export default {
 		GAIN_ABILITY_LVL: {name: "gain_ability_lvl", alive: true, log: true},
 		GENERATE_PERK_POOL: {name: "generate_perk_pool", alive: true},
 		GAIN_LVL: Object.assign({}, statsConfig.SERVER_INNER.GAIN_LVL, {log: false}),
+		CHANGED_ABILITY: Object.assign({}, combatConfig.SERVER_INNER.CHANGED_ABILITY),
 	},
 	"SERVER_GETS": {
 		DISCONNECT: Object.assign({}, socketioConfig.SERVER_GETS.DISCONNECT),
@@ -76,6 +77,8 @@ export default {
 		MP_REGEN_MODIFIER: "mpRegenModifier",
 		HP_REGEN_INTERVAL: "hpRegenInterval",
 		MP_REGEN_INTERVAL: "mpRegenInterval",
+		HP_BONUS: "hpBonus",
+		MP_BONUS: "mpBonus",
 		
 		FREEZE_CHANCE: "freezeChance",
 		FREEZE_DURATION: "freezeDuration",

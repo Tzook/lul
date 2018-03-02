@@ -49,12 +49,18 @@ export default class CombatRouter extends SocketioRouterBase {
 		} else if (socket.character.stats.primaryAbility === ability) {
 			this.sendError(data, socket, "Character already has this ability");
 		} else {
+			const previousAbility = socket.character.stats.primaryAbility;
 			socket.character.stats.primaryAbility = ability;
-			socket.broadcast.to(socket.character.room).emit(this.CLIENT_GETS.CHANGE_ABILITY.name, {
-				id: socket.character._id,
-				ability: socket.character.stats.primaryAbility,
-			});
+			this.emitter.emit(config.SERVER_INNER.CHANGED_ABILITY.name, {previousAbility, ability}, socket);
 		}
+	}
+
+	[config.SERVER_INNER.CHANGED_ABILITY.name](data, socket: GameSocket) {
+		let {ability} = data;
+		socket.broadcast.to(socket.character.room).emit(this.CLIENT_GETS.CHANGE_ABILITY.name, {
+			id: socket.character._id,
+			ability,
+		});
 	}
 
 	[config.SERVER_GETS.USE_ABILITY.name](data, socket: GameSocket) {

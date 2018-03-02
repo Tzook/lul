@@ -180,6 +180,14 @@ export default class TalentsServices extends MasterServices {
 	public getMpRegenInterval(socket: GameSocket): number {
 		return this.getAbilityPerkValue(talentsConfig.PERKS.MP_REGEN_INTERVAL, socket) * 1000;
 	}
+
+	public getHpBonus(socket: GameSocket, ability?: string): number {
+		return this.getCharPerkValue(talentsConfig.PERKS.HP_BONUS, socket, ability);
+	}
+	
+	public getMpBonus(socket: GameSocket, ability?: string): number {
+		return this.getCharPerkValue(talentsConfig.PERKS.MP_BONUS, socket, ability);
+	}
 	
 	public isAbilityActivated(perk: string, target: GameSocket|MOB_INSTANCE): boolean {
 		const value = this.getAbilityPerkValue(perk, target);
@@ -197,8 +205,8 @@ export default class TalentsServices extends MasterServices {
 		return typeof (<MOB_INSTANCE>target).mobId === "undefined";
 	}
 	
-	protected getCharPerkValue(perk: string, socket: GameSocket): number {
-		const ability = socket.character.stats.primaryAbility;
+	protected getCharPerkValue(perk: string, socket: GameSocket, ability?: string): number {
+		ability = ability || socket.character.stats.primaryAbility;
 		const charPerks = socket.character.talents._doc[ability].perks;
 		const level = (charPerks[perk] || 0) + (socket.character.charTalents._doc[talentsConfig.CHAR_TALENT].perks[perk] || 0);
 		let perkValue = this.getSafePerkLevelValue(perk, level);
