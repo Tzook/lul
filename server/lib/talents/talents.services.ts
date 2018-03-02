@@ -342,8 +342,11 @@ export default class TalentsServices extends MasterServices {
 			let perkModel: PERK_CONFIG = {
 				value: +perk.value,
 			};
-			if (perk.max) {
+			if (+perk.max) {
 				perkModel.max = +perk.max;
+			}
+			if (+perk.acc) {
+				perkModel.acc = +perk.acc;
 			}
 			if (perk.default) {
 				perkModel.default = +perk.default;
