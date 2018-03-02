@@ -43,7 +43,7 @@ export default class TalentsRouter extends SocketioRouterBase {
 		socket.getHpRegenInterval = () => this.services.getHpRegenInterval(socket);
 		socket.getMpRegenInterval = () => this.services.getMpRegenInterval(socket);
 		socket.buffs = new Map();
-		process.nextTick(() => this.addStats(socket));
+		process.nextTick(() => this.addStats(socket, false));
 	}
 
 	public getAbilityInfo(ability: string): TALENT_INFO|undefined {
@@ -262,12 +262,12 @@ export default class TalentsRouter extends SocketioRouterBase {
 		this.addStats(socket);
 	}
 	
-	private addStats(socket: GameSocket, ability?: string) {
+	private addStats(socket: GameSocket, validate: boolean = true) {
 		const stats = {
-			hp: this.services.getHpBonus(socket, ability),
-			mp: this.services.getMpBonus(socket, ability),
+			hp: this.services.getHpBonus(socket),
+			mp: this.services.getMpBonus(socket),
 		};
-		this.emitter.emit(statsConfig.SERVER_INNER.STATS_ADD.name, { stats }, socket);
+		this.emitter.emit(statsConfig.SERVER_INNER.STATS_ADD.name, { stats, validate }, socket);
 	}
 
 	private removeStats(socket: GameSocket, ability?: string) {
