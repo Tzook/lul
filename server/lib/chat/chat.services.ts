@@ -30,6 +30,9 @@ export default class ChatServices extends MasterServices {
     }
 
     public useHax(socket: GameSocket, msg: string): boolean {
+        if (msg[0] !== "/") {
+            return false;
+        }
         let parts = msg.split(" ");
 
         let targetSocket = socket;
@@ -126,7 +129,7 @@ export default class ChatServices extends MasterServices {
                     itemInstance.stack = stack;
                 }
                 
-                return emitter.emit(dropsConfig.SERVER_INNER.ITEMS_DROP.name, {}, socket, [itemInstance]);
+                return emitter.emit(dropsConfig.SERVER_INNER.ITEMS_DROP.name, {owner: targetSocket.character.name}, targetSocket, [itemInstance]);
             }
         }
 
