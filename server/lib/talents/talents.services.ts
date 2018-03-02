@@ -78,8 +78,13 @@ export default class TalentsServices extends MasterServices {
 	protected getPerkLevelValue(perk: string, level: number): number {
 		const perkConfig = this.getPerkConfig(perk);
 		const initialValue = perkConfig.default || 0;
-		const valueModifier = perkConfig.value || 1;
-		return initialValue + level * valueModifier;
+		const acceleration = perkConfig.acc || 0;
+		const valueModifier = perkConfig.value;
+		// Gauss formula => 1 + 2 + 3 + ... + n = n * (n + 1) / 2
+		const sumValuesUntilLevel = (level - 1) * level / 2;
+		// 1 * x + 2 * x + ... + n * x = (1 + 2 + 3 + ... + n) * x
+		const accelerationPoint = sumValuesUntilLevel * acceleration;
+		return initialValue + level * valueModifier + accelerationPoint;
 	}
 	
 	protected getSafePerkLevelValue(perk: string, level: number) {
@@ -348,7 +353,7 @@ export default class TalentsServices extends MasterServices {
 			if (+perk.acc) {
 				perkModel.acc = +perk.acc;
 			}
-			if (perk.default) {
+			if (+perk.default) {
 				perkModel.default = +perk.default;
 			}
 			perks[perk.key] = perkModel;
