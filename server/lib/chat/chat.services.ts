@@ -62,9 +62,16 @@ export default class ChatServices extends MasterServices {
             }
                 
             case chatConfig.HAX.LVL.code: {
-                return emitter.emit(statsConfig.SERVER_INNER.GAIN_EXP.name, {
+                emitter.emit(statsConfig.SERVER_INNER.GAIN_EXP.name, {
                     exp: this.statsRouter.getExp(targetSocket.character.stats.lvl)
                 }, targetSocket);
+                if (parts[2]) {
+                    emitter.emit(talentsConfig.SERVER_GETS.CHOOSE_ABILITY_PERK.name, {
+                        ability: talentsConfig.CHAR_TALENT,
+                        perk: _.sample(targetSocket.character.charTalents._doc[talentsConfig.CHAR_TALENT].pool)
+                    }, targetSocket);
+                }
+                return true;
             }
                 
             case chatConfig.HAX.LVLPA.code: {
