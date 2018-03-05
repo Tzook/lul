@@ -210,7 +210,8 @@ export default class TalentsServices extends MasterServices {
 		ability = ability || socket.character.stats.primaryAbility;
         const talent = socket.character.talents._doc[ability];
         if (!talent) {
-            return 0;
+            const perkConfig = this.getPerkConfig(perk);
+            return perkConfig.default || 0;
         }
 		const level = (talent.perks[perk] || 0) + (socket.character.charTalents._doc[talentsConfig.CHAR_TALENT].perks[perk] || 0);
 		let perkValue = this.getSafePerkLevelValue(perk, level);
@@ -473,11 +474,11 @@ export function hasAbility(socket: GameSocket, ability: string): boolean {
 	return !!socket.character.talents._doc[ability];
 }
 
-export function canUseAbility(socket: GameSocket, ability: string): boolean {
-	return hasAbility(socket, ability) || isAbilitySupportedInRoom(socket.character.room, ability);
+export function canUseAbility(socket: GameSocket, ability: string, room?: string): boolean {
+	return hasAbility(socket, ability) || isAbilitySupportedInRoom(room || socket.character.room, ability);
 }
 
 export function isAbilitySupportedInRoom(room: string, ability: string): boolean {
     const roomInfo = getRoomInfo(room);
-	return roomInfo.abilities && roomInfo.abilities[room];
+	return roomInfo.abilities && roomInfo.abilities[ability];
 }

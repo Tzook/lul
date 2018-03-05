@@ -263,6 +263,14 @@ export default class TalentsRouter extends SocketioRouterBase {
 
 		this.removeStats(socket, previousAbility);
 		this.addStats(socket);
+    }
+    
+	[talentsConfig.SERVER_INNER.LEFT_ROOM.name](data, socket: GameSocket) {
+		if (!hasAbility(socket, socket.character.stats.primaryAbility)) {
+            this.emitter.emit(combatConfig.SERVER_GETS.CHANGE_ABILITY.name, { 
+                ability: statsConfig.ABILITY_MELEE
+            }, socket);
+        }
 	}
 	
 	private addStats(socket: GameSocket, validate: boolean = true) {

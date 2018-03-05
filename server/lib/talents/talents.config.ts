@@ -27,6 +27,7 @@ export default {
 		GENERATE_PERK_POOL: {name: "generate_perk_pool", alive: true},
 		GAIN_LVL: Object.assign({}, statsConfig.SERVER_INNER.GAIN_LVL, {log: false}),
 		CHANGED_ABILITY: Object.assign({}, combatConfig.SERVER_INNER.CHANGED_ABILITY),
+		LEFT_ROOM: Object.assign({}, roomsConfig.SERVER_INNER.LEFT_ROOM),
 	},
 	"SERVER_GETS": {
 		DISCONNECT: Object.assign({}, socketioConfig.SERVER_GETS.DISCONNECT),
