@@ -205,7 +205,7 @@ interface ROOM_MODEL {
     abilities?: ROOM_ABILITIES
 }
 interface ROOM_ABILITIES {
-    [key: string]: 1
+    [key: string]: true
 }
 
 // mobs

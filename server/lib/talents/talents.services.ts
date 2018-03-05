@@ -4,6 +4,7 @@ import * as _ from 'underscore';
 import { doesChanceWorkFloat } from '../drops/drops.services';
 import talentsConfig from "../talents/talents.config";
 import TalentsController from './talents.controller';
+import { getRoomInfo } from '../rooms/rooms.services';
 
 export default class TalentsServices extends MasterServices {
 	private controller: TalentsController;
@@ -453,7 +454,7 @@ export function extendRoomSchemaWithTalents(scene: any, roomSchema: ROOM_MODEL):
     let abilities: ROOM_ABILITIES;
     (scene.abilities || []).forEach(ability => {
         abilities = abilities || {};
-        abilities[ability] = 1;
+        abilities[ability] = true;
     });
     if (abilities) {
         roomSchema.abilities = abilities;
@@ -477,6 +478,6 @@ export function canUseAbility(socket: GameSocket, ability: string): boolean {
 }
 
 export function isAbilitySupportedInRoom(room: string, ability: string): boolean {
-    // TODO
-	return false;
+    const roomInfo = getRoomInfo(room);
+	return roomInfo.abilities && roomInfo.abilities[room];
 }

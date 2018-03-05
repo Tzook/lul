@@ -3,6 +3,7 @@ import MasterServices from '../master/master.services';
 import NpcsRouter from "../npcs/npcs.router";
 import * as _ from 'underscore';
 import { extendRoomSchemaWithTalents } from '../talents/talents.services';
+import { getServices } from '../main/bootstrap';
 
 const ROOM_NAME_INSTANCE_SEPARATOR = "~~";
 
@@ -81,4 +82,9 @@ export function getRoomName(socket: GameSocket) {
 
 export function isInInstance(socket: GameSocket) {
 	return socket.character.room.includes(ROOM_NAME_INSTANCE_SEPARATOR);
+};
+
+export function getRoomInfo(room: string): ROOM_MODEL|undefined {
+    const roomsServices: RoomsServices = getServices("rooms");
+    return roomsServices.getRoomInfo(room);
 }
