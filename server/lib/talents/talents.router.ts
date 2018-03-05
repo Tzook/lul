@@ -108,7 +108,10 @@ export default class TalentsRouter extends SocketioRouterBase {
 	
 	[talentsConfig.SERVER_INNER.GAIN_ABILITY_EXP.name]({exp}: {exp: number}, socket: GameSocket) {
 		const ability = socket.character.stats.primaryAbility;
-		const talent = socket.character.talents._doc[ability];
+        const talent = socket.character.talents._doc[ability];
+        if (!talent) {
+            return;
+        }
 		talent.exp += exp;
 		
 		const expNeededToLevel = this.statsRouter.getExp(talent.lvl);

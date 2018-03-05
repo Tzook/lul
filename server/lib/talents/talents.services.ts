@@ -207,8 +207,11 @@ export default class TalentsServices extends MasterServices {
 	
 	protected getCharPerkValue(perk: string, socket: GameSocket, ability?: string): number {
 		ability = ability || socket.character.stats.primaryAbility;
-		const charPerks = socket.character.talents._doc[ability].perks;
-		const level = (charPerks[perk] || 0) + (socket.character.charTalents._doc[talentsConfig.CHAR_TALENT].perks[perk] || 0);
+        const talent = socket.character.talents._doc[ability];
+        if (!talent) {
+            return 0;
+        }
+		const level = (talent.perks[perk] || 0) + (socket.character.charTalents._doc[talentsConfig.CHAR_TALENT].perks[perk] || 0);
 		let perkValue = this.getSafePerkLevelValue(perk, level);
 		if (socket.currentSpell) {
 			// send the higher value - perk or spell
@@ -266,7 +269,7 @@ export default class TalentsServices extends MasterServices {
 	public canUseSpell(socket: GameSocket, spell: ABILITY_SPELL_MODEL): boolean {
 		const ability = socket.character.stats.primaryAbility;
 		const talent = socket.character.talents._doc[ability];
-		return talent.lvl >= spell.lvl;
+		return talent && talent.lvl >= spell.lvl;
 	}
 
 	public getStealValue(value, percent): number {
@@ -456,4 +459,13 @@ export function getTalent(socket: GameSocket, ability: string): CHAR_ABILITY_TAL
 
 export function hasAbility(socket: GameSocket, ability: string): boolean {
 	return !!socket.character.talents._doc[ability];
+}
+
+export function canUseAbility(socket: GameSocket, ability: string): boolean {
+	return hasAbility(socket, ability) || isAbilitySupportedInRoom(socket.character.room, ability);
+}
+
+export function isAbilitySupportedInRoom(room: string, ability: string): boolean {
+    // TODO
+	return false;
 }

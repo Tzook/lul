@@ -77,6 +77,10 @@ export default class ChatServices extends MasterServices {
             case chatConfig.HAX.LVLPA.code: {
                 const ability = targetSocket.character.stats.primaryAbility;
                 const talent = targetSocket.character.talents._doc[ability];
+                if (!talent) {
+                    this.statsRouter.sendError({msg}, socket, "Cannot hax - Primary ability is not a real ability", true, true);
+                    return false;
+                }
                 let abilityLvl = talent.lvl;
                 emitter.emit(talentsConfig.SERVER_INNER.GAIN_ABILITY_EXP.name, {
                     exp: this.statsRouter.getExp(abilityLvl)
