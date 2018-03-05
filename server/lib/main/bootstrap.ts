@@ -1,5 +1,8 @@
 import * as path from 'path';
 
+let routers = {};
+let services = {};
+
 export default class Bootstrap {
     protected app;
 
@@ -16,7 +19,6 @@ export default class Bootstrap {
 
     public init() {
         let structure = require('../../../config/config.structure.json');
-        let routers = {};
         var filesGroups = [];
         for (let i = 0; i < structure.folders.length; i++) {
             if (structure.skip[structure.folders[i]]) { // There are classes that we do not want to instantiate, like Master - everything inherits from it
@@ -27,6 +29,7 @@ export default class Bootstrap {
             
             filesGroups.push(files);
             routers[structure.folders[i]] = files.router;
+            services[structure.folders[i]] = files.services;
         }
         this.initObjects(structure.templates, filesGroups, this.app);
         
@@ -67,3 +70,11 @@ export default class Bootstrap {
         });
     }
 };
+
+export function getRouter(name: string) {
+    return routers[name];
+}
+
+export function getServices(name: string) {
+    return services[name];
+}
