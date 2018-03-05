@@ -1,5 +1,6 @@
 
 import Response from './master.response';
+import { isProduction } from '../main/main';
 
 export default class MasterMiddleware extends Response {
 
@@ -25,6 +26,15 @@ export default class MasterMiddleware extends Response {
 			next();
 		} else {
 			this.sendError(res, this.LOGS.MASTER_NOT_LOGGED_IN);
+		}
+    }
+    
+	debounceIfLocal(req, res, next) {
+        if (isProduction()) {
+            next();
+		} else {
+            // in local, give it a bit of time so it won't freeze
+			setTimeout(() => next(), 500);
 		}
 	}
 
