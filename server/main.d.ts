@@ -202,6 +202,10 @@ interface ROOM_MODEL {
         [key: string]: PORTAL_MODEL
     },
     spawns: SPAWN_MODEL[],
+    abilities?: ROOM_ABILITIES
+}
+interface ROOM_ABILITIES {
+    [key: string]: 1
 }
 
 // mobs

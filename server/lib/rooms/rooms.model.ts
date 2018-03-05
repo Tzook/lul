@@ -23,17 +23,19 @@ export default class RoomsModel extends MasterModel {
         this.addToCharacterSchema = {
             room: {type: String, default: files.config.DEFAULT_ROOM}
         };
+        this.listenForSchemaAddition('Rooms');
     }
-
+    
     get priority() {
         return PRIORITY_ROOMS;
     }
-
+    
     createModel() {
         this.setModel('Rooms');
         this.addToSchema('Character', this.addToCharacterSchema);
 
 		setTimeout(() => this.controller.warmRoomsInfo()); // timeout so the Model can be set
+        this.removeListen('Rooms');
         return Promise.resolve();
     }
 };

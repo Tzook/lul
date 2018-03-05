@@ -2,6 +2,7 @@
 import MasterServices from '../master/master.services';
 import NpcsRouter from "../npcs/npcs.router";
 import * as _ from 'underscore';
+import { extendRoomSchemaWithTalents } from '../talents/talents.services';
 
 const ROOM_NAME_INSTANCE_SEPARATOR = "~~";
 
@@ -43,7 +44,8 @@ export default class RoomsServices extends MasterServices {
 			town: scene.nearestTownScene,
 			portals,
 			spawns
-		};
+        };
+        extendRoomSchemaWithTalents(scene, room);
         let roomModel = new this.Model(room);
 
         let npcsPromise = this.npcsRouter.updateNpcs(scene.name, scene.NPC);

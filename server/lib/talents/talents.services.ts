@@ -449,6 +449,17 @@ export function extendMobSchemaWithTalents(mob: any, mobSchema: MOB_MODEL): void
 	});
 }
 
+export function extendRoomSchemaWithTalents(scene: any, roomSchema: ROOM_MODEL): void {
+    let abilities: ROOM_ABILITIES;
+    (scene.abilities || []).forEach(ability => {
+        abilities = abilities || {};
+        abilities[ability] = 1;
+    });
+    if (abilities) {
+        roomSchema.abilities = abilities;
+    }
+}
+
 export function isCharAbility(ability: string): boolean {
 	return ability === talentsConfig.CHAR_TALENT;
 }
