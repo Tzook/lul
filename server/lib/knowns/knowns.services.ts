@@ -1,6 +1,7 @@
 
 import MasterServices from '../master/master.services';
 import * as _ from "underscore";
+import { extendStatsWithMax } from '../rooms/rooms.middleware';
 
 export default class KnownsServices extends MasterServices {
     protected io: SocketIO.Namespace;
@@ -41,8 +42,9 @@ export default class KnownsServices extends MasterServices {
         return namespace;
     }
 
-    public getKnownCharInfo(char: Char): KnownChar {
-        let {_id, name, stats, room} = char;
-        return {_id, name, stats, room};
+    public getKnownCharInfo(socket: GameSocket): KnownChar {
+        let {_id, name, stats, room} = socket.character.toJSON();
+        let fullStats = extendStatsWithMax(stats, socket);        
+        return {_id, name, stats: fullStats, room};
     }
 };

@@ -12,6 +12,7 @@ interface EVENT {
 interface Doc {
     _id: any;
     save?(fn?: (err: any, product: this, numAffected: number) => void): Promise<this>;
+    toJSON: () => this
 }
 
 interface Config extends Doc {
@@ -53,31 +54,53 @@ interface Stats {
     },
     primaryAbility: string,
 }
+interface FULL_STATS extends Stats {
+    maxHp: number
+    maxMp: number
+}
 
 interface CHAR_ITEMS extends Array<ITEM_INSTANCE> {
     set: (index: number, obj: ITEM_INSTANCE|{}) => {};
 }
 
-interface PublicChar extends Doc {
-    name: string;
-    position: {
-        x: number;
-        y: number;
-        z: number;
-        climbing: boolean, 
-    },
-    looks,
-    equips: Equips,
-    stats: Stats,
+interface CHAR_POSITION {
+    x: number;
+    y: number;
+    z: number;
+    climbing: boolean, 
 }
 
-interface KnownChar extends Doc {
+interface PublicChar {
+    _id: any
     name: string;
-    stats: Stats,
+    position: CHAR_POSITION,
+    looks,
+    equips: Equips,
+    stats: FULL_STATS,
+}
+
+interface KnownChar {
+    _id: any
+    name: string;
+    stats: FULL_STATS,
     room: string;
 }
 
-interface Char extends PublicChar {
+interface PrivateChar extends PublicChar {
+    room: string;
+    gold: number;
+    items: CHAR_ITEMS,
+    quests: CHAR_QUESTS,
+    charTalents: CHAR_TALENT_OBJECT
+    talents: CHAR_TALENT_OBJECT
+}
+
+interface Char extends Doc {
+    name: string;
+    position: CHAR_POSITION,
+    looks,
+    equips: Equips,
+    stats: Stats,
     room: string;
     gold: number;
     items: CHAR_ITEMS,

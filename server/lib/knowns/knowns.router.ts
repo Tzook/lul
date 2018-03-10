@@ -21,6 +21,17 @@ export default class KnownsRouter extends SocketioRouterBase {
         }
     }
 
+    [config.SERVER_INNER.UPDATE_MAX_STATS.name](data, socket: GameSocket) {
+        let namespace = this.services.getKnownsNamespace(this.services.getNotInRoomKnowns(socket));
+        if (namespace) {
+            namespace.emit(statsConfig.CLIENT_GETS.UPDATE_MAX_STATS.name, {
+                name: socket.character.name,
+                hp: socket.maxHp,
+                mp: socket.maxMp,
+            });
+        }
+    }
+
 	[config.SERVER_INNER.MOVE_ROOM.name](data: {room: string}, socket: GameSocket) {
         let namespace = this.services.getKnownsNamespace(this.services.getLoggedInKnownsFromList(socket));
         if (namespace) {
@@ -38,7 +49,7 @@ export default class KnownsRouter extends SocketioRouterBase {
         let namespace = this.services.getKnownsNamespace(knowns);
         if (namespace) {
             namespace.emit(config.CLIENT_GETS.KNOWN_INFO.name, {
-                character: this.services.getKnownCharInfo(socket.character)
+                character: this.services.getKnownCharInfo(socket)
             });
         }
 	}
@@ -61,7 +72,7 @@ export default class KnownsRouter extends SocketioRouterBase {
             let namespace = this.services.getKnownsNamespace(knowns);
             if (namespace) {
                 namespace.emit(config.CLIENT_GETS.KNOWN_INFO.name, {
-                    character: this.services.getKnownCharInfo(socket.character)
+                    character: this.services.getKnownCharInfo(socket)
                 });
                 // we have to get the namespace again because socketio clears it with each emit
                 namespace = this.services.getKnownsNamespace(knowns);
@@ -75,7 +86,7 @@ export default class KnownsRouter extends SocketioRouterBase {
     private notifyKnown(socket: GameSocket, knowns: Set<GameSocket>) {
         for (let knownSocket of knowns) {
             socket.emit(config.CLIENT_GETS.KNOWN_INFO.name, {
-                character: this.services.getKnownCharInfo(knownSocket.character)
+                character: this.services.getKnownCharInfo(knownSocket)
             });
         }
     }

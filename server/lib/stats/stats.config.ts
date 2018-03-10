@@ -9,7 +9,8 @@ const CONFIG = {
 		"TOOK_DMG": {"name": "took_actual_dmg"},
 		"USE_MP": {"name": "use_mp", "alive": true, "log": true},
 		"STATS_ADD": {"name": "stats_add", "alive": true},
-		"STATS_REMOVE": {"name": "stats_remove", "alive": true}
+		"STATS_REMOVE": {"name": "stats_remove", "alive": true},
+		"UPDATE_MAX_STATS": {"name": "update_max_stats"},
 	},
 	"SERVER_GETS": {
 		"RELEASE_DEATH": {"name": "release_death", "alive": false, "log": true}
@@ -19,6 +20,7 @@ const CONFIG = {
 		"GAIN_HP": {"name": "actor_gain_hp"},
 		"GAIN_MP": {"name": "actor_gain_mp"},
 		"GAIN_STATS": {"name": "actor_gain_stats"},
+		"UPDATE_MAX_STATS": {"name": "update_actor_max_stats"},
 		"TAKE_DMG": {"name": "actor_take_dmg"},
 		"USE_MP": {"name": "actor_use_mp"},
 		"DEATH": {"name": "actor_ded"},

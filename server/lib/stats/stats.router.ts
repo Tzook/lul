@@ -49,6 +49,7 @@ export default class StatsRouter extends SocketioRouterBase {
         socket.emit(config.CLIENT_GETS.GAIN_STATS.name, {
             stats: socket.character.stats
         });
+        this.updateMaxStats(socket);
     }
 
     [config.SERVER_INNER.TAKE_DMG.name] (data, socket: GameSocket) {
@@ -122,6 +123,8 @@ export default class StatsRouter extends SocketioRouterBase {
 
     [config.SERVER_INNER.GAIN_STATS.name] (data: {stats: BASE_STATS_MODEL}, socket: GameSocket) {
         let {stats} = data;
+        const oldMaxHp = socket.maxHp;
+        const oldMaxMp = socket.maxMp;
         
         this.services.addStr(socket.character.stats, stats.str || 0);
         this.services.addMag(socket.character.stats, stats.mag || 0);
@@ -132,6 +135,10 @@ export default class StatsRouter extends SocketioRouterBase {
         socket.emit(config.CLIENT_GETS.GAIN_STATS.name, {
             stats: socket.character.stats
         });
+
+        if (oldMaxHp !== socket.maxHp || oldMaxMp !== socket.maxMp) {
+            this.updateMaxStats(socket);
+        }
     }
 
     [config.SERVER_GETS.RELEASE_DEATH.name] (data, socket: GameSocket) {
@@ -150,6 +157,8 @@ export default class StatsRouter extends SocketioRouterBase {
 
     private toggleStats(stats: ITEM_INSTANCE, socket: GameSocket, on: boolean, validate = true) {
         const sign = on ? 1 : -1;
+        const oldMaxHp = socket.maxHp;
+        const oldMaxMp = socket.maxMp;
         const hadFullHp = socket.character.stats.hp.now === socket.maxHp;
         const hadFullMp = socket.character.stats.mp.now === socket.maxMp;
         for (var stat in BASE_STATS_SCHEMA) {
@@ -161,10 +170,14 @@ export default class StatsRouter extends SocketioRouterBase {
         socket.bonusStats.mp += this.services.magToMp(stats.mag || 0) * sign;
         if (validate) {
             if (socket.character.stats.hp.now > socket.maxHp) {
-                socket.character.stats.hp.now = socket.maxHp;
+                let hpToRemove = socket.character.stats.hp.now - socket.maxHp;
+                socket.character.stats.hp.now -= hpToRemove;
+                this.emitter.emit(config.SERVER_INNER.GAIN_HP.name, { hp: -hpToRemove }, socket);
             }
             if (socket.character.stats.mp.now > socket.maxMp) {
-                socket.character.stats.mp.now = socket.maxMp;
+                let mpToRemove = socket.character.stats.mp.now - socket.maxMp;
+                socket.character.stats.mp.now -= mpToRemove;
+                this.emitter.emit(config.SERVER_INNER.GAIN_MP.name, { mp: -mpToRemove }, socket);
             }
             if (hadFullHp && !socket.hpRegenTimer) {
                 this.regenHpInterval(socket);
@@ -172,7 +185,22 @@ export default class StatsRouter extends SocketioRouterBase {
             if (hadFullMp && !socket.mpRegenTimer) {
                 this.regenMpInterval(socket);
             };
+            if (oldMaxHp !== socket.maxHp || oldMaxMp !== socket.maxMp) {
+                this.updateMaxStats(socket);
+            }
         }
+    }
+
+    protected updateMaxStats(socket: GameSocket) {
+        this.emitter.emit(config.SERVER_INNER.UPDATE_MAX_STATS.name, {}, socket);
+    }
+    
+    [config.SERVER_INNER.UPDATE_MAX_STATS.name](data, socket: GameSocket) {
+        this.io.to(socket.character.room).emit(config.CLIENT_GETS.UPDATE_MAX_STATS.name, {
+            id: socket.character._id,
+            hp: socket.maxHp,
+            mp: socket.maxMp,
+        });
     }
 
     public onConnected(socket: GameSocket) {

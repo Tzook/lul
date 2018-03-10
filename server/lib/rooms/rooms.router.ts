@@ -25,10 +25,6 @@ export default class RoomsRouter extends SocketioRouterBase {
 	public getRoomInfo(room: string): ROOM_MODEL|undefined {
 		return this.services.getRoomInfo(room);
 	}
-
-    public getPublicCharInfo(char: Char) {
-        return this.middleware.getPublicCharInfo(char);
-	}
 	
 	public isEmpty(room): boolean {
 		return !this.io.sockets.adapter.rooms[room];
@@ -36,13 +32,13 @@ export default class RoomsRouter extends SocketioRouterBase {
 
 	[config.SERVER_GETS.ENTERED_ROOM.name](data, socket: GameSocket) {
 		socket.broadcast.to(socket.character.room).emit(this.CLIENT_GETS.JOIN_ROOM.name, {
-			character: this.middleware.getPublicCharInfo(socket.character)
+			character: this.middleware.getPublicCharInfo(socket)
 		});
 		let roomObject = socket.adapter.rooms[socket.character.room];
 		if (roomObject) {
 			_.each(roomObject.sockets, (value, socketId: string) => {
 				socket.emit(this.CLIENT_GETS.JOIN_ROOM.name, {
-					character: this.middleware.getPublicCharInfo(socket.map.get(socketId).character)
+					character: this.middleware.getPublicCharInfo(socket.map.get(socketId))
 				});
 			});
 		}
@@ -135,7 +131,7 @@ export default class RoomsRouter extends SocketioRouterBase {
 	protected notifyAboutRoom(socket: GameSocket) {
 		socket.emit(this.CLIENT_GETS.MOVE_ROOM.name, {
 			room: getRoomName(socket),
-			character: socket.character,
+			character: this.middleware.getPrivateCharInfo(socket),
 		});
 	}
 };
