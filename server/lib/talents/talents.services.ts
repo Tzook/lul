@@ -304,7 +304,6 @@ export default class TalentsServices extends MasterServices {
 				perks: [],
 				spells: [],
 				info: {
-					stat: talent.mainStat,
 					hitType: talent.hitType,
 					initPerks: {}
 				}

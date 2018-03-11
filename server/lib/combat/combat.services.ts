@@ -12,8 +12,8 @@ export default class CombatServices extends MasterServices {
 	}
 
 	public calculateDamage(socket: GameSocket, target: GameSocket|MOB_INSTANCE): DMG_RESULT {
-		let mainStat = this.talentsRouter.getPrimaryTalentInfo(socket).stat;
-        let baseDmg = socket.character.stats[mainStat] + socket.bonusStats[mainStat]; 
+        const talent = socket.character.talents._doc[socket.character.stats.primaryAbility];
+        let baseDmg = talent ? talent.lvl * 2 : 2; 
         let load = socket.lastAttackLoad || 0;
 		let bonusDmg = socket.getLoadModifier() * load * baseDmg / 100;
 		let dmgModifier = socket.getDmgModifier(socket, target);
