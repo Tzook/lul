@@ -26,9 +26,9 @@ export default class MobsServices extends MasterServices {
         return Math.ceil(mob.exp * (charDmg / mob.dmged));
 	}
 	
-	public didHitMob(mobLvl: number, myLvl: number, dex: number): boolean {
+	public didHitMob(mobLvl: number, myLvl: number): boolean {
 		const lvlDifference = myLvl - mobLvl + config.MISS_CHANCE_LVLS;
-		const chance = lvlDifference * config.MISS_CHANCE_PER_LVL + (dex - myLvl);
+		const chance = lvlDifference * config.MISS_CHANCE_PER_LVL;
 		return doesChanceWork(chance);
 	}
 
