@@ -66,9 +66,11 @@ export default class ChatServices extends MasterServices {
                     exp: this.statsRouter.getExp(targetSocket.character.stats.lvl)
                 }, targetSocket);
                 if (parts[2]) {
+                    const pool = targetSocket.character.charTalents._doc[talentsConfig.CHAR_TALENT].pool;
+                    const perk = pickPerk(pool, parts[2]);
                     emitter.emit(talentsConfig.SERVER_GETS.CHOOSE_ABILITY_PERK.name, {
                         ability: talentsConfig.CHAR_TALENT,
-                        perk: _.sample(targetSocket.character.charTalents._doc[talentsConfig.CHAR_TALENT].pool)
+                        perk,
                     }, targetSocket);
                 }
                 return true;
@@ -86,9 +88,10 @@ export default class ChatServices extends MasterServices {
                     exp: this.statsRouter.getExp(abilityLvl)
                 }, targetSocket);
                 if (parts[2]) {
+                    const perk = pickPerk(talent.pool, parts[2]);
                     emitter.emit(talentsConfig.SERVER_GETS.CHOOSE_ABILITY_PERK.name, {
                         ability,
-                        perk: _.sample(talent.pool)
+                        perk,
                     }, targetSocket);
                 }
                 return true;
@@ -147,3 +150,16 @@ export default class ChatServices extends MasterServices {
         return false;
     }
 };
+
+function pickPerk(pool: any, perksString: string): string {
+    const perks = perksString.split("|");
+    for (let perk of perks) {
+        const perkRegex = new RegExp(perk);
+        for (let availablePerk of pool) {
+            if (perkRegex.test(availablePerk)) {
+                return availablePerk;
+            }
+        }
+    }
+    return _.sample(pool);
+}

@@ -17,11 +17,11 @@ export default {
 		},
 		LVL: {
 			code: "/lvl",
-            param: "{auto?}"
+            param: "{perk1|perk2|*}"
 		},
 		LVLPA: {
 			code: "/lvlpa",
-			param: "{auto?}"
+			param: "{perk1|perk2|*}"
 		},
 		GAINPA: {
 			code: "/gainpa",
