@@ -182,6 +182,7 @@ interface ITEM_DROP {
 }
 interface ITEM_INSTANCE extends BASE_STATS_MODEL {
     key: string,
+    perks?: PERK_MAP,
     stack?: number,
 }
 interface ITEMS_COUNTS extends Map<string, number> {}

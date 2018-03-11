@@ -9,6 +9,7 @@ import MobsRouter from '../mobs/mobs.router';
 import mobsConfig from '../mobs/mobs.config';
 import RoomsRouter from '../rooms/rooms.router';
 import combatConfig from '../combat/combat.config';
+import { createBonusPerks } from './talents.services';
 
 export default class TalentsRouter extends SocketioRouterBase {
 	protected middleware: TalentsMiddleware;
@@ -43,8 +44,8 @@ export default class TalentsRouter extends SocketioRouterBase {
 		socket.getHpRegenInterval = () => this.services.getHpRegenInterval(socket);
 		socket.getMpRegenInterval = () => this.services.getMpRegenInterval(socket);
         socket.buffs = new Map();
-        socket.bonusPerks = {};
-		process.nextTick(() => this.addStats(socket));
+        createBonusPerks(socket);
+        process.nextTick(() => this.addStats(socket));
 	}
 
 	public getAbilityInfo(ability: string): TALENT_INFO|undefined {

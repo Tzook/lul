@@ -9,7 +9,7 @@ export const REQUIRE_SCHEMA = {
     lvl: Number,
 };
 
-export const ITEM_SCHEMA = {
+export let ITEM_SCHEMA = {
     key: String,
     type: String,
     gold: Number,
@@ -19,7 +19,7 @@ export const ITEM_SCHEMA = {
     req: REQUIRE_SCHEMA,
 };
 
-export const ITEM_INSTANCE_SCHEMA = Object.assign({
+export let ITEM_INSTANCE_SCHEMA = Object.assign({
     key: String,
     stack: Number,
 }, BASE_STATS_SCHEMA);
@@ -33,7 +33,7 @@ export default class ItemsModel extends MasterModel {
         this.controller = files.controller;
 
         this.listenForSchemaAddition('Item');
-        this.listenForSchemaAddition('ItemInstance');
+        this.listenForSchemaAddition('ItemInstance', () => ITEM_INSTANCE_SCHEMA);
         this.minimize = true;
         this.schema = ITEM_SCHEMA;
     }

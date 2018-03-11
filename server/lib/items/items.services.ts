@@ -86,6 +86,9 @@ export default class ItemsServices extends MasterServices {
 					instance[statKey] = itemInfo.stats[statKey];
 				}
 			}
+			if (itemInfo.perks) {
+                instance.perks = Object.assign({}, itemInfo.perks);
+            }
 		}
 		return instance
 	}

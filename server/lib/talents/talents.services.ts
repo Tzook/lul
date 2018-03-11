@@ -5,6 +5,7 @@ import { doesChanceWorkFloat } from '../drops/drops.services';
 import talentsConfig from "../talents/talents.config";
 import TalentsController from './talents.controller';
 import { getRoomInfo } from '../rooms/rooms.services';
+import { EQUIPS_SCHEMA } from '../equips/equips.model';
 
 export default class TalentsServices extends MasterServices {
 	private controller: TalentsController;
@@ -488,4 +489,15 @@ export function canUseAbility(socket: GameSocket, ability: string, room?: string
 export function isAbilitySupportedInRoom(room: string, ability: string): boolean {
     const roomInfo = getRoomInfo(room);
 	return roomInfo.abilities && roomInfo.abilities[ability];
+}
+
+export function createBonusPerks(socket: GameSocket) {
+    socket.bonusPerks = {};
+    for (var itemKey in EQUIPS_SCHEMA) {
+        let equip: ITEM_INSTANCE = socket.character.equips[itemKey];
+        for (let perkName in (equip.perks || {})) {
+            socket.bonusPerks[perkName] = socket.bonusPerks[perkName] || 0;
+            socket.bonusPerks[perkName] += equip.perks[perkName];
+        }
+    }
 }

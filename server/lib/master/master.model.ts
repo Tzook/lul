@@ -50,17 +50,18 @@ export default class MasterModel {
         emitter.emit(model + "Schema", data);
     }
 
-    protected listenForSchemaAddition(model) {
-        emitter.on(model + "Schema", this.addModelToSchema.bind(this));
+    protected listenForSchemaAddition(model, schemaGetter = () => this.schema) {
+        emitter.on(model + "Schema", (data) => this.addModelToSchema(data, schemaGetter));
     }
 
     removeListen(model) {
         emitter.removeAllListeners(model + "Schema");
     }
 
-    private addModelToSchema(data) {
+    private addModelToSchema(data, schemaGetter: () => any) {
+        let schema = schemaGetter();
         for (let i in data) {
-            this.schema[i] = data[i];
+            schema[i] = data[i];
         }
     }
 
