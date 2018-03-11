@@ -39,9 +39,6 @@ interface Equips {
 }
 
 interface Stats {
-    str: number,
-    mag: number,
-    dex: number,
     lvl: number,
     exp: number,
     hp: {
@@ -159,9 +156,6 @@ interface DMG_RESULT {
 
 // items
 interface BASE_STATS_MODEL {
-    str?: number,
-    mag?: number,
-    dex?: number,
     hp?: number,
     mp?: number,
 }
@@ -173,9 +167,6 @@ interface ITEM_MODEL {
     cap?: number,
     stats?: BASE_STATS_MODEL,
     req?: {
-        str?: number,
-        mag?: number,
-        dex?: number,
         lvl?: number,
     }
     use?: {

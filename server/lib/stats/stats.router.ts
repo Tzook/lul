@@ -126,9 +126,6 @@ export default class StatsRouter extends SocketioRouterBase {
         const oldMaxHp = socket.maxHp;
         const oldMaxMp = socket.maxMp;
         
-        this.services.addStr(socket.character.stats, stats.str || 0);
-        this.services.addMag(socket.character.stats, stats.mag || 0);
-        this.services.addDex(socket.character.stats, stats.dex || 0);
         this.services.addHp(socket.character.stats, stats.hp || 0);
         this.services.addMp(socket.character.stats, stats.mp || 0);
 
@@ -166,8 +163,6 @@ export default class StatsRouter extends SocketioRouterBase {
                 socket.bonusStats[stat] += stats[stat] * sign;
             }
         }
-        socket.bonusStats.hp += this.services.strToHp(stats.str || 0) * sign;
-        socket.bonusStats.mp += this.services.magToMp(stats.mag || 0) * sign;
         if (validate) {
             if (socket.character.stats.hp.now > socket.maxHp) {
                 let hpToRemove = socket.character.stats.hp.now - socket.maxHp;

@@ -27,11 +27,7 @@ const CONFIG = {
 		"RESURRECT": {"name": "actor_resurrect"},
 		"LEVEL_UP": {"name": "actor_lvl_up"}
 	},
-	"BEGIN_STATS_SUM": 7,
 	"ABILITY_MELEE": "melee",
-	"MAG_TO_MP_RATIO": 6,
-	"STR_TO_HP_RATIO": 5,
-	"LEVEL_UP_STAT_BONUS": 1
 }
 
 export default CONFIG;

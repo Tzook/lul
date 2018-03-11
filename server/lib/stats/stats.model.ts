@@ -12,17 +12,11 @@ const BAR_SCHEMA = {
 }
 
 export const BASE_STATS_SCHEMA = {
-    str: Number,
-    mag: Number,
-    dex: Number,
     hp: Number,
     mp: Number,
 };
 
 const STATS_SCHEMA = {
-    str: 3,
-    mag: 2,
-    dex: 2,
     lvl: 1,
     exp: 0,
     hp: {},
@@ -76,26 +70,17 @@ export default class StatsModel extends MasterModel {
     protected addFieldToModel(field, data, obj: Char, reqBody) {
         data = _.clone(STATS_SCHEMA);
 
-        let str = +reqBody.str;
-        let mag = +reqBody.mag;
-        let dex = +reqBody.dex;
-        if (str > 0 && mag > 0 && dex > 0 && str + mag + dex == config.BEGIN_STATS_SUM) {
-            data.str = str;
-            data.mag = mag;
-            data.dex = dex;
-        }
-
         let bonusHp = 0;
         let bonusMp = 0;
         for (let type in EQUIPS_SCHEMA) {
             let equip = obj.equips[type];
-            bonusHp += (equip.hp || 0) + this.services.strToHp(equip.str || 0);
-            bonusMp += (equip.mp || 0) + this.services.magToMp(equip.mag || 0);
+            bonusHp += (equip.hp || 0);
+            bonusMp += (equip.mp || 0);
         }
 
-        data.hp.now = data.hp.total = this.services.strToHp(data.str);
+        data.hp.now = data.hp.total = 20;
         data.hp.now += bonusHp;
-        data.mp.now = data.mp.total = this.services.magToMp(data.mag);
+        data.mp.now = data.mp.total = 20;
         data.mp.now += bonusMp;
 
         obj[field] = data;

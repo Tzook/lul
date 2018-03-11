@@ -6,9 +6,6 @@ import config from '../items/items.config';
 import { PRIORITY_CHAR } from '../character/character.model';
 
 export const REQUIRE_SCHEMA = {
-    str: Number,
-    mag: Number,
-    dex: Number,
     lvl: Number,
 };
 

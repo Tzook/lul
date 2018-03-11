@@ -1,17 +1,8 @@
 
 import MasterServices from '../master/master.services';
-import config from './stats.config';
 import * as _ from 'underscore';
 
 export default class StatsServices extends MasterServices {
-    public magToMp(mag: number) {
-        return mag * config.MAG_TO_MP_RATIO;
-    }
-
-    public strToHp(str: number) {
-        return str * config.STR_TO_HP_RATIO;
-    }
-
     public getExp(level: number) {
         return Math.round(this.getAbsoluteExp(level + 1) - this.getAbsoluteExp(level));
     }
@@ -25,28 +16,10 @@ export default class StatsServices extends MasterServices {
         let stats = socket.character.stats;
         stats.lvl++;
 
-        let str, dex, mag;
-        str = dex = mag = config.LEVEL_UP_STAT_BONUS;
-        this.addStr(stats, str);
-        this.addMag(stats, mag);
-        this.addDex(stats, dex);
         stats.hp.now = socket.maxHp;
         stats.mp.now = socket.maxMp;
-
-        console.log("Level up", stats);
     }
 
-    public addStr(stats: Stats, str: number) {
-        stats.str += str;
-        this.addHp(stats, this.strToHp(str));
-    }
-    public addMag(stats: Stats, mag: number) {
-        stats.mag += mag;
-        this.addMp(stats, this.magToMp(mag));
-    }
-    public addDex(stats: Stats, dex: number) {
-        stats.dex += dex;
-    }
     public addHp(stats: Stats, hp: number) {
         stats.hp.total += hp;
     }
@@ -68,10 +41,6 @@ export default class StatsServices extends MasterServices {
 
     public getRegenMp(socket: GameSocket): number {
         return socket.maxMp * socket.getMpRegenModifier() | 0;
-    }
-    
-    public static getMainStat(socket: GameSocket): string {
-        return socket.character.stats.primaryAbility === "range" ? "dex" : "str";
     }
 };
 // cache computations

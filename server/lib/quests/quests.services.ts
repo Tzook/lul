@@ -164,9 +164,6 @@ export default class QuestsServices extends MasterServices {
 
                 // stats
                 let stats: BASE_STATS_MODEL = {};
-                if (quest.rewardSTR > 0) stats.str = +quest.rewardSTR;
-                if (quest.rewardMAG > 0) stats.mag = +quest.rewardMAG;
-                if (quest.rewardDEX > 0) stats.dex = +quest.rewardDEX;
                 if (quest.rewardHP > 0) stats.hp = +quest.rewardHP;
                 if (quest.rewardMP > 0) stats.mp = +quest.rewardMP;
                 if (!_.isEmpty(stats)) {
