@@ -43,7 +43,7 @@ export default class TalentsRouter extends SocketioRouterBase {
 		socket.getHpRegenInterval = () => this.services.getHpRegenInterval(socket);
 		socket.getMpRegenInterval = () => this.services.getMpRegenInterval(socket);
 		socket.buffs = new Map();
-		process.nextTick(() => this.addStats(socket, false));
+		process.nextTick(() => this.addStats(socket));
 	}
 
 	public getAbilityInfo(ability: string): TALENT_INFO|undefined {
@@ -167,9 +167,10 @@ export default class TalentsRouter extends SocketioRouterBase {
 		if (!this.services.canGetPerk(talent, perk)) {
 			return this.sendError(data, socket, "Raising points to that perk is not available.");
 		}
-		this.removeStats(socket);
-		this.services.addPerk(talent, perk);		
-		this.addStats(socket);
+		const oldStats = this.getAbilityStats(socket);        
+        this.services.addPerk(talent, perk);
+		const newStats = this.getAbilityStats(socket);        
+		this.updateStats(socket, oldStats, newStats);
 		talent.points--;
 		talent.pool = [];
 		socket.emit(talentsConfig.CLIENT_GETS.GAIN_ABILITY_PERK.name, {
@@ -261,8 +262,9 @@ export default class TalentsRouter extends SocketioRouterBase {
 	[talentsConfig.SERVER_INNER.CHANGED_ABILITY.name](data, socket: GameSocket) {
 		let {previousAbility} = data;
 
-		this.removeStats(socket, previousAbility);
-		this.addStats(socket);
+		const oldStats = this.getAbilityStats(socket, previousAbility);
+		const newStats = this.getAbilityStats(socket);
+		this.updateStats(socket, oldStats, newStats);
     }
     
 	[talentsConfig.SERVER_INNER.LEFT_ROOM.name](data, socket: GameSocket) {
@@ -272,20 +274,23 @@ export default class TalentsRouter extends SocketioRouterBase {
             }, socket);
         }
 	}
-	
-	private addStats(socket: GameSocket, validate: boolean = true) {
-		const stats = {
-			hp: this.services.getHpBonus(socket),
-			mp: this.services.getMpBonus(socket),
-		};
-		this.emitter.emit(statsConfig.SERVER_INNER.STATS_ADD.name, { stats, validate }, socket);
-	}
+    
+    private addStats(socket: GameSocket) {
+        const stats = this.getAbilityStats(socket);
+        this.emitter.emit(statsConfig.SERVER_INNER.STATS_ADD.name, { stats, validate: true }, socket);
+    }
+    
+    private updateStats(socket: GameSocket, oldStats: {hp: number, mp: number}, newStats: {hp: number, mp: number}) {
+        if (oldStats.hp != newStats.hp || oldStats.mp != newStats.mp) {
+            const stats = {hp: newStats.hp - oldStats.hp, mp: newStats.mp - oldStats.mp};
+            this.emitter.emit(statsConfig.SERVER_INNER.STATS_ADD.name, { stats }, socket);
+        }
+    }
 
-	private removeStats(socket: GameSocket, ability?: string) {
-		const stats = {
+	private getAbilityStats(socket: GameSocket, ability?: string) {
+		return {
 			hp: this.services.getHpBonus(socket, ability),
 			mp: this.services.getMpBonus(socket, ability),
 		};
-		this.emitter.emit(statsConfig.SERVER_INNER.STATS_REMOVE.name, { stats }, socket);
 	}
 };
