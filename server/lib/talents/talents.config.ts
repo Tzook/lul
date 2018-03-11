@@ -99,7 +99,8 @@ export default {
 	},
 	HIT_TYPE_ATTACK: "atk",
 	HIT_TYPE_HEAL: "heal",
-	CHAR_TALENT: "charTalent"
+    CHAR_TALENT: "charTalent",
+    SKIP_SPELL_RETRY_TIME: 3000,
 }
 
 

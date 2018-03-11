@@ -264,22 +264,25 @@ export default class TalentsController extends MasterController {
 		let timersMap: Map<string, NodeJS.Timer> = new Map();
 		
 		for (let spellKey in mob.spells) {
-			this.activateMobSpellTimer(mob, spellKey, timersMap);
+			this.activateMobSpellTimer(mob, spellKey, timersMap, false);
 		}
 
 		this.mobsSpellsPickers.set(mob.id, timersMap);
 	}
 
-	private activateMobSpellTimer(mob: MOB_INSTANCE, spellKey: string, timersMap: Map<string, NodeJS.Timer>) {
+	private activateMobSpellTimer(mob: MOB_INSTANCE, spellKey: string, timersMap: Map<string, NodeJS.Timer>, justSkippedSpell: boolean) {
 		const {minTime, maxTime} = mob.spells[spellKey];
-		const time = this.services.getMobSpellRestTime(minTime, maxTime);
+		const time = justSkippedSpell ? talentsConfig.SKIP_SPELL_RETRY_TIME : this.services.getMobSpellRestTime(minTime, maxTime);
 		const timerId = setTimeout(() => {
-			this.io.to(mob.room).emit(talentsConfig.CLIENT_GETS.MOB_USE_SPELL.name, {
-				mob_id: mob.id,
-				spell_key: spellKey,
-			});
+            const canUseSpell = this.canMobUseSpell(mob);
+            if (canUseSpell) {
+                this.io.to(mob.room).emit(talentsConfig.CLIENT_GETS.MOB_USE_SPELL.name, {
+                    mob_id: mob.id,
+                    spell_key: spellKey,
+                });
+            }
 			// recursively use the spell
-			this.activateMobSpellTimer(mob, spellKey, timersMap);
+			this.activateMobSpellTimer(mob, spellKey, timersMap, !canUseSpell);
 		}, time);
 		timersMap.set(spellKey, timerId);
 	}
@@ -296,7 +299,11 @@ export default class TalentsController extends MasterController {
 			}
 			this.mobsSpellsPickers.delete(mob.id);
 		}
-	}
+    }
+    
+    protected canMobUseSpell(mob: MOB_INSTANCE): boolean {
+        return !this.isMobInBuff(mob.room, mob.id, talentsConfig.PERKS.STUN_CHANCE) && !this.isMobInBuff(mob.room, mob.id, talentsConfig.PERKS.FREEZE_CHANCE);
+    }
 
 	protected getRoomBuffsInstance(room: string, createIfMissing: boolean = false) {
 		let roomBuffs = this.roomToBuff.get(room);
