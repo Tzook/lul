@@ -278,7 +278,7 @@ export default class TalentsRouter extends SocketioRouterBase {
     
     private addStats(socket: GameSocket) {
         const stats = this.getAbilityStats(socket);
-        this.emitter.emit(statsConfig.SERVER_INNER.STATS_ADD.name, { stats, validate: true }, socket);
+        this.emitter.emit(statsConfig.SERVER_INNER.STATS_ADD.name, { stats, validate: false }, socket);
     }
     
     private updateStats(socket: GameSocket, oldStats: {hp: number, mp: number}, newStats: {hp: number, mp: number}) {
