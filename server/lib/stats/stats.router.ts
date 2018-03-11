@@ -166,12 +166,10 @@ export default class StatsRouter extends SocketioRouterBase {
         if (validate) {
             if (socket.character.stats.hp.now > socket.maxHp) {
                 let hpToRemove = socket.character.stats.hp.now - socket.maxHp;
-                socket.character.stats.hp.now -= hpToRemove;
                 this.emitter.emit(config.SERVER_INNER.GAIN_HP.name, { hp: -hpToRemove }, socket);
             }
             if (socket.character.stats.mp.now > socket.maxMp) {
                 let mpToRemove = socket.character.stats.mp.now - socket.maxMp;
-                socket.character.stats.mp.now -= mpToRemove;
                 this.emitter.emit(config.SERVER_INNER.GAIN_MP.name, { mp: -mpToRemove }, socket);
             }
             if (hadFullHp && !socket.hpRegenTimer) {
