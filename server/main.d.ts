@@ -128,9 +128,6 @@ interface GameSocket extends SocketIO.Socket {
     throttles: Map<Function, number>;
     maxHp: number;
     maxMp: number;
-    totalStr: number;
-    totalDex: number;
-    totalMag: number;
     threats: Set<MOB_INSTANCE>
     saveTimer: NodeJS.Timer
     hpRegenTimer: NodeJS.Timer
