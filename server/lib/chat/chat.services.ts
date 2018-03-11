@@ -62,17 +62,23 @@ export default class ChatServices extends MasterServices {
             }
                 
             case chatConfig.HAX.LVL.code: {
-                emitter.emit(statsConfig.SERVER_INNER.GAIN_EXP.name, {
-                    exp: this.statsRouter.getExp(targetSocket.character.stats.lvl)
-                }, targetSocket);
-                if (parts[2]) {
-                    const pool = targetSocket.character.charTalents._doc[talentsConfig.CHAR_TALENT].pool;
-                    const perk = pickPerk(pool, parts[2]);
-                    emitter.emit(talentsConfig.SERVER_GETS.CHOOSE_ABILITY_PERK.name, {
-                        ability: talentsConfig.CHAR_TALENT,
-                        perk,
-                    }, targetSocket);
-                }
+                const times = +parts[3] ? +parts[3] - targetSocket.character.stats.lvl : 1;
+                (async () => {
+                    for (let i = 0; i < times; i++) {
+                        emitter.emit(statsConfig.SERVER_INNER.GAIN_EXP.name, {
+                            exp: this.statsRouter.getExp(targetSocket.character.stats.lvl)
+                        }, targetSocket);
+                        if (parts[2]) {
+                            const pool = targetSocket.character.charTalents._doc[talentsConfig.CHAR_TALENT].pool;
+                            const perk = pickPerk(pool, parts[2]);
+                            emitter.emit(talentsConfig.SERVER_GETS.CHOOSE_ABILITY_PERK.name, {
+                                ability: talentsConfig.CHAR_TALENT,
+                                perk,
+                            }, targetSocket);
+                        }
+                        await new Promise(resolve => setTimeout(resolve, 100));
+                    }
+                })();
                 return true;
             }
                 
@@ -83,17 +89,23 @@ export default class ChatServices extends MasterServices {
                     this.statsRouter.sendError({msg}, socket, "Cannot hax - Primary ability is not a real ability", true, true);
                     return false;
                 }
-                let abilityLvl = talent.lvl;
-                emitter.emit(talentsConfig.SERVER_INNER.GAIN_ABILITY_EXP.name, {
-                    exp: this.statsRouter.getExp(abilityLvl)
-                }, targetSocket);
-                if (parts[2]) {
-                    const perk = pickPerk(talent.pool, parts[2]);
-                    emitter.emit(talentsConfig.SERVER_GETS.CHOOSE_ABILITY_PERK.name, {
-                        ability,
-                        perk,
-                    }, targetSocket);
-                }
+                let times = +parts[3] ? +parts[3] - talent.lvl : 1;
+                (async () => {
+                    for (let i = 0; i < times; i++) {
+                        let abilityLvl = talent.lvl;
+                        emitter.emit(talentsConfig.SERVER_INNER.GAIN_ABILITY_EXP.name, {
+                            exp: this.statsRouter.getExp(abilityLvl)
+                        }, targetSocket);
+                        if (parts[2]) {
+                            const perk = pickPerk(talent.pool, parts[2]);
+                            emitter.emit(talentsConfig.SERVER_GETS.CHOOSE_ABILITY_PERK.name, {
+                                ability,
+                                perk,
+                            }, targetSocket);
+                        }
+                        await new Promise(resolve => setTimeout(resolve, 100));
+                    }
+                })();
                 return true;
             }
                 
