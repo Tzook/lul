@@ -5,6 +5,7 @@ import * as _ from 'underscore';
 import { BASE_STATS_SCHEMA } from "../stats/stats.model";
 import ItemsMiddleware from './items.middleware';
 import { USE_SCHEMA } from '../use/use.model';
+import { extendItemSchemaWithTalents } from '../talents/talents.services';
 
 export default class ItemsServices extends MasterServices {
 	private itemsInfo: Map<string, ITEM_MODEL> = new Map();
@@ -29,6 +30,7 @@ export default class ItemsServices extends MasterServices {
 				cap: item.stackCap,
 			};
 
+            extendItemSchemaWithTalents(item, itemSchema);
 			this.pushStats(itemSchema, item, "req", REQUIRE_SCHEMA);
 			this.pushStats(itemSchema, item, "stats", BASE_STATS_SCHEMA);
 			if (this.middleware.isMisc(itemSchema)) {

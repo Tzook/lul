@@ -462,6 +462,13 @@ export function extendRoomSchemaWithTalents(scene: any, roomSchema: ROOM_MODEL):
     }
 }
 
+export function extendItemSchemaWithTalents(item: any, itemSchema: ITEM_MODEL) {
+    (item.perks || []).forEach(perk => {
+		itemSchema.perks = itemSchema.perks || {};
+		itemSchema.perks[perk.key] = +perk.value;
+	});
+}
+
 export function isCharAbility(ability: string): boolean {
 	return ability === talentsConfig.CHAR_TALENT;
 }

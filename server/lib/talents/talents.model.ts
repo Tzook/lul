@@ -8,6 +8,7 @@ import { PRIORITY_CONFIG } from '../socketio/socketio.model';
 import { PRIORITY_MOBS } from '../mobs/mobs.model';
 import talentsConfig from './talents.config';
 import { PRIORITY_ROOMS } from '../rooms/rooms.model';
+import { PRIORITY_ITEM } from '../items/items.model';
 
 const ABILITY_PERK_SCHEMA = (<any>mongoose.Schema)({
     atLeastLvl: Number,
@@ -37,6 +38,10 @@ const CONFIG_PERK_SCHEMA = mongoose.Schema.Types.Mixed;
 
 const CHAR_TALENTS_SCHEMA = mongoose.Schema.Types.Mixed;
 
+const ITEMS_TALENTS_SCHEMA = {
+    perks: mongoose.Schema.Types.Mixed
+};
+
 const MOB_PERKS_SPELLS_SCHEMA = {
     perks: mongoose.Schema.Types.Mixed,
     spells: mongoose.Schema.Types.Mixed,
@@ -46,7 +51,7 @@ const ROOM_ABILITIES_SCHEMA = {
     abilities: mongoose.Schema.Types.Mixed
 };
 
-export const PRIORITY_TALENTS = PRIORITY_CHAR + PRIORITY_MOBS + PRIORITY_ROOMS + PRIORITY_CONFIG + 10;
+export const PRIORITY_TALENTS = PRIORITY_CHAR + PRIORITY_MOBS + PRIORITY_ROOMS + PRIORITY_ITEM +  PRIORITY_CONFIG + 10;
 
 export default class TalentsModel extends MasterModel {
     protected controller: TalentsController;
@@ -82,6 +87,9 @@ export default class TalentsModel extends MasterModel {
         this.addToSchema("Mobs", MOB_PERKS_SPELLS_SCHEMA);
         
         this.addToSchema("Rooms", ROOM_ABILITIES_SCHEMA);
+        
+        this.addToSchema("Item", ITEMS_TALENTS_SCHEMA);
+        this.addToSchema("ItemInstance", ITEMS_TALENTS_SCHEMA);
         
         this.addToSchema("Config", { perks: CONFIG_PERK_SCHEMA });
         

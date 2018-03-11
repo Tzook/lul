@@ -164,6 +164,7 @@ interface ITEM_MODEL {
     chance: number,
     cap?: number,
     stats?: BASE_STATS_MODEL,
+    perks?: PERK_MAP,
     req?: {
         lvl?: number,
     }
