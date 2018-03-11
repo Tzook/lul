@@ -88,13 +88,12 @@ export default class TalentsServices extends MasterServices {
 		return initialValue + level * valueModifier + accelerationPoint;
 	}
 	
-	protected getSafePerkLevelValue(perk: string, level: number) {
-		let perkLevelValue = this.getPerkLevelValue(perk, level);
+	protected getSafePerkValue(perk: string, value: number) {
 		const perkConfig = this.getPerkConfig(perk);
-		if (!this.isBelowMax(perkConfig, perkLevelValue)) {
-			perkLevelValue = perkConfig.max;
+		if (!this.isBelowMax(perkConfig, value)) {
+			value = perkConfig.max;
 		}
-		return perkLevelValue;
+		return value;
 	}
 	
 	protected pickPool(pool: string[], perksOffered: number): string[] {
@@ -213,8 +212,10 @@ export default class TalentsServices extends MasterServices {
             const perkConfig = this.getPerkConfig(perk);
             return perkConfig.default || 0;
         }
-		const level = (talent.perks[perk] || 0) + (socket.character.charTalents._doc[talentsConfig.CHAR_TALENT].perks[perk] || 0);
-		let perkValue = this.getSafePerkLevelValue(perk, level);
+        const level = (talent.perks[perk] || 0) + (socket.character.charTalents._doc[talentsConfig.CHAR_TALENT].perks[perk] || 0);
+        let rawPerkValue = this.getPerkLevelValue(perk, level);
+        let bonusPerkValue = socket.bonusPerks[perk] || 0;
+		let perkValue = this.getSafePerkValue(perk, rawPerkValue + bonusPerkValue);
 		if (socket.currentSpell) {
 			// send the higher value - perk or spell
 			let spellPerkValue = socket.currentSpell.perks[perk] || 0;

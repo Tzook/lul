@@ -42,7 +42,8 @@ export default class TalentsRouter extends SocketioRouterBase {
 		socket.getMpRegenModifier = () => this.services.getMpRegenModifier(socket);
 		socket.getHpRegenInterval = () => this.services.getHpRegenInterval(socket);
 		socket.getMpRegenInterval = () => this.services.getMpRegenInterval(socket);
-		socket.buffs = new Map();
+        socket.buffs = new Map();
+        socket.bonusPerks = {};
 		process.nextTick(() => this.addStats(socket));
 	}
 

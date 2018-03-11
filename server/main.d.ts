@@ -125,6 +125,7 @@ interface GameSocket extends SocketIO.Socket {
     alive: boolean,
     lastAttackLoad: number;
     bonusStats?: BASE_STATS_MODEL;
+    bonusPerks?: PERK_MAP;
     throttles: Map<Function, number>;
     maxHp: number;
     maxMp: number;
