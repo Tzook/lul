@@ -38,7 +38,7 @@ export default class MasterMiddleware extends Response {
 		}
 	}
 
-	public validateHasSercetKey(req, res, next) {
+	public validateHasSecretKey(req, res, next) {
 		let pass = process.env.secretKey ? process.env.secretKey : require('../../../config/.env.json').secretKey;
 		if (pass && req.body.pass === pass) {
 			next();

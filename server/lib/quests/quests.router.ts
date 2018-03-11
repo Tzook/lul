@@ -30,7 +30,7 @@ export default class QuestsRouter extends SocketioRouterBase {
 
 	protected initRoutes(app) {
 		app.post(this.ROUTES.GENERATE,
-			this.middleware.validateHasSercetKey.bind(this.middleware),
+			this.middleware.validateHasSecretKey.bind(this.middleware),
 			this.controller.generateQuests.bind(this.controller));
 	}
 

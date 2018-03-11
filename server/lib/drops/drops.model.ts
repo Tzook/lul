@@ -2,7 +2,7 @@
 import MasterModel from '../master/master.model';
 import { PRIORITY_MOBS } from '../mobs/mobs.model';
 
-export const PRIOTIY_DROPS = PRIORITY_MOBS + 10;
+export const PRIORITY_DROPS = PRIORITY_MOBS + 10;
 
 export default class DropsModel extends MasterModel {
     
@@ -16,7 +16,7 @@ export default class DropsModel extends MasterModel {
     }
 
     get priority() {
-        return PRIOTIY_DROPS;
+        return PRIORITY_DROPS;
     }
 
     createModel() {

@@ -17,7 +17,7 @@ export default class ItemsRouter extends SocketioRouterBase {
 
 	protected initRoutes(app) {
 		app.post(this.ROUTES.GENERATE,
-			this.middleware.validateHasSercetKey.bind(this.middleware),
+			this.middleware.validateHasSecretKey.bind(this.middleware),
 			this.controller.generateItems.bind(this.controller));
 	}
 
