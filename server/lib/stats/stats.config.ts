@@ -9,7 +9,6 @@ const CONFIG = {
 		"TOOK_DMG": {"name": "took_actual_dmg"},
 		"USE_MP": {"name": "use_mp", "alive": true, "log": true},
 		"STATS_ADD": {"name": "stats_add", "alive": true},
-		"STATS_REMOVE": {"name": "stats_remove", "alive": true},
 		"UPDATE_MAX_STATS": {"name": "update_max_stats"},
 	},
 	"SERVER_GETS": {

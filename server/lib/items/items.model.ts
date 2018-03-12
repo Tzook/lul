@@ -1,7 +1,6 @@
 
 import MasterModel from '../master/master.model';
 import ItemsController from './items.controller';
-import { BASE_STATS_SCHEMA } from "../stats/stats.model";
 import config from '../items/items.config';
 import { PRIORITY_CHAR } from '../character/character.model';
 
@@ -15,14 +14,13 @@ export let ITEM_SCHEMA = {
     gold: Number,
     chance: Number,
     cap: Number,
-    stats: BASE_STATS_SCHEMA,
     req: REQUIRE_SCHEMA,
 };
 
-export let ITEM_INSTANCE_SCHEMA = Object.assign({
+export let ITEM_INSTANCE_SCHEMA = {
     key: String,
     stack: Number,
-}, BASE_STATS_SCHEMA);
+};
 
 export const PRIORITY_ITEM = PRIORITY_CHAR + 10;
 

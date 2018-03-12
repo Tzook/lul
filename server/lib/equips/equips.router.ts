@@ -5,7 +5,6 @@ import ItemsRouter from '../items/items.router';
 import EquipsController from './equips.controller';
 import config from '../equips/equips.config';
 import dropsConfig from '../drops/drops.config';
-import statsConfig from '../stats/stats.config';
 import EquipsServices from './equips.services';
 
 export default class EquipsRouter extends SocketioRouterBase {
@@ -46,9 +45,7 @@ export default class EquipsRouter extends SocketioRouterBase {
 			} else if (!this.middleware.canWearEquip(socket, itemInfo, to)) {
 				this.sendError(data, socket, "Item cannot be equipped there");
 			} else {
-				this.removeStats(to, socket);
 				this.middleware.swapEquipAndItem(socket, from, to);
-				this.addStats(to, socket);
 
 				this.io.to(socket.character.room).emit(this.CLIENT_GETS.EQUIP_ITEM.name, {
 					id: socket.character._id,
@@ -75,9 +72,7 @@ export default class EquipsRouter extends SocketioRouterBase {
 				this.sendError(data, socket, "Cannot unequip to slot!");
 			} else {
 
-				this.removeStats(from, socket);
 				this.middleware.swapEquipAndItem(socket, to, from);
-				this.addStats(from, socket);
 
 				this.io.to(socket.character.room).emit(this.CLIENT_GETS.UNEQUIP_ITEM.name, {
 					id: socket.character._id,
@@ -123,10 +118,14 @@ export default class EquipsRouter extends SocketioRouterBase {
 			let equip = socket.character.equips[slot];
 
 			this.emitter.emit(dropsConfig.SERVER_INNER.ITEMS_DROP.name, { }, socket, [equip]);
-			this.removeStats(slot, socket);
 
 			let ItemsModels = this.mongoose.model("Item");
-			socket.character.equips[slot] = new ItemsModels({});
+            const emptyItem = new ItemsModels({});
+            socket.character.equips[slot] = emptyItem;
+            this.emitter.emit(config.SERVER_INNER.WORE_EQUIP.name, {
+                equip: emptyItem,
+                oldEquip: equip,
+            }, socket);
 			this.io.to(socket.character.room).emit(this.CLIENT_GETS.DELETE_EQUIP.name, {
 				id: socket.character._id,
 				slot
@@ -134,15 +133,5 @@ export default class EquipsRouter extends SocketioRouterBase {
 		} else {
 			this.sendError(data, socket, "Invalid slot!");
 		}
-	}
-
-	private addStats(slot: string, socket: GameSocket) {
-		let equip = socket.character.equips[slot];
-		this.emitter.emit(statsConfig.SERVER_INNER.STATS_ADD.name, { stats: equip }, socket);
-	}
-
-	private removeStats(slot: string, socket: GameSocket) {
-		let equip = socket.character.equips[slot];
-		this.emitter.emit(statsConfig.SERVER_INNER.STATS_REMOVE.name, { stats: equip }, socket);
 	}
 };

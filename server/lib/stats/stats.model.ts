@@ -4,7 +4,6 @@ import StatsServices from './stats.services';
 import * as _ from 'underscore';
 import config from './stats.config';
 import { PRIORITY_CHAR } from '../character/character.model';
-import { EQUIPS_SCHEMA } from '../equips/equips.model';
 
 const BAR_SCHEMA = {
     now: Number,
@@ -70,18 +69,8 @@ export default class StatsModel extends MasterModel {
     protected addFieldToModel(field, data, obj: Char, reqBody) {
         data = _.clone(STATS_SCHEMA);
 
-        let bonusHp = 0;
-        let bonusMp = 0;
-        for (let type in EQUIPS_SCHEMA) {
-            let equip = obj.equips[type];
-            bonusHp += (equip.hp || 0);
-            bonusMp += (equip.mp || 0);
-        }
-
         data.hp.now = data.hp.total = 20;
-        data.hp.now += bonusHp;
         data.mp.now = data.mp.total = 20;
-        data.mp.now += bonusMp;
 
         obj[field] = data;
     }

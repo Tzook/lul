@@ -2,7 +2,6 @@
 import SocketioRouterBase from '../socketio/socketio.router.base';
 import StatsController from './stats.controller';
 import StatsServices from './stats.services';
-import { EQUIPS_SCHEMA } from '../equips/equips.model';
 import { BASE_STATS_SCHEMA } from "./stats.model";
 import config from './stats.config';
 import roomsConfig from '../rooms/rooms.config';
@@ -144,23 +143,16 @@ export default class StatsRouter extends SocketioRouterBase {
         this.emitter.emit(roomsConfig.SERVER_INNER.MOVE_TO_TOWN.name, {}, socket);
     }
 
-    [config.SERVER_INNER.STATS_ADD.name] (data, socket: GameSocket) {
-        this.toggleStats(data.stats, socket, true, data.validate);
-    }
+    [config.SERVER_INNER.STATS_ADD.name] (data: {stats: ITEM_INSTANCE, validate?: boolean}, socket: GameSocket) {
+        const {stats, validate = true} = data;
 
-    [config.SERVER_INNER.STATS_REMOVE.name] (data, socket: GameSocket) {
-        this.toggleStats(data.stats, socket, false, true);
-    }
-
-    private toggleStats(stats: ITEM_INSTANCE, socket: GameSocket, on: boolean, validate = true) {
-        const sign = on ? 1 : -1;
         const oldMaxHp = socket.maxHp;
         const oldMaxMp = socket.maxMp;
         const hadFullHp = socket.character.stats.hp.now >= socket.maxHp;
         const hadFullMp = socket.character.stats.mp.now >= socket.maxMp;
         for (var stat in BASE_STATS_SCHEMA) {
             if (stats[stat]) {
-                socket.bonusStats[stat] += stats[stat] * sign;
+                socket.bonusStats[stat] += stats[stat];
             }
         }
         if (validate) {
@@ -208,10 +200,6 @@ export default class StatsRouter extends SocketioRouterBase {
             socket.bonusStats[stat] = 0;
         }
         process.nextTick(() => {
-            // add the equips to memory
-            for (var itemKey in EQUIPS_SCHEMA) {
-                this[config.SERVER_INNER.STATS_ADD.name]({stats: socket.character.equips[itemKey], validate: false}, socket);
-            }
             this.regenHpInterval(socket);
             this.regenMpInterval(socket);
         });
