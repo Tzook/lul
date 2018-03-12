@@ -113,6 +113,10 @@ export default class EquipsRouter extends SocketioRouterBase {
 	   }
 	}
 
+	[config.SERVER_INNER.WORE_EQUIP.name](data, socket: GameSocket) {
+		
+	}
+
 	[config.SERVER_GETS.DROP_EQUIP.name](data, socket: GameSocket) {
 		let slot = data.slot;
 		if (this.middleware.hasEquip(socket, slot)) {

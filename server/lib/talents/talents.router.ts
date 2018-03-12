@@ -1,7 +1,7 @@
 import SocketioRouterBase from '../socketio/socketio.router.base';
 import TalentsMiddleware from './talents.middleware';
 import TalentsController from './talents.controller';
-import TalentsServices, { getTalent, hasAbility } from './talents.services';
+import TalentsServices, { getTalent, hasAbility, removeBonusPerks, createBonusPerks, addBonusPerks } from './talents.services';
 import talentsConfig from '../talents/talents.config';
 import statsConfig from '../stats/stats.config';
 import StatsRouter from '../stats/stats.router';
@@ -9,7 +9,6 @@ import MobsRouter from '../mobs/mobs.router';
 import mobsConfig from '../mobs/mobs.config';
 import RoomsRouter from '../rooms/rooms.router';
 import combatConfig from '../combat/combat.config';
-import { createBonusPerks } from './talents.services';
 
 export default class TalentsRouter extends SocketioRouterBase {
 	protected middleware: TalentsMiddleware;
@@ -275,6 +274,15 @@ export default class TalentsRouter extends SocketioRouterBase {
                 ability: statsConfig.ABILITY_MELEE
             }, socket);
         }
+    }
+
+	[talentsConfig.SERVER_INNER.WORE_EQUIP.name](data: {equip: ITEM_INSTANCE, oldEquip: ITEM_INSTANCE}, socket: GameSocket) {
+        const {equip, oldEquip} = data;
+        const oldStats = this.getAbilityStats(socket);
+        addBonusPerks(equip, socket);
+        removeBonusPerks(oldEquip, socket);
+        const newStats = this.getAbilityStats(socket);
+		this.updateStats(socket, oldStats, newStats);
 	}
     
     private addStats(socket: GameSocket) {

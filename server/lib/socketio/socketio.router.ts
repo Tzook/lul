@@ -10,6 +10,8 @@ require('./socketio.fixer');
 import * as passportSocketIo from 'passport.socketio';
 import { isProduction } from '../main/main';
 
+let emitter = new Emitter.EventEmitter();
+
 export default class SocketioRouter extends SocketioRouterBase {
 	protected middleware: SocketioMiddleware;
 	protected services: SocketioServices;
@@ -105,7 +107,6 @@ export default class SocketioRouter extends SocketioRouterBase {
 			this.map.set(socket.character.name, socket);
 			this.map.set(socket.id, socket);
 
-			let emitter = new Emitter.EventEmitter();
 			for (let j in this.routers) {
 				let router = this.routers[j];
 				router.eventEmitter = emitter;
@@ -226,3 +227,7 @@ export default class SocketioRouter extends SocketioRouterBase {
 		});
 	}
  };
+
+ export function getEmitter() {
+    return emitter;
+ }

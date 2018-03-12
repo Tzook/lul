@@ -1,6 +1,8 @@
 
 import ItemsMiddleware from '../items/items.middleware';
 import {EQUIPS_SCHEMA} from "./equips.model";
+import { getEmitter } from '../socketio/socketio.router';
+import equipsConfig from './equips.config';
 
 export default class EquipsMiddleware extends ItemsMiddleware {
     isValidEquipSlot(slot: string) {
@@ -40,5 +42,9 @@ export default class EquipsMiddleware extends ItemsMiddleware {
         let currentEquip = socket.character.equips[equipSlot];
         socket.character.equips[equipSlot] = item;
         socket.character.items.set(itemSlot, currentEquip);
+        getEmitter().emit(equipsConfig.SERVER_INNER.WORE_EQUIP.name, {
+            equip: item,
+            oldEquip: currentEquip,
+        }, socket);
     }
 };

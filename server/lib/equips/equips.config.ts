@@ -12,7 +12,8 @@ export default {
 		}
 	},
 	"SERVER_INNER": {
-		"ITEM_USE": Object.assign({}, itemsConfig.SERVER_INNER.ITEM_USE)
+        "ITEM_USE": Object.assign({}, itemsConfig.SERVER_INNER.ITEM_USE),
+        WORE_EQUIP: {"name": "wore_equip"},
 	},
 	"SERVER_GETS": {
 		"EQUIP_ITEM": {"name": "equipped_item", "alive": true, "log": true},

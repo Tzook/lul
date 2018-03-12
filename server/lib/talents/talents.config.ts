@@ -3,6 +3,7 @@ import roomsConfig from '../rooms/rooms.config';
 import mobsConfig from '../mobs/mobs.config';
 import socketioConfig from '../socketio/socketio.config';
 import combatConfig from '../combat/combat.config';
+import equipsConfig from '../equips/equips.config';
 
 export default {
 	"ROUTES": {
@@ -28,6 +29,7 @@ export default {
 		GAIN_LVL: Object.assign({}, statsConfig.SERVER_INNER.GAIN_LVL, {log: false}),
 		CHANGED_ABILITY: Object.assign({}, combatConfig.SERVER_INNER.CHANGED_ABILITY),
 		LEFT_ROOM: Object.assign({}, roomsConfig.SERVER_INNER.LEFT_ROOM),
+		WORE_EQUIP: Object.assign({}, equipsConfig.SERVER_INNER.WORE_EQUIP),
 	},
 	"SERVER_GETS": {
 		DISCONNECT: Object.assign({}, socketioConfig.SERVER_GETS.DISCONNECT),

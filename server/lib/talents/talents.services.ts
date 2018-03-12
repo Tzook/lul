@@ -495,9 +495,22 @@ export function createBonusPerks(socket: GameSocket) {
     socket.bonusPerks = {};
     for (var itemKey in EQUIPS_SCHEMA) {
         let equip: ITEM_INSTANCE = socket.character.equips[itemKey];
-        for (let perkName in (equip.perks || {})) {
-            socket.bonusPerks[perkName] = socket.bonusPerks[perkName] || 0;
-            socket.bonusPerks[perkName] += equip.perks[perkName];
+        addBonusPerks(equip, socket);
+    }
+}
+
+export function addBonusPerks(equip: ITEM_INSTANCE, socket: GameSocket) {
+    for (let perkName in (equip.perks || {})) {
+        socket.bonusPerks[perkName] = socket.bonusPerks[perkName] || 0;
+        socket.bonusPerks[perkName] += equip.perks[perkName];
+    }
+}
+
+export function removeBonusPerks(equip: ITEM_INSTANCE, socket: GameSocket) {
+    for (let perkName in (equip.perks || {})) {
+        socket.bonusPerks[perkName] -= equip.perks[perkName];
+        if (!socket.bonusPerks[perkName]) {
+            delete socket.bonusPerks[perkName];
         }
     }
 }
