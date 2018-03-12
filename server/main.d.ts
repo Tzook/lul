@@ -145,6 +145,7 @@ interface GameSocket extends SocketIO.Socket {
     getMpRegenInterval: () => number
     currentSpell?: ABILITY_SPELL_MODEL
     buffs: Map<string, Set<BUFF_INSTANCE>>
+    emitter: NodeJS.EventEmitter
 }
 
 interface DMG_RESULT {
