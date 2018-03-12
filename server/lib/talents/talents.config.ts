@@ -78,13 +78,13 @@ export default {
 		DAMAGE_REDUCTION: "damageReduction",
 		THREAT_MODIFIER_KEY: "threatModifier",
 
-		LIFE_STEAL_KEY: "lifeSteal",
-		MANA_STEAL_KEY: "manaSteal",
+		LIFE_STEAL_KEY: "hpSteal",
 		HP_REGEN_MODIFIER: "hpRegenModifier",
-		MP_REGEN_MODIFIER: "mpRegenModifier",
 		HP_REGEN_INTERVAL: "hpRegenInterval",
-		MP_REGEN_INTERVAL: "mpRegenInterval",
 		HP_BONUS: "hpBonus",
+		MANA_STEAL_KEY: "mpSteal",
+		MP_REGEN_MODIFIER: "mpRegenModifier",
+		MP_REGEN_INTERVAL: "mpRegenInterval",
 		MP_BONUS: "mpBonus",
 		
 		FREEZE_CHANCE: "freezeChance",
