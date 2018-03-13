@@ -49,6 +49,7 @@ export default {
 		USE_SPELL: {name: "spell_activated"},
 		MOB_USE_SPELL: {name: "mob_spell_activated"},
 		GAIN_ABILITY: {name: "actor_gain_ability"},
+		UPDATE_ATTACK_SPEED: {name: "update_actor_attack_speed"},
 	},
 	PERKS: {
 		AOE_CHANCE: "aoeChance",
@@ -70,6 +71,7 @@ export default {
 		
 		CHARGE_MODIFIER_KEY: "fullyChargeModifier",
 		DMG_MODIFIER_KEY: "damageModifier",
+		ATK_SPEED_MODIFIER_KEY: "attackSpeedModifier",
 		
 		CRIT_CHANCE: "critChance",
 		CRIT_MODIFIER_KEY: "critDamageModifier",

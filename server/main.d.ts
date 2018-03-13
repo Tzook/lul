@@ -388,6 +388,10 @@ interface CHAR_ABILITY_TALENT {
     perks: PERK_MAP // the chosen points
 }
 
+interface PERKS_DIFF extends BASE_STATS_MODEL {
+    atkSpeed: number
+}
+
 interface BUFF_INSTANCE {
     clearTimeoutId: NodeJS.Timer,
     perkName: string,

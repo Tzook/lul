@@ -6,6 +6,7 @@ import talentsConfig from "../talents/talents.config";
 import TalentsController from './talents.controller';
 import { getRoomInfo } from '../rooms/rooms.services';
 import { EQUIPS_SCHEMA } from '../equips/equips.model';
+import { getServices } from '../main/bootstrap';
 
 export default class TalentsServices extends MasterServices {
 	private controller: TalentsController;
@@ -113,7 +114,11 @@ export default class TalentsServices extends MasterServices {
 		const config = this.socketioRouter.getConfig();
 		const perkConfig: PERK_CONFIG = config.perks[perk] || <any>{};
 		return perkConfig;
-	}
+    }
+    
+    public getPerkDefault(perk: string): number {
+        return this.getPerkConfig(perk).default || 0;
+    }
 
 	public getTargetsHit(targetIds: string[], socket: GameSocket): string[] {
 		if (targetIds.length <= 1) {
@@ -149,6 +154,10 @@ export default class TalentsServices extends MasterServices {
 			modifier *= perkModifier;
 		}
 		return {dmg: modifier, crit: critActivated};
+	}
+
+	public getAtkSpeedModifier(socket: GameSocket, ability?: string): number {
+		return this.getCharPerkValue(talentsConfig.PERKS.ATK_SPEED_MODIFIER_KEY, socket, ability);
 	}
 
 	public getThreatModifier(socket: GameSocket): number {
@@ -470,6 +479,10 @@ export function extendItemSchemaWithTalents(item: any, itemSchema: ITEM_MODEL) {
 	});
 }
 
+export function getTalentsServices(): TalentsServices {
+    return getServices("talents");
+}
+
 export function isCharAbility(ability: string): boolean {
 	return ability === talentsConfig.CHAR_TALENT;
 }
@@ -513,4 +526,22 @@ export function removeBonusPerks(equip: ITEM_INSTANCE, socket: GameSocket) {
             delete socket.bonusPerks[perkName];
         }
     }
+}
+
+export function getBonusPerks(socket: GameSocket, ability?: string): PERKS_DIFF {
+    const talentsServices = getTalentsServices();
+    return {
+        hp: talentsServices.getHpBonus(socket, ability),
+        mp: talentsServices.getMpBonus(socket, ability),
+        atkSpeed: talentsServices.getAtkSpeedModifier(socket, ability),
+    };
+}
+
+export function getEmptyBonusPerks(): PERKS_DIFF {
+    const talentsServices = getTalentsServices();
+    return { 
+        hp: talentsServices.getPerkDefault(talentsConfig.PERKS.HP_BONUS), 
+        mp: talentsServices.getPerkDefault(talentsConfig.PERKS.MP_BONUS), 
+        atkSpeed: talentsServices.getPerkDefault(talentsConfig.PERKS.ATK_SPEED_MODIFIER_KEY),
+    };
 }
