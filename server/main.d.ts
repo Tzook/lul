@@ -136,6 +136,7 @@ interface GameSocket extends SocketIO.Socket {
     getKnownsList: (() => Iterable<string>)[] // List of getters for knowns
     getTargetsHit: (targetIds: string[]) => string[]
     getLoadModifier: () => number
+    getDmgBonus: () => number
     getDmgModifier: (attacker: GameSocket|MOB_INSTANCE, target: GameSocket|MOB_INSTANCE) => DMG_RESULT
     getThreatModifier: () => number
     getDefenceModifier: (attacker: GameSocket|MOB_INSTANCE, target: GameSocket|MOB_INSTANCE) => number
@@ -360,7 +361,9 @@ interface ABILITY_SPELL_MODEL {
     perks: PERK_MAP
 }
 
+type POWER_TYPES = "melee"|"range"|"magic";
 interface TALENT_INFO {
+    powerType: POWER_TYPES
     hitType: "atk"|"heal"
     mp?: number
     initPerks?: PERK_MAP

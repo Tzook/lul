@@ -28,6 +28,7 @@ const TALENT_SCHEMA = {
     perks: [ABILITY_PERK_SCHEMA],
     spells: [ABILITY_SPELL_SCHEMA],
     info: {
+        powerType: String,
         hitType: String,
         mp: Number,
         initPerks: mongoose.Schema.Types.Mixed

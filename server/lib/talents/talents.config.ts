@@ -70,8 +70,10 @@ export default {
 		BLEED_TICK_TIME: 0.5,
 		
 		CHARGE_MODIFIER_KEY: "fullyChargeModifier",
-		DMG_MODIFIER_KEY: "damageModifier",
 		ATK_SPEED_MODIFIER_KEY: "attackSpeedModifier",
+        DMG_MODIFIER_KEY: "damageModifier",
+        DMG_BONUS: "damageBonus",
+        ABILITY_DMG_BONUS_SUFFIX: "DamageBonus",
 		
 		CRIT_CHANCE: "critChance",
 		CRIT_MODIFIER_KEY: "critDamageModifier",

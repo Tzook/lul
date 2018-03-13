@@ -135,7 +135,15 @@ export default class TalentsServices extends MasterServices {
 	public getLoadModifier(socket: GameSocket): number {
 		const chargeModifier = this.getAbilityPerkValue(talentsConfig.PERKS.CHARGE_MODIFIER_KEY, socket);
 		return chargeModifier;
-	}
+    }
+    
+    public getDmgBonus(socket: GameSocket): number {
+        const baseDmgBonus = this.getCharPerkValue(talentsConfig.PERKS.DMG_BONUS, socket);
+		const talentInfo = this.getTalentInfo(socket.character.stats.primaryAbility);
+        const abilityBonusPerk = talentInfo.powerType + talentsConfig.PERKS.ABILITY_DMG_BONUS_SUFFIX;
+        const abilityDmgBonus = this.getCharPerkValue(abilityBonusPerk, socket);
+        return baseDmgBonus + abilityDmgBonus;
+    }
 
 	public getDmgModifier(attacker: GameSocket|MOB_INSTANCE, target: GameSocket|MOB_INSTANCE): DMG_RESULT {
 		const dmgModifier = this.getAbilityPerkValue(talentsConfig.PERKS.DMG_MODIFIER_KEY, attacker);
@@ -315,6 +323,7 @@ export default class TalentsServices extends MasterServices {
 				perks: [],
 				spells: [],
 				info: {
+					powerType: talent.powerType,
 					hitType: talent.hitType,
 					initPerks: {}
 				}

@@ -36,6 +36,7 @@ export default class TalentsRouter extends SocketioRouterBase {
     public onConnected(socket: GameSocket) {
 		socket.getTargetsHit = (targetIds) => this.services.getTargetsHit(targetIds, socket);
 		socket.getLoadModifier = () => this.services.getLoadModifier(socket);
+		socket.getDmgBonus = () => this.services.getDmgBonus(socket);
 		socket.getDmgModifier = (attacker: GameSocket|MOB_INSTANCE, target: GameSocket|MOB_INSTANCE) => this.services.getDmgModifier(attacker, target);
 		socket.getThreatModifier = () => this.services.getThreatModifier(socket);
 		socket.getDefenceModifier = (attacker: GameSocket|MOB_INSTANCE, target: GameSocket|MOB_INSTANCE) => this.services.getDefenceModifier(attacker, target);
