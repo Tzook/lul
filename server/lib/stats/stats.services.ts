@@ -16,6 +16,9 @@ export default class StatsServices extends MasterServices {
         let stats = socket.character.stats;
         stats.lvl++;
 
+        this.addHp(stats, 5);
+        this.addMp(stats, 5);
+
         stats.hp.now = socket.maxHp;
         stats.mp.now = socket.maxMp;
     }
