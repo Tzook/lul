@@ -145,7 +145,7 @@ export default class TalentsServices extends MasterServices {
         return baseDmgBonus + abilityDmgBonus;
     }
 
-	public getDmgModifier(attacker: GameSocket|MOB_INSTANCE, target: GameSocket|MOB_INSTANCE): DMG_RESULT {
+	public getDmgModifier(attacker: PLAYER, target: PLAYER): DMG_RESULT {
 		const dmgModifier = this.getAbilityPerkValue(talentsConfig.PERKS.DMG_MODIFIER_KEY, attacker);
 		let modifier = dmgModifier;
 		const critActivated = this.isAbilityActivated(talentsConfig.PERKS.CRIT_CHANCE, attacker);
@@ -164,6 +164,10 @@ export default class TalentsServices extends MasterServices {
 		return {dmg: modifier, crit: critActivated};
 	}
 
+	public getMinDmgModifier(attacker: PLAYER): number {
+		return this.getAbilityPerkValue(talentsConfig.PERKS.MIN_DMG_MODIFIER, attacker);
+    }
+    
 	public getAtkSpeedModifier(socket: GameSocket, ability?: string): number {
 		return this.getCharPerkValue(talentsConfig.PERKS.ATK_SPEED_MODIFIER_KEY, socket, ability);
 	}
@@ -173,7 +177,7 @@ export default class TalentsServices extends MasterServices {
 		return threatModifier;
 	}
 
-	public getDefenceModifier(attacker: GameSocket|MOB_INSTANCE, target: GameSocket|MOB_INSTANCE): number {
+	public getDefenceModifier(attacker: PLAYER, target: PLAYER): number {
 		const isBlock = this.isAbilityActivated(talentsConfig.PERKS.BLOCK_CHANCE, target);
 		let defenceModifier = 0; // complete block
 		if (!isBlock) {
@@ -183,6 +187,10 @@ export default class TalentsServices extends MasterServices {
 		return defenceModifier;
 	}
 	
+	public getDefenceBonus(target: PLAYER): number {
+		return this.getAbilityPerkValue(talentsConfig.PERKS.DEFENCE_BONUS, target);
+    }
+    
 	public getHpRegenModifier(socket: GameSocket): number {
 		return this.getAbilityPerkValue(talentsConfig.PERKS.HP_REGEN_MODIFIER, socket);
 	}
@@ -207,19 +215,19 @@ export default class TalentsServices extends MasterServices {
 		return this.getCharPerkValue(talentsConfig.PERKS.MP_BONUS, socket, ability);
 	}
 	
-	public isAbilityActivated(perk: string, target: GameSocket|MOB_INSTANCE): boolean {
+	public isAbilityActivated(perk: string, target: PLAYER): boolean {
 		const value = this.getAbilityPerkValue(perk, target);
 		const activated = doesChanceWorkFloat(value);
 		return activated;
 	}
 	
-	public getAbilityPerkValue(perk: string, target: GameSocket|MOB_INSTANCE): number {
+	public getAbilityPerkValue(perk: string, target: PLAYER): number {
 		return this.isSocket(target) 
 			? this.getCharPerkValue(perk, <GameSocket>target)
 			: this.getMobPerkValue(perk, <MOB_INSTANCE>target); 
 	}
 
-	protected isSocket(target: GameSocket|MOB_INSTANCE): boolean {
+	protected isSocket(target: PLAYER): boolean {
 		return typeof (<MOB_INSTANCE>target).mobId === "undefined";
 	}
 	
@@ -260,15 +268,15 @@ export default class TalentsServices extends MasterServices {
 		return perkConfig.value > 0 ? Math.max(value1, value2) : Math.min(value1, value2);
 	}
 
-	protected isFrozen(target: GameSocket|MOB_INSTANCE): boolean {
+	protected isFrozen(target: PLAYER): boolean {
 		return this.hasBuff(target, talentsConfig.PERKS.FREEZE_CHANCE);
 	}
 
-	protected isBurnt(target: GameSocket|MOB_INSTANCE): boolean {
+	protected isBurnt(target: PLAYER): boolean {
 		return this.hasBuff(target, talentsConfig.PERKS.BURN_CHANCE);
 	}
 
-	protected hasBuff(target: GameSocket|MOB_INSTANCE, perkName: string): boolean {
+	protected hasBuff(target: PLAYER, perkName: string): boolean {
 		return this.isSocket(target) 
 			? this.controller.isSocketInBuff(<GameSocket>target, perkName)
 			: this.controller.isMobInBuff((<MOB_INSTANCE>target).room, (<MOB_INSTANCE>target).id, perkName);

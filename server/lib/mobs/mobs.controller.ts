@@ -153,15 +153,16 @@ export default class MobsController extends MasterController {
     }
 
 	public getHurtCharDmg(mob: MOB_INSTANCE, socket: GameSocket): DMG_RESULT {
-		let dmg = getDamageRange(mob.minDmg, mob.maxDmg);
-		let dmgResult = socket.getDmgModifier(mob, socket);
-		dmg *= dmgResult.dmg;
-		dmg = this.applyDefenceModifier(dmg, socket, mob, socket);
-		return {dmg, crit: dmgResult.crit};
+        let dmgModifierResult = socket.getDmgModifier(mob, socket);
+        let maxDmg = mob.dmg * dmgModifierResult.dmg;
+        let minDmg = maxDmg * socket.getMinDmgModifier(mob);
+		let dmg = getDamageRange(minDmg, maxDmg);
+		return {dmg, crit: dmgModifierResult.crit};
 	}
 	
 	public applyDefenceModifier(dmg: number, socket: GameSocket, attacker: GameSocket|MOB_INSTANCE, target: GameSocket|MOB_INSTANCE) {
-		dmg *= socket.getDefenceModifier(attacker, target);
+        dmg = Math.max(0, dmg - socket.getDefenceBonus(target));
+        dmg *= socket.getDefenceModifier(attacker, target);
 		dmg = Math.ceil(dmg); // make sure we are always rounded
 		return dmg;
 	}

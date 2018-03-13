@@ -74,6 +74,7 @@ export default {
         DMG_MODIFIER_KEY: "damageModifier",
         DMG_BONUS: "damageBonus",
         ABILITY_DMG_BONUS_SUFFIX: "DamageBonus",
+        MIN_DMG_MODIFIER: "minDamageModifier",
 		
 		CRIT_CHANCE: "critChance",
 		CRIT_MODIFIER_KEY: "critDamageModifier",
@@ -81,6 +82,7 @@ export default {
 		BLOCK_CHANCE: "blockChance",
 		DAMAGE_REDUCTION: "damageReduction",
 		THREAT_MODIFIER_KEY: "threatModifier",
+		DEFENCE_BONUS: "defenceBonus",
 
 		LIFE_STEAL_KEY: "hpSteal",
 		HP_REGEN_MODIFIER: "hpRegenModifier",

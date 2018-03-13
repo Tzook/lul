@@ -19,7 +19,7 @@ export default class CombatServices extends MasterServices {
 		let loadDmg = socket.getLoadModifier() * load * baseDmg / 100;
 		let dmgModifier = socket.getDmgModifier(socket, target);
 		let maxDmg = (baseDmg + loadDmg) * dmgModifier.dmg;
-		let minDmg = maxDmg / 2;
+		let minDmg = maxDmg * socket.getMinDmgModifier(socket);
 		let dmg = getDamageRange(minDmg, maxDmg);
 		return {dmg, crit: dmgModifier.crit};
 	}

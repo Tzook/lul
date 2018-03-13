@@ -37,9 +37,11 @@ export default class TalentsRouter extends SocketioRouterBase {
 		socket.getTargetsHit = (targetIds) => this.services.getTargetsHit(targetIds, socket);
 		socket.getLoadModifier = () => this.services.getLoadModifier(socket);
 		socket.getDmgBonus = () => this.services.getDmgBonus(socket);
-		socket.getDmgModifier = (attacker: GameSocket|MOB_INSTANCE, target: GameSocket|MOB_INSTANCE) => this.services.getDmgModifier(attacker, target);
+		socket.getDmgModifier = (attacker: PLAYER, target: PLAYER) => this.services.getDmgModifier(attacker, target);
+		socket.getMinDmgModifier = (attacker: PLAYER) => this.services.getMinDmgModifier(attacker);
 		socket.getThreatModifier = () => this.services.getThreatModifier(socket);
-		socket.getDefenceModifier = (attacker: GameSocket|MOB_INSTANCE, target: GameSocket|MOB_INSTANCE) => this.services.getDefenceModifier(attacker, target);
+		socket.getDefenceModifier = (attacker: PLAYER, target: PLAYER) => this.services.getDefenceModifier(attacker, target);
+		socket.getDefenceBonus = (target: PLAYER) => this.services.getDefenceBonus(target);
 		socket.getHpRegenModifier = () => this.services.getHpRegenModifier(socket);
 		socket.getMpRegenModifier = () => this.services.getMpRegenModifier(socket);
 		socket.getHpRegenInterval = () => this.services.getHpRegenInterval(socket);

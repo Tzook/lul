@@ -8,8 +8,7 @@ const MOB_SCHEMA = {
     hp: Number,
     lvl: Number,
     exp: Number,
-    minDmg: Number,
-    maxDmg: Number
+    dmg: Number,
 };
 
 export const PRIORITY_MOBS = 10;

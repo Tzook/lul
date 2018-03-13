@@ -116,6 +116,8 @@ interface User extends Doc {
     characters: Char[]
 }
 
+type PLAYER = GameSocket|MOB_INSTANCE;
+
 interface GameSocket extends SocketIO.Socket {
     test?: boolean;
     character: Char;
@@ -137,9 +139,11 @@ interface GameSocket extends SocketIO.Socket {
     getTargetsHit: (targetIds: string[]) => string[]
     getLoadModifier: () => number
     getDmgBonus: () => number
-    getDmgModifier: (attacker: GameSocket|MOB_INSTANCE, target: GameSocket|MOB_INSTANCE) => DMG_RESULT
+    getDmgModifier: (attacker: PLAYER, target: PLAYER) => DMG_RESULT
+    getMinDmgModifier: (attacker: PLAYER) => number
     getThreatModifier: () => number
-    getDefenceModifier: (attacker: GameSocket|MOB_INSTANCE, target: GameSocket|MOB_INSTANCE) => number
+    getDefenceModifier: (attacker: PLAYER, target: PLAYER) => number
+    getDefenceBonus: (target: PLAYER) => number
     getHpRegenModifier: () => number
     getMpRegenModifier: () => number
     getHpRegenInterval: () => number
@@ -230,8 +234,7 @@ interface MOB_MODEL {
     hp: number,
     lvl: number,
     exp: number,
-    minDmg: number,
-    maxDmg: number,
+    dmg: number,
     drops: DROP_MODEL[],
     perks?: PERK_MAP,
     spells?: {
