@@ -1,9 +1,10 @@
 import * as faker from "faker";
 import characterConfig from "./character.config";
+import * as _ from 'underscore';
 
-const COMMON_PREFIXES = ["Lol", "Lel", "Kek", "Haha", "Hehe", "Noob", "Dr"];
+const COMMON_PREFIXES = ["Lol", "Lel", "Kek", "Haha", "Hehe", "Noob"];
 const FEMALE_PREFIXES = ["Ms", "Mrs", "Miss", "Sakura", "Kitty", "Hot", "Lady"];
-const MALE_PREFIXES = ["Mr", "Sasuke", "Naruto", "Ninja"];
+const MALE_PREFIXES = ["Mr", "Dr", "Sasuke", "Naruto", "Ninja"];
 
 const COMMON_SUFFIXES = ["Jr", "Sr", "MD", "PhD", "V"];
 const FEMALE_SUFFIXES = ["Girl", "Queen"];
@@ -17,15 +18,20 @@ const LEET_LANG = {
     b: 8,
 };
 
+const DUPLICATION_LETTERS = ["u", "i", "y", "a", "o", "e"];
+
 const WRAP_LETTERS = ["x", "v", "z", "w"];
 
 const NAME_MODIFIERS = [
-    {modifier: modifyAddPrefix, chance: 5},
-    {modifier: modifyAddSuffix, chance: 5},
-    {modifier: modifyLowercase, chance: 4},
+    {modifier: modifyAddPrefix, chance: 7},
+    {modifier: modifyAddSuffix, chance: 7},
+    {modifier: modifyReplaceLowercase, chance: 4},
     {modifier: modifyReplaceLeet, chance: 3},
+    {modifier: modifyAddDuplicateLetters, chance: 4},
+    {modifier: modifyReplaceCapitalize, chance: 4},
+    {modifier: modifyReplaceMakeTypos, chance: 5},
     {modifier: modifyAddNumber, chance: 3},
-    {modifier: modifyWrap, chance: 4},
+    {modifier: modifyAddWrap, chance: 4},
 ];
 
 export async function getRandomName(isMale) {
@@ -58,7 +64,7 @@ function getBaseName(isMale: boolean): string {
     }
 }
 
-function modifyLowercase(name: string): string {
+function modifyReplaceLowercase(name: string): string {
     return name.toLowerCase();
 }
 
@@ -84,6 +90,38 @@ function modifyReplaceLeet(name: string): string {
     return name;
 }
 
+function modifyAddDuplicateLetters(name: string): string {
+    let lengthAvailable = characterConfig.MAX_NAME_LENGTH - name.length;
+    const duplicationLetters: string[] = _.shuffle(DUPLICATION_LETTERS);
+    for (let letter of duplicationLetters) {
+        if (lengthAvailable > 0 && faker.random.boolean()) {
+            name = name.replace(letter, letter + letter);
+            lengthAvailable = characterConfig.MAX_NAME_LENGTH - name.length;
+        }
+    }
+    return name;
+}
+
+function modifyReplaceCapitalize(name: string): string {
+    const times = faker.random.number({min: 1, max: 3});
+    for (let i = 0; i < times; i++) {
+        const place = faker.random.number(name.length - 1);
+        name = name.replace(name[place], name[place].toUpperCase());
+    }
+    return name;
+}
+
+function modifyReplaceMakeTypos(name: string): string {
+    const times = faker.random.number({min: 1, max: 2});
+    for (let i = 0; i < times; i++) {
+        const place = faker.random.number(name.length - 1);
+        if (place > 0) {
+            name = name.replace(name[place - 1] + name[place], name[place] + name[place - 1]);
+        }
+    }
+    return name;
+}
+
 function modifyAddNumber(name: string): string {
     let lengthAvailable = characterConfig.MAX_NAME_LENGTH - name.length;
 
@@ -98,7 +136,7 @@ function modifyAddNumber(name: string): string {
     }
 }
 
-function modifyWrap(name: string): string {
+function modifyAddWrap(name: string): string {
     let lengthAvailable = characterConfig.MAX_NAME_LENGTH - name.length;
     const l = faker.random.arrayElement(WRAP_LETTERS);
 
