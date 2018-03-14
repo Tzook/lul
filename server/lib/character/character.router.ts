@@ -19,6 +19,10 @@ export default class CharacterRouter extends MasterRouter {
 			this.middleware.isLoggedIn.bind(this.middleware),
 			this.middleware.validateDeleteCharacterParams.bind(this.middleware),
 			this.middleware.validateCharacterBelongsToUser.bind(this.middleware),
-			this.controller.deleteCharacter.bind(this.controller));
+            this.controller.deleteCharacter.bind(this.controller));
+            
+		app.get(this.ROUTES.CHARACTER_RANDOM_NAME,
+			this.middleware.isLoggedIn.bind(this.middleware),
+			this.controller.generateRandomName.bind(this.controller));
 	}
 };

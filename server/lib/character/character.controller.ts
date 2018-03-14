@@ -1,5 +1,6 @@
 
 import MasterController from '../master/master.controller';
+import { getRandomName } from './randomNames';
 
 export default class CharacterController extends MasterController {
 
@@ -20,6 +21,16 @@ export default class CharacterController extends MasterController {
         })
         .catch(e => {
             this.sendError(res, this.LOGS.MASTER_INTERNAL_ERROR, {e, fn: "deleteCharacter", file: "character.controller.js"});
+        });
+    }
+
+    generateRandomName(req, res, next) {
+        getRandomName(req.query.g == "1")
+        .then(name => {
+            this.sendData(res, this.LOGS.CHARACTER_DELETED_SUCCESSFULLY, name);
+        })
+        .catch(e => {
+            this.sendError(res, this.LOGS.MASTER_INTERNAL_ERROR, {e, fn: "generateRandomName", file: "character.controller.js"});
         });
     }
 };
