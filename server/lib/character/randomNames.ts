@@ -1,10 +1,11 @@
 import * as faker from "faker";
 import characterConfig from "./character.config";
 import * as _ from 'underscore';
+import talentsConfig from "../talents/talents.config";
 
-const COMMON_PREFIXES = ["Lol", "Lel", "Kek", "Haha", "Hehe", "Noob"];
-const FEMALE_PREFIXES = ["Ms", "Mrs", "Miss", "Sakura", "Kitty", "Hot", "Lady"];
-const MALE_PREFIXES = ["Mr", "Dr", "Sasuke", "Naruto", "Ninja"];
+const COMMON_PREFIXES = ["Lol", "Lel", "Kek", "Haha", "Hehe"];
+const FEMALE_PREFIXES = ["Ms", "Mrs", "Miss", "Sexy", "Sakura", "Kitty", "Hot", "Lady"];
+const MALE_PREFIXES = ["Mr", "Noob", "Dr", "Pro", "Sasuke", "Naruto", "Ninja"];
 
 const COMMON_SUFFIXES = ["Jr", "Sr", "MD", "PhD", "V"];
 const FEMALE_SUFFIXES = ["Girl", "Queen"];
@@ -23,13 +24,13 @@ const DUPLICATION_LETTERS = ["u", "i", "y", "a", "o", "e"];
 const WRAP_LETTERS = ["x", "v", "z", "w"];
 
 const NAME_MODIFIERS = [
-    {modifier: modifyAddPrefix, chance: 7},
+    {modifier: modifyAddPrefix, chance: 5},
     {modifier: modifyAddSuffix, chance: 7},
+    {modifier: modifyReplaceMakeTypos, chance: 5},
     {modifier: modifyReplaceLowercase, chance: 4},
     {modifier: modifyReplaceLeet, chance: 3},
     {modifier: modifyAddDuplicateLetters, chance: 4},
     {modifier: modifyReplaceCapitalize, chance: 4},
-    {modifier: modifyReplaceMakeTypos, chance: 5},
     {modifier: modifyAddNumber, chance: 3},
     {modifier: modifyAddWrap, chance: 4},
 ];
@@ -70,6 +71,19 @@ function modifyReplaceLowercase(name: string): string {
 
 function modifyAddPrefix(name: string, isMale: boolean): string {
     let lengthAvailable = characterConfig.MAX_NAME_LENGTH - name.length;
+    if (faker.random.boolean()) {
+        const perk = faker.random.objectElement(talentsConfig.PERKS);
+        const perkWords = perk.split(/(?=[A-Z])/);
+        if (lengthAvailable >= perkWords[0].length) {
+            return capitalizeFirstLetter(perkWords[0]) + name;
+        }
+    }
+    if (faker.random.boolean()) {
+        const color = faker.commerce.color();
+        if (lengthAvailable >= color.length) {
+            return capitalizeFirstLetter(color) + name;
+        }
+    }
     const prefixes = COMMON_PREFIXES.concat(isMale ? MALE_PREFIXES : FEMALE_PREFIXES).filter(prefix => prefix.length <= lengthAvailable);
     return (prefixes.length > 0 ? faker.random.arrayElement(prefixes) : "") + name;
 }
@@ -83,7 +97,7 @@ function modifyAddSuffix(name: string, isMale: boolean): string {
 function modifyReplaceLeet(name: string): string {
     for (let letter in LEET_LANG) {
         if (faker.random.boolean()) {
-            let regex = new RegExp(letter, "i" + (faker.random.boolean() ? "g" : ""));
+            let regex = new RegExp(letter, faker.random.boolean() ? "g" : "");
             name = name.replace(regex, LEET_LANG[letter]);
         }
     }
@@ -152,4 +166,8 @@ function modifyAddWrap(name: string): string {
                 case 2: return `${l}${name}${l}`;
             }
     }
+}
+
+function capitalizeFirstLetter(word: string) {
+    return word[0].toUpperCase() + word.slice(1);
 }

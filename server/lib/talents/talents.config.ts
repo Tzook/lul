@@ -66,14 +66,11 @@ export default {
 		BLEED_CHANCE: "bleedChance",
 		BLEED_DURATION: "bleedDuration",
 		BLEED_RESISTANCE: "bleedResistance",
-		BLEED_DMG_MODIFIER: 0.1,
-		BLEED_TICK_TIME: 0.5,
 		
 		CHARGE_MODIFIER_KEY: "fullyChargeModifier",
 		ATK_SPEED_MODIFIER_KEY: "attackSpeedModifier",
         DMG_MODIFIER_KEY: "damageModifier",
         DMG_BONUS: "damageBonus",
-        ABILITY_DMG_BONUS_SUFFIX: "DamageBonus",
         MIN_DMG_MODIFIER: "minDamageModifier",
 		
 		CRIT_CHANCE: "critChance",
@@ -83,7 +80,7 @@ export default {
 		DAMAGE_REDUCTION: "damageReduction",
 		THREAT_MODIFIER_KEY: "threatModifier",
 		DEFENCE_BONUS: "defenceBonus",
-
+        
 		LIFE_STEAL_KEY: "hpSteal",
 		HP_REGEN_MODIFIER: "hpRegenModifier",
 		HP_REGEN_INTERVAL: "hpRegenInterval",
@@ -102,9 +99,14 @@ export default {
 		BURN_DURATION: "burnDuration",
 		BURN_RESISTANCE: "burnResistance",
 		BURNT_TARGET_MODIFIER_KEY: "burntTargetModifier",
-		BURN_DMG_MODIFIER: 0.05,
-		BURN_TICK_TIME: 0.25,
-	},
+    },
+    PERKS_INFO: {
+        BLEED_DMG_MODIFIER: 0.1,
+        BLEED_TICK_TIME: 0.5,
+        ABILITY_DMG_BONUS_SUFFIX: "DamageBonus",
+        BURN_DMG_MODIFIER: 0.05,
+        BURN_TICK_TIME: 0.25,
+    },
 	HIT_TYPE_ATTACK: "atk",
 	HIT_TYPE_HEAL: "heal",
     CHAR_TALENT: "charTalent",

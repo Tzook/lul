@@ -202,12 +202,12 @@ export default class TalentsController extends MasterController {
 
 	protected triggerMobBleed(dmg: number, crit: boolean, mob: MOB_INSTANCE, buffInstace: BUFF_INSTANCE, socket: GameSocket) {
 		let bleedDmg = this.services.getBleedDmg(dmg);
-		this.tickMobDmg(bleedDmg, crit, buffInstace, mob, combatConfig.HIT_CAUSE.BLEED, talentsConfig.PERKS.BLEED_TICK_TIME, 0, socket);
+		this.tickMobDmg(bleedDmg, crit, buffInstace, mob, combatConfig.HIT_CAUSE.BLEED, talentsConfig.PERKS_INFO.BLEED_TICK_TIME, 0, socket);
 	}
 
 	protected triggerMobBurn(dmg: number, crit: boolean, mob: MOB_INSTANCE, buffInstace: BUFF_INSTANCE, socket: GameSocket) {
 		let burnDmg = this.services.getBurnDmg(dmg);
-		this.tickMobDmg(burnDmg, crit, buffInstace, mob, combatConfig.HIT_CAUSE.BURN, talentsConfig.PERKS.BURN_TICK_TIME, 0, socket);
+		this.tickMobDmg(burnDmg, crit, buffInstace, mob, combatConfig.HIT_CAUSE.BURN, talentsConfig.PERKS_INFO.BURN_TICK_TIME, 0, socket);
 	}
 
 	protected tickMobDmg(dmg: number, crit: boolean, buffInstance: BUFF_INSTANCE, mob: MOB_INSTANCE, cause: string, interval: number, tickIndex: number, socket: GameSocket) {
@@ -229,12 +229,12 @@ export default class TalentsController extends MasterController {
 
 	protected triggerSocketBleed(dmg: number, crit: boolean, buffInstace: BUFF_INSTANCE, socket: GameSocket) {
 		let bleedDmg = this.services.getBleedDmg(dmg);
-		this.tickSocketDmg(bleedDmg, crit, buffInstace, combatConfig.HIT_CAUSE.BLEED, talentsConfig.PERKS.BLEED_TICK_TIME, 0, socket);
+		this.tickSocketDmg(bleedDmg, crit, buffInstace, combatConfig.HIT_CAUSE.BLEED, talentsConfig.PERKS_INFO.BLEED_TICK_TIME, 0, socket);
 	}
 
 	protected triggerSocketBurn(dmg: number, crit: boolean, buffInstace: BUFF_INSTANCE, socket: GameSocket) {
 		let burnDmg = this.services.getBurnDmg(dmg);
-		this.tickSocketDmg(burnDmg, crit, buffInstace, combatConfig.HIT_CAUSE.BURN, talentsConfig.PERKS.BURN_TICK_TIME, 0, socket);
+		this.tickSocketDmg(burnDmg, crit, buffInstace, combatConfig.HIT_CAUSE.BURN, talentsConfig.PERKS_INFO.BURN_TICK_TIME, 0, socket);
 	}
 
 	protected tickSocketDmg(dmg: number, crit: boolean, buffInstance: BUFF_INSTANCE, cause: string, interval: number, tickIndex: number, socket: GameSocket) {

@@ -140,7 +140,7 @@ export default class TalentsServices extends MasterServices {
     public getDmgBonus(socket: GameSocket): number {
         const baseDmgBonus = this.getCharPerkValue(talentsConfig.PERKS.DMG_BONUS, socket);
 		const talentInfo = this.getTalentInfo(socket.character.stats.primaryAbility);
-        const abilityBonusPerk = talentInfo.powerType + talentsConfig.PERKS.ABILITY_DMG_BONUS_SUFFIX;
+        const abilityBonusPerk = talentInfo.powerType + talentsConfig.PERKS_INFO.ABILITY_DMG_BONUS_SUFFIX;
         const abilityDmgBonus = this.getCharPerkValue(abilityBonusPerk, socket);
         return baseDmgBonus + abilityDmgBonus;
     }
@@ -283,11 +283,11 @@ export default class TalentsServices extends MasterServices {
 	}
 
 	public getBleedDmg(dmg: number): number {
-		return Math.max(dmg * talentsConfig.PERKS.BLEED_DMG_MODIFIER | 0, 1);
+		return Math.max(dmg * talentsConfig.PERKS_INFO.BLEED_DMG_MODIFIER | 0, 1);
 	}
 
 	public getBurnDmg(dmg: number): number {
-		return Math.max(dmg * talentsConfig.PERKS.BURN_DMG_MODIFIER | 0, 1);
+		return Math.max(dmg * talentsConfig.PERKS_INFO.BURN_DMG_MODIFIER | 0, 1);
 	}
 
 	public getSpell(socket: GameSocket, spellKey: string): ABILITY_SPELL_MODEL|undefined {
