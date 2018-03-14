@@ -2,6 +2,7 @@ import * as path from 'path';
 
 let routers = {};
 let services = {};
+let controllers = {};
 
 export default class Bootstrap {
     protected app;
@@ -30,6 +31,7 @@ export default class Bootstrap {
             filesGroups.push(files);
             routers[structure.folders[i]] = files.router;
             services[structure.folders[i]] = files.services;
+            controllers[structure.folders[i]] = files.controller;
         }
         this.initObjects(structure.templates, filesGroups, this.app);
         
@@ -77,4 +79,8 @@ export function getRouter(name: string) {
 
 export function getServices(name: string) {
     return services[name];
+}
+
+export function getController(name: string) {
+    return controllers[name];
 }

@@ -10,6 +10,7 @@ import mobsConfig from '../mobs/mobs.config';
 import RoomsRouter from '../rooms/rooms.router';
 import combatConfig from '../combat/combat.config';
 import { getEmptyBonusPerks, getBonusPerks } from './talents.services';
+import { getMobDeadOrAlive } from '../mobs/mobs.controller';
 
 export default class TalentsRouter extends SocketioRouterBase {
 	protected middleware: TalentsMiddleware;
@@ -231,7 +232,7 @@ export default class TalentsRouter extends SocketioRouterBase {
 
 	[talentsConfig.SERVER_GETS.HURT_BY_SPELL.name](data, socket: GameSocket) {
 		let {mob_id, spell_key} = data;
-		let mob = this.mobsRouter.getMob(mob_id, socket);
+		let mob = getMobDeadOrAlive(mob_id, socket);
 		if (!mob) {
 			return this.sendError(data, socket, "Mob doesn't exist!");
 		} else if (!(mob.spells || {})[spell_key]) {

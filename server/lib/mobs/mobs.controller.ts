@@ -1,18 +1,20 @@
 import MasterController from '../master/master.controller';
 import MobsServices, { getDamageRange } from './mobs.services';
 import * as _ from 'underscore';
-import config from '../mobs/mobs.config';
 import MobsRouter from './mobs.router';
+import mobsConfig from '../mobs/mobs.config';
+import { getController } from '../main/bootstrap';
 
 export default class MobsController extends MasterController {
 	protected services: MobsServices;
 	protected router: MobsRouter;
 	private roomsMobs: Map<string, ROOM_MOBS> = new Map();
 	private mobById: Map<string, MOB_INSTANCE> = new Map();
+	private mobsJustDied: Map<string, MOB_INSTANCE> = new Map();
 
 	init(files, app) {
         this.router = files.router;
-		super.init(files, app);
+        super.init(files, app);
 	}
 
 	// Socket functions
@@ -21,12 +23,12 @@ export default class MobsController extends MasterController {
 		return this.roomsMobs.has(room);
 	}
 
-	public hasMob(mobId: string, socket: GameSocket): boolean {
-		return this.mobById.has(this.services.getMobRoomId(socket.character.room, mobId));
-	}
-
 	public getMob(mobId: string, socket: GameSocket): MOB_INSTANCE|undefined {
 		return this.mobById.get(this.services.getMobRoomId(socket.character.room, mobId));
+    }
+    
+	public getMobJustDied(mobId: string, socket: GameSocket): MOB_INSTANCE|undefined {
+		return this.mobsJustDied.get(this.services.getMobRoomId(socket.character.room, mobId));
 	}
 
 	public startSpawningMobs(roomInfo: ROOM_MODEL, room: string) {
@@ -77,7 +79,7 @@ export default class MobsController extends MasterController {
 	}
 
 	protected notifyAboutMob(mob: MOB_INSTANCE, to: SocketIO.Namespace|SocketIO.Socket) {
-		to.emit(config.CLIENT_GETS.MOB_SPAWN.name, {
+		to.emit(mobsConfig.CLIENT_GETS.MOB_SPAWN.name, {
 			mob_id: mob.id,
 			x: mob.x,
 			y: mob.y,
@@ -98,7 +100,7 @@ export default class MobsController extends MasterController {
 		let mob = this.getMob(mobId, socket);
 		mob.x = x;
 		mob.y = y;
-		socket.broadcast.to(socket.character.room).emit(config.CLIENT_GETS.MOB_MOVE.name, {
+		socket.broadcast.to(socket.character.room).emit(mobsConfig.CLIENT_GETS.MOB_MOVE.name, {
 			mob_id: mobId, 
 			x,
 			y,
@@ -129,7 +131,7 @@ export default class MobsController extends MasterController {
     }
 	
     private aggroChanged(mob: MOB_INSTANCE, id?: string) {
-		this.router.getEmitter().emit(config.SERVER_INNER.MOB_AGGRO_CHANGED.name, { 
+		this.router.getEmitter().emit(mobsConfig.SERVER_INNER.MOB_AGGRO_CHANGED.name, { 
 			mob, 
 			id,
 		});	
@@ -168,7 +170,7 @@ export default class MobsController extends MasterController {
 	}
 
 	public despawnMob(mob: MOB_INSTANCE, socket: GameSocket) {
-		this.io.to(socket.character.room).emit(config.CLIENT_GETS.MOB_DIE.name, {
+		this.io.to(socket.character.room).emit(mobsConfig.CLIENT_GETS.MOB_DIE.name, {
 			mob_id: mob.id,
 		});
 		// remove mob references
@@ -176,7 +178,11 @@ export default class MobsController extends MasterController {
 			socket.map.get(char).threats.delete(mob);
 		}
 		mob.spawn.mobs.delete(mob.id);
-		this.mobById.delete(this.services.getMobRoomId(socket.character.room, mob.id));
+        const mobId = this.services.getMobRoomId(socket.character.room, mob.id);
+        this.mobById.delete(mobId);
+        // allow the mob to live in memory for a bit longer, so he can still hurt characters
+        this.mobsJustDied.set(mobId, mob);
+        setTimeout(() => this.mobsJustDied.delete(mobId), mobsConfig.MOB_DEATH_DEBOUNCE);
 
 		if (mob.spawn.cap == mob.spawn.mobs.size + 1) {
 			// if it's the first mob that we kill, set a timer to respawn
@@ -205,7 +211,7 @@ export default class MobsController extends MasterController {
 			map.spawns.forEach(spawn => {
 				spawn.interval = -1; // make sure respawn doesn't occur
 				spawn.mobs.forEach(mob => {
-					emitter.emit(config.SERVER_INNER.MOB_DESPAWN.name, { mob }, socket);	
+					emitter.emit(mobsConfig.SERVER_INNER.MOB_DESPAWN.name, { mob }, socket);	
 				});
 			});
 			this.roomsMobs.delete(socket.character.room);
@@ -232,3 +238,12 @@ export default class MobsController extends MasterController {
 			});
 	}
 };
+
+export function getMobsController(): MobsController {
+    return getController("mobs");
+}
+
+export function getMobDeadOrAlive(mobId: string, socket: GameSocket) {
+    const controller = getMobsController();
+    return controller.getMob(mobId, socket) || controller.getMobJustDied(mobId, socket);
+}

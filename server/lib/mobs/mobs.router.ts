@@ -12,6 +12,7 @@ import questsConfig from '../quests/quests.config';
 import combatConfig from '../combat/combat.config';
 import CombatRouter from '../combat/combat.router';
 import { isInInstance, getRoomName } from '../rooms/rooms.services';
+import { getMobDeadOrAlive } from './mobs.controller';
 
 export default class MobsRouter extends SocketioRouterBase {
 	protected middleware: MobsMiddleware;
@@ -41,14 +42,6 @@ export default class MobsRouter extends SocketioRouterBase {
 	
 	public getMobInfo(mobId: string): MOB_MODEL {
 		return this.services.getMobInfo(mobId);
-	}
-	
-	public hasMob(mobId: string, socket: GameSocket): boolean {
-		return this.controller.hasMob(mobId, socket);
-	}
-	
-	public getMob(mobId: string, socket: GameSocket): MOB_INSTANCE|undefined {
-		return this.controller.getMob(mobId, socket);
 	}
 
 	[config.SERVER_GETS.ENTERED_ROOM.name](data, socket: GameSocket) {
@@ -81,7 +74,7 @@ export default class MobsRouter extends SocketioRouterBase {
 		let cause = combatConfig.HIT_CAUSE.ATK;
 		for (let i = 0; i < mobsHit.length; i++) {
 			let mobHitData = {mobId: mobsHit[i], cause};
-			if (!this.controller.hasMob(mobsHit[i], socket)) {
+			if (!this.controller.getMob(mobsHit[i], socket)) {
 				this.sendError(data, socket, "Mob doesn't exist!");
 			} else if (this.controller.didHitMob(mobsHit[i], socket)) {
 				this.emitter.emit(config.SERVER_INNER.MOB_TAKE_DMG.name, mobHitData, socket);
@@ -94,7 +87,7 @@ export default class MobsRouter extends SocketioRouterBase {
 
 	[config.SERVER_INNER.MISS_MOB.name](data, socket: GameSocket) {
 		let {mobId, cause} = data;
-		const mob = this.getMob(mobId, socket);
+		const mob = this.controller.getMob(mobId, socket);
 		this.controller.addThreat(mob, 1, socket);
 		this.io.to(socket.character.room).emit(config.CLIENT_GETS.MOB_TAKE_MISS.name, {
 			id: socket.character._id,
@@ -106,7 +99,7 @@ export default class MobsRouter extends SocketioRouterBase {
 	[config.SERVER_INNER.MOB_TAKE_DMG.name](data, socket: GameSocket): any {
 		let {mobId, cause, dmg, crit} = data;
 		
-		const mob = this.getMob(mobId, socket);
+		const mob = this.controller.getMob(mobId, socket);
 		if (!dmg) {
 			let dmgResult = this.combatRouter.calculateDamage(socket, mob);
 			dmg = this.controller.applyDefenceModifier(dmgResult.dmg, socket, socket, mob);
@@ -175,7 +168,7 @@ export default class MobsRouter extends SocketioRouterBase {
 
 	[config.SERVER_GETS.MOBS_MOVE.name](data, socket: GameSocket) {
         (data.mobs || []).forEach(mob => {
-            if (!this.controller.hasMob(mob.mob_id, socket)) {
+            if (!this.controller.getMob(mob.mob_id, socket)) {
 				// ignore it for now. The client keeps sending it right after a mob dies because it doesn't know it's dead yet
                 // this.sendError(mob, socket, "Mob doesn't exist!");
             } else {
@@ -185,7 +178,7 @@ export default class MobsRouter extends SocketioRouterBase {
 	}
 
 	[config.SERVER_GETS.PLAYER_TAKE_DMG.name](data, socket: GameSocket) {
-		let mob = this.controller.getMob(data.mob_id, socket);
+		let mob = getMobDeadOrAlive(data.mob_id, socket);
 		if (!mob) {
 			return this.sendError(data, socket, "Mob doesn't exist!");
 		}
