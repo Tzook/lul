@@ -166,7 +166,7 @@ export default class ChatServices extends MasterServices {
 function pickPerk(pool: any, perksString: string): string {
     const perks = perksString.split("|");
     for (let perk of perks) {
-        const perkRegex = new RegExp(perk);
+        const perkRegex = new RegExp(perk, "i");
         for (let availablePerk of pool) {
             if (perkRegex.test(availablePerk)) {
                 return availablePerk;
