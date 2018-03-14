@@ -36,5 +36,6 @@ export default {
             "STATUS": "OK"
         },
 	},
-	"MAX_CHARACTERS": 8
+    "MAX_CHARACTERS": 8,
+    "MAX_NAME_LENGTH": 16,
 }

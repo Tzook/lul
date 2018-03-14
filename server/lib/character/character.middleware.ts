@@ -2,6 +2,7 @@
 import MasterMiddleware from '../master/master.middleware';
 import CharacterServices from './character.services';
 import config from '../character/character.config';
+import characterConfig from '../character/character.config';
 
 export default class CharacterMiddleware extends MasterMiddleware {
 	protected services: CharacterServices;
@@ -17,7 +18,7 @@ export default class CharacterMiddleware extends MasterMiddleware {
 	validateCreateCharacterParams(req, res, next) {
 		return this.validateParams(req, res, next, [
 			{param: "name", isType: ["string"], callback: this.services.invalidatesRegex, args: [req.body.name, /[^a-z0-9]/i, this.LOGS.MASTER_INVALID_PARAM_TYPE, 'name']},
-			{param: "name", isType: ["string"], callback: this.services.inRange, args: [req.body.name && req.body.name.length, 1, 16, this.LOGS.MASTER_OUT_OF_RANGE, 'name']},
+			{param: "name", isType: ["string"], callback: this.services.inRange, args: [req.body.name && req.body.name.length, 1, characterConfig.MAX_NAME_LENGTH, this.LOGS.MASTER_OUT_OF_RANGE, 'name']},
 			{param: "g", 	isType: ["string"]},
 			{param: "eyes", isType: ["string"]},
 			{param: "nose", isType: ["string"]},
