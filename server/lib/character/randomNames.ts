@@ -36,7 +36,7 @@ const NAME_MODIFIERS = [
 ];
 
 export async function getRandomName(isMale) {
-    let name = getBaseName(isMale).replace(/'/g, "");
+    let name = getBaseName(isMale).replace(/[^a-zA-Z0-9]/g, "");
 
     for (let {modifier, chance} of NAME_MODIFIERS) {
         if (faker.random.number(chance - 1) === 0) {
