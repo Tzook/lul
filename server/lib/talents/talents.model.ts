@@ -46,6 +46,7 @@ const ITEMS_TALENTS_SCHEMA = {
 const MOB_PERKS_SPELLS_SCHEMA = {
     perks: mongoose.Schema.Types.Mixed,
     spells: mongoose.Schema.Types.Mixed,
+    deathSpell: mongoose.Schema.Types.Mixed,
 };
 
 const ROOM_ABILITIES_SCHEMA = {

@@ -466,16 +466,28 @@ export function extendMobSchemaWithTalents(mob: any, mobSchema: MOB_MODEL): void
 
 	(mob.spells || []).forEach(spell => {
 		mobSchema.spells = mobSchema.spells || {};
-		let mobPerks = {};
-		mobSchema.spells[spell.key] = {
-			perks: mobPerks,
-			minTime: spell.minTime,
-			maxTime: spell.maxTime,
-		};
-		spell.perks.forEach(perk => {
-			mobPerks[perk.key] = +perk.value;
-		});
-	});
+        let spellSchema: MOB_SPELL = <MOB_SPELL>getPerksSchema(spell);
+        spellSchema.minTime = spell.minTime;
+        spellSchema.maxTime = spell.maxTime;
+        mobSchema.spells[spell.key] = spellSchema;
+    });
+    
+    if (mob.deathRattle) {
+        let deathRattle: MOB_DEATH_SPELL = <MOB_DEATH_SPELL>getPerksSchema(mob.deathRattle);
+        deathRattle.key = mob.deathRattle.key;
+        mobSchema.deathSpell = deathRattle;
+    }
+}
+
+function getPerksSchema(perksObject: any): {perks: PERK_MAP} {
+    let perks: PERK_MAP = {};
+    perksObject.perks.forEach(perk => {
+        perks[perk.key] = +perk.value;
+    });
+    let perksObjectResult = {
+        perks,
+    };
+    return perksObjectResult;
 }
 
 export function extendRoomSchemaWithTalents(scene: any, roomSchema: ROOM_MODEL): void {

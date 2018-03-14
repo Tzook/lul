@@ -276,16 +276,20 @@ export default class TalentsController extends MasterController {
 		const timerId = setTimeout(() => {
             const canUseSpell = this.canMobUseSpell(mob);
             if (canUseSpell) {
-                this.io.to(mob.room).emit(talentsConfig.CLIENT_GETS.MOB_USE_SPELL.name, {
-                    mob_id: mob.id,
-                    spell_key: spellKey,
-                });
+                this.mobUsesSpell(mob, spellKey);
             }
 			// recursively use the spell
 			this.activateMobSpellTimer(mob, spellKey, timersMap, !canUseSpell);
 		}, time);
 		timersMap.set(spellKey, timerId);
 	}
+
+    public mobUsesSpell(mob: MOB_INSTANCE, spellKey: string) {
+        this.io.to(mob.room).emit(talentsConfig.CLIENT_GETS.MOB_USE_SPELL.name, {
+            mob_id: mob.id,
+            spell_key: spellKey,
+        });
+    }
 
 	public hasMobSpellsPicker(mob: MOB_INSTANCE): boolean {
 		return this.mobsSpellsPickers.has(mob.id);

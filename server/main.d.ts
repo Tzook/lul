@@ -239,13 +239,20 @@ interface MOB_MODEL {
     perks?: PERK_MAP,
     spells?: {
         [spellKey: string]: MOB_SPELL
-    }
+    },
+    deathSpell?: MOB_DEATH_SPELL
 }
 interface MOB_SPELL {
     perks: PERK_MAP
     minTime: number
     maxTime: number
 }
+
+interface MOB_DEATH_SPELL {
+    key: string,
+    perks: PERK_MAP,
+}
+
 interface MOB_INSTANCE extends MOB_MODEL {
     id?: string, // a unique id for this specific mob
     x?: number,

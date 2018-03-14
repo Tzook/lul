@@ -261,7 +261,10 @@ export default class TalentsRouter extends SocketioRouterBase {
 		let {mob} = data;
 		if (mob.spells) {
 			this.controller.mobStopSpellsPicker(mob);
-		}
+        }
+        if (mob.deathSpell) {
+            this.controller.mobUsesSpell(mob, mob.deathSpell.key);
+        }
 		this.controller.clearMobBuffs(socket.character.room, mob.id);
 	}
 	
