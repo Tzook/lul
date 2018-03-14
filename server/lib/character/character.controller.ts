@@ -27,7 +27,7 @@ export default class CharacterController extends MasterController {
     generateRandomName(req, res, next) {
         getRandomName(req.query.g == "1")
         .then(name => {
-            this.sendData(res, this.LOGS.CHARACTER_DELETED_SUCCESSFULLY, name);
+            this.sendData(res, this.LOGS.GENERATED_RANDOM_NAME_SUCCESSFULLY, name);
         })
         .catch(e => {
             this.sendError(res, this.LOGS.MASTER_INTERNAL_ERROR, {e, fn: "generateRandomName", file: "character.controller.js"});
