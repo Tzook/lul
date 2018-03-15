@@ -28,6 +28,15 @@ export default class MasterMiddleware extends Response {
 			this.sendError(res, this.LOGS.MASTER_NOT_LOGGED_IN);
 		}
     }
+
+	isBoss(req, res, next) {
+		// if user is authenticated in the session, carry on
+		if (req.user && req.user.boss) {
+			next();
+		} else {
+			this.sendError(res, this.LOGS.MASTER_NOT_AUTHORIZED);
+		}
+    }
     
 	debounceIfLocal(req, res, next) {
         if (isProduction()) {
@@ -35,15 +44,6 @@ export default class MasterMiddleware extends Response {
 		} else {
             // in local, give it a bit of time so it won't freeze
 			setTimeout(() => next(), 500);
-		}
-	}
-
-	public validateHasSecretKey(req, res, next) {
-		let pass = process.env.secretKey ? process.env.secretKey : require('../../../config/.env.json').secretKey;
-		if (pass && req.body.pass === pass) {
-			next();
-		} else {
-			this.sendError(res, this.LOGS.MASTER_INVALID_PARAM_TYPE, { param: 'pass' })
 		}
 	}
 };

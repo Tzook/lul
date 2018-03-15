@@ -215,7 +215,7 @@ export default class SocketioRouter extends SocketioRouterBase {
 		let heroku = new Heroku({ token });
 		
 		app.post(this.ROUTES.RESTART, 
-			this.middleware.validateHasSecretKey.bind(this.middleware),
+			this.middleware.isBoss.bind(this.middleware),
 			(req, res) => {
 				heroku.delete('/apps/lul/dynos')
 					.then(apps => {

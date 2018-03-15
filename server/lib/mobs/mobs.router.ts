@@ -32,7 +32,7 @@ export default class MobsRouter extends SocketioRouterBase {
 	
 	protected initRoutes(app) {
 		app.post(this.ROUTES.GENERATE,
-			this.middleware.validateHasSecretKey.bind(this.middleware),
+			this.middleware.isBoss.bind(this.middleware),
 			this.controller.generateMobs.bind(this.controller));
 	}
 

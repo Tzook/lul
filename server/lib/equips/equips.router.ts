@@ -23,7 +23,7 @@ export default class EquipsRouter extends SocketioRouterBase {
 
 	protected initRoutes(app) {
 		app.post(this.ROUTES.BEGIN,
-			this.middleware.validateHasSecretKey.bind(this.middleware),
+			this.middleware.isBoss.bind(this.middleware),
 			this.controller.beginEquips.bind(this.controller));
 	}
 

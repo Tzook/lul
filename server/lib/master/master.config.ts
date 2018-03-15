@@ -28,9 +28,14 @@ export default {
 			"STATUS": "UNAUTHORIZED"
 		},
 		"MASTER_OUT_OF_RANGE": {
-			"MSG": "The parameter '{param}' is out of range.",
+            "MSG": "The parameter '{param}' is out of range.",
 			"CODE": "MASTER_5",
 			"STATUS": "BAD_VALUES"
-		}
+		},
+        "MASTER_NOT_AUTHORIZED": {
+            "MSG": "A boss user must be logged in for this request.",
+            "CODE": "MASTER_6",
+            "STATUS": "UNAUTHORIZED"
+        },
 	}
 }
