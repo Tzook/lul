@@ -589,9 +589,8 @@ export function slightlyTweakPerks(perksObject: PERK_MAP): PERK_MAP {
         // round extra floating points
         const numberParts = ("" + perkValue / 10).split(".");
         const firstNoneZeroDigitIndex = numberParts[1] ? _.findIndex(numberParts[1].split(""), item => item !== "0") : -1;
-        addition = +addition.toFixed(firstNoneZeroDigitIndex + 1);
         
-        result[perkName] = perkValue + addition;
+        result[perkName] = +(perkValue + addition).toFixed(firstNoneZeroDigitIndex + 1);
     }    
 
     return result;
