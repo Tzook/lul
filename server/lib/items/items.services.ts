@@ -4,7 +4,7 @@ import { REQUIRE_SCHEMA } from "./items.model";
 import * as _ from 'underscore';
 import ItemsMiddleware from './items.middleware';
 import { USE_SCHEMA } from '../use/use.model';
-import { extendItemSchemaWithTalents } from '../talents/talents.services';
+import { extendItemSchemaWithTalents, slightlyTweakPerks } from '../talents/talents.services';
 
 export default class ItemsServices extends MasterServices {
 	private itemsInfo: Map<string, ITEM_MODEL> = new Map();
@@ -85,7 +85,7 @@ export default class ItemsServices extends MasterServices {
 				}
 			}
 			if (itemInfo.perks) {
-                instance.perks = Object.assign({}, itemInfo.perks);
+                instance.perks = slightlyTweakPerks(itemInfo.perks);
             }
 		}
 		return instance

@@ -574,3 +574,25 @@ export function getEmptyBonusPerks(): PERKS_DIFF {
         atkSpeed: talentsServices.getPerkDefault(talentsConfig.PERKS.ATK_SPEED_MODIFIER_KEY),
     };
 }
+
+export function slightlyTweakPerks(perksObject: PERK_MAP): PERK_MAP {
+    let result: PERK_MAP = {};
+    const offset = talentsConfig.PERK_VALUES_RANDOM_OFFSET;
+
+    for (let perkName in perksObject) {
+        let perkValue = perksObject[perkName];
+
+        // get a random number between -0.1 and 0.1
+        const random = Math.random() * offset * 2 - offset;
+        let addition = perkValue * random;
+
+        // round extra floating points
+        const numberParts = ("" + perkValue / 10).split(".");
+        const firstNoneZeroDigitIndex = numberParts[1] ? _.findIndex(numberParts[1].split(""), item => item !== "0") : -1;
+        addition = +addition.toFixed(firstNoneZeroDigitIndex + 1);
+        
+        result[perkName] = perkValue + addition;
+    }    
+
+    return result;
+}

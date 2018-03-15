@@ -111,6 +111,7 @@ export default {
 	HIT_TYPE_HEAL: "heal",
     CHAR_TALENT: "charTalent",
     SKIP_SPELL_RETRY_TIME: 3000,
+    PERK_VALUES_RANDOM_OFFSET: 0.2,
 }
 
 
