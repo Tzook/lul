@@ -4,13 +4,13 @@ import * as _ from 'underscore';
 import talentsConfig from "../talents/talents.config";
 import { checkIsNameUnique } from "./character.services";
 
-const COMMON_PREFIXES = ["Lol", "Lel", "Kek", "Haha", "Hehe"];
-const FEMALE_PREFIXES = ["Ms", "Mrs", "Miss", "Sexy", "Sakura", "Kitty", "Hot", "Lady"];
-const MALE_PREFIXES = ["Mr", "Noob", "Dr", "Pro", "Sasuke", "Naruto", "Ninja"];
+const COMMON_PREFIXES = ["lol", "lel", "kek", "haha", "hehe", "Epic", "Evil", "Demon", "Bad", "The", "New", "My"];
+const FEMALE_PREFIXES = ["Ms", "Mrs", "Miss", "Sexy", "Sakura", "Kitty", "Lovely", "Angel", "Hot", "Lady"];
+const MALE_PREFIXES = ["asdf", "Mr", "Noob", "Dr", "Pro", "Sasuke", "Naruto", "Ninja", "Zen"];
 
-const COMMON_SUFFIXES = ["Jr", "Sr", "MD", "PhD", "V"];
-const FEMALE_SUFFIXES = ["Girl", "Queen"];
-const MALE_SUFFIXES = ["Boy", "King", "Boss"];
+const COMMON_SUFFIXES = ["Jr", "Sr", "MD", "PhD", "HD", "XX", "Meow", "Arrow"];
+const FEMALE_SUFFIXES = ["Girl", "Queen", "saurus", "Cat", "Love"];
+const MALE_SUFFIXES = ["Boy", "King", "Boss", "Dude"];
 
 const LEET_LANG = {
     o: 0,
@@ -22,6 +22,8 @@ const LEET_LANG = {
 
 const DUPLICATION_LETTERS = ["u", "i", "y", "a", "o", "e"];
 
+const SINGLE_LETTER_PREFIXES = ["i", "x", "o"];
+
 const WRAP_LETTERS = ["x", "v", "z", "w"];
 
 const NAME_MODIFIERS = [
@@ -29,9 +31,10 @@ const NAME_MODIFIERS = [
     {modifier: modifyAddSuffix, chance: 7},
     {modifier: modifyReplaceMakeTypos, chance: 5},
     {modifier: modifyReplaceLowercase, chance: 4},
-    {modifier: modifyReplaceLeet, chance: 3},
-    {modifier: modifyAddDuplicateLetters, chance: 4},
-    {modifier: modifyReplaceCapitalize, chance: 4},
+    {modifier: modifyReplaceLeet, chance: 4},
+    {modifier: modifyAddSinglePrefix, chance: 7},
+    {modifier: modifyAddDuplicateLetters, chance: 5},
+    {modifier: modifyReplaceCapitalize, chance: 5},
     {modifier: modifyAddNumber, chance: 3},
     {modifier: modifyAddWrap, chance: 4},
 ];
@@ -64,9 +67,9 @@ function getMaleNumber(isMale: boolean): 0|1 {
 
 function getBaseName(isMale: boolean): string {
     const gender = getMaleNumber(isMale);
-    const random = faker.random.number(2);
+    const random = faker.random.number(3);
     switch (random) {
-        case 0:default: return faker.name.firstName(gender);
+        default: case 0: return faker.name.firstName(gender);
         case 1: return faker.name.lastName(gender);
         case 2:
             const firstName = faker.name.firstName(gender);
@@ -90,7 +93,7 @@ function modifyAddPrefix(name: string, isMale: boolean): string {
         }
     }
     if (faker.random.boolean()) {
-        const color = faker.commerce.color();
+        const color = faker.commerce.color().replace(/ /g, "");
         if (lengthAvailable >= color.length) {
             return capitalizeFirstLetter(color) + name;
         }
@@ -113,6 +116,11 @@ function modifyReplaceLeet(name: string): string {
         }
     }
     return name;
+}
+
+function modifyAddSinglePrefix(name: string): string {
+    let lengthAvailable = characterConfig.MAX_NAME_LENGTH - name.length;
+    return (lengthAvailable > 0 ? faker.random.arrayElement(SINGLE_LETTER_PREFIXES) : "") + name;
 }
 
 function modifyAddDuplicateLetters(name: string): string {
@@ -163,19 +171,44 @@ function modifyAddNumber(name: string): string {
 
 function modifyAddWrap(name: string): string {
     let lengthAvailable = characterConfig.MAX_NAME_LENGTH - name.length;
-    const l = faker.random.arrayElement(WRAP_LETTERS);
+    let l, l1, l2, l3;
+    l = faker.random.arrayElement(WRAP_LETTERS);
+    l1 = faker.random.number(2) === 0 ? l.toUpperCase() : l;
+    l2 = faker.random.number(2) === 0 ? l.toUpperCase() : l;
+    l3 = faker.random.number(2) === 0 ? l.toUpperCase() : l;
 
     switch (lengthAvailable) {
         case 0: case 1: return name;
-        case 2: case 3: return `${l}${name}${l}`;
-        case 4: case 5: return `${l}${l}${name}${l}${l}`;
+        case 2: case 3: return single();
+        case 4: case 5: return double();
 
         default: case 6: case 7: 
             switch (faker.random.number(2)) {
-                default: case 0: return `${l}${l.toUpperCase()}${l}${name}${l}${l.toUpperCase()}${l}`;
-                case 1: return `${l}${l}${name}${l}${l}`;
-                case 2: return `${l}${name}${l}`;
+                case 0: return single();
+                case 1: return double();
+                default: case 2: return triple();
             }
+    }
+
+    function single() {
+        return `${l1}${name}${l1}`;
+    }
+
+    function double() {
+        if (l === "x" && faker.random.number(3) === 0) {
+            // add d so it will look like xD
+            l2 = l2 === "x" ? "d" : "D";
+        }
+        let start = l1 + l2;
+        if (faker.random.number(3) === 0) {
+            start = "";
+        }
+
+        return `${start}${name}${l2}${l1}`;
+    }
+
+    function triple() {
+        return `${l1}${l2}${l3}${name}${l3}${l2}${l1}`;
     }
 }
 
