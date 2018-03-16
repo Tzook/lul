@@ -1,5 +1,6 @@
 
 import MasterServices from '../master/master.services';
+import { getServices } from '../main/bootstrap';
 
 export default class CharacterServices extends MasterServices {
 
@@ -42,19 +43,25 @@ export default class CharacterServices extends MasterServices {
 		this.model.addFields(character, data);
 		return Promise.resolve(character);
 	}
-	checkIsNameUnique(name, error) {
-		return new Promise((resolve, reject) => {
-			this.getCharacter(name)
-			.then(d => {
-				d ? reject(error) : resolve();
-			})
-			.catch(e => {
-				reject(e);
-			});
-		});
-	}
 
     getCharacter(name) {
         return this.Q.ninvoke(this.mongoose.model('User'), 'findOne', {'characters.name': name});
     }
 };
+
+export function getCharacterServices(): CharacterServices {
+    return getServices("character");
+}
+
+export function checkIsNameUnique(name, error) {
+	return new Promise((resolve, reject) => {
+		const characterServices = getCharacterServices();
+		characterServices.getCharacter(name)
+		.then(d => {
+			d ? reject(error) : resolve();
+		})
+		.catch(e => {
+			reject(e);
+		});
+	});
+}

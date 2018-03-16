@@ -2,6 +2,7 @@ import * as faker from "faker";
 import characterConfig from "./character.config";
 import * as _ from 'underscore';
 import talentsConfig from "../talents/talents.config";
+import { checkIsNameUnique } from "./character.services";
 
 const COMMON_PREFIXES = ["Lol", "Lel", "Kek", "Haha", "Hehe"];
 const FEMALE_PREFIXES = ["Ms", "Mrs", "Miss", "Sexy", "Sakura", "Kitty", "Hot", "Lady"];
@@ -41,6 +42,16 @@ export async function getRandomName(isMale) {
     for (let {modifier, chance} of NAME_MODIFIERS) {
         if (faker.random.number(chance - 1) === 0) {
             name = modifier(name, isMale);
+        }
+    }
+
+    // verify we can use that name
+    try {
+        await checkIsNameUnique(name, characterConfig.LOGS.CHARACTER_NAME_CAUGHT);
+    } catch (error) {
+        if (error === characterConfig.LOGS.CHARACTER_NAME_CAUGHT) {
+            // name is already used, try to generate a new one
+            name = await getRandomName(isMale);
         }
     }
 

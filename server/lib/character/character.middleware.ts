@@ -1,6 +1,6 @@
 
 import MasterMiddleware from '../master/master.middleware';
-import CharacterServices from './character.services';
+import CharacterServices, { checkIsNameUnique } from './character.services';
 import config from '../character/character.config';
 import characterConfig from '../character/character.config';
 
@@ -30,7 +30,7 @@ export default class CharacterMiddleware extends MasterMiddleware {
 
 	convertToFormatAndCheckNameUniqueness(req, res, next) {
 		return Promise.all([
-			this.services.checkIsNameUnique(req.body.name, {LOG: this.LOGS.CHARACTER_NAME_CAUGHT, params: {name: req.body.name}}),
+			checkIsNameUnique(req.body.name, {LOG: this.LOGS.CHARACTER_NAME_CAUGHT, params: {name: req.body.name}}),
 			this.services.convertToFormat(req.body)
 		])
 		.then(d => {
