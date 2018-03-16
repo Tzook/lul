@@ -391,6 +391,7 @@ interface PERK_CONFIG {
     max?: number,
     acc?: number,
 	default?: number, 
+	bonusPerks?: PERK_MAP, 
 }
 
 interface CHAR_ABILITY_TALENT {

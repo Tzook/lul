@@ -16,6 +16,9 @@ export default {
 			"STATUS": "OK"
 		}
 	},
+	GLOBAL_EVENTS: {
+		CONFIG_READY: Object.assign({}, socketioConfig.GLOBAL_CONFIG_READY),
+	},
 	"SERVER_INNER": {
 		GAIN_ABILITY: {name: "gain_ability", alive: true, log: true},
 		HURT_MOB: Object.assign({}, mobsConfig.SERVER_INNER.HURT_MOB),

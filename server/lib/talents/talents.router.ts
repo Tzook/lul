@@ -33,6 +33,10 @@ export default class TalentsRouter extends SocketioRouterBase {
 			this.middleware.isBoss.bind(this.middleware),
 			this.controller.generateTalents.bind(this.controller));
 	}	
+	
+    [talentsConfig.GLOBAL_EVENTS.CONFIG_READY.name]() {
+		this.services.setBuffPerks();
+    }
 
     public onConnected(socket: GameSocket) {
 		socket.getTargetsHit = (targetIds) => this.services.getTargetsHit(targetIds, socket);

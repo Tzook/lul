@@ -1,5 +1,7 @@
 
 import MasterServices from '../master/master.services';
+import { getEmitter } from '../main/bootstrap';
+import socketioConfig from './socketio.config';
 
 export default class SocketioServices extends MasterServices {
 	private config: Config;
@@ -12,7 +14,9 @@ export default class SocketioServices extends MasterServices {
 		return this.Model.find({})
 			.then((docs: Config[]) => {
 				console.log("got config");
-				return this.config = docs[0];
+				this.config = docs[0];
+				getEmitter().emit(socketioConfig.GLOBAL_CONFIG_READY.name);
+				return this.config;
 			});
 	}
 };

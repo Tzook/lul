@@ -14,6 +14,8 @@ export default class TalentsServices extends MasterServices {
 	private perksInfo: Map<string, ABILITY_PERK_INSTANCE[]> = new Map();
 	// primary ability => lvl|key => spell
 	private spellsInfo: Map<string, Map<number|string, ABILITY_SPELL_MODEL>> = new Map();
+	// buffPerkChance => buffPerkDuration
+	private buffPerks: Map<string, string> = new Map();
 
 	protected socketioRouter: SocketioRouter;
 	
@@ -21,6 +23,23 @@ export default class TalentsServices extends MasterServices {
 		this.controller = files.controller;
 		super.init(files, app);
 		this.socketioRouter = files.routers.socketio;
+	}
+
+    public setBuffPerks() {
+		let {perks} = this.socketioRouter.getConfig();
+		for (let perkName in perks) {
+			let perkConfig = perks[perkName];
+			if (perkConfig.bonusPerks) {
+				let perkDurationName = perkName.replace("Chance", "Duration");
+				if (perkDurationName !== perkName && perks[perkDurationName]) {
+					this.buffPerks.set(perkName, perkDurationName);
+				}
+			}
+		}
+	}
+	
+	public getBuffPerks() {
+		return this.buffPerks;
 	}
 
 	public getEmptyCharAbility(ability: string): CHAR_ABILITY_TALENT {
@@ -396,6 +415,10 @@ export default class TalentsServices extends MasterServices {
 			if (+perk.default) {
 				perkModel.default = +perk.default;
 			}
+			if (perk.bonusPerks) {
+				let {perks} = getPerksSchema(perk.bonusPerks);
+				perkModel.bonusPerks = perks;
+			}
 			perks[perk.key] = perkModel;
 		});
 
@@ -466,22 +489,22 @@ export function extendMobSchemaWithTalents(mob: any, mobSchema: MOB_MODEL): void
 
 	(mob.spells || []).forEach(spell => {
 		mobSchema.spells = mobSchema.spells || {};
-        let spellSchema: MOB_SPELL = <MOB_SPELL>getPerksSchema(spell);
+        let spellSchema: MOB_SPELL = <MOB_SPELL>getPerksSchema(spell.perks);
         spellSchema.minTime = spell.minTime;
         spellSchema.maxTime = spell.maxTime;
         mobSchema.spells[spell.key] = spellSchema;
     });
     
     if (mob.deathRattle) {
-        let deathRattle: MOB_DEATH_SPELL = <MOB_DEATH_SPELL>getPerksSchema(mob.deathRattle);
+        let deathRattle: MOB_DEATH_SPELL = <MOB_DEATH_SPELL>getPerksSchema(mob.deathRattle.perks);
         deathRattle.key = mob.deathRattle.key;
         mobSchema.deathSpell = deathRattle;
     }
 }
 
-function getPerksSchema(perksObject: any): {perks: PERK_MAP} {
+function getPerksSchema(perkList?: any[]): {perks: PERK_MAP} {
     let perks: PERK_MAP = {};
-    perksObject.perks.forEach(perk => {
+    (perkList || []).forEach(perk => {
         perks[perk.key] = +perk.value;
     });
     let perksObjectResult = {
@@ -541,16 +564,16 @@ export function createBonusPerks(socket: GameSocket) {
     }
 }
 
-export function addBonusPerks(equip: ITEM_INSTANCE, socket: GameSocket) {
-    for (let perkName in (equip.perks || {})) {
+export function addBonusPerks({perks = {}}: {perks?: PERK_MAP}, socket: GameSocket) {
+    for (let perkName in perks || {}) {
         socket.bonusPerks[perkName] = socket.bonusPerks[perkName] || 0;
-        socket.bonusPerks[perkName] += equip.perks[perkName];
+        socket.bonusPerks[perkName] += perks[perkName];
     }
 }
 
-export function removeBonusPerks(equip: ITEM_INSTANCE, socket: GameSocket) {
-    for (let perkName in (equip.perks || {})) {
-        socket.bonusPerks[perkName] -= equip.perks[perkName];
+export function removeBonusPerks({perks = {}}: {perks?: PERK_MAP}, socket: GameSocket) {
+    for (let perkName in perks || {}) {
+        socket.bonusPerks[perkName] -= perks[perkName];
         if (!socket.bonusPerks[perkName]) {
             delete socket.bonusPerks[perkName];
         }

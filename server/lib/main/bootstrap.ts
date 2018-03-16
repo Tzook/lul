@@ -1,8 +1,10 @@
 import * as path from 'path';
+import { EventEmitter } from 'events';
 
 let routers = {};
 let services = {};
 let controllers = {};
+let globalEmitter = new EventEmitter();
 
 export default class Bootstrap {
     protected app;
@@ -50,6 +52,12 @@ export default class Bootstrap {
         // load config files
         files.config = require(`../${feature}/${feature}.config`).default;
 
+        for (let eventKey in (files.config.GLOBAL_EVENTS || {})) {
+            let event = files.config.GLOBAL_EVENTS[eventKey];
+            let handler = files.router[event.name].bind(files.router);
+            globalEmitter.on(event.name, handler);
+        }
+
         return files;
     }
 
@@ -83,4 +91,8 @@ export function getServices(name: string) {
 
 export function getController(name: string) {
     return controllers[name];
+}
+
+export function getEmitter() {
+    return globalEmitter;
 }

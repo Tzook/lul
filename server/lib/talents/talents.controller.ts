@@ -38,6 +38,12 @@ export default class TalentsController extends MasterController {
 		this.tryToApplySocketPerk(talentsConfig.PERKS.BLEED_CHANCE, talentsConfig.PERKS.BLEED_DURATION, talentsConfig.PERKS.BLEED_RESISTANCE, mob, socket, (buffInstace) => this.triggerMobBleed(dmg, crit, mob, buffInstace, socket));
 		this.tryToApplySocketPerk(talentsConfig.PERKS.FREEZE_CHANCE, talentsConfig.PERKS.FREEZE_DURATION, talentsConfig.PERKS.FREEZE_RESISTANCE, mob, socket);
 		this.tryToApplySocketPerk(talentsConfig.PERKS.BURN_CHANCE, talentsConfig.PERKS.BURN_DURATION, talentsConfig.PERKS.BURN_RESISTANCE, mob, socket, (buffInstace) => this.triggerMobBurn(dmg, crit, mob, buffInstace, socket));
+		
+		// TODO - first need to make applying buffs more generic
+		// let buffPerks = this.services.getBuffPerks();
+		// for (let [perkChanceName, perkDurationName] of buffPerks) {
+			// this.tryToApplySocketPerk(perkChanceName, perkDurationName, null, mob, socket, (buffInstace) => this.onSocketBuffPerkActivated(socket, perkChanceName));
+		// }
 	}
 	
 	public applyMobHurtPerks(dmg: number, crit: boolean, mob: MOB_INSTANCE, socket: GameSocket) {
@@ -51,7 +57,7 @@ export default class TalentsController extends MasterController {
 	public tryToApplySocketPerk(perkChanceName: string, perkDurationName: string, perkResistanceName: string, mob: MOB_INSTANCE, socket: GameSocket, onPerkActivated = (buffInstace: BUFF_INSTANCE) => {}) {
 		let activated = this.services.isAbilityActivated(perkChanceName, socket);
 		if (activated) {
-			const resistanceActivated = this.services.isAbilityActivated(perkResistanceName, mob);
+			const resistanceActivated = perkResistanceName && this.services.isAbilityActivated(perkResistanceName, mob);
 			if (resistanceActivated) {
 				activated = false;
 				this.io.to(socket.character.room).emit(talentsConfig.CLIENT_GETS.RESISTED_BUFF.name, {
@@ -83,7 +89,7 @@ export default class TalentsController extends MasterController {
 	public tryToApplyMobPerk(perkChanceName: string, perkDurationName: string, perkResistanceName: string, mob: MOB_INSTANCE, socket: GameSocket, onPerkActivated = (buffInstace: BUFF_INSTANCE) => {}) {
 		let activated = this.services.isAbilityActivated(perkChanceName, mob);
 		if (activated) {
-			const resistanceActivated = this.services.isAbilityActivated(perkResistanceName, socket);
+			const resistanceActivated = perkResistanceName && this.services.isAbilityActivated(perkResistanceName, socket);
 			if (resistanceActivated) {
 				activated = false;
 				this.io.to(socket.character.room).emit(talentsConfig.CLIENT_GETS.RESISTED_BUFF.name, {
