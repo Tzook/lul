@@ -13,6 +13,7 @@ let 	express 		= require('express'),
 // Internal
 import Bootstrap from './bootstrap';
 import { setLogger } from './logger';
+import { Request } from 'express';
 
 export default class Main {
 	private app;
@@ -75,4 +76,8 @@ export default class Main {
 
 export function isProduction(): boolean {
 	return process.env.NODE_ENV === "production";
+}
+
+export function isFromWeb(req: Request): boolean {
+	return req.headers.host === "lul.herokuapp.com";
 }

@@ -1,6 +1,6 @@
 
 import Response from './master.response';
-import { isProduction } from '../main/main';
+import { isProduction, isFromWeb } from '../main/main';
 
 export default class MasterMiddleware extends Response {
 
@@ -39,7 +39,7 @@ export default class MasterMiddleware extends Response {
     }
     
 	debounceIfLocal(req, res, next) {
-        if (isProduction()) {
+        if (isProduction() && !isFromWeb(req)) {
             next();
 		} else {
             // in local, give it a bit of time so it won't freeze
