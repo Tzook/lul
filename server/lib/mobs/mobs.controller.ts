@@ -1,5 +1,5 @@
 import MasterController from '../master/master.controller';
-import MobsServices, { getDamageRange } from './mobs.services';
+import MobsServices, { getDamageRange, getSpawnIntervalTime } from './mobs.services';
 import * as _ from 'underscore';
 import MobsRouter from './mobs.router';
 import mobsConfig from '../mobs/mobs.config';
@@ -196,7 +196,7 @@ export default class MobsController extends MasterController {
 		if (mob.spawn.interval >= 0) {
 			setTimeout(() => {
 				this.spawnMobs(mob.spawn, mob.spawn.mobs, room);
-			}, mob.spawn.interval * 1000);
+			}, getSpawnIntervalTime(mob.spawn));
 		}
 	}
 
