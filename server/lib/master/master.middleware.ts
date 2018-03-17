@@ -39,11 +39,14 @@ export default class MasterMiddleware extends Response {
     }
     
 	debounceIfLocal(req, res, next) {
-        if (isProduction() && !isFromWeb(req)) {
-            next();
-		} else {
+        if (isFromWeb(req)) {
+            // in web, it takes time to load so give it a couple of seconds to live
+			setTimeout(() => next(), 2000);
+		} else if (!isProduction()) {
             // in local, give it a bit of time so it won't freeze
 			setTimeout(() => next(), 500);
+		} else {
+            next();
 		}
 	}
 };
