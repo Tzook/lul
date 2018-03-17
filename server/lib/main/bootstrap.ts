@@ -5,6 +5,7 @@ let routers = {};
 let services = {};
 let controllers = {};
 let globalEmitter = new EventEmitter();
+import * as express from "express";
 
 export default class Bootstrap {
     protected app;
@@ -18,6 +19,8 @@ export default class Bootstrap {
         this.app.get('/assets.html', (req, res) => {
             res.sendFile(path.resolve(`playground/assets`));
         });
+
+        this.app.use(express.static('playground'));
     }
 
     public init() {
