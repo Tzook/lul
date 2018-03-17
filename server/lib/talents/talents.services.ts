@@ -281,18 +281,18 @@ export default class TalentsServices extends MasterServices {
 		if (target.currentSpell) {
 			// send the higher value - perk or spell
 			let spellPerkValue = target.currentSpell.perks[perkName] || 0;
-			perkValue = this.getBetterPerkValue(spellPerkValue, perkValue, perkName);
+			perkValue = this.getBetterPerkValue(perkName, spellPerkValue, perkValue);
 		}
 		let bonusPerkValue = target.bonusPerks[perkName] || 0;
 		let safePerkValueWithBonus = this.getSafePerkValue(perkName, perkValue + bonusPerkValue);
-		// we want to add the bonus up to the max value, but if the value was already above the max then use the original value
-		perkValue = Math.max(perkValue, safePerkValueWithBonus);
+		// we want to add the bonus up to the max value, after that take the original value
+		perkValue = this.getBetterPerkValue(perkName, perkValue, safePerkValueWithBonus);
 		return perkValue;
 	}
 
-	protected getBetterPerkValue(value1: number, value2: number, perk: string): number {
+	protected getBetterPerkValue(perk: string, ...values: number[]): number {
 		const perkConfig = this.getPerkConfig(perk);
-		return perkConfig.value > 0 ? Math.max(value1, value2) : Math.min(value1, value2);
+		return perkConfig.value > 0 ? Math.max(...values) : Math.min(...values);
 	}
 
 	protected isFrozen(target: PLAYER): boolean {
