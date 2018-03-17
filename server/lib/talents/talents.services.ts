@@ -238,6 +238,10 @@ export default class TalentsServices extends MasterServices {
 	public getMpBonus(target: PLAYER, ability?: string): number {
 		return this.getAbilityPerkValue(talentsConfig.PERKS.MP_BONUS, target, ability);
 	}
+
+	public getMpUsageModifier(target: PLAYER, ability?: string): number {
+		return this.getAbilityPerkValue(talentsConfig.PERKS.MP_COST, target, ability);
+	}
 	
 	public isAbilityActivated(perk: string, target: PLAYER): boolean {
 		const value = this.getAbilityPerkValue(perk, target);
@@ -600,6 +604,7 @@ export function getBonusPerks(target: PLAYER, ability?: string): PERKS_DIFF {
         hp: talentsServices.getHpBonus(target, ability),
         mp: talentsServices.getMpBonus(target, ability),
         atkSpeed: talentsServices.getAtkSpeedModifier(target, ability),
+        mpCost: talentsServices.getMpUsageModifier(target, ability),
     };
 }
 
@@ -611,6 +616,9 @@ export function updateBonusPerks(socket: GameSocket, oldStats: PERKS_DIFF, newSt
 	if (oldStats.atkSpeed != newStats.atkSpeed) {
 		socket.emit(talentsConfig.CLIENT_GETS.UPDATE_ATTACK_SPEED.name, {speed: newStats.atkSpeed});
 	}
+	if (oldStats.mpCost != newStats.mpCost) {
+		socket.emit(talentsConfig.CLIENT_GETS.UPDATE_MANA_COST.name, {mpCost: newStats.mpCost});
+	}
 }
 
 export function getEmptyBonusPerks(): PERKS_DIFF {
@@ -618,7 +626,8 @@ export function getEmptyBonusPerks(): PERKS_DIFF {
     return { 
         hp: talentsServices.getPerkDefault(talentsConfig.PERKS.HP_BONUS), 
         mp: talentsServices.getPerkDefault(talentsConfig.PERKS.MP_BONUS), 
-        atkSpeed: talentsServices.getPerkDefault(talentsConfig.PERKS.ATK_SPEED_MODIFIER_KEY),
+		atkSpeed: talentsServices.getPerkDefault(talentsConfig.PERKS.ATK_SPEED_MODIFIER_KEY),
+		mpCost: talentsServices.getPerkDefault(talentsConfig.PERKS.MP_COST)
     };
 }
 

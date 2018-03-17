@@ -51,6 +51,7 @@ export default class TalentsRouter extends SocketioRouterBase {
 		socket.getMpRegenModifier = () => this.services.getMpRegenModifier(socket);
 		socket.getHpRegenInterval = () => this.services.getHpRegenInterval(socket);
 		socket.getMpRegenInterval = () => this.services.getMpRegenInterval(socket);
+		socket.getMpUsageModifier = () => this.services.getMpUsageModifier(socket);
         socket.buffs = new Map();
         createBonusPerks(socket);
         process.nextTick(() => this.addStats(socket));
@@ -203,13 +204,13 @@ export default class TalentsRouter extends SocketioRouterBase {
 			return this.sendError(data, socket, "The primary ability does not have that spell.");	
 		} else if (!this.services.canUseSpell(socket, spell)) {
 			return this.sendError(data, socket, "Character does not meet the requirements to use that spell.");
-		} else if (socket.character.stats.mp.now < spell.mp) {
+		}
+		let mp = spell.mp * socket.getMpUsageModifier() | 0;
+		if (socket.character.stats.mp.now < mp) {
 			return this.sendError(data, socket, "Not enough mana to activate the spell.");
 		}
 
-		this.emitter.emit(statsConfig.SERVER_INNER.USE_MP.name, {
-			mp: spell.mp
-		}, socket);
+		this.emitter.emit(statsConfig.SERVER_INNER.USE_MP.name, { mp }, socket);
 		
 		socket.broadcast.to(socket.character.room).emit(talentsConfig.CLIENT_GETS.USE_SPELL.name, {
 			char_id: socket.character._id,

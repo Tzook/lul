@@ -53,6 +53,7 @@ export default {
 		MOB_USE_SPELL: {name: "mob_spell_activated"},
 		GAIN_ABILITY: {name: "actor_gain_ability"},
 		UPDATE_ATTACK_SPEED: {name: "update_actor_attack_speed"},
+		UPDATE_MANA_COST: {name: "update_actor_mana_cost"},
 	},
 	PERKS: {
 		AOE_CHANCE: "aoeChance",
@@ -88,10 +89,12 @@ export default {
 		HP_REGEN_MODIFIER: "hpRegenModifier",
 		HP_REGEN_INTERVAL: "hpRegenInterval",
 		HP_BONUS: "hpBonus",
+		
 		MANA_STEAL_KEY: "mpSteal",
 		MP_REGEN_MODIFIER: "mpRegenModifier",
 		MP_REGEN_INTERVAL: "mpRegenInterval",
 		MP_BONUS: "mpBonus",
+		MP_COST: "mpCost",
 		
 		FREEZE_CHANCE: "freezeChance",
 		FREEZE_DURATION: "freezeDuration",

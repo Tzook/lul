@@ -148,6 +148,7 @@ interface GameSocket extends SocketIO.Socket {
     getMpRegenModifier: () => number
     getHpRegenInterval: () => number
     getMpRegenInterval: () => number
+    getMpUsageModifier: () => number
     currentSpell?: ABILITY_SPELL_MODEL
     buffs: Map<string, Set<BUFF_INSTANCE>>
     emitter: NodeJS.EventEmitter
@@ -404,7 +405,8 @@ interface CHAR_ABILITY_TALENT {
 }
 
 interface PERKS_DIFF extends BASE_STATS_MODEL {
-    atkSpeed: number
+    atkSpeed: number,
+    mpCost: number
 }
 
 interface BUFF_INSTANCE {
