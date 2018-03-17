@@ -11,5 +11,5 @@ export default {
 	},
 	GLOBAL_CONFIG_READY: {"name": "config_ready"},
 	"EVENTS_THROTTLE": 100,
-	SAVE_INTERVAL: 10000,
+	SAVE_INTERVAL: 3000,
 }

@@ -43,17 +43,13 @@ export default class SocketioRouterBase extends MasterRouter {
 	public sendError(data: any, socket: GameSocket, error: string, emit = true, display = false) {
 		const event = this.getEventName();
 		logger.warn(error, this.getMeta(socket, data, event));
-		emit && socket.emit(config.CLIENT_GETS.EVENT_ERROR.name, {
-			error,
-			data,
-			event,
-			display,
-		});
+		emit && notifyUserAboutError(socket, error, display);
 	}
 
 	public fatal(socket: GameSocket, error: Error, event?: string) {
 		event = event || this.getEventName();
-        logger.error(error.toString(), this.getMeta(socket, error, event));
+		logger.error(error.toString(), this.getMeta(socket, error, event));
+		notifyUserAboutError(socket, "A bad error occurred. Relog ASAP.", true);
 	}
 	
 	private getEventName(): string {
@@ -69,3 +65,10 @@ export default class SocketioRouterBase extends MasterRouter {
 		return Object.assign({name: socket.character.name, event}, data);
 	}
 };
+
+function notifyUserAboutError(socket: GameSocket, error: string, display: boolean) {
+	socket.emit(config.CLIENT_GETS.EVENT_ERROR.name, {
+		error,
+		display,
+	});
+}
