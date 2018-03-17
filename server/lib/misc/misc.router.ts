@@ -24,7 +24,7 @@ export default class MiscRouter extends SocketioRouterBase {
         let slots = this.middleware.getStackSlots(socket, item, itemInfo);
 
         if (slots.length === 0) { 
-            return this.sendError(data, socket, itemsConfig.LOGS.INVENTORY_FULL.MSG, true, true);
+            return this.sendError(data, socket, itemsConfig.LOGS.INVENTORY_FULL.MSG);
         }	
         this.controller.pickMiscItem(socket, slots, item, itemInfo);
         callback();

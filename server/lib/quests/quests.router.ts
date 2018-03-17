@@ -74,7 +74,7 @@ export default class QuestsRouter extends SocketioRouterBase {
 		} else if (unmetReason = this.services.questFinishUnmetReason(socket.character, this.itemsRouter.getItemsCounts(socket), questInfo)) {
 			this.sendError(data, socket, "Quest does not meet finishing criteria: " + unmetReason);
 		} else if (!(slots = this.itemsRouter.getItemsSlots(socket, (questInfo.reward || {}).items || []))) {
-			this.sendError(data, socket, `There must be ${questInfo.reward.items.length} empty slots for the quest rewards.`);
+			this.sendError(data, socket, `Need ${questInfo.reward.items.length} empty inventory slots!`, true, true);
 		} else {
 			this.services.finishQuest(socket.character.quests, questInfo);
 			socket.emit(config.CLIENT_GETS.QUEST_DONE.name, { id: questKey });
