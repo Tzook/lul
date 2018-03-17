@@ -254,27 +254,28 @@ export default class TalentsServices extends MasterServices {
             return perkConfig.default || 0;
         }
         const level = (talent.perks[perk] || 0) + (socket.character.charTalents._doc[talentsConfig.CHAR_TALENT].perks[perk] || 0);
-        let rawPerkValue = this.getPerkLevelValue(perk, level);
-        let bonusPerkValue = socket.bonusPerks[perk] || 0;
-		let perkValue = this.getSafePerkValue(perk, rawPerkValue + bonusPerkValue);
-		if (socket.currentSpell) {
-			// send the higher value - perk or spell
-			let spellPerkValue = socket.currentSpell.perks[perk] || 0;
-			perkValue = this.getBetterPerkValue(spellPerkValue, perkValue, perk);
-		}
+		let perkValue = this.getPerkLevelValue(perk, level);
+		perkValue = this.addPerkValueBonuses(socket, perk, perkValue);
 		return perkValue;
 	}
-
+	
 	protected getMobPerkValue(perk: string, mob: MOB_INSTANCE): number {
 		// get the perk if exists, otherwise get its default
 		let perkValue = (mob.perks || {})[perk] || this.getPerkLevelValue(perk, 0);
 		
-		if (mob.currentSpell) {
-			// send the higher value - perk or spell
-			let spellPerkValue = mob.currentSpell.perks[perk] || 0;
-			perkValue = this.getBetterPerkValue(spellPerkValue, perkValue, perk);
-		}
+		perkValue = this.addPerkValueBonuses(mob, perk, perkValue);
 		
+		return perkValue;
+	}
+
+	protected addPerkValueBonuses(target: PLAYER, perkName: string, perkValue: number): number {
+		if (target.currentSpell) {
+			// send the higher value - perk or spell
+			let spellPerkValue = target.currentSpell.perks[perkName] || 0;
+			perkValue = this.getBetterPerkValue(spellPerkValue, perkValue, perkName);
+		}
+		let bonusPerkValue = target.bonusPerks[perkName] || 0;
+		perkValue = this.getSafePerkValue(perkName, perkValue + bonusPerkValue);
 		return perkValue;
 	}
 
@@ -560,18 +561,18 @@ export function createBonusPerks(socket: GameSocket) {
     }
 }
 
-export function addBonusPerks({perks = {}}: {perks?: PERK_MAP}, socket: GameSocket) {
+export function addBonusPerks({perks = {}}: {perks?: PERK_MAP}, target: PLAYER) {
     for (let perkName in perks || {}) {
-        socket.bonusPerks[perkName] = socket.bonusPerks[perkName] || 0;
-        socket.bonusPerks[perkName] += perks[perkName];
+        target.bonusPerks[perkName] = target.bonusPerks[perkName] || 0;
+        target.bonusPerks[perkName] += perks[perkName];
     }
 }
 
-export function removeBonusPerks({perks = {}}: {perks?: PERK_MAP}, socket: GameSocket) {
+export function removeBonusPerks({perks = {}}: {perks?: PERK_MAP}, target: PLAYER) {
     for (let perkName in perks || {}) {
-        socket.bonusPerks[perkName] -= perks[perkName];
-        if (!socket.bonusPerks[perkName]) {
-            delete socket.bonusPerks[perkName];
+        target.bonusPerks[perkName] -= perks[perkName];
+        if (!target.bonusPerks[perkName]) {
+            delete target.bonusPerks[perkName];
         }
     }
 }

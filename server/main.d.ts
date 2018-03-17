@@ -126,8 +126,8 @@ interface GameSocket extends SocketIO.Socket {
     bitch: boolean;
     alive: boolean,
     lastAttackLoad: number;
-    bonusStats?: BASE_STATS_MODEL;
-    bonusPerks?: PERK_MAP;
+    bonusStats: BASE_STATS_MODEL;
+    bonusPerks: PERK_MAP;
     throttles: Map<Function, number>;
     maxHp: number;
     maxMp: number;
@@ -254,18 +254,19 @@ interface MOB_DEATH_SPELL {
 }
 
 interface MOB_INSTANCE extends MOB_MODEL {
-    id?: string, // a unique id for this specific mob
-    x?: number,
-    y?: number,
-    room?: string,
-    dmgers?: Map<string, number>
-    threat?: {
+    id: string, // a unique id for this specific mob
+    x: number,
+    y: number,
+    room: string,
+    dmgers: Map<string, number>
+    threat: {
         top?: string
         map: Map<string, number>
     }
-    dmged?: number
+    dmged: number
     spawn?: SPAWN_INSTANCE,
     currentSpell?: MOB_SPELL
+    bonusPerks: PERK_MAP
 }
 interface ROOM_MOBS {
     spawns: SPAWN_INSTANCE[],

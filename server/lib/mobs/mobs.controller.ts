@@ -61,17 +61,19 @@ export default class MobsController extends MasterController {
 	}
 
 	protected spawnMob(spawnInfo: SPAWN_INSTANCE, room: string): MOB_INSTANCE {
-		let mob: MOB_INSTANCE = this.services.getMobInfo(spawnInfo.mobId);
-		mob.id = _.uniqueId("mob-");
-		mob.x = spawnInfo.x;
-		mob.y = spawnInfo.y;
-        mob.dmgers = new Map();
-        mob.threat = {
-            top: "",
-            map: new Map()
-		};
-		mob.dmged = 0;
-		mob.room = room;
+		let mob: MOB_INSTANCE = Object.assign(this.services.getMobInfo(spawnInfo.mobId), {
+			id: _.uniqueId("mob-"),
+			x: spawnInfo.x,
+			y: spawnInfo.y,
+			dmgers: new Map(),
+			threat: {
+				top: "",
+				map: new Map()
+			},
+			dmged: 0,
+			room,
+			bonusPerks:{}
+		});
 
 		this.mobById.set(this.services.getMobRoomId(room, mob.id), mob);
 		this.notifyAboutMob(mob, this.io.to(room));
