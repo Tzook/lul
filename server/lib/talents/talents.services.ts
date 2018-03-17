@@ -241,13 +241,9 @@ export default class TalentsServices extends MasterServices {
 	}
 	
 	public getAbilityPerkValue(perk: string, target: PLAYER): number {
-		return this.isSocket(target) 
+		return isSocket(target) 
 			? this.getCharPerkValue(perk, <GameSocket>target)
 			: this.getMobPerkValue(perk, <MOB_INSTANCE>target); 
-	}
-
-	protected isSocket(target: PLAYER): boolean {
-		return typeof (<MOB_INSTANCE>target).mobId === "undefined";
 	}
 	
 	protected getCharPerkValue(perk: string, socket: GameSocket, ability?: string): number {
@@ -296,7 +292,7 @@ export default class TalentsServices extends MasterServices {
 	}
 
 	protected hasBuff(target: PLAYER, perkName: string): boolean {
-		return this.isSocket(target) 
+		return isSocket(target) 
 			? this.controller.isSocketInBuff(<GameSocket>target, perkName)
 			: this.controller.isMobInBuff((<MOB_INSTANCE>target).room, (<MOB_INSTANCE>target).id, perkName);
 	}
@@ -617,4 +613,20 @@ export function slightlyTweakPerks(perksObject: PERK_MAP): PERK_MAP {
     }    
 
     return result;
+}
+
+export function isSocket(target: PLAYER): boolean {
+	return typeof (<MOB_INSTANCE>target).mobId === "undefined";
+}
+
+export function getRoom(target: PLAYER): string {
+	return isSocket(target) 
+		? (<GameSocket>target).character.room
+		: (<MOB_INSTANCE>target).room;
+}
+
+export function getId(target: PLAYER): string {
+	return isSocket(target) 
+		? (<GameSocket>target).character._id
+		: (<MOB_INSTANCE>target).id;
 }
