@@ -7,6 +7,7 @@ import TalentsController from './talents.controller';
 import { getRoomInfo } from '../rooms/rooms.services';
 import { EQUIPS_SCHEMA } from '../equips/equips.model';
 import { getServices } from '../main/bootstrap';
+import statsConfig from '../stats/stats.config';
 
 export default class TalentsServices extends MasterServices {
 	private controller: TalentsController;
@@ -191,12 +192,12 @@ export default class TalentsServices extends MasterServices {
 		return this.getAbilityPerkValue(talentsConfig.PERKS.MIN_DMG_MODIFIER, attacker);
     }
     
-	public getAtkSpeedModifier(socket: GameSocket, ability?: string): number {
-		return this.getCharPerkValue(talentsConfig.PERKS.ATK_SPEED_MODIFIER_KEY, socket, ability);
+	public getAtkSpeedModifier(target: PLAYER, ability?: string): number {
+		return this.getAbilityPerkValue(talentsConfig.PERKS.ATK_SPEED_MODIFIER_KEY, target, ability);
 	}
 
-	public getThreatModifier(socket: GameSocket): number {
-		const threatModifier = this.getAbilityPerkValue(talentsConfig.PERKS.THREAT_MODIFIER_KEY, socket);
+	public getThreatModifier(target: PLAYER): number {
+		const threatModifier = this.getAbilityPerkValue(talentsConfig.PERKS.THREAT_MODIFIER_KEY, target);
 		return threatModifier;
 	}
 
@@ -214,28 +215,28 @@ export default class TalentsServices extends MasterServices {
 		return this.getAbilityPerkValue(talentsConfig.PERKS.DEFENCE_BONUS, target);
     }
     
-	public getHpRegenModifier(socket: GameSocket): number {
-		return this.getAbilityPerkValue(talentsConfig.PERKS.HP_REGEN_MODIFIER, socket);
+	public getHpRegenModifier(target: PLAYER): number {
+		return this.getAbilityPerkValue(talentsConfig.PERKS.HP_REGEN_MODIFIER, target);
 	}
 	
-	public getMpRegenModifier(socket: GameSocket): number {
-		return this.getAbilityPerkValue(talentsConfig.PERKS.MP_REGEN_MODIFIER, socket);
+	public getMpRegenModifier(target: PLAYER): number {
+		return this.getAbilityPerkValue(talentsConfig.PERKS.MP_REGEN_MODIFIER, target);
 	}
 	
-	public getHpRegenInterval(socket: GameSocket): number {
-		return this.getAbilityPerkValue(talentsConfig.PERKS.HP_REGEN_INTERVAL, socket) * 1000;
+	public getHpRegenInterval(target: PLAYER): number {
+		return this.getAbilityPerkValue(talentsConfig.PERKS.HP_REGEN_INTERVAL, target) * 1000;
 	}
 	
-	public getMpRegenInterval(socket: GameSocket): number {
-		return this.getAbilityPerkValue(talentsConfig.PERKS.MP_REGEN_INTERVAL, socket) * 1000;
+	public getMpRegenInterval(target: PLAYER): number {
+		return this.getAbilityPerkValue(talentsConfig.PERKS.MP_REGEN_INTERVAL, target) * 1000;
 	}
 
-	public getHpBonus(socket: GameSocket, ability?: string): number {
-		return this.getCharPerkValue(talentsConfig.PERKS.HP_BONUS, socket, ability);
+	public getHpBonus(target: PLAYER, ability?: string): number {
+		return this.getAbilityPerkValue(talentsConfig.PERKS.HP_BONUS, target, ability);
 	}
 	
-	public getMpBonus(socket: GameSocket, ability?: string): number {
-		return this.getCharPerkValue(talentsConfig.PERKS.MP_BONUS, socket, ability);
+	public getMpBonus(target: PLAYER, ability?: string): number {
+		return this.getAbilityPerkValue(talentsConfig.PERKS.MP_BONUS, target, ability);
 	}
 	
 	public isAbilityActivated(perk: string, target: PLAYER): boolean {
@@ -244,9 +245,9 @@ export default class TalentsServices extends MasterServices {
 		return activated;
 	}
 	
-	public getAbilityPerkValue(perk: string, target: PLAYER): number {
+	public getAbilityPerkValue(perk: string, target: PLAYER, ability?: string): number {
 		return isSocket(target) 
-			? this.getCharPerkValue(perk, <GameSocket>target)
+			? this.getCharPerkValue(perk, <GameSocket>target, ability)
 			: this.getMobPerkValue(perk, <MOB_INSTANCE>target); 
 	}
 	
@@ -583,13 +584,33 @@ export function removeBonusPerks({perks = {}}: {perks?: PERK_MAP}, target: PLAYE
     }
 }
 
-export function getBonusPerks(socket: GameSocket, ability?: string): PERKS_DIFF {
+export function modifyBonusPerks(target: PLAYER, modificationsCallback: Function) {
+	const oldStats = getBonusPerks(target);
+	modificationsCallback();
+	const newStats = getBonusPerks(target);
+	if (isSocket(target)) {
+		// currently only socket supports these perks..
+		updateBonusPerks(<GameSocket>target, oldStats, newStats);
+	}
+}
+
+export function getBonusPerks(target: PLAYER, ability?: string): PERKS_DIFF {
     const talentsServices = getTalentsServices();
     return {
-        hp: talentsServices.getHpBonus(socket, ability),
-        mp: talentsServices.getMpBonus(socket, ability),
-        atkSpeed: talentsServices.getAtkSpeedModifier(socket, ability),
+        hp: talentsServices.getHpBonus(target, ability),
+        mp: talentsServices.getMpBonus(target, ability),
+        atkSpeed: talentsServices.getAtkSpeedModifier(target, ability),
     };
+}
+
+export function updateBonusPerks(socket: GameSocket, oldStats: PERKS_DIFF, newStats: PERKS_DIFF) {
+	if (oldStats.hp != newStats.hp || oldStats.mp != newStats.mp) {
+		const stats = {hp: newStats.hp - oldStats.hp, mp: newStats.mp - oldStats.mp};
+		socket.emitter.emit(statsConfig.SERVER_INNER.STATS_ADD.name, { stats }, socket);
+	}
+	if (oldStats.atkSpeed != newStats.atkSpeed) {
+		socket.emit(talentsConfig.CLIENT_GETS.UPDATE_ATTACK_SPEED.name, {speed: newStats.atkSpeed});
+	}
 }
 
 export function getEmptyBonusPerks(): PERKS_DIFF {

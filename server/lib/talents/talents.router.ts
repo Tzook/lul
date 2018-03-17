@@ -1,7 +1,7 @@
 import SocketioRouterBase from '../socketio/socketio.router.base';
 import TalentsMiddleware from './talents.middleware';
 import TalentsController from './talents.controller';
-import TalentsServices, { getTalent, hasAbility, removeBonusPerks, createBonusPerks, addBonusPerks } from './talents.services';
+import TalentsServices, { getTalent, hasAbility, removeBonusPerks, createBonusPerks, addBonusPerks, updateBonusPerks, modifyBonusPerks } from './talents.services';
 import talentsConfig from '../talents/talents.config';
 import statsConfig from '../stats/stats.config';
 import StatsRouter from '../stats/stats.router';
@@ -177,10 +177,9 @@ export default class TalentsRouter extends SocketioRouterBase {
 		if (!this.services.canGetPerk(talent, perk)) {
 			return this.sendError(data, socket, "Raising points to that perk is not available.");
 		}
-		const oldStats = getBonusPerks(socket);        
-        this.services.addPerk(talent, perk);
-		const newStats = getBonusPerks(socket);        
-		this.updateBonusPerks(socket, oldStats, newStats);
+		modifyBonusPerks(socket, () => {
+			this.services.addPerk(talent, perk);
+		});
 		talent.points--;
 		talent.pool = [];
 		socket.emit(talentsConfig.CLIENT_GETS.GAIN_ABILITY_PERK.name, {
@@ -277,7 +276,7 @@ export default class TalentsRouter extends SocketioRouterBase {
 
 		const oldStats = getBonusPerks(socket, previousAbility);
 		const newStats = getBonusPerks(socket);
-		this.updateBonusPerks(socket, oldStats, newStats);
+		updateBonusPerks(socket, oldStats, newStats);
     }
     
 	[talentsConfig.SERVER_INNER.LEFT_ROOM.name](data, socket: GameSocket) {
@@ -289,26 +288,14 @@ export default class TalentsRouter extends SocketioRouterBase {
     }
 
 	[talentsConfig.SERVER_INNER.WORE_EQUIP.name](data: {equip: ITEM_INSTANCE, oldEquip: ITEM_INSTANCE}, socket: GameSocket) {
-        const {equip, oldEquip} = data;
-        const oldStats = getBonusPerks(socket);
-        addBonusPerks(equip, socket);
-        removeBonusPerks(oldEquip, socket);
-        const newStats = getBonusPerks(socket);
-		this.updateBonusPerks(socket, oldStats, newStats);
+		const {equip, oldEquip} = data;
+		modifyBonusPerks(socket, () => {
+			addBonusPerks(equip, socket);
+			removeBonusPerks(oldEquip, socket);
+		});
 	}
     
     private addStats(socket: GameSocket) {
-        this.updateBonusPerks(socket, getEmptyBonusPerks(), getBonusPerks(socket));
-    }
-
-	// TODO support
-    private updateBonusPerks(socket: GameSocket, oldStats: PERKS_DIFF, newStats: PERKS_DIFF) {
-        if (oldStats.hp != newStats.hp || oldStats.mp != newStats.mp) {
-            const stats = {hp: newStats.hp - oldStats.hp, mp: newStats.mp - oldStats.mp};
-            this.emitter.emit(statsConfig.SERVER_INNER.STATS_ADD.name, { stats }, socket);
-        }
-        if (oldStats.atkSpeed != newStats.atkSpeed) {
-            socket.emit(talentsConfig.CLIENT_GETS.UPDATE_ATTACK_SPEED.name, {speed: newStats.atkSpeed});
-        }
+        updateBonusPerks(socket, getEmptyBonusPerks(), getBonusPerks(socket));
     }
 };

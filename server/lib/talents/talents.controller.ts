@@ -1,5 +1,5 @@
 import MasterController from '../master/master.controller';
-import TalentsServices, { getRoom, getId, isSocket, removeBonusPerks, addBonusPerks } from './talents.services';
+import TalentsServices, { getRoom, getId, isSocket, removeBonusPerks, addBonusPerks, modifyBonusPerks } from './talents.services';
 import MobsRouter from '../mobs/mobs.router';
 import talentsConfig from '../talents/talents.config';
 import mobsConfig from '../mobs/mobs.config';
@@ -245,18 +245,19 @@ export default class TalentsController extends MasterController {
 	protected addBuffBonusPerks(target: PLAYER, perkName: string) {
 		let perkBuffs = this.getPerkBuffs(target, perkName);
 		if (perkBuffs.size === 1) {
-			// todo apply the diff
-			addBonusPerks({perks: this.services.getBonusPerks(perkName)}, target);
+			modifyBonusPerks(target, () => {
+				addBonusPerks({perks: this.services.getBonusPerks(perkName)}, target);			
+			});
 		}
 	}
 	
 	protected removeBuffBonusPerks(target: PLAYER, perkName: string) {
 		let perkBuffs = this.getPerkBuffs(target, perkName);
 		if (perkBuffs.size === 0) {
-			// todo apply the diff
-			removeBonusPerks({perks: this.services.getBonusPerks(perkName)}, target);
+			modifyBonusPerks(target, () => {
+				removeBonusPerks({perks: this.services.getBonusPerks(perkName)}, target);			
+			});
 		}
-
 	}
 
 	public isMobInBuff(room: string, mobId: string, perkName: string): boolean {
