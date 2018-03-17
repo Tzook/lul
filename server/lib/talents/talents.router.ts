@@ -301,6 +301,7 @@ export default class TalentsRouter extends SocketioRouterBase {
         this.updateBonusPerks(socket, getEmptyBonusPerks(), getBonusPerks(socket));
     }
 
+	// TODO support
     private updateBonusPerks(socket: GameSocket, oldStats: PERKS_DIFF, newStats: PERKS_DIFF) {
         if (oldStats.hp != newStats.hp || oldStats.mp != newStats.mp) {
             const stats = {hp: newStats.hp - oldStats.hp, mp: newStats.mp - oldStats.mp};

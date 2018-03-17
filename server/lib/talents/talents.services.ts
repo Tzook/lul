@@ -138,6 +138,10 @@ export default class TalentsServices extends MasterServices {
     public getPerkDefault(perk: string): number {
         return this.getPerkConfig(perk).default || 0;
     }
+    
+    public getBonusPerks(perk: string): PERK_MAP {
+        return this.getPerkConfig(perk).bonusPerks || {};
+    }
 
 	public getTargetsHit(targetIds: string[], socket: GameSocket): string[] {
 		if (targetIds.length <= 1) {
