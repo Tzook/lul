@@ -14,7 +14,7 @@ export default class Bootstrap {
         this.app = app;
 
         this.app.get('/', (req, res) => {
-            res.sendFile(path.resolve(`playground/test.html`));
+            res.sendFile(path.resolve(`playground/index.html`));
         });
         this.app.get('/assets.html', (req, res) => {
             res.sendFile(path.resolve(`playground/assets`));

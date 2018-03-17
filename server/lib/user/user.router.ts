@@ -23,19 +23,16 @@ export default class UserRouter extends MasterRouter {
 			this.controller.sendUser.bind(this.controller));
 
 		app.get(this.ROUTES.USER_LOGOUT,
-			this.middleware.isLoggedIn.bind(this.middleware),
 			this.controller.performLogout.bind(this.controller),
 			this.controller.sendLogout.bind(this.controller));
 
 		app.post(this.ROUTES.USER_LOGIN,
-			this.middleware.isLoggedOut.bind(this.middleware),
 			this.middleware.hasLoginParams.bind(this.middleware),
 			this.middleware.passportLocalAuthenticate.bind(this.middleware),
 			this.controller.performLogin.bind(this.controller),
 			this.controller.sendUser.bind(this.controller));
 
 		app.post(this.ROUTES.USER_REGISTER,
-			this.middleware.isLoggedOut.bind(this.middleware),
 			this.middleware.hasRegisterParams.bind(this.middleware),
 			this.middleware.isUsernameUnique.bind(this.middleware),
 			this.controller.handleNewUser.bind(this.controller),
