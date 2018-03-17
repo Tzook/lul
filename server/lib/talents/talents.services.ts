@@ -275,7 +275,9 @@ export default class TalentsServices extends MasterServices {
 			perkValue = this.getBetterPerkValue(spellPerkValue, perkValue, perkName);
 		}
 		let bonusPerkValue = target.bonusPerks[perkName] || 0;
-		perkValue = this.getSafePerkValue(perkName, perkValue + bonusPerkValue);
+		let safePerkValueWithBonus = this.getSafePerkValue(perkName, perkValue + bonusPerkValue);
+		// we want to add the bonus up to the max value, but if the value was already above the max then use the original value
+		perkValue = Math.max(perkValue, safePerkValueWithBonus);
 		return perkValue;
 	}
 
