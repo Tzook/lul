@@ -32,26 +32,18 @@ export default class TalentsController extends MasterController {
 		}
 	}
 
-	public applyHurtMobPerks(dmg: number, crit: boolean, mob: MOB_INSTANCE, socket: GameSocket) {
-		this.tryToApplyPerk(talentsConfig.PERKS.STUN_CHANCE, talentsConfig.PERKS.STUN_DURATION, talentsConfig.PERKS.STUN_RESISTANCE, socket, mob);
-		this.tryToApplyPerk(talentsConfig.PERKS.CRIPPLE_CHANCE, talentsConfig.PERKS.CRIPPLE_DURATION, talentsConfig.PERKS.CRIPPLE_RESISTANCE, socket, mob);
-		this.tryToApplyPerk(talentsConfig.PERKS.BLEED_CHANCE, talentsConfig.PERKS.BLEED_DURATION, talentsConfig.PERKS.BLEED_RESISTANCE, socket, mob, (buffInstace) => this.triggerMobBleed(dmg, crit, mob, buffInstace, socket));
-		this.tryToApplyPerk(talentsConfig.PERKS.FREEZE_CHANCE, talentsConfig.PERKS.FREEZE_DURATION, talentsConfig.PERKS.FREEZE_RESISTANCE, socket, mob);
-		this.tryToApplyPerk(talentsConfig.PERKS.BURN_CHANCE, talentsConfig.PERKS.BURN_DURATION, talentsConfig.PERKS.BURN_RESISTANCE, socket, mob, (buffInstace) => this.triggerMobBurn(dmg, crit, mob, buffInstace, socket));
+	public applyHurtPerks(dmg: number, crit: boolean, attacker: PLAYER, target: PLAYER) {
+		this.tryToApplyPerk(talentsConfig.PERKS.STUN_CHANCE, talentsConfig.PERKS.STUN_DURATION, talentsConfig.PERKS.STUN_RESISTANCE, attacker, target);
+		this.tryToApplyPerk(talentsConfig.PERKS.CRIPPLE_CHANCE, talentsConfig.PERKS.CRIPPLE_DURATION, talentsConfig.PERKS.CRIPPLE_RESISTANCE, attacker, target);
+		this.tryToApplyPerk(talentsConfig.PERKS.BLEED_CHANCE, talentsConfig.PERKS.BLEED_DURATION, talentsConfig.PERKS.BLEED_RESISTANCE, attacker, target, (buffInstace) => this.triggerBleed(dmg, crit, buffInstace, attacker, target));
+		this.tryToApplyPerk(talentsConfig.PERKS.FREEZE_CHANCE, talentsConfig.PERKS.FREEZE_DURATION, talentsConfig.PERKS.FREEZE_RESISTANCE, attacker, target);
+		this.tryToApplyPerk(talentsConfig.PERKS.BURN_CHANCE, talentsConfig.PERKS.BURN_DURATION, talentsConfig.PERKS.BURN_RESISTANCE, attacker, target, (buffInstace) => this.triggerBurn(dmg, crit, buffInstace, attacker, target));
 		
 		// TODO
 		// let buffPerks = this.services.getBuffPerks();
 		// for (let [perkChanceName, perkDurationName] of buffPerks) {
-			// this.tryToApplySocketPerk(perkChanceName, perkDurationName, null, mob, socket, (buffInstace) => this.onSocketBuffPerkActivated(socket, perkChanceName));
+		// 	this.tryToApplyPerk(perkChanceName, perkDurationName, null, socket, socket, (buffInstace) => this.onSocketBuffPerkActivated(socket, perkChanceName));
 		// }
-	}
-	
-	public applyMobHurtPerks(dmg: number, crit: boolean, mob: MOB_INSTANCE, socket: GameSocket) {
-		this.tryToApplyPerk(talentsConfig.PERKS.STUN_CHANCE, talentsConfig.PERKS.STUN_DURATION, talentsConfig.PERKS.STUN_RESISTANCE, mob, socket);
-		this.tryToApplyPerk(talentsConfig.PERKS.CRIPPLE_CHANCE, talentsConfig.PERKS.CRIPPLE_DURATION, talentsConfig.PERKS.CRIPPLE_RESISTANCE, mob, socket);
-		this.tryToApplyPerk(talentsConfig.PERKS.BLEED_CHANCE, talentsConfig.PERKS.BLEED_DURATION, talentsConfig.PERKS.BLEED_RESISTANCE, mob, socket, (buffInstace) => this.triggerSocketBleed(dmg, crit, buffInstace, socket));
-		this.tryToApplyPerk(talentsConfig.PERKS.FREEZE_CHANCE, talentsConfig.PERKS.FREEZE_DURATION, talentsConfig.PERKS.FREEZE_RESISTANCE, mob, socket);
-		this.tryToApplyPerk(talentsConfig.PERKS.BURN_CHANCE, talentsConfig.PERKS.BURN_DURATION, talentsConfig.PERKS.BURN_RESISTANCE, mob, socket, (buffInstace) => this.triggerSocketBurn(dmg, crit, buffInstace, socket));
 	}
 
 	public tryToApplyPerk(perkChanceName: string, perkDurationName: string, perkResistanceName: string, attacker: PLAYER, target: PLAYER, onPerkActivated = (buffInstace: BUFF_INSTANCE) => {}, onPerkCleared = () => {}) {
@@ -187,14 +179,20 @@ export default class TalentsController extends MasterController {
 		return perkBuffs;
 	}
 
-	protected triggerMobBleed(dmg: number, crit: boolean, mob: MOB_INSTANCE, buffInstace: BUFF_INSTANCE, socket: GameSocket) {
+	protected triggerBleed(dmg: number, crit: boolean, buffInstance: BUFF_INSTANCE, attacker: PLAYER, target: PLAYER) {
 		let bleedDmg = this.services.getBleedDmg(dmg);
-		this.tickMobDmg(bleedDmg, crit, buffInstace, mob, combatConfig.HIT_CAUSE.BLEED, talentsConfig.PERKS_INFO.BLEED_TICK_TIME, 0, socket);
+		this.tickDmg(bleedDmg, crit, buffInstance, combatConfig.HIT_CAUSE.BLEED, talentsConfig.PERKS_INFO.BLEED_TICK_TIME, attacker, target);
 	}
 
-	protected triggerMobBurn(dmg: number, crit: boolean, mob: MOB_INSTANCE, buffInstace: BUFF_INSTANCE, socket: GameSocket) {
+	protected triggerBurn(dmg: number, crit: boolean, buffInstance: BUFF_INSTANCE, attacker: PLAYER, target: PLAYER) {
 		let burnDmg = this.services.getBurnDmg(dmg);
-		this.tickMobDmg(burnDmg, crit, buffInstace, mob, combatConfig.HIT_CAUSE.BURN, talentsConfig.PERKS_INFO.BURN_TICK_TIME, 0, socket);
+		this.tickDmg(burnDmg, crit, buffInstance, combatConfig.HIT_CAUSE.BURN, talentsConfig.PERKS_INFO.BURN_TICK_TIME, attacker, target);
+	}
+
+	protected tickDmg(dmg: number, crit: boolean, buffInstance: BUFF_INSTANCE, cause: string, interval: number, attacker: PLAYER, target: PLAYER) {
+		isSocket(target) 
+			? this.tickSocketDmg(dmg, crit, buffInstance, cause, interval, 0, <GameSocket>target)
+			: this.tickMobDmg(dmg, crit, buffInstance, <MOB_INSTANCE>target, cause, interval, 0, <GameSocket>attacker);
 	}
 
 	protected tickMobDmg(dmg: number, crit: boolean, buffInstance: BUFF_INSTANCE, mob: MOB_INSTANCE, cause: string, interval: number, tickIndex: number, socket: GameSocket) {
@@ -212,16 +210,6 @@ export default class TalentsController extends MasterController {
 		}, interval * 1000 - (tickIndex === 0 ? 100 : 0)); // reducing 100 ms so all the ticks will fit in the time
 		
 		buffInstance.onPerkCleared = () => clearTimeout(buffTimer);
-	}
-
-	protected triggerSocketBleed(dmg: number, crit: boolean, buffInstace: BUFF_INSTANCE, socket: GameSocket) {
-		let bleedDmg = this.services.getBleedDmg(dmg);
-		this.tickSocketDmg(bleedDmg, crit, buffInstace, combatConfig.HIT_CAUSE.BLEED, talentsConfig.PERKS_INFO.BLEED_TICK_TIME, 0, socket);
-	}
-
-	protected triggerSocketBurn(dmg: number, crit: boolean, buffInstace: BUFF_INSTANCE, socket: GameSocket) {
-		let burnDmg = this.services.getBurnDmg(dmg);
-		this.tickSocketDmg(burnDmg, crit, buffInstace, combatConfig.HIT_CAUSE.BURN, talentsConfig.PERKS_INFO.BURN_TICK_TIME, 0, socket);
 	}
 
 	protected tickSocketDmg(dmg: number, crit: boolean, buffInstance: BUFF_INSTANCE, cause: string, interval: number, tickIndex: number, socket: GameSocket) {
