@@ -1,5 +1,5 @@
 import MasterController from '../master/master.controller';
-import TalentsServices from './talents.services';
+import TalentsServices, { getRoom, getId, isSocket, removeBonusPerks, addBonusPerks, modifyBonusPerks } from './talents.services';
 import MobsRouter from '../mobs/mobs.router';
 import talentsConfig from '../talents/talents.config';
 import mobsConfig from '../mobs/mobs.config';
@@ -32,84 +32,63 @@ export default class TalentsController extends MasterController {
 		}
 	}
 
-	public applyHurtMobPerks(dmg: number, crit: boolean, mob: MOB_INSTANCE, socket: GameSocket) {
-		this.tryToApplySocketPerk(talentsConfig.PERKS.STUN_CHANCE, talentsConfig.PERKS.STUN_DURATION, talentsConfig.PERKS.STUN_RESISTANCE, mob, socket);
-		this.tryToApplySocketPerk(talentsConfig.PERKS.CRIPPLE_CHANCE, talentsConfig.PERKS.CRIPPLE_DURATION, talentsConfig.PERKS.CRIPPLE_RESISTANCE, mob, socket);
-		this.tryToApplySocketPerk(talentsConfig.PERKS.BLEED_CHANCE, talentsConfig.PERKS.BLEED_DURATION, talentsConfig.PERKS.BLEED_RESISTANCE, mob, socket, (buffInstace) => this.triggerMobBleed(dmg, crit, mob, buffInstace, socket));
-		this.tryToApplySocketPerk(talentsConfig.PERKS.FREEZE_CHANCE, talentsConfig.PERKS.FREEZE_DURATION, talentsConfig.PERKS.FREEZE_RESISTANCE, mob, socket);
-		this.tryToApplySocketPerk(talentsConfig.PERKS.BURN_CHANCE, talentsConfig.PERKS.BURN_DURATION, talentsConfig.PERKS.BURN_RESISTANCE, mob, socket, (buffInstace) => this.triggerMobBurn(dmg, crit, mob, buffInstace, socket));
+	public applyHurtPerks(dmg: number, crit: boolean, attacker: PLAYER, target: PLAYER) {
+		this.tryToApplyPerk(talentsConfig.PERKS.STUN_CHANCE, talentsConfig.PERKS.STUN_DURATION, talentsConfig.PERKS.STUN_RESISTANCE, attacker, target);
+		this.tryToApplyPerk(talentsConfig.PERKS.CRIPPLE_CHANCE, talentsConfig.PERKS.CRIPPLE_DURATION, talentsConfig.PERKS.CRIPPLE_RESISTANCE, attacker, target);
+		this.tryToApplyPerk(talentsConfig.PERKS.BLEED_CHANCE, talentsConfig.PERKS.BLEED_DURATION, talentsConfig.PERKS.BLEED_RESISTANCE, attacker, target, (buffInstace) => this.triggerBleed(dmg, crit, buffInstace, attacker, target));
+		this.tryToApplyPerk(talentsConfig.PERKS.FREEZE_CHANCE, talentsConfig.PERKS.FREEZE_DURATION, talentsConfig.PERKS.FREEZE_RESISTANCE, attacker, target);
+		this.tryToApplyPerk(talentsConfig.PERKS.BURN_CHANCE, talentsConfig.PERKS.BURN_DURATION, talentsConfig.PERKS.BURN_RESISTANCE, attacker, target, (buffInstace) => this.triggerBurn(dmg, crit, buffInstace, attacker, target));
+		
+		let buffPerks = this.services.getBuffPerks();
+		for (let [perkChanceName, perkDurationName] of buffPerks) {
+			this.tryToApplyPerk(perkChanceName, perkDurationName, null, attacker, attacker, (buffInstace) => this.addBuffBonusPerks(attacker, perkChanceName), () => this.removeBuffBonusPerks(attacker, perkChanceName));
+		}
 	}
-	
-	public applyMobHurtPerks(dmg: number, crit: boolean, mob: MOB_INSTANCE, socket: GameSocket) {
-		this.tryToApplyMobPerk(talentsConfig.PERKS.STUN_CHANCE, talentsConfig.PERKS.STUN_DURATION, talentsConfig.PERKS.STUN_RESISTANCE, mob, socket);
-		this.tryToApplyMobPerk(talentsConfig.PERKS.CRIPPLE_CHANCE, talentsConfig.PERKS.CRIPPLE_DURATION, talentsConfig.PERKS.CRIPPLE_RESISTANCE, mob, socket);
-		this.tryToApplyMobPerk(talentsConfig.PERKS.BLEED_CHANCE, talentsConfig.PERKS.BLEED_DURATION, talentsConfig.PERKS.BLEED_RESISTANCE, mob, socket, (buffInstace) => this.triggerSocketBleed(dmg, crit, buffInstace, socket));
-		this.tryToApplyMobPerk(talentsConfig.PERKS.FREEZE_CHANCE, talentsConfig.PERKS.FREEZE_DURATION, talentsConfig.PERKS.FREEZE_RESISTANCE, mob, socket);
-		this.tryToApplyMobPerk(talentsConfig.PERKS.BURN_CHANCE, talentsConfig.PERKS.BURN_DURATION, talentsConfig.PERKS.BURN_RESISTANCE, mob, socket, (buffInstace) => this.triggerSocketBurn(dmg, crit, buffInstace, socket));
-	}
-	
-	public tryToApplySocketPerk(perkChanceName: string, perkDurationName: string, perkResistanceName: string, mob: MOB_INSTANCE, socket: GameSocket, onPerkActivated = (buffInstace: BUFF_INSTANCE) => {}) {
-		let activated = this.services.isAbilityActivated(perkChanceName, socket);
+
+	public tryToApplyPerk(perkChanceName: string, perkDurationName: string, perkResistanceName: string, attacker: PLAYER, target: PLAYER, onPerkActivated = (buffInstace: BUFF_INSTANCE) => {}, onPerkCleared = () => {}) {
+		let activated = this.services.isAbilityActivated(perkChanceName, attacker);	
 		if (activated) {
-			const resistanceActivated = this.services.isAbilityActivated(perkResistanceName, mob);
+			const resistanceActivated = perkResistanceName && this.services.isAbilityActivated(perkResistanceName, target);
 			if (resistanceActivated) {
 				activated = false;
-				this.io.to(socket.character.room).emit(talentsConfig.CLIENT_GETS.RESISTED_BUFF.name, {
-					target_id: mob.id,
+				this.io.to(getRoom(target)).emit(talentsConfig.CLIENT_GETS.RESISTED_BUFF.name, {
+					target_id: getId(target),
 					key: perkResistanceName,
 				});
 			}
 		}
 		if (activated) {
-			const room = socket.character.room;
-			let duration = this.services.getAbilityPerkValue(perkDurationName, socket);
-			this.io.to(socket.character.room).emit(talentsConfig.CLIENT_GETS.ACTIVATED_BUFF.name, {
-				target_id: mob.id,
+			let duration = this.services.getAbilityPerkValue(perkDurationName, attacker);
+			this.io.to(getRoom(target)).emit(talentsConfig.CLIENT_GETS.ACTIVATED_BUFF.name, {
+				target_id: getId(target),
 				key: perkChanceName,
 				duration,
 			});
-			let clearTimeoutId = setTimeout(() => this.clearMobBuff(room, mob.id, buffInstace), duration * 1000);
+
+			let clearTimeoutId = setTimeout(() => this.clearBuff(target, buffInstace), duration * 1000);
 			var buffInstace = {
 				clearTimeoutId,
 				perkName: perkChanceName,
 				duration,
+				onPerkCleared,
 				initTime: Date.now(),
 			};
-			this.addMobBuff(mob, buffInstace);
+			this.addBuff(target, buffInstace);
 			onPerkActivated(buffInstace);
 		}
 	}
-	
-	public tryToApplyMobPerk(perkChanceName: string, perkDurationName: string, perkResistanceName: string, mob: MOB_INSTANCE, socket: GameSocket, onPerkActivated = (buffInstace: BUFF_INSTANCE) => {}) {
-		let activated = this.services.isAbilityActivated(perkChanceName, mob);
-		if (activated) {
-			const resistanceActivated = this.services.isAbilityActivated(perkResistanceName, socket);
-			if (resistanceActivated) {
-				activated = false;
-				this.io.to(socket.character.room).emit(talentsConfig.CLIENT_GETS.RESISTED_BUFF.name, {
-					target_id: socket.character._id,
-					key: perkResistanceName,
-				});
-			}
+
+	protected clearBuff(target: PLAYER, buffInstace: BUFF_INSTANCE) {
+		return isSocket(target) 
+			? this.clearSocketBuff(<GameSocket>target, buffInstace)
+			: this.clearMobBuff((<MOB_INSTANCE>target).room, (<MOB_INSTANCE>target).id, buffInstace);
 		}
-		if (activated) {
-			let duration = this.services.getAbilityPerkValue(perkDurationName, mob);
-			this.io.to(socket.character.room).emit(talentsConfig.CLIENT_GETS.ACTIVATED_BUFF.name, {
-				target_id: socket.character._id,
-				key: perkChanceName,
-				duration,
-			});
-			let clearTimeoutId = setTimeout(() => this.clearSocketBuff(socket, buffInstace), duration * 1000);
-			var buffInstace = {
-				clearTimeoutId,
-				perkName: perkChanceName,
-				duration,
-				initTime: Date.now(),
-			};
-			let perkBuffs = this.getSocketPerkBuffs(socket, buffInstace.perkName, true);
-			perkBuffs.add(buffInstace);
-			onPerkActivated(buffInstace);
-		}
+		
+	protected addBuff(target: PLAYER, buffInstace: BUFF_INSTANCE) {
+		let buffs = isSocket(target) 
+			? this.getSocketPerkBuffs(<GameSocket>target, buffInstace.perkName, true)
+			: this.getMobPerkBuffs(<MOB_INSTANCE>target, buffInstace.perkName, true);
+		buffs.add(buffInstace);
 	}
 
 	public notifyAboutBuffs(socket: GameSocket) {
@@ -147,7 +126,6 @@ export default class TalentsController extends MasterController {
 
 	protected clearMobBuff(room: string, mobId: string, buffInstance: BUFF_INSTANCE) {
 		clearTimeout(buffInstance.clearTimeoutId);
-		buffInstance.onPerkCleared && buffInstance.onPerkCleared();
 		
 		let roomMap = this.getRoomBuffsInstance(room);
 		let mobsBuff = this.getMobBuffsInstance(room, mobId);
@@ -164,6 +142,7 @@ export default class TalentsController extends MasterController {
 		if (roomMap.size === 0) {
 			this.roomToBuff.delete(room);
 		}
+		buffInstance.onPerkCleared();
 	} 
 	
 	public clearMobBuffs(room: string, mobId: string) {
@@ -177,16 +156,22 @@ export default class TalentsController extends MasterController {
 	
 	protected clearSocketBuff(socket: GameSocket, buffInstance: BUFF_INSTANCE): void {
 		clearTimeout(buffInstance.clearTimeoutId);
-		buffInstance.onPerkCleared && buffInstance.onPerkCleared();
 		let perkBuffs = this.getSocketPerkBuffs(socket, buffInstance.perkName);
 		perkBuffs.delete(buffInstance);
 		if (perkBuffs.size === 0) {
 			socket.buffs.delete(buffInstance.perkName);
 		}
+		buffInstance.onPerkCleared();
 	}
 	
 	public clearSocketBuffs(socket: GameSocket): void {
 		socket.buffs.forEach(perkBuffs => perkBuffs.forEach(buffInstance => this.clearSocketBuff(socket, buffInstance)));
+	}
+
+	protected getPerkBuffs(target: PLAYER, perkName: string, createIfMissing: boolean = false) {
+		return isSocket(target) 
+			? this.getSocketPerkBuffs(<GameSocket>target, perkName, createIfMissing)
+			: this.getMobPerkBuffs(<MOB_INSTANCE>target, perkName, createIfMissing);
 	}
 	
 	protected getSocketPerkBuffs(socket: GameSocket, perkName: string, createIfMissing: boolean = false) {
@@ -200,14 +185,32 @@ export default class TalentsController extends MasterController {
 		return perkBuffs;
 	}
 
-	protected triggerMobBleed(dmg: number, crit: boolean, mob: MOB_INSTANCE, buffInstace: BUFF_INSTANCE, socket: GameSocket) {
-		let bleedDmg = this.services.getBleedDmg(dmg);
-		this.tickMobDmg(bleedDmg, crit, buffInstace, mob, combatConfig.HIT_CAUSE.BLEED, talentsConfig.PERKS_INFO.BLEED_TICK_TIME, 0, socket);
+	protected getMobPerkBuffs(mob: MOB_INSTANCE, perkName: string, createIfMissing: boolean = false) {
+		let mobBuffs = this.getMobBuffsInstance(mob.room, mob.id, createIfMissing);
+		let perkBuffs = mobBuffs.get(perkName);
+		if (!perkBuffs) {
+			perkBuffs = new Set();
+			if (createIfMissing) {
+				mobBuffs.set(perkName, perkBuffs);
+			}
+		}
+		return perkBuffs;
 	}
 
-	protected triggerMobBurn(dmg: number, crit: boolean, mob: MOB_INSTANCE, buffInstace: BUFF_INSTANCE, socket: GameSocket) {
+	protected triggerBleed(dmg: number, crit: boolean, buffInstance: BUFF_INSTANCE, attacker: PLAYER, target: PLAYER) {
+		let bleedDmg = this.services.getBleedDmg(dmg);
+		this.tickDmg(bleedDmg, crit, buffInstance, combatConfig.HIT_CAUSE.BLEED, talentsConfig.PERKS_INFO.BLEED_TICK_TIME, attacker, target);
+	}
+
+	protected triggerBurn(dmg: number, crit: boolean, buffInstance: BUFF_INSTANCE, attacker: PLAYER, target: PLAYER) {
 		let burnDmg = this.services.getBurnDmg(dmg);
-		this.tickMobDmg(burnDmg, crit, buffInstace, mob, combatConfig.HIT_CAUSE.BURN, talentsConfig.PERKS_INFO.BURN_TICK_TIME, 0, socket);
+		this.tickDmg(burnDmg, crit, buffInstance, combatConfig.HIT_CAUSE.BURN, talentsConfig.PERKS_INFO.BURN_TICK_TIME, attacker, target);
+	}
+
+	protected tickDmg(dmg: number, crit: boolean, buffInstance: BUFF_INSTANCE, cause: string, interval: number, attacker: PLAYER, target: PLAYER) {
+		isSocket(target) 
+			? this.tickSocketDmg(dmg, crit, buffInstance, cause, interval, 0, <GameSocket>target)
+			: this.tickMobDmg(dmg, crit, buffInstance, <MOB_INSTANCE>target, cause, interval, 0, <GameSocket>attacker);
 	}
 
 	protected tickMobDmg(dmg: number, crit: boolean, buffInstance: BUFF_INSTANCE, mob: MOB_INSTANCE, cause: string, interval: number, tickIndex: number, socket: GameSocket) {
@@ -227,16 +230,6 @@ export default class TalentsController extends MasterController {
 		buffInstance.onPerkCleared = () => clearTimeout(buffTimer);
 	}
 
-	protected triggerSocketBleed(dmg: number, crit: boolean, buffInstace: BUFF_INSTANCE, socket: GameSocket) {
-		let bleedDmg = this.services.getBleedDmg(dmg);
-		this.tickSocketDmg(bleedDmg, crit, buffInstace, combatConfig.HIT_CAUSE.BLEED, talentsConfig.PERKS_INFO.BLEED_TICK_TIME, 0, socket);
-	}
-
-	protected triggerSocketBurn(dmg: number, crit: boolean, buffInstace: BUFF_INSTANCE, socket: GameSocket) {
-		let burnDmg = this.services.getBurnDmg(dmg);
-		this.tickSocketDmg(burnDmg, crit, buffInstace, combatConfig.HIT_CAUSE.BURN, talentsConfig.PERKS_INFO.BURN_TICK_TIME, 0, socket);
-	}
-
 	protected tickSocketDmg(dmg: number, crit: boolean, buffInstance: BUFF_INSTANCE, cause: string, interval: number, tickIndex: number, socket: GameSocket) {
 		let buffTimer = setTimeout(() => {
 			this.tickSocketDmg(dmg, crit, buffInstance, cause, interval, tickIndex + 1, socket);
@@ -247,6 +240,24 @@ export default class TalentsController extends MasterController {
 			}, socket);
 		}, interval * 1000 - (tickIndex === 0 ? 100 : 0)); // reducing 200 ms so all the ticks will fit in the time
 		buffInstance.onPerkCleared = () => clearTimeout(buffTimer);
+	}
+
+	protected addBuffBonusPerks(target: PLAYER, perkName: string) {
+		let perkBuffs = this.getPerkBuffs(target, perkName);
+		if (perkBuffs.size === 1) {
+			modifyBonusPerks(target, () => {
+				addBonusPerks({perks: this.services.getBonusPerks(perkName)}, target);			
+			});
+		}
+	}
+	
+	protected removeBuffBonusPerks(target: PLAYER, perkName: string) {
+		let perkBuffs = this.getPerkBuffs(target, perkName);
+		if (perkBuffs.size === 0) {
+			modifyBonusPerks(target, () => {
+				removeBonusPerks({perks: this.services.getBonusPerks(perkName)}, target);			
+			});
+		}
 	}
 
 	public isMobInBuff(room: string, mobId: string, perkName: string): boolean {
@@ -330,16 +341,6 @@ export default class TalentsController extends MasterController {
 			}
 		}
 		return mobBuffs;
-	}
-
-	protected addMobBuff(mob: MOB_INSTANCE, buffInstace: BUFF_INSTANCE) {
-		let mobBuffs = this.getMobBuffsInstance(mob.room, mob.id, true);
-		let perkBuffs = mobBuffs.get(buffInstace.perkName);
-		if (!perkBuffs) {
-			perkBuffs = new Set();
-			mobBuffs.set(buffInstace.perkName, perkBuffs);
-		}
-		perkBuffs.add(buffInstace);
 	}
 
     // HTTP functions

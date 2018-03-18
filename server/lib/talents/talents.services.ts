@@ -7,6 +7,7 @@ import TalentsController from './talents.controller';
 import { getRoomInfo } from '../rooms/rooms.services';
 import { EQUIPS_SCHEMA } from '../equips/equips.model';
 import { getServices } from '../main/bootstrap';
+import statsConfig from '../stats/stats.config';
 
 export default class TalentsServices extends MasterServices {
 	private controller: TalentsController;
@@ -14,6 +15,8 @@ export default class TalentsServices extends MasterServices {
 	private perksInfo: Map<string, ABILITY_PERK_INSTANCE[]> = new Map();
 	// primary ability => lvl|key => spell
 	private spellsInfo: Map<string, Map<number|string, ABILITY_SPELL_MODEL>> = new Map();
+	// buffPerkChance => buffPerkDuration
+	private buffPerks: Map<string, string> = new Map();
 
 	protected socketioRouter: SocketioRouter;
 	
@@ -21,6 +24,23 @@ export default class TalentsServices extends MasterServices {
 		this.controller = files.controller;
 		super.init(files, app);
 		this.socketioRouter = files.routers.socketio;
+	}
+
+    public setBuffPerks() {
+		let {perks} = this.socketioRouter.getConfig();
+		for (let perkName in perks) {
+			let perkConfig = perks[perkName];
+			if (perkConfig.bonusPerks) {
+				let perkDurationName = perkName.replace("Chance", "Duration");
+				if (perkDurationName !== perkName && perks[perkDurationName]) {
+					this.buffPerks.set(perkName, perkDurationName);
+				}
+			}
+		}
+	}
+	
+	public getBuffPerks() {
+		return this.buffPerks;
 	}
 
 	public getEmptyCharAbility(ability: string): CHAR_ABILITY_TALENT {
@@ -119,6 +139,10 @@ export default class TalentsServices extends MasterServices {
     public getPerkDefault(perk: string): number {
         return this.getPerkConfig(perk).default || 0;
     }
+    
+    public getBonusPerks(perk: string): PERK_MAP {
+        return this.getPerkConfig(perk).bonusPerks || {};
+    }
 
 	public getTargetsHit(targetIds: string[], socket: GameSocket): string[] {
 		if (targetIds.length <= 1) {
@@ -168,12 +192,12 @@ export default class TalentsServices extends MasterServices {
 		return this.getAbilityPerkValue(talentsConfig.PERKS.MIN_DMG_MODIFIER, attacker);
     }
     
-	public getAtkSpeedModifier(socket: GameSocket, ability?: string): number {
-		return this.getCharPerkValue(talentsConfig.PERKS.ATK_SPEED_MODIFIER_KEY, socket, ability);
+	public getAtkSpeedModifier(target: PLAYER, ability?: string): number {
+		return this.getAbilityPerkValue(talentsConfig.PERKS.ATK_SPEED_MODIFIER_KEY, target, ability);
 	}
 
-	public getThreatModifier(socket: GameSocket): number {
-		const threatModifier = this.getAbilityPerkValue(talentsConfig.PERKS.THREAT_MODIFIER_KEY, socket);
+	public getThreatModifier(target: PLAYER): number {
+		const threatModifier = this.getAbilityPerkValue(talentsConfig.PERKS.THREAT_MODIFIER_KEY, target);
 		return threatModifier;
 	}
 
@@ -191,28 +215,32 @@ export default class TalentsServices extends MasterServices {
 		return this.getAbilityPerkValue(talentsConfig.PERKS.DEFENCE_BONUS, target);
     }
     
-	public getHpRegenModifier(socket: GameSocket): number {
-		return this.getAbilityPerkValue(talentsConfig.PERKS.HP_REGEN_MODIFIER, socket);
+	public getHpRegenModifier(target: PLAYER): number {
+		return this.getAbilityPerkValue(talentsConfig.PERKS.HP_REGEN_MODIFIER, target);
 	}
 	
-	public getMpRegenModifier(socket: GameSocket): number {
-		return this.getAbilityPerkValue(talentsConfig.PERKS.MP_REGEN_MODIFIER, socket);
+	public getMpRegenModifier(target: PLAYER): number {
+		return this.getAbilityPerkValue(talentsConfig.PERKS.MP_REGEN_MODIFIER, target);
 	}
 	
-	public getHpRegenInterval(socket: GameSocket): number {
-		return this.getAbilityPerkValue(talentsConfig.PERKS.HP_REGEN_INTERVAL, socket) * 1000;
+	public getHpRegenInterval(target: PLAYER): number {
+		return this.getAbilityPerkValue(talentsConfig.PERKS.HP_REGEN_INTERVAL, target) * 1000;
 	}
 	
-	public getMpRegenInterval(socket: GameSocket): number {
-		return this.getAbilityPerkValue(talentsConfig.PERKS.MP_REGEN_INTERVAL, socket) * 1000;
+	public getMpRegenInterval(target: PLAYER): number {
+		return this.getAbilityPerkValue(talentsConfig.PERKS.MP_REGEN_INTERVAL, target) * 1000;
 	}
 
-	public getHpBonus(socket: GameSocket, ability?: string): number {
-		return this.getCharPerkValue(talentsConfig.PERKS.HP_BONUS, socket, ability);
+	public getHpBonus(target: PLAYER, ability?: string): number {
+		return this.getAbilityPerkValue(talentsConfig.PERKS.HP_BONUS, target, ability);
 	}
 	
-	public getMpBonus(socket: GameSocket, ability?: string): number {
-		return this.getCharPerkValue(talentsConfig.PERKS.MP_BONUS, socket, ability);
+	public getMpBonus(target: PLAYER, ability?: string): number {
+		return this.getAbilityPerkValue(talentsConfig.PERKS.MP_BONUS, target, ability);
+	}
+
+	public getMpUsageModifier(target: PLAYER, ability?: string): number {
+		return this.getAbilityPerkValue(talentsConfig.PERKS.MP_COST, target, ability);
 	}
 	
 	public isAbilityActivated(perk: string, target: PLAYER): boolean {
@@ -221,14 +249,10 @@ export default class TalentsServices extends MasterServices {
 		return activated;
 	}
 	
-	public getAbilityPerkValue(perk: string, target: PLAYER): number {
-		return this.isSocket(target) 
-			? this.getCharPerkValue(perk, <GameSocket>target)
+	public getAbilityPerkValue(perk: string, target: PLAYER, ability?: string): number {
+		return isSocket(target) 
+			? this.getCharPerkValue(perk, <GameSocket>target, ability)
 			: this.getMobPerkValue(perk, <MOB_INSTANCE>target); 
-	}
-
-	protected isSocket(target: PLAYER): boolean {
-		return typeof (<MOB_INSTANCE>target).mobId === "undefined";
 	}
 	
 	protected getCharPerkValue(perk: string, socket: GameSocket, ability?: string): number {
@@ -239,33 +263,36 @@ export default class TalentsServices extends MasterServices {
             return perkConfig.default || 0;
         }
         const level = (talent.perks[perk] || 0) + (socket.character.charTalents._doc[talentsConfig.CHAR_TALENT].perks[perk] || 0);
-        let rawPerkValue = this.getPerkLevelValue(perk, level);
-        let bonusPerkValue = socket.bonusPerks[perk] || 0;
-		let perkValue = this.getSafePerkValue(perk, rawPerkValue + bonusPerkValue);
-		if (socket.currentSpell) {
-			// send the higher value - perk or spell
-			let spellPerkValue = socket.currentSpell.perks[perk] || 0;
-			perkValue = this.getBetterPerkValue(spellPerkValue, perkValue, perk);
-		}
+		let perkValue = this.getPerkLevelValue(perk, level);
+		perkValue = this.addPerkValueBonuses(socket, perk, perkValue);
 		return perkValue;
 	}
-
+	
 	protected getMobPerkValue(perk: string, mob: MOB_INSTANCE): number {
 		// get the perk if exists, otherwise get its default
 		let perkValue = (mob.perks || {})[perk] || this.getPerkLevelValue(perk, 0);
 		
-		if (mob.currentSpell) {
-			// send the higher value - perk or spell
-			let spellPerkValue = mob.currentSpell.perks[perk] || 0;
-			perkValue = this.getBetterPerkValue(spellPerkValue, perkValue, perk);
-		}
+		perkValue = this.addPerkValueBonuses(mob, perk, perkValue);
 		
 		return perkValue;
 	}
 
-	protected getBetterPerkValue(value1: number, value2: number, perk: string): number {
+	protected addPerkValueBonuses(target: PLAYER, perkName: string, perkValue: number): number {
+		if (target.currentSpell) {
+			// send the higher value - perk or spell
+			let spellPerkValue = target.currentSpell.perks[perkName] || 0;
+			perkValue = this.getBetterPerkValue(perkName, spellPerkValue, perkValue);
+		}
+		let bonusPerkValue = target.bonusPerks[perkName] || 0;
+		let safePerkValueWithBonus = this.getSafePerkValue(perkName, perkValue + bonusPerkValue);
+		// we want to add the bonus up to the max value, after that take the original value
+		perkValue = this.getBetterPerkValue(perkName, perkValue, safePerkValueWithBonus);
+		return perkValue;
+	}
+
+	protected getBetterPerkValue(perk: string, ...values: number[]): number {
 		const perkConfig = this.getPerkConfig(perk);
-		return perkConfig.value > 0 ? Math.max(value1, value2) : Math.min(value1, value2);
+		return perkConfig.value > 0 ? Math.max(...values) : Math.min(...values);
 	}
 
 	protected isFrozen(target: PLAYER): boolean {
@@ -277,7 +304,7 @@ export default class TalentsServices extends MasterServices {
 	}
 
 	protected hasBuff(target: PLAYER, perkName: string): boolean {
-		return this.isSocket(target) 
+		return isSocket(target) 
 			? this.controller.isSocketInBuff(<GameSocket>target, perkName)
 			: this.controller.isMobInBuff((<MOB_INSTANCE>target).room, (<MOB_INSTANCE>target).id, perkName);
 	}
@@ -396,6 +423,10 @@ export default class TalentsServices extends MasterServices {
 			if (+perk.default) {
 				perkModel.default = +perk.default;
 			}
+			if (perk.bonusPerks) {
+				let {perks} = getPerksSchema(perk.bonusPerks);
+				perkModel.bonusPerks = perks;
+			}
 			perks[perk.key] = perkModel;
 		});
 
@@ -466,22 +497,22 @@ export function extendMobSchemaWithTalents(mob: any, mobSchema: MOB_MODEL): void
 
 	(mob.spells || []).forEach(spell => {
 		mobSchema.spells = mobSchema.spells || {};
-        let spellSchema: MOB_SPELL = <MOB_SPELL>getPerksSchema(spell);
+        let spellSchema: MOB_SPELL = <MOB_SPELL>getPerksSchema(spell.perks);
         spellSchema.minTime = spell.minTime;
         spellSchema.maxTime = spell.maxTime;
         mobSchema.spells[spell.key] = spellSchema;
     });
     
     if (mob.deathRattle) {
-        let deathRattle: MOB_DEATH_SPELL = <MOB_DEATH_SPELL>getPerksSchema(mob.deathRattle);
+        let deathRattle: MOB_DEATH_SPELL = <MOB_DEATH_SPELL>getPerksSchema(mob.deathRattle.perks);
         deathRattle.key = mob.deathRattle.key;
         mobSchema.deathSpell = deathRattle;
     }
 }
 
-function getPerksSchema(perksObject: any): {perks: PERK_MAP} {
+function getPerksSchema(perkList?: any[]): {perks: PERK_MAP} {
     let perks: PERK_MAP = {};
-    perksObject.perks.forEach(perk => {
+    (perkList || []).forEach(perk => {
         perks[perk.key] = +perk.value;
     });
     let perksObjectResult = {
@@ -541,29 +572,53 @@ export function createBonusPerks(socket: GameSocket) {
     }
 }
 
-export function addBonusPerks(equip: ITEM_INSTANCE, socket: GameSocket) {
-    for (let perkName in (equip.perks || {})) {
-        socket.bonusPerks[perkName] = socket.bonusPerks[perkName] || 0;
-        socket.bonusPerks[perkName] += equip.perks[perkName];
+export function addBonusPerks({perks = {}}: {perks?: PERK_MAP}, target: PLAYER) {
+    for (let perkName in perks || {}) {
+        target.bonusPerks[perkName] = target.bonusPerks[perkName] || 0;
+        target.bonusPerks[perkName] += perks[perkName];
     }
 }
 
-export function removeBonusPerks(equip: ITEM_INSTANCE, socket: GameSocket) {
-    for (let perkName in (equip.perks || {})) {
-        socket.bonusPerks[perkName] -= equip.perks[perkName];
-        if (!socket.bonusPerks[perkName]) {
-            delete socket.bonusPerks[perkName];
+export function removeBonusPerks({perks = {}}: {perks?: PERK_MAP}, target: PLAYER) {
+    for (let perkName in perks || {}) {
+        target.bonusPerks[perkName] -= perks[perkName];
+        if (!target.bonusPerks[perkName]) {
+            delete target.bonusPerks[perkName];
         }
     }
 }
 
-export function getBonusPerks(socket: GameSocket, ability?: string): PERKS_DIFF {
+export function modifyBonusPerks(target: PLAYER, modificationsCallback: Function) {
+	const oldStats = getBonusPerks(target);
+	modificationsCallback();
+	const newStats = getBonusPerks(target);
+	if (isSocket(target)) {
+		// currently only socket supports these perks..
+		updateBonusPerks(<GameSocket>target, oldStats, newStats);
+	}
+}
+
+export function getBonusPerks(target: PLAYER, ability?: string): PERKS_DIFF {
     const talentsServices = getTalentsServices();
     return {
-        hp: talentsServices.getHpBonus(socket, ability),
-        mp: talentsServices.getMpBonus(socket, ability),
-        atkSpeed: talentsServices.getAtkSpeedModifier(socket, ability),
+        hp: talentsServices.getHpBonus(target, ability),
+        mp: talentsServices.getMpBonus(target, ability),
+        atkSpeed: talentsServices.getAtkSpeedModifier(target, ability),
+        mpCost: talentsServices.getMpUsageModifier(target, ability),
     };
+}
+
+export function updateBonusPerks(socket: GameSocket, oldStats: PERKS_DIFF, newStats: PERKS_DIFF) {
+	if (oldStats.hp != newStats.hp || oldStats.mp != newStats.mp) {
+		const stats = {hp: newStats.hp - oldStats.hp, mp: newStats.mp - oldStats.mp};
+		socket.emitter.emit(statsConfig.SERVER_INNER.STATS_ADD.name, { stats }, socket);
+	}
+	if (oldStats.atkSpeed != newStats.atkSpeed) {
+		socket.emit(talentsConfig.CLIENT_GETS.UPDATE_ATTACK_SPEED.name, {speed: newStats.atkSpeed});
+	}
+	if (oldStats.mpCost != newStats.mpCost) {
+		socket.emit(talentsConfig.CLIENT_GETS.UPDATE_MANA_COST.name, {mpCost: newStats.mpCost});
+	}
 }
 
 export function getEmptyBonusPerks(): PERKS_DIFF {
@@ -571,7 +626,8 @@ export function getEmptyBonusPerks(): PERKS_DIFF {
     return { 
         hp: talentsServices.getPerkDefault(talentsConfig.PERKS.HP_BONUS), 
         mp: talentsServices.getPerkDefault(talentsConfig.PERKS.MP_BONUS), 
-        atkSpeed: talentsServices.getPerkDefault(talentsConfig.PERKS.ATK_SPEED_MODIFIER_KEY),
+		atkSpeed: talentsServices.getPerkDefault(talentsConfig.PERKS.ATK_SPEED_MODIFIER_KEY),
+		mpCost: talentsServices.getPerkDefault(talentsConfig.PERKS.MP_COST)
     };
 }
 
@@ -594,4 +650,24 @@ export function slightlyTweakPerks(perksObject: PERK_MAP): PERK_MAP {
     }    
 
     return result;
+}
+
+export function isSocket(target: PLAYER): boolean {
+	return typeof (<MOB_INSTANCE>target).mobId === "undefined";
+}
+
+export function getRoom(target: PLAYER): string {
+	return isSocket(target) 
+		? (<GameSocket>target).character.room
+		: (<MOB_INSTANCE>target).room;
+}
+
+export function getId(target: PLAYER): string {
+	return isSocket(target) 
+		? (<GameSocket>target).character._id
+		: (<MOB_INSTANCE>target).id;
+}
+
+export function getMpUsage(mp: number, socket: GameSocket): number {
+	return Math.round(mp * socket.getMpUsageModifier());
 }

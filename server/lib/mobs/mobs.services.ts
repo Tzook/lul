@@ -2,8 +2,8 @@
 import MasterServices from '../master/master.services';
 import * as _ from "underscore";
 import { doesChanceWork } from '../drops/drops.services';
-import config from "../mobs/mobs.config";
 import { extendMobSchemaWithTalents } from '../talents/talents.services';
+import mobsConfig from '../mobs/mobs.config';
 
 export default class MobsServices extends MasterServices {
 	private mobsInfo: Map<string, MOB_MODEL> = new Map();
@@ -27,8 +27,8 @@ export default class MobsServices extends MasterServices {
 	}
 	
 	public didHitMob(mobLvl: number, myLvl: number): boolean {
-		const lvlDifference = myLvl - mobLvl + config.MISS_CHANCE_LVLS;
-		const chance = lvlDifference * config.MISS_CHANCE_PER_LVL;
+		const lvlDifference = myLvl - mobLvl + mobsConfig.MISS_CHANCE_LVLS;
+		const chance = lvlDifference * mobsConfig.MISS_CHANCE_PER_LVL;
 		return doesChanceWork(chance);
 	}
 
@@ -85,4 +85,9 @@ export default class MobsServices extends MasterServices {
 
 export function getDamageRange(min: number, max: number): number {
 	return _.random(Math.floor(min) || 1, Math.floor(max));
+}
+
+export function getSpawnIntervalTime(spawn: SPAWN_INSTANCE) {
+	let minOffset = spawn.interval > 1 ? -mobsConfig.SPAWN_INTERVAL_OFFSET : 0;
+	return spawn.interval * 1000 + _.random(minOffset, mobsConfig.SPAWN_INTERVAL_OFFSET);
 }

@@ -126,8 +126,8 @@ interface GameSocket extends SocketIO.Socket {
     bitch: boolean;
     alive: boolean,
     lastAttackLoad: number;
-    bonusStats?: BASE_STATS_MODEL;
-    bonusPerks?: PERK_MAP;
+    bonusStats: BASE_STATS_MODEL;
+    bonusPerks: PERK_MAP;
     throttles: Map<Function, number>;
     maxHp: number;
     maxMp: number;
@@ -148,6 +148,7 @@ interface GameSocket extends SocketIO.Socket {
     getMpRegenModifier: () => number
     getHpRegenInterval: () => number
     getMpRegenInterval: () => number
+    getMpUsageModifier: () => number
     currentSpell?: ABILITY_SPELL_MODEL
     buffs: Map<string, Set<BUFF_INSTANCE>>
     emitter: NodeJS.EventEmitter
@@ -254,18 +255,19 @@ interface MOB_DEATH_SPELL {
 }
 
 interface MOB_INSTANCE extends MOB_MODEL {
-    id?: string, // a unique id for this specific mob
-    x?: number,
-    y?: number,
-    room?: string,
-    dmgers?: Map<string, number>
-    threat?: {
+    id: string, // a unique id for this specific mob
+    x: number,
+    y: number,
+    room: string,
+    dmgers: Map<string, number>
+    threat: {
         top?: string
         map: Map<string, number>
     }
-    dmged?: number
+    dmged: number
     spawn?: SPAWN_INSTANCE,
     currentSpell?: MOB_SPELL
+    bonusPerks: PERK_MAP
 }
 interface ROOM_MOBS {
     spawns: SPAWN_INSTANCE[],
@@ -391,6 +393,7 @@ interface PERK_CONFIG {
     max?: number,
     acc?: number,
 	default?: number, 
+	bonusPerks?: PERK_MAP, 
 }
 
 interface CHAR_ABILITY_TALENT {
@@ -402,7 +405,8 @@ interface CHAR_ABILITY_TALENT {
 }
 
 interface PERKS_DIFF extends BASE_STATS_MODEL {
-    atkSpeed: number
+    atkSpeed: number,
+    mpCost: number
 }
 
 interface BUFF_INSTANCE {

@@ -58,7 +58,7 @@ export default class ItemsRouter extends SocketioRouterBase {
         }
         let slot = this.middleware.getFirstAvailableSlot(socket);
         if (!(slot >= 0)) { 
-            return this.sendError(data, socket, config.LOGS.INVENTORY_FULL.MSG, true, true);
+            return this.sendError(data, socket, config.LOGS.INVENTORY_FULL.MSG);
         }	
         this[config.SERVER_INNER.ITEM_ADD.name]({slots: [slot], item}, socket);
         callback();

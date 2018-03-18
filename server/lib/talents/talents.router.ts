@@ -1,7 +1,7 @@
 import SocketioRouterBase from '../socketio/socketio.router.base';
 import TalentsMiddleware from './talents.middleware';
 import TalentsController from './talents.controller';
-import TalentsServices, { getTalent, hasAbility, removeBonusPerks, createBonusPerks, addBonusPerks } from './talents.services';
+import TalentsServices, { getTalent, hasAbility, removeBonusPerks, createBonusPerks, addBonusPerks, updateBonusPerks, modifyBonusPerks, getMpUsage } from './talents.services';
 import talentsConfig from '../talents/talents.config';
 import statsConfig from '../stats/stats.config';
 import StatsRouter from '../stats/stats.router';
@@ -33,6 +33,10 @@ export default class TalentsRouter extends SocketioRouterBase {
 			this.middleware.isBoss.bind(this.middleware),
 			this.controller.generateTalents.bind(this.controller));
 	}	
+	
+    [talentsConfig.GLOBAL_EVENTS.CONFIG_READY.name]() {
+		this.services.setBuffPerks();
+    }
 
     public onConnected(socket: GameSocket) {
 		socket.getTargetsHit = (targetIds) => this.services.getTargetsHit(targetIds, socket);
@@ -47,6 +51,7 @@ export default class TalentsRouter extends SocketioRouterBase {
 		socket.getMpRegenModifier = () => this.services.getMpRegenModifier(socket);
 		socket.getHpRegenInterval = () => this.services.getHpRegenInterval(socket);
 		socket.getMpRegenInterval = () => this.services.getMpRegenInterval(socket);
+		socket.getMpUsageModifier = () => this.services.getMpUsageModifier(socket);
         socket.buffs = new Map();
         createBonusPerks(socket);
         process.nextTick(() => this.addStats(socket));
@@ -88,7 +93,7 @@ export default class TalentsRouter extends SocketioRouterBase {
 		const exp = this.services.getAbilityExp(dmg, mobModel);
 		this.emitter.emit(talentsConfig.SERVER_INNER.GAIN_ABILITY_EXP.name, {exp}, socket);
 		if (mob.hp > 0 && cause !== combatConfig.HIT_CAUSE.BLEED && cause !== combatConfig.HIT_CAUSE.BURN) {
-			this.controller.applyHurtMobPerks(dmg, crit, mob, socket);
+			this.controller.applyHurtPerks(dmg, crit, socket, mob);
 		}
 		this.controller.applySelfPerks(dmg, socket);
 	}
@@ -108,7 +113,7 @@ export default class TalentsRouter extends SocketioRouterBase {
 		if (!socket.alive) {
 			this.controller.clearSocketBuffs(socket);
 		} else if (cause !== combatConfig.HIT_CAUSE.BLEED && cause !== combatConfig.HIT_CAUSE.BURN) {
-			this.controller.applyMobHurtPerks(dmg, crit, mob, socket);
+			this.controller.applyHurtPerks(dmg, crit, mob, socket);
 		}
     }
 	
@@ -173,10 +178,9 @@ export default class TalentsRouter extends SocketioRouterBase {
 		if (!this.services.canGetPerk(talent, perk)) {
 			return this.sendError(data, socket, "Raising points to that perk is not available.");
 		}
-		const oldStats = getBonusPerks(socket);        
-        this.services.addPerk(talent, perk);
-		const newStats = getBonusPerks(socket);        
-		this.updateBonusPerks(socket, oldStats, newStats);
+		modifyBonusPerks(socket, () => {
+			this.services.addPerk(talent, perk);
+		});
 		talent.points--;
 		talent.pool = [];
 		socket.emit(talentsConfig.CLIENT_GETS.GAIN_ABILITY_PERK.name, {
@@ -200,13 +204,13 @@ export default class TalentsRouter extends SocketioRouterBase {
 			return this.sendError(data, socket, "The primary ability does not have that spell.");	
 		} else if (!this.services.canUseSpell(socket, spell)) {
 			return this.sendError(data, socket, "Character does not meet the requirements to use that spell.");
-		} else if (socket.character.stats.mp.now < spell.mp) {
+		}
+		let mp = getMpUsage(spell.mp, socket);
+		if (socket.character.stats.mp.now < mp) {
 			return this.sendError(data, socket, "Not enough mana to activate the spell.");
 		}
 
-		this.emitter.emit(statsConfig.SERVER_INNER.USE_MP.name, {
-			mp: spell.mp
-		}, socket);
+		this.emitter.emit(statsConfig.SERVER_INNER.USE_MP.name, { mp }, socket);
 		
 		socket.broadcast.to(socket.character.room).emit(talentsConfig.CLIENT_GETS.USE_SPELL.name, {
 			char_id: socket.character._id,
@@ -224,6 +228,7 @@ export default class TalentsRouter extends SocketioRouterBase {
 		}
 
 		socket.currentSpell = spell;
+		socket.lastAttackLoad = 0;
 		
 		this.emitter.emit(combatConfig.SERVER_GETS.USE_ABILITY.name, {target_ids}, socket);		
 		
@@ -273,7 +278,7 @@ export default class TalentsRouter extends SocketioRouterBase {
 
 		const oldStats = getBonusPerks(socket, previousAbility);
 		const newStats = getBonusPerks(socket);
-		this.updateBonusPerks(socket, oldStats, newStats);
+		updateBonusPerks(socket, oldStats, newStats);
     }
     
 	[talentsConfig.SERVER_INNER.LEFT_ROOM.name](data, socket: GameSocket) {
@@ -285,25 +290,14 @@ export default class TalentsRouter extends SocketioRouterBase {
     }
 
 	[talentsConfig.SERVER_INNER.WORE_EQUIP.name](data: {equip: ITEM_INSTANCE, oldEquip: ITEM_INSTANCE}, socket: GameSocket) {
-        const {equip, oldEquip} = data;
-        const oldStats = getBonusPerks(socket);
-        addBonusPerks(equip, socket);
-        removeBonusPerks(oldEquip, socket);
-        const newStats = getBonusPerks(socket);
-		this.updateBonusPerks(socket, oldStats, newStats);
+		const {equip, oldEquip} = data;
+		modifyBonusPerks(socket, () => {
+			addBonusPerks(equip, socket);
+			removeBonusPerks(oldEquip, socket);
+		});
 	}
     
     private addStats(socket: GameSocket) {
-        this.updateBonusPerks(socket, getEmptyBonusPerks(), getBonusPerks(socket));
-    }
-
-    private updateBonusPerks(socket: GameSocket, oldStats: PERKS_DIFF, newStats: PERKS_DIFF) {
-        if (oldStats.hp != newStats.hp || oldStats.mp != newStats.mp) {
-            const stats = {hp: newStats.hp - oldStats.hp, mp: newStats.mp - oldStats.mp};
-            this.emitter.emit(statsConfig.SERVER_INNER.STATS_ADD.name, { stats }, socket);
-        }
-        if (oldStats.atkSpeed != newStats.atkSpeed) {
-            socket.emit(talentsConfig.CLIENT_GETS.UPDATE_ATTACK_SPEED.name, {speed: newStats.atkSpeed});
-        }
+        updateBonusPerks(socket, getEmptyBonusPerks(), getBonusPerks(socket));
     }
 };
