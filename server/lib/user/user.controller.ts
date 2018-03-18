@@ -1,6 +1,8 @@
 
 import MasterController from '../master/master.controller';
 import UserServices from './user.services';
+import { Response } from 'express';
+import userConfig from './user.config';
 
 export default class UserController extends MasterController {
     protected services: UserServices;
@@ -30,11 +32,12 @@ export default class UserController extends MasterController {
         });
     }
 
-    performLogout(req, res, next) {
+    performLogout(req, res: Response, next) {
         req.session.destroy(e => {
             if (e) {
                 this.sendError(res, this.LOGS.MASTER_INTERNAL_ERROR, {e, fn: "performLogout", file: "user.controller.js"});
             } else {
+                res.clearCookie(userConfig.UNICORN);
                 next();
             }
         });

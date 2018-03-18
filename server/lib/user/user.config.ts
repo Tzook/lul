@@ -52,5 +52,6 @@ export default {
 			"CODE": "USER_9",
 			"STATUS": "OK"
 		}
-	}
+    },
+    "UNICORN": "unicorn"
 }
