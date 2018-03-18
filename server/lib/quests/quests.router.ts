@@ -147,7 +147,7 @@ export default class QuestsRouter extends SocketioRouterBase {
 
 	[config.SERVER_GETS.QUEST_OK_PROGRESS.name](data, socket: GameSocket) {
 		let quests = socket.character.quests.ok[data.ok] || {};
-		const increment = data.value > 0 ? data.value : 1;
+		const increment = data.value > 0 ? +data.value : 1;
 		let fields: Set<string> = new Set();
 		for (let questKey in quests) {
 			let questInfo = this.services.getQuestInfo(questKey);
