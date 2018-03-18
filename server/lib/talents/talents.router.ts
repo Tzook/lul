@@ -1,7 +1,7 @@
 import SocketioRouterBase from '../socketio/socketio.router.base';
 import TalentsMiddleware from './talents.middleware';
 import TalentsController from './talents.controller';
-import TalentsServices, { getTalent, hasAbility, removeBonusPerks, createBonusPerks, addBonusPerks, updateBonusPerks, modifyBonusPerks } from './talents.services';
+import TalentsServices, { getTalent, hasAbility, removeBonusPerks, createBonusPerks, addBonusPerks, updateBonusPerks, modifyBonusPerks, getMpUsage } from './talents.services';
 import talentsConfig from '../talents/talents.config';
 import statsConfig from '../stats/stats.config';
 import StatsRouter from '../stats/stats.router';
@@ -205,7 +205,7 @@ export default class TalentsRouter extends SocketioRouterBase {
 		} else if (!this.services.canUseSpell(socket, spell)) {
 			return this.sendError(data, socket, "Character does not meet the requirements to use that spell.");
 		}
-		let mp = spell.mp * socket.getMpUsageModifier() | 0;
+		let mp = getMpUsage(spell.mp, socket);
 		if (socket.character.stats.mp.now < mp) {
 			return this.sendError(data, socket, "Not enough mana to activate the spell.");
 		}
@@ -228,6 +228,7 @@ export default class TalentsRouter extends SocketioRouterBase {
 		}
 
 		socket.currentSpell = spell;
+		socket.lastAttackLoad = 0;
 		
 		this.emitter.emit(combatConfig.SERVER_GETS.USE_ABILITY.name, {target_ids}, socket);		
 		

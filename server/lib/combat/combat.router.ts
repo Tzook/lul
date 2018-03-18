@@ -7,6 +7,7 @@ import TalentsRouter from '../talents/talents.router';
 import talentsConfig from '../talents/talents.config';
 import statsConfig from '../stats/stats.config';
 import CombatServices from './combat.services';
+import { getMpUsage } from '../talents/talents.services';
 
 export default class CombatRouter extends SocketioRouterBase {
 	protected services: CombatServices;
@@ -31,6 +32,17 @@ export default class CombatRouter extends SocketioRouterBase {
 	}
 
 	[config.SERVER_GETS.PERFORM_ATTACK.name](data, socket: GameSocket) {
+		let {mp} = this.talentsRouter.getPrimaryTalentInfo(socket);
+		
+		socket.lastAttackLoad = null;
+		if (mp) {
+			mp = getMpUsage(mp, socket);
+			if (socket.character.stats.mp.now < mp) {
+				return this.sendError(data, socket, "Not enough mana to use the ability");
+			}
+			this.emitter.emit(statsConfig.SERVER_INNER.USE_MP.name, {mp}, socket);
+		}
+		
 		let load = this.middleware.getValidLoad(data.load);
 		socket.lastAttackLoad = load;
 		socket.broadcast.to(socket.character.room).emit(this.CLIENT_GETS.PERFORM_ATTACK.name, {
@@ -64,25 +76,20 @@ export default class CombatRouter extends SocketioRouterBase {
 	}
 
 	[config.SERVER_GETS.USE_ABILITY.name](data, socket: GameSocket) {
+		if (typeof socket.lastAttackLoad !== "number") {
+			return this.sendError(data, socket, "Must perform attack before using it");
+		}
 		const targetsInArea = data.target_ids || [];
 		const targetsHit = socket.getTargetsHit(targetsInArea);
 
-		const talentInfo = this.talentsRouter.getPrimaryTalentInfo(socket);
+		const {hitType} = this.talentsRouter.getPrimaryTalentInfo(socket);
 
-		let mp = talentInfo.mp;
-		if (mp && !socket.currentSpell) {
-			mp *= socket.getMpUsageModifier() | 0;
-			if (socket.character.stats.mp.now < mp) {
-				return this.sendError(data, socket, "Not enough mana to use the ability");
-			}
-			this.emitter.emit(statsConfig.SERVER_INNER.USE_MP.name, {mp}, socket);
-		}
-
-		if (talentInfo.hitType == talentsConfig.HIT_TYPE_ATTACK) {
+		if (hitType == talentsConfig.HIT_TYPE_ATTACK) {
 			this.emitter.emit(mobsConfig.SERVER_INNER.MOBS_TAKE_DMG.name, {mobs: targetsHit}, socket);		
 		} else {
 			this.emitter.emit(config.SERVER_INNER.HEAL_CHARS.name, {charNames: targetsHit}, socket);		
 		}
+		socket.lastAttackLoad = null;
 	}
 
 	[config.SERVER_INNER.HEAL_CHARS.name](data, socket: GameSocket) {

@@ -667,3 +667,7 @@ export function getId(target: PLAYER): string {
 		? (<GameSocket>target).character._id
 		: (<MOB_INSTANCE>target).id;
 }
+
+export function getMpUsage(mp: number, socket: GameSocket): number {
+	return Math.round(mp * socket.getMpUsageModifier());
+}
