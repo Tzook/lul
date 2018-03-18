@@ -35,7 +35,7 @@ export default class Main {
 			cookieParser(),
 			bodyParser.json(),
 			cors()
-		];
+        ];
 		this.app.use((req, res, next) => {
 			let count = this.app.dependencies.length;
 			for (let i in this.app.dependencies) {
@@ -46,6 +46,21 @@ export default class Main {
 			}
 		});
 	}
+
+    redirectIfNotSecure() {
+        if (isProduction()) {
+            this.app.use((req, res, next) => {
+                if (req.secure) {
+                    // request was via https, so do no special handling
+                    next();
+                }
+                else {
+                    // request was via http, so redirect to https
+                    res.redirect('https://' + req.headers.host + req.url);
+                }
+            });
+        }
+    }
 
 	beginServer() {
 		this.app.set('view engine', 'jade');
