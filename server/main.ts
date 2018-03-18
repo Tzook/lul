@@ -3,7 +3,7 @@
 import Main from './lib/main/main';
 
 let main = new Main();
-// main.redirectIfNotSecure();
+main.redirectIfNotSecure();
 main.useDb();
 main.useDependencies();
 main.beginServer();

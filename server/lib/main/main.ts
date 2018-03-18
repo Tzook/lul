@@ -51,11 +51,10 @@ export default class Main {
     redirectIfNotSecure() {
         if (isProduction()) {
             this.app.use((req, res, next) => {
-                if (req.secure) {
+                if (isSecure(req)) {
                     // request was via https, so do no special handling
                     next();
-                }
-                else {
+                } else {
                     // request was via http, so redirect to https
                     res.redirect('https://' + req.headers.host + req.url);
                 }
@@ -91,6 +90,10 @@ export default class Main {
 
 export function isProduction(): boolean {
 	return process.env.NODE_ENV === "production";
+}
+
+export function isSecure(req: Request): boolean {
+    return req.headers["x-forwarded-proto"] === "https";
 }
 
 export function isFromWeb(req: Request): boolean {
