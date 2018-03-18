@@ -97,5 +97,5 @@ export function isSecure(req: Request): boolean {
 }
 
 export function isFromWeb(req: Request): boolean {
-	return req.headers.host === "lul.herokuapp.com";
+	return req.headers.host === "lul.herokuapp.com" || req.headers.host === "localhost:5000";
 }

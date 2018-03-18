@@ -49,13 +49,14 @@ export default class UserRouter extends MasterRouter {
 
 	usePassport(app, session, mongoStore, controller, middleware) {
 		// NOTE: in passport's middleware library under file authenticate.js, i changed the callback called on error to send the res too
-		app.dependencies.push((session({
-				name: userConfig.UNICORN,
-				secret: 'UnicornsAreAmazingB0ss',
-				store: mongoStore,
-				cookie: { maxAge: sessionTime, httpOnly: false },
-				saveUninitialized: true,
-				resave: true })));
+		app.use(session({
+            name: userConfig.UNICORN,
+            secret: 'UnicornsAreAmazingB0ss',
+            store: mongoStore,
+            cookie: { maxAge: sessionTime, httpOnly: false },
+            saveUninitialized: true,
+            resave: true 
+        }));
 		app.use(passport.initialize());
 		app.use(passport.authenticate('session', {}, controller.deserializeError.bind(controller)));
 		passport.use(new LocalStrategy(middleware.authenticateUser.bind(middleware)));
