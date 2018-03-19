@@ -1,6 +1,5 @@
 
 import Response from './master.response';
-import { isProduction, isFromWeb } from '../main/main';
 
 export default class MasterMiddleware extends Response {
 
@@ -37,16 +36,4 @@ export default class MasterMiddleware extends Response {
 			this.sendError(res, this.LOGS.MASTER_NOT_AUTHORIZED);
 		}
     }
-    
-	debounceIfLocal(req, res, next) {
-        if (isFromWeb(req)) {
-            // in web, it takes time to load so give it a couple of seconds to live
-			setTimeout(() => next(), 2000);
-		} else if (!isProduction()) {
-            // in local, give it a bit of time so it won't freeze
-			setTimeout(() => next(), 500);
-		} else {
-            next();
-		}
-	}
 };

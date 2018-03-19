@@ -20,7 +20,6 @@ export default class UserRouter extends MasterRouter {
 	protected initRoutes(app) {
 		app.get(this.ROUTES.USER_SESSION,
 			this.middleware.isLoggedIn.bind(this.middleware),
-			this.middleware.debounceIfLocal.bind(this.middleware),
 			this.controller.sendUser.bind(this.controller));
 
 		app.get(this.ROUTES.USER_LOGOUT,
