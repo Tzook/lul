@@ -183,10 +183,10 @@ export default class MobsRouter extends SocketioRouterBase {
 		if (!mob) {
 			return this.sendError(data, socket, "Mob doesn't exist!");
         }
-        this.emitter.emit(config.SERVER_INNER.PLAYER_HURT.name, { mob, reason: config.PLAYER_HURT_REASON.TOUCH }, socket);
+        this.emitter.emit(config.SERVER_INNER.PLAYER_HURT.name, { mob, cause: combatConfig.HIT_CAUSE.ATK }, socket);
     }
     
-    [config.SERVER_INNER.PLAYER_HURT.name]({mob}: {mob: MOB_INSTANCE, reason: string}, socket: GameSocket) {
+    [config.SERVER_INNER.PLAYER_HURT.name]({mob}: {mob: MOB_INSTANCE, cause: string}, socket: GameSocket) {
         let {dmg, crit} = this.controller.getHurtCharDmg(mob, socket);
         dmg = applyDefenceModifier(dmg, socket, mob, socket);        
         if (dmg === 0) {

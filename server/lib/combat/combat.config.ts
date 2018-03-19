@@ -17,6 +17,7 @@ export default {
 	},
 	HIT_CAUSE: {
 		ATK: "attack",
+		SPELL: "spell",
 		HEAL: "heal",
 		AOE: "aoe",
 		BLEED: "bleed",

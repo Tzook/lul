@@ -34,10 +34,6 @@ export default {
 		"ATTACK_BLOCK": {"name": "actor_blocked"},
 		"MOB_ATTACK_BLOCK": {"name": "mob_blocked"},
     },
-    PLAYER_HURT_REASON: {
-        TOUCH: "touch",
-        SPELL: "spell"
-    },
 	MISS_CHANCE_PER_LVL: 20,
     MISS_CHANCE_LVLS: 5,
     MOB_DEATH_DEBOUNCE: 5000,

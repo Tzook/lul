@@ -247,13 +247,13 @@ export default class TalentsRouter extends SocketioRouterBase {
 		
 		mob.currentSpell = mob.spells[spell_key];
 
-		this.emitter.emit(mobsConfig.SERVER_INNER.PLAYER_HURT.name, {mob, reason: mobsConfig.PLAYER_HURT_REASON.SPELL}, socket);
+		this.emitter.emit(mobsConfig.SERVER_INNER.PLAYER_HURT.name, {mob, cause: combatConfig.HIT_CAUSE.SPELL}, socket);
 
 		mob.currentSpell = null;
     }
     
-    [talentsConfig.SERVER_INNER.PLAYER_HURT.name]({mob, reason}: {mob: MOB_INSTANCE, reason: string}, socket: GameSocket) {
-        if (reason === mobsConfig.PLAYER_HURT_REASON.TOUCH && getMob(mob.id, socket)) {
+    [talentsConfig.SERVER_INNER.PLAYER_HURT.name]({mob, cause}: {mob: MOB_INSTANCE, cause: string}, socket: GameSocket) {
+        if (cause === combatConfig.HIT_CAUSE.ATK && getMob(mob.id, socket)) {
             let spikesModifier = this.services.getSpikesModifier(socket);
             if (spikesModifier > 0) {
                 let {dmg, crit} = getDamageTaken(socket, mob);
