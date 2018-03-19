@@ -17,6 +17,7 @@ export default {
 		"MOB_DESPAWN": {"name": "mob_despawn"},
 		"MOBS_TAKE_DMG": {"name": "mobs_took_dmg", "alive": true, log: true},
 		"MOB_AGGRO_CHANGED": {"name": "mob_aggro_changed"},
+        "PLAYER_HURT": {"name": "player_hurt"}
     },
 	"SERVER_GETS": {
 		"ENTERED_ROOM": {"name": "entered_room"},
@@ -32,7 +33,11 @@ export default {
 		"AGGRO": {"name": "aggro"},
 		"ATTACK_BLOCK": {"name": "actor_blocked"},
 		"MOB_ATTACK_BLOCK": {"name": "mob_blocked"},
-	},
+    },
+    PLAYER_HURT_REASON: {
+        TOUCH: "touch",
+        SPELL: "spell"
+    },
 	MISS_CHANCE_PER_LVL: 20,
     MISS_CHANCE_LVLS: 5,
     MOB_DEATH_DEBOUNCE: 5000,

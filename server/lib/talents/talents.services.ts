@@ -209,6 +209,10 @@ export default class TalentsServices extends MasterServices {
 			defenceModifier = 1 - dmgReduction;
 		}
 		return defenceModifier;
+    }
+    
+	public getSpikesModifier(target: PLAYER): number {
+		return this.getAbilityPerkValue(talentsConfig.PERKS.SPIKES_MODIFIER, target);
 	}
 	
 	public getDefenceBonus(target: PLAYER): number {
@@ -670,4 +674,8 @@ export function getId(target: PLAYER): string {
 
 export function getMpUsage(mp: number, socket: GameSocket): number {
 	return Math.round(mp * socket.getMpUsageModifier());
+}
+
+export function applySpikes(dmg: number, spikesModifier: number): number {
+    return Math.round(dmg * spikesModifier);
 }

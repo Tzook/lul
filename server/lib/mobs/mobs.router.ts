@@ -13,6 +13,7 @@ import combatConfig from '../combat/combat.config';
 import CombatRouter from '../combat/combat.router';
 import { isInInstance, getRoomName } from '../rooms/rooms.services';
 import { getMobDeadOrAlive } from './mobs.controller';
+import { applyDefenceModifier, getDamageTaken } from '../combat/combat.services';
 
 export default class MobsRouter extends SocketioRouterBase {
 	protected middleware: MobsMiddleware;
@@ -100,10 +101,10 @@ export default class MobsRouter extends SocketioRouterBase {
 		let {mobId, cause, dmg, crit} = data;
 		
 		const mob = this.controller.getMob(mobId, socket);
-		if (!dmg) {
-			let dmgResult = this.combatRouter.calculateDamage(socket, mob);
-			dmg = this.controller.applyDefenceModifier(dmgResult.dmg, socket, socket, mob);
-			crit = dmgResult.crit;
+		if (typeof dmg !== "number") {
+            let dmgResult = getDamageTaken(socket, mob);
+            dmg = dmgResult.dmg;
+            crit = dmgResult.crit;
 		}
 		if (dmg === 0) {
 			this.controller.addThreat(mob, 1, socket);
@@ -181,20 +182,24 @@ export default class MobsRouter extends SocketioRouterBase {
 		let mob = getMobDeadOrAlive(data.mob_id, socket);
 		if (!mob) {
 			return this.sendError(data, socket, "Mob doesn't exist!");
-		}
+        }
+        this.emitter.emit(config.SERVER_INNER.PLAYER_HURT.name, { mob, reason: config.PLAYER_HURT_REASON.TOUCH }, socket);
+    }
+    
+    [config.SERVER_INNER.PLAYER_HURT.name]({mob}: {mob: MOB_INSTANCE, reason: string}, socket: GameSocket) {
         let {dmg, crit} = this.controller.getHurtCharDmg(mob, socket);
-		dmg = this.controller.applyDefenceModifier(dmg, socket, mob, socket);        
-		if (dmg === 0) {
-			this.io.to(socket.character.room).emit(config.CLIENT_GETS.ATTACK_BLOCK.name, { id: socket.character._id });
-		} else {
-			this.emitter.emit(statsConfig.SERVER_INNER.TAKE_DMG.name, { 
-				dmg,
-				mob, 
-				cause: combatConfig.HIT_CAUSE.ATK,
-				crit
-			}, socket);
-		}
-	}
+        dmg = applyDefenceModifier(dmg, socket, mob, socket);        
+        if (dmg === 0) {
+            this.io.to(socket.character.room).emit(config.CLIENT_GETS.ATTACK_BLOCK.name, { id: socket.character._id });
+        } else {
+            this.emitter.emit(statsConfig.SERVER_INNER.TAKE_DMG.name, { 
+                dmg,
+                mob, 
+                cause: combatConfig.HIT_CAUSE.ATK,
+                crit
+            }, socket);
+        }
+    }
 	
 	[config.SERVER_INNER.MOB_AGGRO_CHANGED.name](data: {mob: MOB_INSTANCE, id?: string}) {
 		let {id, mob} = data;			

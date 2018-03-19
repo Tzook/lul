@@ -163,13 +163,6 @@ export default class MobsController extends MasterController {
 		let dmg = getDamageRange(minDmg, maxDmg);
 		return {dmg, crit: dmgModifierResult.crit};
 	}
-	
-	public applyDefenceModifier(dmg: number, socket: GameSocket, attacker: GameSocket|MOB_INSTANCE, target: GameSocket|MOB_INSTANCE) {
-        dmg = Math.max(0, dmg - socket.getDefenceBonus(target));
-        dmg *= socket.getDefenceModifier(attacker, target);
-		dmg = Math.ceil(dmg); // make sure we are always rounded
-		return dmg;
-	}
 
 	public despawnMob(mob: MOB_INSTANCE, socket: GameSocket) {
 		this.io.to(socket.character.room).emit(mobsConfig.CLIENT_GETS.MOB_DIE.name, {
@@ -245,7 +238,12 @@ export function getMobsController(): MobsController {
     return getController("mobs");
 }
 
-export function getMobDeadOrAlive(mobId: string, socket: GameSocket) {
+export function getMobDeadOrAlive(mobId: string, socket: GameSocket): MOB_INSTANCE|undefined {
     const controller = getMobsController();
-    return controller.getMob(mobId, socket) || controller.getMobJustDied(mobId, socket);
+    return getMob(mobId, socket) || controller.getMobJustDied(mobId, socket);
+}
+
+export function getMob(mobId, socket: GameSocket): MOB_INSTANCE|undefined {
+    const controller = getMobsController();
+    return controller.getMob(mobId, socket);
 }

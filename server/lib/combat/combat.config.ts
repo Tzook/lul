@@ -20,6 +20,7 @@ export default {
 		HEAL: "heal",
 		AOE: "aoe",
 		BLEED: "bleed",
+		SPIKES: "spikes",
 		BURN: "burn",
-	}
+    }
 }

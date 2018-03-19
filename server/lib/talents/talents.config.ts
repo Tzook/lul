@@ -33,6 +33,7 @@ export default {
 		CHANGED_ABILITY: Object.assign({}, combatConfig.SERVER_INNER.CHANGED_ABILITY),
 		LEFT_ROOM: Object.assign({}, roomsConfig.SERVER_INNER.LEFT_ROOM),
 		WORE_EQUIP: Object.assign({}, equipsConfig.SERVER_INNER.WORE_EQUIP),
+		PLAYER_HURT: Object.assign({}, mobsConfig.SERVER_INNER.PLAYER_HURT),
 	},
 	"SERVER_GETS": {
 		DISCONNECT: Object.assign({}, socketioConfig.SERVER_GETS.DISCONNECT),
@@ -83,7 +84,8 @@ export default {
 		BLOCK_CHANCE: "blockChance",
 		DAMAGE_REDUCTION: "damageReduction",
 		THREAT_MODIFIER_KEY: "threatModifier",
-		DEFENCE_BONUS: "defenceBonus",
+        DEFENCE_BONUS: "defenceBonus",
+        SPIKES_MODIFIER: "spikesModifier",
         
 		LIFE_STEAL_KEY: "hpSteal",
 		HP_REGEN_MODIFIER: "hpRegenModifier",

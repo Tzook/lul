@@ -8,6 +8,7 @@ import talentsConfig from '../talents/talents.config';
 import statsConfig from '../stats/stats.config';
 import CombatServices from './combat.services';
 import { getMpUsage } from '../talents/talents.services';
+import { calculateDamage } from './combat.services';
 
 export default class CombatRouter extends SocketioRouterBase {
 	protected services: CombatServices;
@@ -18,10 +19,6 @@ export default class CombatRouter extends SocketioRouterBase {
 		this.services = files.services;
 		this.talentsRouter = files.routers.talents;
 		super.init(files, app);
-	}
-
-	public calculateDamage(socket: GameSocket, target: GameSocket|MOB_INSTANCE): DMG_RESULT {
-		return this.services.calculateDamage(socket, target);
 	}
 
 	[config.SERVER_GETS.LOAD_ATTACK.name](data, socket: GameSocket) {
@@ -106,7 +103,7 @@ export default class CombatRouter extends SocketioRouterBase {
 			} else if (!healedSocket.alive) {
 				this.sendError({charName}, socket, "Cannot heal dead people. You ain't jesus");
 			} else {
-				const dmgResult = this.calculateDamage(socket, healedSocket);
+				const dmgResult = calculateDamage(socket, healedSocket);
 				this.emitter.emit(config.SERVER_INNER.HEAL_CHAR.name, {
 					healedSocket,
 					cause,

@@ -9,8 +9,9 @@ import MobsRouter from '../mobs/mobs.router';
 import mobsConfig from '../mobs/mobs.config';
 import RoomsRouter from '../rooms/rooms.router';
 import combatConfig from '../combat/combat.config';
-import { getEmptyBonusPerks, getBonusPerks } from './talents.services';
-import { getMobDeadOrAlive } from '../mobs/mobs.controller';
+import { getEmptyBonusPerks, getBonusPerks, applySpikes } from './talents.services';
+import { getMobDeadOrAlive, getMob } from '../mobs/mobs.controller';
+import { getDamageTaken } from '../combat/combat.services';
 
 export default class TalentsRouter extends SocketioRouterBase {
 	protected middleware: TalentsMiddleware;
@@ -92,7 +93,7 @@ export default class TalentsRouter extends SocketioRouterBase {
 		const mobModel = this.mobsRouter.getMobInfo(mob.mobId);
 		const exp = this.services.getAbilityExp(dmg, mobModel);
 		this.emitter.emit(talentsConfig.SERVER_INNER.GAIN_ABILITY_EXP.name, {exp}, socket);
-		if (mob.hp > 0 && cause !== combatConfig.HIT_CAUSE.BLEED && cause !== combatConfig.HIT_CAUSE.BURN) {
+		if (mob.hp > 0 && cause !== combatConfig.HIT_CAUSE.BLEED && cause !== combatConfig.HIT_CAUSE.BURN && cause !== combatConfig.HIT_CAUSE.SPIKES) {
 			this.controller.applyHurtPerks(dmg, crit, socket, mob);
 		}
 		this.controller.applySelfPerks(dmg, socket);
@@ -246,10 +247,26 @@ export default class TalentsRouter extends SocketioRouterBase {
 		
 		mob.currentSpell = mob.spells[spell_key];
 
-		this.emitter.emit(mobsConfig.SERVER_GETS.PLAYER_TAKE_DMG.name, data, socket);
+		this.emitter.emit(mobsConfig.SERVER_INNER.PLAYER_HURT.name, {mob, reason: mobsConfig.PLAYER_HURT_REASON.SPELL}, socket);
 
 		mob.currentSpell = null;
-	}
+    }
+    
+    [talentsConfig.SERVER_INNER.PLAYER_HURT.name]({mob, reason}: {mob: MOB_INSTANCE, reason: string}, socket: GameSocket) {
+        if (reason === mobsConfig.PLAYER_HURT_REASON.TOUCH && getMob(mob.id, socket)) {
+            let spikesModifier = this.services.getSpikesModifier(socket);
+            if (spikesModifier > 0) {
+                let {dmg, crit} = getDamageTaken(socket, mob);
+                dmg = applySpikes(dmg, spikesModifier);
+                this.emitter.emit(mobsConfig.SERVER_INNER.MOB_TAKE_DMG.name, {
+                    mobId: mob.id, 
+                    dmg,
+                    crit,
+                    cause: combatConfig.HIT_CAUSE.SPIKES,
+                }, socket);
+            }
+        }
+    }
 	
 	[talentsConfig.SERVER_INNER.MOB_AGGRO_CHANGED.name](data) {
 		let {id, mob}: {mob: MOB_INSTANCE, id?: string} = data;	
