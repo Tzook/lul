@@ -10,6 +10,7 @@ export default class UserModel extends MasterModel {
             username: String,
             password: String
         };
+        this.params.versionKey = false;
         this.listenForSchemaAddition('User');
     }
 
