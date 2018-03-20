@@ -27,7 +27,8 @@
 		"npcs",
 		"talents",
 		"use",
-		"state"
+        "state",
+        "github"
 	],
 	"skip": 	 { "master": 1 }
 }

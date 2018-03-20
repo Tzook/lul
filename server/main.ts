@@ -6,6 +6,7 @@ let main = new Main();
 main.redirectIfNotSecure();
 main.useDb();
 main.useDependencies();
+main.listenToErrors();
 main.beginServer();
 main.attachAppVariables();
 main.connectToDbAndBootstrap();

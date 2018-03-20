@@ -8,7 +8,7 @@ import SocketioServices from './socketio.services';
 import config from './socketio.config';
 require('./socketio.fixer');
 import * as passportSocketIo from 'passport.socketio';
-import { isProduction } from '../main/main';
+import { isProduction, getEnvVariable } from '../main/main';
 
 export default class SocketioRouter extends SocketioRouterBase {
 	protected middleware: SocketioMiddleware;
@@ -211,7 +211,7 @@ export default class SocketioRouter extends SocketioRouterBase {
     }
 
 	private restartServerEvent(app) {
-		let token = process.env.herokuAuth ? process.env.herokuAuth : require('../../../config/.env.json').herokuAuth;
+		let token = getEnvVariable("herokuAuth");
 		let heroku = new Heroku({ token });
 		
 		app.post(this.ROUTES.RESTART, 

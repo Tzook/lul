@@ -11,7 +11,7 @@ export default class Response {
 		this.LOGS = Object.assign({}, files.config.LOGS, config.LOGS); // merge MASTER logs into the instance logs
     }
 
-    protected sendError(res, ERROR, tokens?) {
+    public sendError(res, ERROR, tokens?) {
         return this.services.replaceTokens(ERROR.MSG, tokens)
         .then(error => {
             console.error("Sending an error:", error);

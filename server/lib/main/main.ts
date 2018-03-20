@@ -14,6 +14,8 @@ let 	express 		= require('express'),
 import Bootstrap from './bootstrap';
 import { setLogger } from './logger';
 import { Request } from 'express';
+import { getController } from './bootstrap';
+import Response from '../master/master.response';
 
 export default class Main {
 	private app;
@@ -24,7 +26,7 @@ export default class Main {
 
 	useDb() {
 		mongoose.Promise = global.Promise;
-		mongoose.connect(process.env.dbUrl ? process.env.dbUrl : require('../../../config/.env.json').dbUrl, {useMongoClient: true});
+		mongoose.connect(getEnvVariable("dbUrl"), {useMongoClient: true});
 		mongoose.connection.on('error', console.error.bind(console, 'connection error:'));
 	}
 
@@ -60,6 +62,13 @@ export default class Main {
                 }
             });
         }
+    }
+
+    listenToErrors() {
+        this.app.use((error, req, res, next) => {
+            const controller: Response = getController("user");
+            controller.sendError(res, error.message, error.tokens);
+        });
     }
 
 	beginServer() {
@@ -98,4 +107,8 @@ export function isSecure(req: Request): boolean {
 
 export function isFromWeb(req: Request): boolean {
 	return req.headers.host === "lul.herokuapp.com" || req.headers.host === "localhost:5000";
+}
+
+export function getEnvVariable(key: string) {
+    return process.env[key] ? process.env[key] : require('../../../config/.env.json')[key];
 }
