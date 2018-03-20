@@ -14,8 +14,7 @@ export default class GithubMiddleware extends MasterMiddleware {
         }
 
         return this.validateParams(req, res, next, [
-			{param: "title", isType: ["string"], callback: this.services.inRange, args: [(req.body.title || "").length, 3, 30, this.LOGS.MASTER_OUT_OF_RANGE, 'title']},
-			{param: "body", isType: ["string"], callback: this.services.inRange, args: [(req.body.body || "").length, 3, 200, this.LOGS.MASTER_OUT_OF_RANGE, 'body']},
+			{param: "body", isType: ["string"], callback: this.services.inRange, args: [(req.body.body || "").length, 5, 500, this.LOGS.MASTER_OUT_OF_RANGE, 'body']},
 			{param: "name", isType: ["string"]}
 		]);
     }

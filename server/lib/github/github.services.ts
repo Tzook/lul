@@ -24,7 +24,8 @@ function getGithubClient() {
     return services.githubClient;
 }
 
-export function createIssue({title, body, name}) {
+export function createIssue({body, name}: {body: string, name: string}) {
+    const title = body.length > 25 ? `${body.slice(0, 22)}...` : body;
     const client = getGithubClient();
     return client.issues.create({
         owner: "Tzook", 

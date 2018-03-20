@@ -5,7 +5,7 @@ export default {
 	LOGS: {
         CREATE_ISSUE_SUCCESS: {
             "MSG": "Created an issue successfully.",
-            "CODE": "ISSUES_!",
+            "CODE": "ISSUES_1",
             "STATUS": "OK"
         },
 	},
