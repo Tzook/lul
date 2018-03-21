@@ -4,7 +4,8 @@ import { REQUIRE_SCHEMA } from "./items.model";
 import * as _ from 'underscore';
 import ItemsMiddleware from './items.middleware';
 import { USE_SCHEMA } from '../use/use.model';
-import { slightlyTweakPerks, extendItemSchemaWithTalents } from '../bonusPerks/bonusPerks.services';
+import { slightlyTweakPerks } from '../bonusPerks/bonusPerks.services';
+import { extendItemSchemaWithTalents } from '../bonusPerks/bonusPerks.model';
 
 export default class ItemsServices extends MasterServices {
 	private itemsInfo: Map<string, ITEM_MODEL> = new Map();

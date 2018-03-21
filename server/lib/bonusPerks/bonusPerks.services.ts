@@ -78,14 +78,6 @@ export function getEmptyBonusPerks(): PERKS_DIFF {
     };
 }
 
-
-export function extendItemSchemaWithTalents(item: any, itemSchema: ITEM_MODEL) {
-    (item.perks || []).forEach(perk => {
-		itemSchema.perks = itemSchema.perks || {};
-		itemSchema.perks[perk.key] = +perk.value;
-	});
-}
-
 export function slightlyTweakPerks(perksObject: PERK_MAP): PERK_MAP {
     let result: PERK_MAP = {};
     const offset = bonusPerksConfig.PERK_VALUES_RANDOM_OFFSET;

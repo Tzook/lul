@@ -22,16 +22,15 @@ export default class SpellsModel extends MasterModel {
 
     init(files, app) {
         this.minimize = true;
-    
-        this.addToSchema("Talent", {spells: [ABILITY_SPELL_SCHEMA]});
-        this.addToSchema("Mobs", MOB_SPELLS_SCHEMA);
     }
-
+    
     get priority() {
         return PRIORITY_SPELLS;
     }
-
+    
     createModel() {
+        this.addToSchema("Talent", {spells: [ABILITY_SPELL_SCHEMA]});
+        this.addToSchema("Mobs", MOB_SPELLS_SCHEMA);
         return Promise.resolve();
     }
 };
