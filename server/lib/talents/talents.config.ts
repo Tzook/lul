@@ -15,7 +15,8 @@ export default {
 			"CODE": "TALENTS_1",
 			"STATUS": "OK"
 		}
-	},
+    },
+    GLOBAL_TALENT_READY: {name: "talent_ready"},
 	GLOBAL_EVENTS: {
 		CONFIG_READY: Object.assign({}, socketioConfig.GLOBAL_CONFIG_READY),
 	},
@@ -23,7 +24,6 @@ export default {
 		GAIN_ABILITY: {name: "gain_ability", alive: true, log: true},
 		HURT_MOB: Object.assign({}, mobsConfig.SERVER_INNER.HURT_MOB),
 		HEAL_CHAR: Object.assign({}, combatConfig.SERVER_INNER.HEAL_CHAR),
-		MOB_AGGRO_CHANGED: Object.assign({}, mobsConfig.SERVER_INNER.MOB_AGGRO_CHANGED),
 		MOB_DESPAWN: Object.assign({}, mobsConfig.SERVER_INNER.MOB_DESPAWN),
 		TOOK_DMG: Object.assign({}, statsConfig.SERVER_INNER.TOOK_DMG),		
 		GAIN_ABILITY_EXP: {name: "gain_ability_exp", alive: true, log: true},
@@ -39,9 +39,6 @@ export default {
 		DISCONNECT: Object.assign({}, socketioConfig.SERVER_GETS.DISCONNECT),
 		ENTERED_ROOM: Object.assign({}, roomsConfig.SERVER_GETS.ENTERED_ROOM, {log: false}),
 		CHOOSE_ABILITY_PERK: {name: "choose_perk", alive: true, log: true},
-		USE_SPELL: {name: "used_spell", alive: true, log: true},
-		HIT_SPELL: {name: "hit_spell", alive: true, log: true},
-		HURT_BY_SPELL: {name: "took_spell_dmg", log: true},
 	},
 	"CLIENT_GETS": {
 		GAIN_ABILITY_EXP: {name: "ability_gain_exp"},
@@ -50,8 +47,6 @@ export default {
 		GAIN_ABILITY_PERK: {name: "ability_gain_perk"},
 		ACTIVATED_BUFF: {name: "buff_activated"},
 		RESISTED_BUFF: {name: "buff_resisted"},
-		USE_SPELL: {name: "spell_activated"},
-		MOB_USE_SPELL: {name: "mob_spell_activated"},
 		GAIN_ABILITY: {name: "actor_gain_ability"},
 		UPDATE_ATTACK_SPEED: {name: "update_actor_attack_speed"},
 		UPDATE_MANA_COST: {name: "update_actor_mana_cost"},
@@ -118,7 +113,6 @@ export default {
 	HIT_TYPE_ATTACK: "atk",
 	HIT_TYPE_HEAL: "heal",
     CHAR_TALENT: "charTalent",
-    SKIP_SPELL_RETRY_TIME: 3000,
     PERK_VALUES_RANDOM_OFFSET: 0.2,
 }
 

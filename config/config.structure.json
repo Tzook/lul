@@ -25,7 +25,8 @@
 		"knowns",
 		"party",
 		"npcs",
-		"talents",
+        "talents",
+        "spells",
 		"use",
         "state",
         "github"

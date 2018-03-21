@@ -40,7 +40,7 @@ export default class Bootstrap {
         }
         this.initObjects(structure.templates, filesGroups, this.app);
         
-        filesGroups.sort((a, b) => b.model.priority - a.model.priority);
+        filesGroups.sort((a, b) => (b.model || {priority: 0}).priority - (a.model || {priority: 0}).priority);
         this.createModel(filesGroups, 0);
     }
 
@@ -49,8 +49,10 @@ export default class Bootstrap {
         // creates new instances
         let feature = structure.folders[i];
         for (let j = 0; j < structure.templates.length; j++) {
-            let path = `../${feature}/${feature}.${structure.templates[j]}`;
-            files[structure.templates[j]] = new (require(path).default)();
+            try {
+                let path = `../${feature}/${feature}.${structure.templates[j]}`;
+                files[structure.templates[j]] = new (require(path).default)();
+            } catch (e) {}
         } 
         // load config files
         files.config = require(`../${feature}/${feature}.config`).default;
@@ -68,6 +70,9 @@ export default class Bootstrap {
         if (i === filesGroups.length) {
             return;
         }
+        if (!filesGroups[i].model) {
+            return this.createModel(filesGroups, i + 1);
+        }
         filesGroups[i].model.createModel()
             .then(() => {
                 this.createModel(filesGroups, i + 1);
@@ -78,7 +83,7 @@ export default class Bootstrap {
     private initObjects(templates, objectsToInit, app) {
         objectsToInit.forEach(objToInit => {
             templates.forEach(template => {
-                objToInit[template].init(objToInit, app);
+                objToInit[template] && objToInit[template].init(objToInit, app);
             });
         });
     }

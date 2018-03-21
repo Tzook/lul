@@ -16,17 +16,9 @@ const ABILITY_PERK_SCHEMA = (<any>mongoose.Schema)({
     addToPool: [String]
 }, {_id: false});
 
-const ABILITY_SPELL_SCHEMA = (<any>mongoose.Schema)({
-    key: String,
-    lvl: Number,
-    mp: Number,
-    perks: mongoose.Schema.Types.Mixed
-}, {_id: false});
-
 const TALENT_SCHEMA = {
     ability: String,
     perks: [ABILITY_PERK_SCHEMA],
-    spells: [ABILITY_SPELL_SCHEMA],
     info: {
         powerType: String,
         hitType: String,
@@ -43,10 +35,8 @@ const ITEMS_TALENTS_SCHEMA = {
     perks: mongoose.Schema.Types.Mixed
 };
 
-const MOB_PERKS_SPELLS_SCHEMA = {
+const MOB_PERKS_SCHEMA = {
     perks: mongoose.Schema.Types.Mixed,
-    spells: mongoose.Schema.Types.Mixed,
-    deathSpell: mongoose.Schema.Types.Mixed,
 };
 
 const ROOM_ABILITIES_SCHEMA = {
@@ -86,7 +76,7 @@ export default class TalentsModel extends MasterModel {
             [talentsConfig.CHAR_TALENT]: this.services.getEmptyCharAbility(talentsConfig.CHAR_TALENT)
         }));
         
-        this.addToSchema("Mobs", MOB_PERKS_SPELLS_SCHEMA);
+        this.addToSchema("Mobs", MOB_PERKS_SCHEMA);
         
         this.addToSchema("Rooms", ROOM_ABILITIES_SCHEMA);
         

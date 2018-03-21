@@ -7,14 +7,16 @@ export default class MasterServices {
     protected mongoose: typeof mongoose;
     protected model: MasterModel;
     protected Model: mongoose.Model<any>;
+    public io: SocketIO.Namespace;
 
     constructor() {
         this.Q = Q;
     }
-
+    
 	init(files, app) {
+        this.io = app.socketio;
         this.model = files.model;
-		this.mongoose = files.model.mongoose;
+		this.mongoose = files.model && files.model.mongoose;
 	}
 
     setModel(Model) {

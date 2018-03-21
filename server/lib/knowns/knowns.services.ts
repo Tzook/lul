@@ -4,13 +4,6 @@ import * as _ from "underscore";
 import { extendStatsWithMax } from '../rooms/rooms.middleware';
 
 export default class KnownsServices extends MasterServices {
-    protected io: SocketIO.Namespace;
-
-	init(files, app) {
-		this.io = app.socketio;
-		super.init(files, app);
-	}
-
     public getLoggedInKnownsFromList(socket: GameSocket, validator: (knownSocket: GameSocket) => boolean = _.constant(true)): Set<GameSocket> {
         let loggedInKnowns: Set<GameSocket> = new Set();
         for (let getKnowns of socket.getKnownsList) {

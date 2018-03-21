@@ -6,15 +6,15 @@ import talentsConfig from "../talents/talents.config";
 import TalentsController from './talents.controller';
 import { getRoomInfo } from '../rooms/rooms.services';
 import { EQUIPS_SCHEMA } from '../equips/equips.model';
-import { getServices } from '../main/bootstrap';
+import { getServices, getEmitter } from '../main/bootstrap';
 import statsConfig from '../stats/stats.config';
+import { isMobInBuff } from './talents.controller';
+import { extendMobSchemaWithSpells, extendTalentsGenerationWithSpells } from '../spells/spells.model';
 
 export default class TalentsServices extends MasterServices {
 	private controller: TalentsController;
 	private abilitiesInfo: Map<string, TALENT_INFO> = new Map();
 	private perksInfo: Map<string, ABILITY_PERK_INSTANCE[]> = new Map();
-	// primary ability => lvl|key => spell
-	private spellsInfo: Map<string, Map<number|string, ABILITY_SPELL_MODEL>> = new Map();
 	// buffPerkChance => buffPerkDuration
 	private buffPerks: Map<string, string> = new Map();
 
@@ -310,7 +310,7 @@ export default class TalentsServices extends MasterServices {
 	protected hasBuff(target: PLAYER, perkName: string): boolean {
 		return isSocket(target) 
 			? this.controller.isSocketInBuff(<GameSocket>target, perkName)
-			: this.controller.isMobInBuff((<MOB_INSTANCE>target).room, (<MOB_INSTANCE>target).id, perkName);
+			: isMobInBuff((<MOB_INSTANCE>target).room, (<MOB_INSTANCE>target).id, perkName);
 	}
 
 	public getBleedDmg(dmg: number): number {
@@ -321,23 +321,8 @@ export default class TalentsServices extends MasterServices {
 		return Math.max(dmg * talentsConfig.PERKS_INFO.BURN_DMG_MODIFIER | 0, 1);
 	}
 
-	public getSpell(socket: GameSocket, spellKey: string): ABILITY_SPELL_MODEL|undefined {
-		const ability = socket.character.stats.primaryAbility;
-		return this.spellsInfo.get(ability).get(spellKey);
-	}
-
-	public canUseSpell(socket: GameSocket, spell: ABILITY_SPELL_MODEL): boolean {
-		const ability = socket.character.stats.primaryAbility;
-		const talent = socket.character.talents._doc[ability];
-		return talent && talent.lvl >= spell.lvl;
-	}
-
 	public getStealValue(value, percent): number {
 		return value * percent | 0;
-	}
-
-	public getMobSpellRestTime(min: number, max: number): number {
-		return _.random(min * 1000, max * 1000);
 	}
 
 	public getTalentInfo(ability: string): TALENT_INFO|undefined {
@@ -375,20 +360,9 @@ export default class TalentsServices extends MasterServices {
 					addToPool: perk.addToPool,
 				};
 				talentSchema.perks.push(perkSchema);
-			});
-			
-			(talent.spells || []).forEach(spell => {
-				let spellSchema: ABILITY_SPELL_MODEL = {
-					key: spell.key,
-					lvl: spell.level,
-					mp: spell.mana,
-					perks: {},
-				};
-				(spell.perks || []).forEach(perk => {
-					spellSchema.perks[perk.key] = +perk.value;
-				});
-				talentSchema.spells.push(spellSchema);
-			});
+            });
+            
+            extendTalentsGenerationWithSpells(talent, talentSchema);
 			
 			(talent.initialPerks || []).forEach(perk => {
 				talentSchema.info.initPerks[perk.key] = +perk.value;
@@ -443,12 +417,11 @@ export default class TalentsServices extends MasterServices {
 			.then((docs: TALENT_MODEL[]) => {
 				docs.forEach(doc => {
 					const perksArray = this.getLvlPerksArray(doc.perks);
-					this.perksInfo.set(doc.ability, perksArray);
-
-					const spellsArray = this.getSpellsArrayMap(doc.spells);
-					this.spellsInfo.set(doc.ability, spellsArray);
+                    this.perksInfo.set(doc.ability, perksArray);
 
 					this.abilitiesInfo.set(doc.ability, doc.info);
+                    
+                    getEmitter().emit(talentsConfig.GLOBAL_TALENT_READY.name, {doc});
 				});
 				console.log("got talents");
 				return this.perksInfo;
@@ -479,42 +452,17 @@ export default class TalentsServices extends MasterServices {
 		}
 		return perksArray;
 	}
-
-	protected getSpellsArrayMap(spells: ABILITY_SPELL_MODEL[]){
-		let result = new Map();
-
-		for (let i = 0; i < spells.length; i++) {
-			const spell = spells[i];
-			result.set(spell.lvl, spell);
-			result.set(spell.key, spell);
-		}
-
-		return result;
-	}
 };
 
 export function extendMobSchemaWithTalents(mob: any, mobSchema: MOB_MODEL): void {
 	(mob.perks || []).forEach(perk => {
 		mobSchema.perks = mobSchema.perks || {};
 		mobSchema.perks[perk.key] = +perk.value;
-	});
-
-	(mob.spells || []).forEach(spell => {
-		mobSchema.spells = mobSchema.spells || {};
-        let spellSchema: MOB_SPELL = <MOB_SPELL>getPerksSchema(spell.perks);
-        spellSchema.minTime = spell.minTime;
-        spellSchema.maxTime = spell.maxTime;
-        mobSchema.spells[spell.key] = spellSchema;
     });
-    
-    if (mob.deathRattle) {
-        let deathRattle: MOB_DEATH_SPELL = <MOB_DEATH_SPELL>getPerksSchema(mob.deathRattle.perks);
-        deathRattle.key = mob.deathRattle.key;
-        mobSchema.deathSpell = deathRattle;
-    }
+    extendMobSchemaWithSpells(mob, mobSchema);
 }
 
-function getPerksSchema(perkList?: any[]): {perks: PERK_MAP} {
+export function getPerksSchema(perkList?: any[]): {perks: PERK_MAP} {
     let perks: PERK_MAP = {};
     (perkList || []).forEach(perk => {
         perks[perk.key] = +perk.value;

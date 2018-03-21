@@ -1,7 +1,7 @@
 import SocketioRouterBase from '../socketio/socketio.router.base';
 import TalentsMiddleware from './talents.middleware';
 import TalentsController from './talents.controller';
-import TalentsServices, { getTalent, hasAbility, removeBonusPerks, createBonusPerks, addBonusPerks, updateBonusPerks, modifyBonusPerks, getMpUsage } from './talents.services';
+import TalentsServices, { getTalent, hasAbility, removeBonusPerks, createBonusPerks, addBonusPerks, updateBonusPerks, modifyBonusPerks } from './talents.services';
 import talentsConfig from '../talents/talents.config';
 import statsConfig from '../stats/stats.config';
 import StatsRouter from '../stats/stats.router';
@@ -10,7 +10,7 @@ import mobsConfig from '../mobs/mobs.config';
 import RoomsRouter from '../rooms/rooms.router';
 import combatConfig from '../combat/combat.config';
 import { getEmptyBonusPerks, getBonusPerks, applySpikes } from './talents.services';
-import { getMobDeadOrAlive, getMob } from '../mobs/mobs.controller';
+import { getMob } from '../mobs/mobs.controller';
 import { getDamageTaken } from '../combat/combat.services';
 
 export default class TalentsRouter extends SocketioRouterBase {
@@ -197,60 +197,6 @@ export default class TalentsRouter extends SocketioRouterBase {
     [talentsConfig.SERVER_INNER.GAIN_LVL.name] (data, socket: GameSocket) {
 		this.emitter.emit(talentsConfig.SERVER_INNER.GAIN_ABILITY_LVL.name, {talent: socket.character.charTalents._doc[talentsConfig.CHAR_TALENT], ability: talentsConfig.CHAR_TALENT}, socket);
     }
-
-	[talentsConfig.SERVER_GETS.USE_SPELL.name](data, socket: GameSocket) {
-		const {spell_key} = data;
-		const spell = this.services.getSpell(socket, spell_key);
-		if (!spell) {
-			return this.sendError(data, socket, "The primary ability does not have that spell.");	
-		} else if (!this.services.canUseSpell(socket, spell)) {
-			return this.sendError(data, socket, "Character does not meet the requirements to use that spell.");
-		}
-		let mp = getMpUsage(spell.mp, socket);
-		if (socket.character.stats.mp.now < mp) {
-			return this.sendError(data, socket, "Not enough mana to activate the spell.");
-		}
-
-		this.emitter.emit(statsConfig.SERVER_INNER.USE_MP.name, { mp }, socket);
-		
-		socket.broadcast.to(socket.character.room).emit(talentsConfig.CLIENT_GETS.USE_SPELL.name, {
-			char_id: socket.character._id,
-            spell_key,
-		});
-	}
-
-	[talentsConfig.SERVER_GETS.HIT_SPELL.name](data, socket: GameSocket) {
-		const {target_ids, spell_key} = data;
-		const spell = this.services.getSpell(socket, spell_key);
-		if (!spell) {
-			return this.sendError(data, socket, "The primary ability does not have that spell.");	
-		} else if (!this.services.canUseSpell(socket, spell)) {
-			return this.sendError(data, socket, "Character does not meet the requirements to use that spell.");
-		}
-
-		socket.currentSpell = spell;
-		socket.lastAttackLoad = 0;
-		
-		this.emitter.emit(combatConfig.SERVER_GETS.USE_ABILITY.name, {target_ids}, socket);		
-		
-		socket.currentSpell = null;
-	}
-
-	[talentsConfig.SERVER_GETS.HURT_BY_SPELL.name](data, socket: GameSocket) {
-		let {mob_id, spell_key} = data;
-		let mob = getMobDeadOrAlive(mob_id, socket);
-		if (!mob) {
-			return this.sendError(data, socket, "Mob doesn't exist!");
-		} else if (!(mob.spells || {})[spell_key]) {
-			return this.sendError(data, socket, "Mob doesn't have that spell!");
-		}
-		
-		mob.currentSpell = mob.spells[spell_key];
-
-		this.emitter.emit(mobsConfig.SERVER_INNER.PLAYER_HURT.name, {mob, cause: combatConfig.HIT_CAUSE.SPELL}, socket);
-
-		mob.currentSpell = null;
-    }
     
     [talentsConfig.SERVER_INNER.PLAYER_HURT.name]({mob, cause}: {mob: MOB_INSTANCE, cause: string}, socket: GameSocket) {
         if (cause === combatConfig.HIT_CAUSE.ATK && getMob(mob.id, socket)) {
@@ -268,25 +214,8 @@ export default class TalentsRouter extends SocketioRouterBase {
         }
     }
 	
-	[talentsConfig.SERVER_INNER.MOB_AGGRO_CHANGED.name](data) {
-		let {id, mob}: {mob: MOB_INSTANCE, id?: string} = data;	
-		if (mob.spells) {
-			if (!id) {
-				this.controller.mobStopSpellsPicker(mob);
-			} else if (!this.controller.hasMobSpellsPicker(mob)) {
-				this.controller.mobStartSpellsPicker(mob);
-			}
-		}		
-	}
-	
 	[talentsConfig.SERVER_INNER.MOB_DESPAWN.name](data: {mob: MOB_INSTANCE}, socket: GameSocket) {
 		let {mob} = data;
-		if (mob.spells) {
-			this.controller.mobStopSpellsPicker(mob);
-        }
-        if (mob.deathSpell) {
-            this.controller.mobUsesSpell(mob, mob.deathSpell.key);
-        }
 		this.controller.clearMobBuffs(socket.character.room, mob.id);
 	}
 	

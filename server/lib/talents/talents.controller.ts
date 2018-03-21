@@ -6,13 +6,13 @@ import mobsConfig from '../mobs/mobs.config';
 import statsConfig from '../stats/stats.config';
 import * as _ from 'underscore';
 import combatConfig from '../combat/combat.config';
+import { getController } from '../main/bootstrap';
 
 export default class TalentsController extends MasterController {
 	protected services: TalentsServices;
 	protected mobsRouter: MobsRouter;
 	// room => mob => perk name => buff instance[]
 	protected roomToBuff: Map<string, Map<string, Map<string, Set<BUFF_INSTANCE>>>> = new Map();
-	protected mobsSpellsPickers: Map<string, Map<string, NodeJS.Timer>> = new Map();
 
 	init(files, app) {
 		this.mobsRouter = files.routers.mobs;
@@ -260,65 +260,10 @@ export default class TalentsController extends MasterController {
 		}
 	}
 
-	public isMobInBuff(room: string, mobId: string, perkName: string): boolean {
-		const mobBuffs = this.getMobBuffsInstance(room, mobId);
-		const hasBuff = mobBuffs.has(perkName);
-		return hasBuff;
-	}
-
 	public isSocketInBuff(socket: GameSocket, perkName: string): boolean {
 		const hasBuff = socket.buffs.has(perkName);
 		return hasBuff;
 	}
-
-	public mobStartSpellsPicker(mob: MOB_INSTANCE) {
-		let timersMap: Map<string, NodeJS.Timer> = new Map();
-		
-		for (let spellKey in mob.spells) {
-			this.activateMobSpellTimer(mob, spellKey, timersMap, false);
-		}
-
-		this.mobsSpellsPickers.set(mob.id, timersMap);
-	}
-
-	private activateMobSpellTimer(mob: MOB_INSTANCE, spellKey: string, timersMap: Map<string, NodeJS.Timer>, justSkippedSpell: boolean) {
-		const {minTime, maxTime} = mob.spells[spellKey];
-		const time = justSkippedSpell ? talentsConfig.SKIP_SPELL_RETRY_TIME : this.services.getMobSpellRestTime(minTime, maxTime);
-		const timerId = setTimeout(() => {
-            const canUseSpell = this.canMobUseSpell(mob);
-            if (canUseSpell) {
-                this.mobUsesSpell(mob, spellKey);
-            }
-			// recursively use the spell
-			this.activateMobSpellTimer(mob, spellKey, timersMap, !canUseSpell);
-		}, time);
-		timersMap.set(spellKey, timerId);
-	}
-
-    public mobUsesSpell(mob: MOB_INSTANCE, spellKey: string) {
-        this.io.to(mob.room).emit(talentsConfig.CLIENT_GETS.MOB_USE_SPELL.name, {
-            mob_id: mob.id,
-            spell_key: spellKey,
-        });
-    }
-
-	public hasMobSpellsPicker(mob: MOB_INSTANCE): boolean {
-		return this.mobsSpellsPickers.has(mob.id);
-	}
-	
-	public mobStopSpellsPicker(mob: MOB_INSTANCE) {
-		const timersMap = this.mobsSpellsPickers.get(mob.id);
-		if (timersMap) {
-			for (let [,timerId] of timersMap) {
-				clearTimeout(timerId);
-			}
-			this.mobsSpellsPickers.delete(mob.id);
-		}
-    }
-    
-    protected canMobUseSpell(mob: MOB_INSTANCE): boolean {
-        return !this.isMobInBuff(mob.room, mob.id, talentsConfig.PERKS.STUN_CHANCE) && !this.isMobInBuff(mob.room, mob.id, talentsConfig.PERKS.FREEZE_CHANCE);
-    }
 
 	protected getRoomBuffsInstance(room: string, createIfMissing: boolean = false) {
 		let roomBuffs = this.roomToBuff.get(room);
@@ -331,7 +276,7 @@ export default class TalentsController extends MasterController {
 		return roomBuffs;
 	}
 
-	protected getMobBuffsInstance(room: string, mobId: string, createIfMissing: boolean = false) {
+	public getMobBuffsInstance(room: string, mobId: string, createIfMissing: boolean = false) {
 		let roomBuffs = this.getRoomBuffsInstance(room, createIfMissing);
 		let mobBuffs = roomBuffs.get(mobId);
 		if (!mobBuffs) {
@@ -363,3 +308,13 @@ export default class TalentsController extends MasterController {
 			});
 	}
 };
+
+function getTalentsController(): TalentsController {
+    return getController("talents");
+}
+
+export function isMobInBuff(room: string, mobId: string, perkName: string): boolean {
+    const mobBuffs = getTalentsController().getMobBuffsInstance(room, mobId);
+    const hasBuff = mobBuffs.has(perkName);
+    return hasBuff;
+}
