@@ -55,6 +55,7 @@ export default class TalentsModel extends MasterModel {
 
         this.schema = TALENT_SCHEMA;
         this.minimize = true;
+        this.listenForSchemaAddition('Talent');
     }
 
     get priority() {
@@ -84,6 +85,8 @@ export default class TalentsModel extends MasterModel {
         this.addToSchema("ItemInstance", ITEMS_TALENTS_SCHEMA);
         
         this.addToSchema("Config", { perks: CONFIG_PERK_SCHEMA });
+
+        this.removeListen('Character');
         
         setTimeout(() => this.controller.warmTalentsInfo()); // timeout so the Model can be set
         return Promise.resolve();
