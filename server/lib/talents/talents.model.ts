@@ -85,8 +85,8 @@ export default class TalentsModel extends MasterModel {
         this.addToSchema("ItemInstance", ITEMS_TALENTS_SCHEMA);
         
         this.addToSchema("Config", { perks: CONFIG_PERK_SCHEMA });
-
-        this.removeListen('Character');
+        
+        this.removeListen('Talent');
         
         setTimeout(() => this.controller.warmTalentsInfo()); // timeout so the Model can be set
         return Promise.resolve();
