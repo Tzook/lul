@@ -1,7 +1,7 @@
 import SocketioRouterBase from '../socketio/socketio.router.base';
 import TalentsMiddleware from './talents.middleware';
 import TalentsController from './talents.controller';
-import TalentsServices, { getTalent, hasAbility, removeBonusPerks, createBonusPerks, addBonusPerks, updateBonusPerks, modifyBonusPerks } from './talents.services';
+import TalentsServices, { getTalent, hasAbility } from './talents.services';
 import talentsConfig from '../talents/talents.config';
 import statsConfig from '../stats/stats.config';
 import StatsRouter from '../stats/stats.router';
@@ -9,9 +9,10 @@ import MobsRouter from '../mobs/mobs.router';
 import mobsConfig from '../mobs/mobs.config';
 import RoomsRouter from '../rooms/rooms.router';
 import combatConfig from '../combat/combat.config';
-import { getEmptyBonusPerks, getBonusPerks, applySpikes } from './talents.services';
+import { applySpikes } from './talents.services';
 import { getMob } from '../mobs/mobs.controller';
 import { getDamageTaken } from '../combat/combat.services';
+import { modifyBonusPerks } from '../bonusPerks/bonusPerks.services';
 
 export default class TalentsRouter extends SocketioRouterBase {
 	protected middleware: TalentsMiddleware;
@@ -54,8 +55,6 @@ export default class TalentsRouter extends SocketioRouterBase {
 		socket.getMpRegenInterval = () => this.services.getMpRegenInterval(socket);
 		socket.getMpUsageModifier = () => this.services.getMpUsageModifier(socket);
         socket.buffs = new Map();
-        createBonusPerks(socket);
-        process.nextTick(() => this.addStats(socket));
 	}
 
 	public getAbilityInfo(ability: string): TALENT_INFO|undefined {
@@ -218,32 +217,13 @@ export default class TalentsRouter extends SocketioRouterBase {
 		let {mob} = data;
 		this.controller.clearMobBuffs(socket.character.room, mob.id);
 	}
-	
-	[talentsConfig.SERVER_INNER.CHANGED_ABILITY.name](data, socket: GameSocket) {
-		let {previousAbility} = data;
-
-		const oldStats = getBonusPerks(socket, previousAbility);
-		const newStats = getBonusPerks(socket);
-		updateBonusPerks(socket, oldStats, newStats);
-    }
     
 	[talentsConfig.SERVER_INNER.LEFT_ROOM.name](data, socket: GameSocket) {
+        // make sure that the user doesn't have the room's ability if he doesn't own it
 		if (!hasAbility(socket, socket.character.stats.primaryAbility)) {
             this.emitter.emit(combatConfig.SERVER_GETS.CHANGE_ABILITY.name, { 
                 ability: statsConfig.ABILITY_MELEE
             }, socket);
         }
-    }
-
-	[talentsConfig.SERVER_INNER.WORE_EQUIP.name](data: {equip: ITEM_INSTANCE, oldEquip: ITEM_INSTANCE}, socket: GameSocket) {
-		const {equip, oldEquip} = data;
-		modifyBonusPerks(socket, () => {
-			addBonusPerks(equip, socket);
-			removeBonusPerks(oldEquip, socket);
-		});
-	}
-    
-    private addStats(socket: GameSocket) {
-        updateBonusPerks(socket, getEmptyBonusPerks(), getBonusPerks(socket));
     }
 };

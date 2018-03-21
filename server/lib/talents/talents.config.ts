@@ -3,7 +3,6 @@ import roomsConfig from '../rooms/rooms.config';
 import mobsConfig from '../mobs/mobs.config';
 import socketioConfig from '../socketio/socketio.config';
 import combatConfig from '../combat/combat.config';
-import equipsConfig from '../equips/equips.config';
 
 export default {
 	"ROUTES": {
@@ -30,9 +29,7 @@ export default {
 		GAIN_ABILITY_LVL: {name: "gain_ability_lvl", alive: true, log: true},
 		GENERATE_PERK_POOL: {name: "generate_perk_pool", alive: true},
 		GAIN_LVL: Object.assign({}, statsConfig.SERVER_INNER.GAIN_LVL, {log: false}),
-		CHANGED_ABILITY: Object.assign({}, combatConfig.SERVER_INNER.CHANGED_ABILITY),
 		LEFT_ROOM: Object.assign({}, roomsConfig.SERVER_INNER.LEFT_ROOM),
-		WORE_EQUIP: Object.assign({}, equipsConfig.SERVER_INNER.WORE_EQUIP),
 		PLAYER_HURT: Object.assign({}, mobsConfig.SERVER_INNER.PLAYER_HURT),
 	},
 	"SERVER_GETS": {
@@ -48,8 +45,6 @@ export default {
 		ACTIVATED_BUFF: {name: "buff_activated"},
 		RESISTED_BUFF: {name: "buff_resisted"},
 		GAIN_ABILITY: {name: "actor_gain_ability"},
-		UPDATE_ATTACK_SPEED: {name: "update_actor_attack_speed"},
-		UPDATE_MANA_COST: {name: "update_actor_mana_cost"},
 	},
 	PERKS: {
 		AOE_CHANCE: "aoeChance",
@@ -113,7 +108,6 @@ export default {
 	HIT_TYPE_ATTACK: "atk",
 	HIT_TYPE_HEAL: "heal",
     CHAR_TALENT: "charTalent",
-    PERK_VALUES_RANDOM_OFFSET: 0.2,
 }
 
 

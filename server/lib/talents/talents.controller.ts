@@ -1,5 +1,5 @@
 import MasterController from '../master/master.controller';
-import TalentsServices, { getRoom, getId, isSocket, removeBonusPerks, addBonusPerks, modifyBonusPerks } from './talents.services';
+import TalentsServices, { getRoom, getId, isSocket } from './talents.services';
 import MobsRouter from '../mobs/mobs.router';
 import talentsConfig from '../talents/talents.config';
 import mobsConfig from '../mobs/mobs.config';
@@ -7,6 +7,7 @@ import statsConfig from '../stats/stats.config';
 import * as _ from 'underscore';
 import combatConfig from '../combat/combat.config';
 import { getController } from '../main/bootstrap';
+import { modifyBonusPerks, addBonusPerks, removeBonusPerks } from '../bonusPerks/bonusPerks.services';
 
 export default class TalentsController extends MasterController {
 	protected services: TalentsServices;
