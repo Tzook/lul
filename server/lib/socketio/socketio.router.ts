@@ -236,8 +236,12 @@ export default class SocketioRouter extends SocketioRouterBase {
                 });
             });
             
-        process.on("exit", () => {
-            notifyUserAboutError(this.io, restartText, true);    
-        });
+        if (isProduction()) {
+            ["exit", "SIGINT", "SIGUSR1", "SIGUSR2", "SIGTERM"].forEach((eventType) => {
+                (<any>process).on(eventType, () => notifyUserAboutError(this.io, restartText, true));
+            });
+
+            (<any>process).on("uncaughtException", () => notifyUserAboutError(this.io, "Server had an unexpected error!", true));
+        }
 	}
  };
