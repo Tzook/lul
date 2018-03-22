@@ -32,6 +32,6 @@ export function createIssue({body, name}: {body: string, name: string}) {
         repo: "lel", 
         title: `[Bug] ${title} (by ${name})`,
         body: `User's description:\n${body}`,
-        labels: ["user bug"]
+        labels: ["user bug", "bug"]
     }).then(() => {});
 }
