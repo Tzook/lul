@@ -214,25 +214,30 @@ export default class SocketioRouter extends SocketioRouterBase {
 
 	private restartServerEvent(app) {
 		let token = getEnvVariable("herokuAuth");
-		let heroku = new Heroku({ token });
+        let heroku = new Heroku({ token });
+        
+        let restartText = "Restarting server for an update!\n";
 		
 		app.post(this.ROUTES.RESTART, 
 			this.middleware.isBoss.bind(this.middleware),
 			(req, res) => {
-                let restartText = "Restarting server!";
+                restartText = "Restarting server!";
                 let charName = (<any>_.last(req.user.characters) || {}).name;
                 if (charName) {
                     restartText += `\nTriggered by ${charName}.`;
                 }
-                notifyUserAboutError(this.io, restartText, true);
 				heroku.delete('/apps/lul/dynos')
-					.then(apps => {
-						console.log("Restarting dynos");
-						res.send({data: 'Restarting server.'});	
-					})
-					.catch(e => {
-						console.error("Had an error restarting lul:", e);
-					});
-		});
+                .then(apps => {
+                    console.log("Restarting dynos");
+                    res.send({data: 'Restarting server.'});	
+                })
+                .catch(e => {
+                    console.error("Had an error restarting lul:", e);
+                });
+            });
+            
+        process.on("exit", () => {
+            notifyUserAboutError(this.io, restartText, true);    
+        });
 	}
  };
