@@ -216,7 +216,7 @@ export default class SocketioRouter extends SocketioRouterBase {
 		let token = getEnvVariable("herokuAuth");
         let heroku = new Heroku({ token });
         
-        let restartText = "Restarting server for an update!\n";
+        let restartText = "Restarting server for an update!";
 		
 		app.post(this.ROUTES.RESTART, 
 			this.middleware.isBoss.bind(this.middleware),
