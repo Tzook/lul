@@ -66,8 +66,8 @@ export default class SocketioRouterBase extends MasterRouter {
 	}
 };
 
-function notifyUserAboutError(socket: GameSocket, error: string, display: boolean) {
-	socket.emit(config.CLIENT_GETS.EVENT_ERROR.name, {
+export function notifyUserAboutError(to: NodeJS.EventEmitter, error: string, display: boolean) {
+	to.emit(config.CLIENT_GETS.EVENT_ERROR.name, {
 		error,
 		display,
 	});

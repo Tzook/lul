@@ -9,6 +9,8 @@ import config from './socketio.config';
 require('./socketio.fixer');
 import * as passportSocketIo from 'passport.socketio';
 import { isProduction, getEnvVariable } from '../main/main';
+import { notifyUserAboutError } from './socketio.router.base';
+import * as _ from "underscore";
 
 export default class SocketioRouter extends SocketioRouterBase {
 	protected middleware: SocketioMiddleware;
@@ -217,6 +219,12 @@ export default class SocketioRouter extends SocketioRouterBase {
 		app.post(this.ROUTES.RESTART, 
 			this.middleware.isBoss.bind(this.middleware),
 			(req, res) => {
+                let restartText = "Restarting server!";
+                let charName = (<any>_.last(req.user.characters) || {}).name;
+                if (charName) {
+                    restartText += `\nTriggered by ${charName}.`;
+                }
+                notifyUserAboutError(this.io, restartText, true);
 				heroku.delete('/apps/lul/dynos')
 					.then(apps => {
 						console.log("Restarting dynos");
