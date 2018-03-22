@@ -4,7 +4,7 @@ import * as _ from 'underscore';
 import { doesChanceWorkFloat } from '../drops/drops.services';
 import talentsConfig from "../talents/talents.config";
 import TalentsController from './talents.controller';
-import { getRoomInfo } from '../rooms/rooms.services';
+import { getRoomInfo, getRoomName } from '../rooms/rooms.services';
 import { getServices, getEmitter } from '../main/bootstrap';
 import { isMobInBuff } from './talents.controller';
 import { extendMobSchemaWithSpells, extendTalentsGenerationWithSpells } from '../spells/spells.model';
@@ -200,7 +200,7 @@ export default class TalentsServices extends MasterServices {
 	}
 
 	public getDefenceModifier(attacker: PLAYER, target: PLAYER): number {
-		const isBlock = this.isAbilityActivated(talentsConfig.PERKS.BLOCK_CHANCE, target);
+		const isBlock = this.isAttackBlocked(attacker, target);
 		let defenceModifier = 0; // complete block
 		if (!isBlock) {
 			let dmgReduction = this.getAbilityPerkValue(talentsConfig.PERKS.DAMAGE_REDUCTION, target);
@@ -209,6 +209,12 @@ export default class TalentsServices extends MasterServices {
 		return defenceModifier;
     }
     
+	private isAttackBlocked(attacker: PLAYER, target: PLAYER) {
+		return this.isAbilityActivated(talentsConfig.PERKS.BLOCK_CHANCE, target)
+			// block if the socket is using a non-supported ability
+			|| (isSocket(attacker) && isAbilityNotSupportedInRoom(<GameSocket>attacker));
+	}
+
 	public getSpikesModifier(target: PLAYER): number {
 		return this.getAbilityPerkValue(talentsConfig.PERKS.SPIKES_MODIFIER, target);
 	}
@@ -498,13 +504,22 @@ export function hasAbility(socket: GameSocket, ability: string): boolean {
 	return !!socket.character.talents._doc[ability];
 }
 
-export function canUseAbility(socket: GameSocket, ability: string, room?: string): boolean {
-	return hasAbility(socket, ability) || isAbilitySupportedInRoom(room || socket.character.room, ability);
+export function canUseAbility(socket: GameSocket, ability: string): boolean {
+	return hasAbility(socket, ability) || isAbilitySupportedInRoom(socket, ability);
 }
 
-export function isAbilitySupportedInRoom(room: string, ability: string): boolean {
+export function isAbilitySupportedInRoom(socket: GameSocket, ability?: string, room?: string): boolean {
+	room = room || getRoomName(socket);
+	ability = ability || socket.character.stats.primaryAbility;
     const roomInfo = getRoomInfo(room);
 	return roomInfo.abilities && roomInfo.abilities[ability];
+}
+
+export function isAbilityNotSupportedInRoom(socket: GameSocket, ability?: string, room?: string): boolean {
+	room = room || getRoomName(socket);
+	ability = ability || socket.character.stats.primaryAbility;
+    const roomInfo = getRoomInfo(room);
+	return roomInfo.abilities && !roomInfo.abilities[ability];
 }
 
 export function isSocket(target: PLAYER): boolean {
