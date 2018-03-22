@@ -103,13 +103,17 @@ export default class CombatRouter extends SocketioRouterBase {
 			} else if (!healedSocket.alive) {
 				this.sendError({charName}, socket, "Cannot heal dead people. You ain't jesus");
 			} else {
-				const dmgResult = calculateDamage(socket, healedSocket);
-				this.emitter.emit(config.SERVER_INNER.HEAL_CHAR.name, {
-					healedSocket,
-					cause,
-					dmg: dmgResult.dmg,
-					crit: dmgResult.crit
-				}, socket);
+                const dmgResult = calculateDamage(socket, healedSocket);
+                // don't heal above the missing hp of the individual
+                const dmg = Math.min(healedSocket.maxHp - healedSocket.character.stats.hp.now, dmgResult.dmg);
+                if (dmg > 0) {
+                    this.emitter.emit(config.SERVER_INNER.HEAL_CHAR.name, {
+                        healedSocket,
+                        cause,
+                        dmg,
+                        crit: dmgResult.crit
+                    }, socket);
+                }
 			}
 			cause = config.HIT_CAUSE.AOE;
 		}
