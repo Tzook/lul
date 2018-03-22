@@ -74,6 +74,10 @@ export default class RoomsRouter extends SocketioRouterBase {
 		}
 	}
 
+	[config.SERVER_GETS.STUCK.name] (data, socket: GameSocket) {
+        this.emitter.emit(config.SERVER_INNER.MOVE_TO_TOWN.name, {}, socket);
+	}
+
 	[config.SERVER_INNER.MOVE_TO_TOWN.name] (data, socket: GameSocket) {
 		let roomInfo = this.services.getRoomInfo(getRoomName(socket));
 		if (!roomInfo) {
