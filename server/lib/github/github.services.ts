@@ -25,12 +25,12 @@ function getGithubClient() {
 }
 
 export function createIssue({body, name}: {body: string, name: string}) {
-    const title = body.length > 25 ? `${body.slice(0, 22)}...` : body;
+    const title = body.length > 35 ? `${body.slice(0, 32)}...` : body;
     const client = getGithubClient();
     return client.issues.create({
         owner: "Tzook", 
         repo: "lel", 
-        title: `[User Bug]: ${title} (by ${name})`,
+        title: `[Bug] ${title} (by ${name})`,
         body: `User's description:\n${body}`,
         labels: ["user bug"]
     }).then(() => {});
