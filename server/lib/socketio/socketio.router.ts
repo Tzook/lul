@@ -216,7 +216,7 @@ export default class SocketioRouter extends SocketioRouterBase {
 		let token = getEnvVariable("herokuAuth");
         let heroku = new Heroku({ token });
         
-        let restartText = "Restarting server for an update!";
+        let restartText = "Restarting server!\n(For an update)";
 		
 		app.post(this.ROUTES.RESTART, 
 			this.middleware.isBoss.bind(this.middleware),
@@ -224,7 +224,7 @@ export default class SocketioRouter extends SocketioRouterBase {
                 restartText = "Restarting server!";
                 let charName = (<any>_.last(req.user.characters) || {}).name;
                 if (charName) {
-                    restartText += `\nTriggered by ${charName}.`;
+                    restartText += `\n(Triggered by ${charName})`;
                 }
 				heroku.delete('/apps/lul/dynos')
                 .then(apps => {
@@ -241,7 +241,7 @@ export default class SocketioRouter extends SocketioRouterBase {
                 (<any>process).on(eventType, () => notifyUserAboutError(this.io, restartText, true));
             });
 
-            (<any>process).on("uncaughtException", () => notifyUserAboutError(this.io, "Server had an unexpected error!", true));
+            (<any>process).on("uncaughtException", () => notifyUserAboutError(this.io, "Restarting server!\n(Had an error)", true));
         }
 	}
  };
