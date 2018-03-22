@@ -89,5 +89,6 @@ export function getDamageRange(min: number, max: number): number {
 
 export function getSpawnIntervalTime(spawn: SPAWN_INSTANCE) {
 	let minOffset = spawn.interval > 1 ? -mobsConfig.SPAWN_INTERVAL_OFFSET : 0;
-	return spawn.interval * 1000 + _.random(minOffset, mobsConfig.SPAWN_INTERVAL_OFFSET);
+	let maxOffset = spawn.interval > 1 ? mobsConfig.SPAWN_INTERVAL_OFFSET : 0;
+	return spawn.interval * 1000 + _.random(minOffset, maxOffset);
 }
