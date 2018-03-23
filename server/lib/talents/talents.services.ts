@@ -478,14 +478,12 @@ export function getPerksSchema(perkList?: any[]): {perks: PERK_MAP} {
 }
 
 export function extendRoomSchemaWithTalents(scene: any, roomSchema: ROOM_MODEL): void {
-    let abilities: ROOM_ABILITIES;
+    let abilities: ROOM_ABILITIES = null;
     (scene.abilities || []).forEach(ability => {
         abilities = abilities || {};
         abilities[ability] = true;
     });
-    if (abilities) {
-        roomSchema.abilities = abilities;
-    }
+    roomSchema.abilities = abilities;
 }
 
 export function getTalentsServices(): TalentsServices {

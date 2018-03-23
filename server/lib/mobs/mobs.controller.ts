@@ -195,7 +195,7 @@ export default class MobsController extends MasterController {
 
 	public didHitMob(mobId: string, socket: GameSocket) {
 		let mob = this.getMob(mobId, socket);
-		return this.services.didHitMob(mob.lvl, socket.character.stats.lvl);
+		return mob.hp > 0 && this.services.didHitMob(mob.lvl, socket.character.stats.lvl);
 	}
 
 	public clearRoom(socket: GameSocket) {
