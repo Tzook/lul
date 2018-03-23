@@ -3,7 +3,7 @@ import SocketioRouterBase from '../socketio/socketio.router.base';
 import MobsMiddleware from './mobs.middleware';
 import MobsController from './mobs.controller';
 import RoomsRouter from '../rooms/rooms.router';
-import MobsServices from './mobs.services';
+import MobsServices, { getPartyShareExp } from './mobs.services';
 import PartyRouter from '../party/party.router';
 import config from '../mobs/mobs.config';
 import statsConfig from '../stats/stats.config';
@@ -121,7 +121,7 @@ export default class MobsRouter extends SocketioRouterBase {
 			this.emitter.emit(config.SERVER_INNER.MOB_DESPAWN.name, { mob }, socket);	
 
 			let max = {dmg: 0, socket: null};
-			let parties: Map<PARTY_MODEL | GameSocket, {exp: number, socket: GameSocket}> = new Map();
+			let parties: Map<PARTY_MODEL | GameSocket, {exp: number, partySocketOwner: GameSocket}> = new Map();
 			for (let [charId, charDmg] of mob.dmgers) {
 				let charSocket = socket.map.get(charId);
 				if (charSocket && charSocket.character.room === socket.character.room && charSocket.alive) {
@@ -130,7 +130,7 @@ export default class MobsRouter extends SocketioRouterBase {
 					let party = this.partyRouter.getCharParty(charSocket);
 					if (party) {
 						let currentPartyExp = (parties.get(party) || {exp: 0}).exp;
-						parties.set(party, {socket: charSocket, exp: currentPartyExp + exp});
+						parties.set(party, {partySocketOwner: charSocket, exp: currentPartyExp + exp});
 					} else {
 						this.emitter.emit(statsConfig.SERVER_INNER.GAIN_EXP.name, { exp }, charSocket);
 					}
@@ -141,10 +141,10 @@ export default class MobsRouter extends SocketioRouterBase {
 					}
 				}
 			}
-			for (let [, {socket, exp}] of parties) {
-				let partySockets = this.partyRouter.getPartyMembersInMap(socket);
+			for (let [, {partySocketOwner, exp}] of parties) {
+				let partySockets = this.partyRouter.getPartyMembersInMap(partySocketOwner);
 				// split exp equally among party members
-				exp = Math.ceil(exp / partySockets.length);
+				exp = getPartyShareExp(exp, partySockets);
 
 				for (let memberSocket of partySockets) {
 					this.emitter.emit(statsConfig.SERVER_INNER.GAIN_EXP.name, { exp }, memberSocket);

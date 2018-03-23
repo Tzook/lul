@@ -92,3 +92,9 @@ export function getSpawnIntervalTime(spawn: SPAWN_INSTANCE) {
 	let maxOffset = spawn.interval > 1 ? mobsConfig.SPAWN_INTERVAL_OFFSET : 0;
 	return spawn.interval * 1000 + _.random(minOffset, maxOffset);
 }
+
+export function getPartyShareExp(totalExp: number, partySockets: GameSocket[]) {
+    let expModifier = 1 + (partySockets.length - 1) * 0.1;
+    let exp = Math.ceil(expModifier * totalExp / partySockets.length);
+    return exp;
+}
