@@ -102,11 +102,6 @@ export default class MobsController extends MasterController {
 		let mob = this.getMob(mobId, socket);
 		mob.x = x;
 		mob.y = y;
-		socket.broadcast.to(socket.character.room).emit(mobsConfig.CLIENT_GETS.MOB_MOVE.name, {
-			mob_id: mobId, 
-			x,
-			y,
-		});
 	}
 
 	public hurtMob(mob: MOB_INSTANCE, dmg: number, socket: GameSocket) {

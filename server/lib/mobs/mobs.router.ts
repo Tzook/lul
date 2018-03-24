@@ -14,6 +14,7 @@ import CombatRouter from '../combat/combat.router';
 import { isInInstance, getRoomName } from '../rooms/rooms.services';
 import { getMobDeadOrAlive } from './mobs.controller';
 import { applyDefenceModifier, getDamageTaken } from '../combat/combat.services';
+import mobsConfig from '../mobs/mobs.config';
 
 export default class MobsRouter extends SocketioRouterBase {
 	protected middleware: MobsMiddleware;
@@ -173,7 +174,13 @@ export default class MobsRouter extends SocketioRouterBase {
 				// ignore it for now. The client keeps sending it right after a mob dies because it doesn't know it's dead yet
                 // this.sendError(mob, socket, "Mob doesn't exist!");
             } else {
-                this.controller.moveMob(mob.mob_id, mob.x, mob.y, socket);
+				this.controller.moveMob(mob.mob_id, mob.x, mob.y, socket);
+				socket.broadcast.to(socket.character.room).emit(mobsConfig.CLIENT_GETS.MOB_MOVE.name, {
+					mob_id: mob.mob_id, 
+					x: mob.x,
+					y: mob.y,
+					velocity: mob.velocity
+				});
             }
         });
 	}
