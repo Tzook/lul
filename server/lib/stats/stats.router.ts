@@ -6,6 +6,8 @@ import { BASE_STATS_SCHEMA } from "./stats.model";
 import config from './stats.config';
 import roomsConfig from '../rooms/rooms.config';
 import PartyRouter from '../party/party.router';
+import * as _ from "underscore";
+import combatConfig from '../combat/combat.config';
 
 export default class StatsRouter extends SocketioRouterBase {
     protected controller: StatsController;
@@ -51,7 +53,31 @@ export default class StatsRouter extends SocketioRouterBase {
         this.updateMaxStats(socket);
     }
 
-    [config.SERVER_INNER.TAKE_DMG.name] (data, socket: GameSocket) {
+    [config.SERVER_GETS.TAKE_WORLD_DAMAGE.name] (data: {dmg, perks?}, socket: GameSocket) {
+        let {dmg, perks} = data;
+        let hurter: PERKABLE = {};
+        // convert perks array to an object
+        if (_.isArray(perks)) {
+            for (let perkObject of perks) {
+                if (_.isObject(perkObject) && _.isString(perkObject.key) && !_.isNaN(+perkObject.value)) {
+                    hurter.perks = hurter.perks || {};
+                    hurter.perks[perkObject.key] = +perkObject.value;
+                }
+            }
+        }
+        dmg = +dmg;
+        if (!(dmg > 0)) {
+            return this.sendError(data, socket, "Must mention how much damage to take");
+        }
+        let cause = combatConfig.HIT_CAUSE.ATK;
+        this.emitter.emit(config.SERVER_INNER.TAKE_DMG.name, {
+            dmg,
+            cause,
+            hurter
+        }, socket);
+    }
+
+    [config.SERVER_INNER.TAKE_DMG.name] (data: {dmg, cause, crit, hurter}, socket: GameSocket) {
         let dmg = data.dmg;
         let hpAfterDmg = this.services.getHpAfterDamage(socket.character.stats.hp.now, dmg);
         let hadFullHp = socket.character.stats.hp.now === socket.maxHp;
@@ -69,7 +95,7 @@ export default class StatsRouter extends SocketioRouterBase {
         }
     }
 
-    [config.SERVER_INNER.TOOK_DMG.name] (data, socket: GameSocket) {
+    [config.SERVER_INNER.TOOK_DMG.name] (data: {dmg, cause, crit, hurter}, socket: GameSocket) {
         let {dmg, cause, crit} = data;
 		this.io.to(socket.character.room).emit(config.CLIENT_GETS.TAKE_DMG.name, {
 			id: socket.character._id,

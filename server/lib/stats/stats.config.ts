@@ -12,6 +12,7 @@ const CONFIG = {
 		"UPDATE_MAX_STATS": {"name": "update_max_stats"},
 	},
 	"SERVER_GETS": {
+		"TAKE_WORLD_DAMAGE": {"name": "take_world_damage", "alive": true, "log": true},
 		"RELEASE_DEATH": {"name": "release_death", "alive": false, "log": true}
 	},
 	"CLIENT_GETS": {

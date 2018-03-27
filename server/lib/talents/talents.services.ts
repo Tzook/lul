@@ -251,16 +251,18 @@ export default class TalentsServices extends MasterServices {
 		return this.getAbilityPerkValue(talentsConfig.PERKS.MP_COST, target, ability);
 	}
 	
-	public isAbilityActivated(perk: string, target: PLAYER): boolean {
+	public isAbilityActivated(perk: string, target: HURTER): boolean {
 		const value = this.getAbilityPerkValue(perk, target);
 		const activated = doesChanceWorkFloat(value);
 		return activated;
 	}
 	
-	public getAbilityPerkValue(perk: string, target: PLAYER, ability?: string): number {
+	public getAbilityPerkValue(perk: string, target: HURTER, ability?: string): number {
 		return isSocket(target) 
 			? this.getCharPerkValue(perk, <GameSocket>target, ability)
-			: this.getMobPerkValue(perk, <MOB_INSTANCE>target); 
+			: isMob(target) 
+				? this.getMobPerkValue(perk, <MOB_INSTANCE>target)
+				: this.getGeneralPerkValue(perk, <MOB_INSTANCE>target);
 	}
 	
 	protected getCharPerkValue(perk: string, socket: GameSocket, ability?: string): number {
@@ -277,12 +279,16 @@ export default class TalentsServices extends MasterServices {
 	}
 	
 	protected getMobPerkValue(perk: string, mob: MOB_INSTANCE): number {
-		// get the perk if exists, otherwise get its default
-		let perkValue = (mob.perks || {})[perk] || this.getPerkLevelValue(perk, 0);
+		let perkValue = this.getGeneralPerkValue(perk, mob);
 		
 		perkValue = this.addPerkValueBonuses(mob, perk, perkValue);
 		
 		return perkValue;
+	}
+	
+	protected getGeneralPerkValue(perk: string, target: PERKABLE): number {
+		// get the perk if exists, otherwise get its default
+		return (target.perks || {})[perk] || this.getPerkLevelValue(perk, 0);
 	}
 
 	protected addPerkValueBonuses(target: PLAYER, perkName: string, perkValue: number): number {
@@ -520,8 +526,12 @@ export function isAbilityNotSupportedInRoom(socket: GameSocket, ability?: string
 	return roomInfo.abilities && !roomInfo.abilities[ability];
 }
 
-export function isSocket(target: PLAYER): boolean {
-	return typeof (<MOB_INSTANCE>target).mobId === "undefined";
+export function isSocket(target: HURTER): boolean {
+	return typeof (<GameSocket>target).user !== "undefined";
+}
+
+export function isMob(target: HURTER): boolean {
+	return typeof (<MOB_INSTANCE>target).mobId !== "undefined";
 }
 
 export function getRoom(target: PLAYER): string {

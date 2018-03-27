@@ -109,11 +109,11 @@ export default class TalentsRouter extends SocketioRouterBase {
 	}
 	
     [talentsConfig.SERVER_INNER.TOOK_DMG.name] (data, socket: GameSocket) {
-		let {dmg, mob, cause, crit} = data;
+		let {dmg, hurter, cause, crit} = data;
 		if (!socket.alive) {
 			this.controller.clearSocketBuffs(socket);
 		} else if (cause !== combatConfig.HIT_CAUSE.BLEED && cause !== combatConfig.HIT_CAUSE.BURN) {
-			this.controller.applyHurtPerks(dmg, crit, mob, socket);
+			this.controller.applyHurtPerks(dmg, crit, hurter, socket);
 		}
     }
 	

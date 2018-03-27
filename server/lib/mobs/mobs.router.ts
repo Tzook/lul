@@ -201,7 +201,7 @@ export default class MobsRouter extends SocketioRouterBase {
         } else {
             this.emitter.emit(statsConfig.SERVER_INNER.TAKE_DMG.name, { 
                 dmg,
-                mob, 
+                hurter: mob, 
                 cause: combatConfig.HIT_CAUSE.ATK,
                 crit
             }, socket);

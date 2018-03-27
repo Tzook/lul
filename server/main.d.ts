@@ -116,7 +116,11 @@ interface User extends Doc {
     characters: Char[]
 }
 
+interface PERKABLE {
+    perks?: PERK_MAP
+}
 type PLAYER = GameSocket|MOB_INSTANCE;
+type HURTER = PLAYER|PERKABLE;
 
 interface GameSocket extends SocketIO.Socket {
     test?: boolean;
