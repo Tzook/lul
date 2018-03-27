@@ -218,6 +218,6 @@ export default class MobsRouter extends SocketioRouterBase {
 	
 	[config.SERVER_INNER.MOB_DESPAWN.name](data, socket: GameSocket) {
 		let {mob} = data;
-		this.controller.despawnMob(mob, socket);
+		process.nextTick(() => this.controller.despawnMob(mob, socket));
 	}
 };
