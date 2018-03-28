@@ -54,14 +54,15 @@ export function extendMobSchemaWithSpells(mob: any, mobSchema: MOB_MODEL): void 
 	(mob.spells || []).forEach(spell => {
 		mobSchema.spells = mobSchema.spells || {};
         let spellSchema: MOB_SPELL = <MOB_SPELL>getPerksSchema(spell.perks);
-        spellSchema.minTime = spell.minTime;
-        spellSchema.maxTime = spell.maxTime;
+        spellSchema.minTime = +spell.minTime;
+        spellSchema.maxTime = +spell.maxTime;
         mobSchema.spells[spell.key] = spellSchema;
     });
     
     if (mob.deathRattle) {
         let deathRattle: MOB_DEATH_SPELL = <MOB_DEATH_SPELL>getPerksSchema(mob.deathRattle.perks);
         deathRattle.key = mob.deathRattle.key;
+        deathRattle.duration = +mob.deathRattle.maxTime;
         mobSchema.deathSpell = deathRattle;
     }
 }

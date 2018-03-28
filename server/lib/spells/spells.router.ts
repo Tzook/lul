@@ -2,7 +2,7 @@ import SocketioRouterBase from '../socketio/socketio.router.base';
 import spellsConfig from './spells.config';
 import statsConfig from '../stats/stats.config';
 import combatConfig from '../combat/combat.config';
-import { getMobDeadOrAlive } from '../mobs/mobs.controller';
+import { getMobDeadOrAlive, getMob } from '../mobs/mobs.controller';
 import mobsConfig from '../mobs/mobs.config';
 import { getMpUsage } from '../talents/talents.services';
 import { mobStopSpellsPicker, hasMobSpellsPicker, mobStartSpellsPicker, mobUsesSpell, canUseSpell, addSpellInfo, getSpell } from './spells.services';
@@ -57,7 +57,14 @@ export default class SpellsRouter extends SocketioRouterBase {
 		if (!mob) {
 			return this.sendError(data, socket, "Mob doesn't exist");
 		}
-		let spell = mob.deathSpell && mob.deathSpell.key === spell_key ? mob.deathSpell : (mob.spells || {})[spell_key];
+		let spell;
+		if (getMob(mob_id, socket)) {
+			// mob is still alive
+			spell = (mob.spells || {})[spell_key];
+		} else {
+			// mob is dead
+			spell = mob.deathSpell && mob.deathSpell.key === spell_key ? mob.deathSpell : null;
+		}
 		if (!spell) {
 			return this.sendError(data, socket, "Mob doesn't have that spell");
 		}

@@ -171,8 +171,9 @@ export default class MobsController extends MasterController {
         const mobId = this.services.getMobRoomId(socket.character.room, mob.id);
         this.mobById.delete(mobId);
         // allow the mob to live in memory for a bit longer, so he can still hurt characters
-        this.mobsJustDied.set(mobId, mob);
-        setTimeout(() => this.mobsJustDied.delete(mobId), mobsConfig.MOB_DEATH_DEBOUNCE);
+		this.mobsJustDied.set(mobId, mob);
+		const mobDeathDebounce = (mob.deathSpell ? mob.deathSpell.duration * 1000 : 0) + mobsConfig.MOB_DEATH_DEBOUNCE;
+        setTimeout(() => this.mobsJustDied.delete(mobId), mobDeathDebounce);
 
 		if (mob.spawn.cap == mob.spawn.mobs.size + 1) {
 			// if it's the first mob that we kill, set a timer to respawn

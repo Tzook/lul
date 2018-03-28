@@ -256,6 +256,7 @@ interface MOB_SPELL {
 interface MOB_DEATH_SPELL {
     key: string,
     perks: PERK_MAP,
+    duration: number
 }
 
 interface MOB_INSTANCE extends MOB_MODEL {
