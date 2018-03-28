@@ -55,12 +55,14 @@ export default class SpellsRouter extends SocketioRouterBase {
 		let {mob_id, spell_key} = data;
 		let mob = getMobDeadOrAlive(mob_id, socket);
 		if (!mob) {
-			return this.sendError(data, socket, "Mob doesn't exist!");
-		} else if (!(mob.spells || {})[spell_key]) {
-			return this.sendError(data, socket, "Mob doesn't have that spell!");
+			return this.sendError(data, socket, "Mob doesn't exist");
+		}
+		let spell = mob.deathSpell && mob.deathSpell.key === spell_key ? mob.deathSpell : (mob.spells || {})[spell_key];
+		if (!spell) {
+			return this.sendError(data, socket, "Mob doesn't have that spell");
 		}
 		
-		mob.currentSpell = mob.spells[spell_key];
+		mob.currentSpell = spell;
 
 		this.emitter.emit(mobsConfig.SERVER_INNER.PLAYER_HURT.name, {mob, cause: combatConfig.HIT_CAUSE.SPELL}, socket);
 
