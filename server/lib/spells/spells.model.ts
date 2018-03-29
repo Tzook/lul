@@ -56,6 +56,7 @@ export function extendMobSchemaWithSpells(mob: any, mobSchema: MOB_MODEL): void 
 	(mob.spells || []).forEach(spell => {
 		mobSchema.spells = mobSchema.spells || {};
         let spellSchema: MOB_SPELL = <MOB_SPELL>getPerksSchema(spell.perks);
+        spellSchema.chance = +spell.chance;
         mobSchema.spells[spell.key] = spellSchema;
     });
     if (mob.spellsMinTime > 0 && mob.spellsMaxTime > 0) {

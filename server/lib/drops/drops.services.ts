@@ -19,3 +19,17 @@ export function doesChanceWork(chance: number): boolean {
     let rolled = rand * 100 / CHANCE_PRECISE;
     return chance >= rolled;
 }
+
+export function pickRandomly(list: {chance: number}[]|{[key: string]: {chance: number}}): string|number|null {
+    let sum = 0;
+    const random = Math.random();
+    for (let key in list) {
+        let {chance} = list[key];
+        sum += chance;
+        if (random <= sum) {
+            return key;
+        }
+    }
+
+    return null;
+}

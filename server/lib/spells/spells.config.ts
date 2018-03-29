@@ -18,5 +18,5 @@ export default {
 		USE_SPELL: {name: "spell_activated"},
 		MOB_USE_SPELL: {name: "mob_spell_activated"},
     },
-    SKIP_SPELL_RETRY_TIME: 3000,    
+    SKIP_SPELL_RETRY_TIME: 2000,    
 }

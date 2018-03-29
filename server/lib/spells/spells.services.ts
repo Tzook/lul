@@ -4,9 +4,10 @@ import spellsConfig from "./spells.config";
 import { isMobInBuff } from '../talents/talents.controller';
 import talentsConfig from "../talents/talents.config";
 import * as _ from 'underscore';
+import { pickRandomly } from "../drops/drops.services";
 
 export default class SpellsServices extends MasterServices {
-	public mobsSpellsPickers: Map<string, Map<string, NodeJS.Timer>> = new Map();
+	public mobsSpellsPickers: Map<string, NodeJS.Timer> = new Map();
 	// primary ability => lvl|key => spell
 	public spellsInfo: Map<string, Map<number|string, ABILITY_SPELL_MODEL>> = new Map();
 }
@@ -50,27 +51,27 @@ export function getSpell(socket: GameSocket, spellKey: string): ABILITY_SPELL_MO
 // Mob spells:
 // ============
 export function mobStartSpellsPicker(mob: MOB_INSTANCE) {
-    let timersMap: Map<string, NodeJS.Timer> = new Map();
-    
-    for (let spellKey in mob.spells) {
-        activateMobSpellTimer(mob, spellKey, timersMap, false);
-    }
-
-    getSpellsServices().mobsSpellsPickers.set(mob.id, timersMap);
+    activateMobSpellTimer(mob, false);
 }
 
-function activateMobSpellTimer(mob: MOB_INSTANCE, spellKey: string, timersMap: Map<string, NodeJS.Timer>, justSkippedSpell: boolean) {
-    const {minTime, maxTime} = mob.spells[spellKey];
-    const time = justSkippedSpell ? spellsConfig.SKIP_SPELL_RETRY_TIME : getMobSpellRestTime(minTime, maxTime);
+function activateMobSpellTimer(mob: MOB_INSTANCE, justSkippedSpell: boolean) {
+    const time = justSkippedSpell ? spellsConfig.SKIP_SPELL_RETRY_TIME : getMobSpellRestTime(mob.spellMinTime, mob.spellMaxTime);
     const timerId = setTimeout(() => {
         const canUseSpell = canMobUseSpell(mob);
         if (canUseSpell) {
+            const spellKey = pickSpell(mob);
+            if (spellKey)
             mobUsesSpell(mob, spellKey);
         }
         // recursively use the spell
-        activateMobSpellTimer(mob, spellKey, timersMap, !canUseSpell);
+        activateMobSpellTimer(mob, !canUseSpell);
     }, time);
-    timersMap.set(spellKey, timerId);
+
+    getSpellsServices().mobsSpellsPickers.set(mob.id, timerId);
+}
+
+function pickSpell(mob: MOB_INSTANCE): string {
+    return <string>pickRandomly(mob.spells);
 }
 
 function getMobSpellRestTime(min: number, max: number): number {
@@ -90,15 +91,13 @@ export function hasMobSpellsPicker(mob: MOB_INSTANCE): boolean {
 
 export function mobStopSpellsPicker(mob: MOB_INSTANCE) {
     const spellPickers = getSpellsServices().mobsSpellsPickers;
-    const timersMap = spellPickers.get(mob.id);
-    if (timersMap) {
-        for (let [,timerId] of timersMap) {
-            clearTimeout(timerId);
-        }
+    const timerId = spellPickers.get(mob.id);
+    if (timerId) {
+        clearTimeout(timerId);
         spellPickers.delete(mob.id);
     }
 }
 
 function canMobUseSpell(mob: MOB_INSTANCE): boolean {
-    return !isMobInBuff(mob.room, mob.id, talentsConfig.PERKS.STUN_CHANCE) && !isMobInBuff(mob.room, mob.id, talentsConfig.PERKS.FREEZE_CHANCE);
+    return !isMobInBuff(mob.room, mob.id, talentsConfig.PERKS.STUN_CHANCE);
 }
