@@ -411,10 +411,8 @@ interface CHAR_ABILITY_TALENT {
 }
 
 interface PERKS_DIFF {
-    bonusHp?: number,
-    bonusMp?: number,
-    atkSpeed?: number,
-    mpCost?: number
+    hpBonus?: number,
+    mpBonus?: number,
 }
 
 interface BUFF_INSTANCE {

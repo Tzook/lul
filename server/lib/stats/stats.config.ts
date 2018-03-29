@@ -20,7 +20,6 @@ const CONFIG = {
 		"GAIN_HP": {"name": "actor_gain_hp"},
 		"GAIN_MP": {"name": "actor_gain_mp"},
 		"GAIN_STATS": {"name": "actor_gain_stats"},
-		"UPDATE_MAX_STATS": {"name": "update_actor_max_stats"},
 		"TAKE_DMG": {"name": "actor_take_dmg"},
 		"USE_MP": {"name": "actor_use_mp"},
 		"DEATH": {"name": "actor_ded"},

@@ -6,7 +6,6 @@ export default {
     SERVER_INNER: {
         MOVE_ROOM: Object.assign({}, roomsConfig.SERVER_INNER.MOVE_ROOM),
         GAIN_LVL: Object.assign({log: false}, statsConfig.SERVER_INNER.GAIN_LVL),
-        UPDATE_MAX_STATS: Object.assign({}, statsConfig.SERVER_INNER.UPDATE_MAX_STATS),
         UPDATE_KNOWN: {"name": "update_known"},
     },
 	SERVER_GETS: {

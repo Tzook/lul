@@ -1,5 +1,5 @@
 import bonusPerksConfig from "./bonusPerks.config";
-import { createBonusPerks, updateBonusPerks, getEmptyBonusPerks, getBonusPerks, modifyBonusPerks, addBonusPerks, removeBonusPerks, setClientPerks } from "./bonusPerks.services";
+import { createBonusPerks, updateBonusPerks, getEmptyBonusPerks, getBonusPerks, modifyBonusPerks, addBonusPerks, removeBonusPerks, setClientPerks, notifyBonusPerks } from "./bonusPerks.services";
 import SocketioRouterBase from "../socketio/socketio.router.base";
 
 export default class BonusPerksRouter extends SocketioRouterBase {
@@ -18,6 +18,14 @@ export default class BonusPerksRouter extends SocketioRouterBase {
 		const oldStats = getBonusPerks(socket, previousAbility);
 		const newStats = getBonusPerks(socket);
 		updateBonusPerks(socket, oldStats, newStats);
+    }
+    
+    [bonusPerksConfig.SERVER_INNER.UPDATE_MAX_STATS.name](data: {hp, mp}, socket: GameSocket) {
+        let diff: PERKS_DIFF = {
+            hpBonus: data.hp,
+            mpBonus: data.mp
+        };
+        notifyBonusPerks(socket, diff);
     }
 
     [bonusPerksConfig.SERVER_INNER.WORE_EQUIP.name](data: {equip: ITEM_INSTANCE, oldEquip: ITEM_INSTANCE}, socket: GameSocket) {

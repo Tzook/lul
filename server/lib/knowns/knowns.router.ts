@@ -21,17 +21,6 @@ export default class KnownsRouter extends SocketioRouterBase {
         }
     }
 
-    [config.SERVER_INNER.UPDATE_MAX_STATS.name](data, socket: GameSocket) {
-        let namespace = this.services.getKnownsNamespace(this.services.getNotInRoomKnowns(socket));
-        if (namespace) {
-            namespace.emit(statsConfig.CLIENT_GETS.UPDATE_MAX_STATS.name, {
-                name: socket.character.name,
-                hp: socket.maxHp,
-                mp: socket.maxMp,
-            });
-        }
-    }
-
 	[config.SERVER_INNER.MOVE_ROOM.name](data: {room: string}, socket: GameSocket) {
         let namespace = this.services.getKnownsNamespace(this.services.getLoggedInKnownsFromList(socket));
         if (namespace) {

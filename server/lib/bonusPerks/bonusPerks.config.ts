@@ -1,5 +1,6 @@
 import combatConfig from "../combat/combat.config";
 import equipsConfig from "../equips/equips.config";
+import statsConfig from "../stats/stats.config";
 import socketioConfig from "../socketio/socketio.config";
 
 export default {
@@ -8,6 +9,7 @@ export default {
 	},
     SERVER_INNER: {
         CHANGED_ABILITY: Object.assign({}, combatConfig.SERVER_INNER.CHANGED_ABILITY),
+        UPDATE_MAX_STATS: Object.assign({}, statsConfig.SERVER_INNER.UPDATE_MAX_STATS),
         WORE_EQUIP: Object.assign({}, equipsConfig.SERVER_INNER.WORE_EQUIP),
     },
     CLIENT_GETS: {
