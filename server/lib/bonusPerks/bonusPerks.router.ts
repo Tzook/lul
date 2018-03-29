@@ -1,12 +1,16 @@
 import bonusPerksConfig from "./bonusPerks.config";
-import { createBonusPerks, updateBonusPerks, getEmptyBonusPerks, getBonusPerks, modifyBonusPerks, addBonusPerks, removeBonusPerks } from "./bonusPerks.services";
+import { createBonusPerks, updateBonusPerks, getEmptyBonusPerks, getBonusPerks, modifyBonusPerks, addBonusPerks, removeBonusPerks, setClientPerks } from "./bonusPerks.services";
 import SocketioRouterBase from "../socketio/socketio.router.base";
 
 export default class BonusPerksRouter extends SocketioRouterBase {
     public onConnected(socket: GameSocket) {
         createBonusPerks(socket);
         process.nextTick(() => updateBonusPerks(socket, getEmptyBonusPerks(), getBonusPerks(socket)));
-	}
+	}	
+	
+    [bonusPerksConfig.GLOBAL_EVENTS.CONFIG_READY.name]() {
+		setClientPerks();
+    }
 	
 	[bonusPerksConfig.SERVER_INNER.CHANGED_ABILITY.name](data, socket: GameSocket) {
 		let {previousAbility} = data;

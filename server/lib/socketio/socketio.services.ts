@@ -1,6 +1,6 @@
 
 import MasterServices from '../master/master.services';
-import { getEmitter } from '../main/bootstrap';
+import { getEmitter, getServices } from '../main/bootstrap';
 import socketioConfig from './socketio.config';
 
 export default class SocketioServices extends MasterServices {
@@ -20,3 +20,11 @@ export default class SocketioServices extends MasterServices {
 			});
 	}
 };
+
+export function getSocketioServices(): SocketioServices {
+    return getServices("socketio");
+}
+
+export function getConfig() {
+	return getSocketioServices().getConfig();
+}

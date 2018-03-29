@@ -193,10 +193,10 @@ export default class StatsRouter extends SocketioRouterBase {
         }
         if (hadFullHp && !socket.hpRegenTimer) {
             this.regenHpInterval(socket);
-        };
+        }
         if (hadFullMp && !socket.mpRegenTimer) {
             this.regenMpInterval(socket);
-        };
+        }
         if (oldMaxHp !== socket.maxHp || oldMaxMp !== socket.maxMp) {
             this.updateMaxStats(socket);
         }

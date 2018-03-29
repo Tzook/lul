@@ -63,7 +63,6 @@ export default {
 		BLEED_RESISTANCE: "bleedResistance",
 		
 		CHARGE_MODIFIER_KEY: "fullyChargeModifier",
-		ATK_SPEED_MODIFIER_KEY: "attackSpeedModifier",
         DMG_MODIFIER_KEY: "damageModifier",
         DMG_BONUS: "damageBonus",
         MIN_DMG_MODIFIER: "minDamageModifier",
@@ -80,12 +79,10 @@ export default {
 		LIFE_STEAL_KEY: "hpSteal",
 		HP_REGEN_MODIFIER: "hpRegenModifier",
 		HP_REGEN_INTERVAL: "hpRegenInterval",
-		HP_BONUS: "hpBonus",
 		
 		MANA_STEAL_KEY: "mpSteal",
 		MP_REGEN_MODIFIER: "mpRegenModifier",
 		MP_REGEN_INTERVAL: "mpRegenInterval",
-		MP_BONUS: "mpBonus",
 		MP_COST: "mpCost",
 		
 		FREEZE_CHANCE: "freezeChance",

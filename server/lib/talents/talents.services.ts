@@ -190,10 +190,6 @@ export default class TalentsServices extends MasterServices {
 		return this.getAbilityPerkValue(talentsConfig.PERKS.MIN_DMG_MODIFIER, attacker);
     }
     
-	public getAtkSpeedModifier(target: PLAYER, ability?: string): number {
-		return this.getAbilityPerkValue(talentsConfig.PERKS.ATK_SPEED_MODIFIER_KEY, target, ability);
-	}
-
 	public getThreatModifier(target: PLAYER): number {
 		const threatModifier = this.getAbilityPerkValue(talentsConfig.PERKS.THREAT_MODIFIER_KEY, target);
 		return threatModifier;
@@ -237,14 +233,6 @@ export default class TalentsServices extends MasterServices {
 	
 	public getMpRegenInterval(target: PLAYER): number {
 		return this.getAbilityPerkValue(talentsConfig.PERKS.MP_REGEN_INTERVAL, target) * 1000;
-	}
-
-	public getHpBonus(target: PLAYER, ability?: string): number {
-		return this.getAbilityPerkValue(talentsConfig.PERKS.HP_BONUS, target, ability);
-	}
-	
-	public getMpBonus(target: PLAYER, ability?: string): number {
-		return this.getAbilityPerkValue(talentsConfig.PERKS.MP_BONUS, target, ability);
 	}
 
 	public getMpUsageModifier(target: PLAYER, ability?: string): number {
@@ -414,6 +402,9 @@ export default class TalentsServices extends MasterServices {
 			if (perk.bonusPerks) {
 				let {perks} = getPerksSchema(perk.bonusPerks);
 				perkModel.bonusPerks = perks;
+			}
+			if (perk.client === "true") {
+				perkModel.client = true;
 			}
 			perks[perk.key] = perkModel;
 		});

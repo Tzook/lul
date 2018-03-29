@@ -398,7 +398,8 @@ interface PERK_CONFIG {
     max?: number,
     acc?: number,
 	default?: number, 
-	bonusPerks?: PERK_MAP, 
+    bonusPerks?: PERK_MAP, 
+    client?: true
 }
 
 interface CHAR_ABILITY_TALENT {
@@ -409,9 +410,11 @@ interface CHAR_ABILITY_TALENT {
     perks: PERK_MAP // the chosen points
 }
 
-interface PERKS_DIFF extends BASE_STATS_MODEL {
-    atkSpeed: number,
-    mpCost: number
+interface PERKS_DIFF {
+    bonusHp?: number,
+    bonusMp?: number,
+    atkSpeed?: number,
+    mpCost?: number
 }
 
 interface BUFF_INSTANCE {
