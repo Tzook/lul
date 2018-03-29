@@ -13,6 +13,8 @@ const ABILITY_SPELL_SCHEMA = (<any>mongoose.Schema)({
 
 const MOB_SPELLS_SCHEMA = {
     spells: mongoose.Schema.Types.Mixed,
+    spellMinTime: Number,
+    spellMaxTime: Number,
     deathSpell: mongoose.Schema.Types.Mixed,
 };
 
@@ -54,15 +56,19 @@ export function extendMobSchemaWithSpells(mob: any, mobSchema: MOB_MODEL): void 
 	(mob.spells || []).forEach(spell => {
 		mobSchema.spells = mobSchema.spells || {};
         let spellSchema: MOB_SPELL = <MOB_SPELL>getPerksSchema(spell.perks);
-        spellSchema.minTime = +spell.minTime;
-        spellSchema.maxTime = +spell.maxTime;
         mobSchema.spells[spell.key] = spellSchema;
     });
+    if (mob.spellsMinTime > 0 && mob.spellsMaxTime > 0) {
+        mobSchema.spellMinTime = +mob.spellsMinTime;
+        mobSchema.spellMaxTime = +mob.spellsMaxTime;
+    }
     
     if (mob.deathRattle) {
         let deathRattle: MOB_DEATH_SPELL = <MOB_DEATH_SPELL>getPerksSchema(mob.deathRattle.perks);
         deathRattle.key = mob.deathRattle.key;
-        deathRattle.duration = +mob.deathRattle.maxTime;
+        if (mob.deathRattle.duration > 0) {
+            deathRattle.duration = +mob.deathRattle.duration;
+        }
         mobSchema.deathSpell = deathRattle;
     }
 }

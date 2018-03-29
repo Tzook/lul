@@ -246,11 +246,12 @@ interface MOB_MODEL {
         [spellKey: string]: MOB_SPELL
     },
     deathSpell?: MOB_DEATH_SPELL
+    spellMinTime?: number
+    spellMaxTime?: number
 }
 interface MOB_SPELL {
     perks: PERK_MAP
-    minTime: number
-    maxTime: number
+    chance: number
 }
 
 interface MOB_DEATH_SPELL {
