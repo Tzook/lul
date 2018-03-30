@@ -172,7 +172,7 @@ export default class MobsController extends MasterController {
         this.mobById.delete(mobId);
         // allow the mob to live in memory for a bit longer, so he can still hurt characters
 		this.mobsJustDied.set(mobId, mob);
-		const mobDeathDebounce = (mob.deathSpell ? mob.deathSpell.duration * 1000 : 0) + mobsConfig.MOB_DEATH_DEBOUNCE;
+		const mobDeathDebounce = (mob.deathSpell ? (mob.deathSpell.duration || 0) * 1000 : 0) + mobsConfig.MOB_DEATH_DEBOUNCE;
         setTimeout(() => this.mobsJustDied.delete(mobId), mobDeathDebounce);
 
 		if (mob.spawn.cap == mob.spawn.mobs.size + 1) {
