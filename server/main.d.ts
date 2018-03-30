@@ -182,7 +182,9 @@ interface ITEM_MODEL {
     use?: {
         hp?: number
         mp?: number
-    }
+    },
+    minLvlMobs?: number,
+    maxLvlMobs?: number,
 }
 interface ITEM_DROP {
     x: number, 

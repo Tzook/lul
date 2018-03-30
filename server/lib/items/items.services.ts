@@ -6,6 +6,7 @@ import ItemsMiddleware from './items.middleware';
 import { USE_SCHEMA } from '../use/use.model';
 import { slightlyTweakPerks } from '../bonusPerks/bonusPerks.services';
 import { extendItemSchemaWithTalents } from '../bonusPerks/bonusPerks.model';
+import { extendItemWithMobs } from '../mobs/mobs.model';
 
 export default class ItemsServices extends MasterServices {
 	private itemsInfo: Map<string, ITEM_MODEL> = new Map();
@@ -31,6 +32,7 @@ export default class ItemsServices extends MasterServices {
 			};
 
             extendItemSchemaWithTalents(item, itemSchema);
+            extendItemWithMobs(item, itemSchema);
 			this.pushStats(itemSchema, item, "req", REQUIRE_SCHEMA);
 			if (this.middleware.isMisc(itemSchema)) {
 				this.pushStats(itemSchema, item, "use", USE_SCHEMA);
