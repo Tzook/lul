@@ -28,5 +28,6 @@ export default {
 		"ITEM_MOVE": {"name": "actor_move_item"},
 		"ITEM_ADD": {"name": "actor_add_item"}
 	},
+	GLOBAL_ITEMS_READY: {"name": "items_ready"},
 	"MAX_ITEMS": 20
 }

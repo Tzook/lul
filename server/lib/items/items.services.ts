@@ -7,9 +7,11 @@ import { USE_SCHEMA } from '../use/use.model';
 import { slightlyTweakPerks } from '../bonusPerks/bonusPerks.services';
 import { extendItemSchemaWithTalents } from '../bonusPerks/bonusPerks.model';
 import { extendItemWithMobs } from '../mobs/mobs.model';
+import itemsConfig from './items.config';
+import { getEmitter, getServices } from '../main/bootstrap';
 
 export default class ItemsServices extends MasterServices {
-	private itemsInfo: Map<string, ITEM_MODEL> = new Map();
+	public itemsInfo: Map<string, ITEM_MODEL> = new Map();
 	protected middleware: ItemsMiddleware;
 	
 	init(files, app) {
@@ -66,6 +68,7 @@ export default class ItemsServices extends MasterServices {
 					this.itemsInfo.set(doc.key, doc);
 				});
 				console.log("got items");
+				getEmitter().emit(itemsConfig.GLOBAL_ITEMS_READY.name);				
 				return this.itemsInfo;
 			});
 	}
@@ -108,3 +111,11 @@ export default class ItemsServices extends MasterServices {
 		socket.character.items.set(slot, {});
 	}
 };
+
+function getItemsServices(): ItemsServices {
+	return getServices("items");
+}
+
+export function getItemsInfo() {
+	return getItemsServices().itemsInfo;
+}

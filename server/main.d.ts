@@ -183,8 +183,13 @@ interface ITEM_MODEL {
         hp?: number
         mp?: number
     },
-    minLvlMobs?: number,
-    maxLvlMobs?: number,
+    mobsDrop?: ITEM_MOBS_DROP
+}
+interface ITEM_MOBS_DROP {
+    minLvl?: number,
+    maxLvl?: number,
+    minStack?: number,
+    maxStack?: number,
 }
 interface ITEM_DROP {
     x: number, 

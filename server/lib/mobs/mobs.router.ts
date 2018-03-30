@@ -3,7 +3,7 @@ import SocketioRouterBase from '../socketio/socketio.router.base';
 import MobsMiddleware from './mobs.middleware';
 import MobsController from './mobs.controller';
 import RoomsRouter from '../rooms/rooms.router';
-import MobsServices, { getPartyShareExp } from './mobs.services';
+import MobsServices, { getPartyShareExp, setMobsExtraDropsAfter2, getMobExtraDrops, shouldMobHaveExtraDrops } from './mobs.services';
 import PartyRouter from '../party/party.router';
 import config from '../mobs/mobs.config';
 import statsConfig from '../stats/stats.config';
@@ -45,6 +45,14 @@ export default class MobsRouter extends SocketioRouterBase {
 	public getMobInfo(mobId: string): MOB_MODEL {
 		return this.services.getMobInfo(mobId);
 	}
+	
+    [config.GLOBAL_EVENTS.GLOBAL_ITEMS_READY.name]() {
+		setMobsExtraDropsAfter2();
+    }
+	
+    [config.GLOBAL_EVENTS.GLOBAL_MOBS_READY.name]() {
+		setMobsExtraDropsAfter2();
+    }
 
 	[config.SERVER_GETS.ENTERED_ROOM.name](data, socket: GameSocket) {
 		if (!this.controller.hasRoom(socket.character.room)) {
@@ -152,7 +160,11 @@ export default class MobsRouter extends SocketioRouterBase {
 				}
 			}
 
-			this.emitter.emit(dropsConfig.SERVER_INNER.GENERATE_DROPS.name, {x: mob.x, y: mob.y, owner: max.socket.character.name}, max.socket, mob.drops);
+			let drops = mob.drops;
+			if (shouldMobHaveExtraDrops(mob)) {
+				drops = drops.concat(getMobExtraDrops(mob.lvl));
+			}
+			this.emitter.emit(dropsConfig.SERVER_INNER.GENERATE_DROPS.name, {x: mob.x, y: mob.y, owner: max.socket.character.name}, max.socket, drops);
 			this.emitter.emit(questsConfig.SERVER_INNER.HUNT_MOB.name, {id: mob.mobId}, max.socket);
 		}
 	}

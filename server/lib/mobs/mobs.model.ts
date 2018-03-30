@@ -2,6 +2,7 @@
 import MasterModel from '../master/master.model';
 import MobsController from './mobs.controller';
 import { PRIORITY_ITEM } from '../items/items.model';
+import _ = require('underscore');
 
 const MOB_SCHEMA = {
     mobId: String, 
@@ -13,8 +14,12 @@ const MOB_SCHEMA = {
 };
 
 const ITEM_SCHEMA_ADDITION = {
-    minLvlMobs: Number,
-    maxLvlMobs: Number,
+    mobsDrop: {
+        minLvl: Number,
+        maxLvl: Number,
+        minStack: Number,
+        maxStack: Number,
+    }
 }
 
 export const PRIORITY_MOBS = PRIORITY_ITEM + 10;
@@ -46,10 +51,20 @@ export default class MobsModel extends MasterModel {
 };
 
 export function extendItemWithMobs(item, itemSchema: ITEM_MODEL) {
+    let mobsDrop: ITEM_MOBS_DROP = {};
     if (item.minLvlMobs > 0) {
-        itemSchema.minLvlMobs = +item.minLvlMobs;
+        mobsDrop.minLvl = +item.minLvlMobs;
     }
     if (item.maxLvlMobs > 0) {
-        itemSchema.maxLvlMobs = +item.maxLvlMobs;
+        mobsDrop.maxLvl = +item.maxLvlMobs;
+    }
+    if (item.minMobsStack > 1) {
+        mobsDrop.minStack = +item.minMobsStack;
+    }
+    if (item.maxMobsStack > 1) {
+        mobsDrop.maxStack = +item.maxMobsStack;
+    }
+    if (!_.isEmpty(mobsDrop)) {
+        itemSchema.mobsDrop = mobsDrop;
     }
 }

@@ -4,9 +4,12 @@ import * as _ from "underscore";
 import { doesChanceWork } from '../drops/drops.services';
 import { extendMobSchemaWithTalents } from '../talents/talents.services';
 import mobsConfig from '../mobs/mobs.config';
+import { getServices, getEmitter } from '../main/bootstrap';
+import { getItemsInfo } from '../items/items.services';
 
 export default class MobsServices extends MasterServices {
-	private mobsInfo: Map<string, MOB_MODEL> = new Map();
+	public mobsDrops: Map<number, DROP_MODEL[]> = new Map();
+	public mobsInfo: Map<string, MOB_MODEL> = new Map();
 
 	public getMobInfo(mobId: string): MOB_MODEL {
 		// always return a copy of the mob, so it can be modified freely
@@ -78,10 +81,69 @@ export default class MobsServices extends MasterServices {
 					this.mobsInfo.set(doc.mobId, doc);
 				});
 				console.log("got mobs");
+				getEmitter().emit(mobsConfig.GLOBAL_EVENTS.GLOBAL_MOBS_READY.name);				
 				return this.mobsInfo;
 			});
 	}
 };
+
+function getMobsServices(): MobsServices {
+	return getServices("mobs");
+}
+
+function setMobsExtraDrops() {
+	const mobsServices = getMobsServices();
+	
+	const mobsMaxLevel = getMaxMobLevel(mobsServices.mobsInfo);
+	
+	for (let [,{key, mobsDrop = {}}] of getItemsInfo()) {
+		let {minLvl, maxLvl, minStack, maxStack} = mobsDrop;
+		if (!minLvl && !maxLvl) {
+			continue;
+		}
+		if (!minLvl) {
+			minLvl = 1;
+		}
+		if (!maxLvl || maxLvl > mobsMaxLevel) {
+			maxLvl = mobsMaxLevel;
+		}
+		let drop: DROP_MODEL = {key};
+		if (minStack) drop.minStack = minStack;
+		if (maxStack) drop.maxStack = maxStack;
+		for (let lvl = minLvl; lvl <= maxLvl; lvl++) {
+			addDropToExtraDrops(mobsServices.mobsDrops, lvl, drop);
+		}
+	}
+}
+// call it only after it has been called for 2 times, so we know both mobs and items have loaded
+export const setMobsExtraDropsAfter2 = _.after(2, setMobsExtraDrops);
+
+function addDropToExtraDrops(mobsDrops: Map<number, DROP_MODEL[]>, lvl: number, drop: DROP_MODEL) {
+	let lvlDrops = mobsDrops.get(lvl);
+	if (!lvlDrops) {
+		lvlDrops = [];
+		mobsDrops.set(lvl, lvlDrops);
+	}
+	lvlDrops.push(drop);
+}
+
+export function getMobExtraDrops(lvl: number): DROP_MODEL[] {
+	return getMobsServices().mobsDrops.get(lvl) || [];
+}
+
+function getMaxMobLevel(mobs: Map<string, MOB_MODEL>) {
+	let max = 0;
+	for (let [,{lvl}] of mobs) {
+		if (lvl > max) {
+			max = lvl;
+		}
+	}
+	return max;
+}
+
+export function shouldMobHaveExtraDrops(mob: MOB_MODEL): boolean {
+	return mob.dmg > 0 && mob.exp > 0;
+}
 
 export function getDamageRange(min: number, max: number): number {
 	return _.random(Math.floor(min) || 1, Math.floor(max));

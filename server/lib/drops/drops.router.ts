@@ -83,7 +83,7 @@ export default class DropsRouter extends SocketioRouterBase {
                     console.log("Dropping item from drop!", drop, itemInstance);
                 }
 			} else {
-				this.sendError({key: drop}, socket, "No item info! cannot drop item.");
+				this.sendError({key: drop.key}, socket, "No item info! cannot drop item.");
             }
         });
 
