@@ -18,11 +18,11 @@ export default class UseRouter extends SocketioRouterBase {
 			let {hp, mp} = itemInfo.use;
 
 			if (hp) {
-				this.emitter.emit(statsConfig.SERVER_INNER.GAIN_HP.name, { hp }, socket);
+				this.emitter.emit(statsConfig.SERVER_INNER.GAIN_HP.name, { hp, cause: statsConfig.REGEN_CAUSE.USE }, socket);
 			}
 
 			if (mp) {
-				this.emitter.emit(statsConfig.SERVER_INNER.GAIN_MP.name, { mp }, socket);
+				this.emitter.emit(statsConfig.SERVER_INNER.GAIN_MP.name, { mp, cause: statsConfig.REGEN_CAUSE.USE }, socket);
 			}
 		}
 	}

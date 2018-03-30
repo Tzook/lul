@@ -1,4 +1,4 @@
-const CONFIG = {
+export default {
 	"SERVER_INNER": {
 		"GAIN_EXP": {"name": "gain_exp", "alive": true, "log": true},
 		"GAIN_LVL": {"name": "gain_lvl", "alive": true, "log": true},
@@ -26,7 +26,13 @@ const CONFIG = {
 		"RESURRECT": {"name": "actor_resurrect"},
 		"LEVEL_UP": {"name": "actor_lvl_up"}
 	},
+	REGEN_CAUSE: {
+		HEAL: "heal",
+		AOE: "aoe",
+		STEAL: "steal",
+		USE: "use",
+		REGEN: "regen",
+		OTHER: "other",
+	},
 	"ABILITY_MELEE": "melee",
-}
-
-export default CONFIG;
+};

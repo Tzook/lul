@@ -118,7 +118,7 @@ export default class StatsRouter extends SocketioRouterBase {
     }
 
     [config.SERVER_INNER.GAIN_HP.name] (data, socket: GameSocket) {
-        let {hp, crit} = data;
+        let {hp, crit, cause = config.REGEN_CAUSE.OTHER} = data;
         let gainedHp = this.controller.addHp(socket, hp);
 
         if (gainedHp) {
@@ -129,18 +129,20 @@ export default class StatsRouter extends SocketioRouterBase {
                 name: socket.character.name,
                 hp,
                 crit,
+                cause,
                 now: socket.character.stats.hp.now
             });
         }
     }
 
     [config.SERVER_INNER.GAIN_MP.name] (data, socket: GameSocket) {
-        let mp = data.mp;
+        let {mp, cause = config.REGEN_CAUSE.OTHER} = data;
         let gainedMp = this.controller.addMp(socket, mp);
 
         if (gainedMp) {
             socket.emit(config.CLIENT_GETS.GAIN_MP.name, {
                 mp,
+                cause,
                 now: socket.character.stats.mp.now
             });
         }
@@ -237,7 +239,7 @@ export default class StatsRouter extends SocketioRouterBase {
             socket.hpRegenTimer = setTimeout(() => {
                 if (socket.connected && socket.alive) {
                     const hp = this.services.getRegenHp(socket);
-                    this.emitter.emit(config.SERVER_INNER.GAIN_HP.name, { hp }, socket);
+                    this.emitter.emit(config.SERVER_INNER.GAIN_HP.name, { hp, cause: config.REGEN_CAUSE.REGEN }, socket);
                     this.regenHpInterval(socket);
                 }
             }, socket.getHpRegenInterval());
@@ -251,7 +253,7 @@ export default class StatsRouter extends SocketioRouterBase {
             socket.mpRegenTimer = setTimeout(() => {
                 if (socket.connected && socket.alive) {
                     const mp = this.services.getRegenMp(socket);
-                    this.emitter.emit(config.SERVER_INNER.GAIN_MP.name, { mp }, socket);
+                    this.emitter.emit(config.SERVER_INNER.GAIN_MP.name, { mp, cause: config.REGEN_CAUSE.REGEN }, socket);
                     this.regenMpInterval(socket);
                 }
             }, socket.getMpRegenInterval());

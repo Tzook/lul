@@ -92,7 +92,7 @@ export default class CombatRouter extends SocketioRouterBase {
 	[config.SERVER_INNER.HEAL_CHARS.name](data, socket: GameSocket) {
 		const {charNames} = data;
 
-		let cause = config.HIT_CAUSE.HEAL;
+		let cause = statsConfig.REGEN_CAUSE.HEAL;
 		for (let i = 0; i < charNames.length; i++) {
 			const charName = charNames[i];
 			const healedSocket = socket.map.get(charName);
@@ -115,16 +115,17 @@ export default class CombatRouter extends SocketioRouterBase {
                     }, socket);
                 }
 			}
-			cause = config.HIT_CAUSE.AOE;
+			cause = statsConfig.REGEN_CAUSE.AOE;
 		}
 	}
 	
 	[config.SERVER_INNER.HEAL_CHAR.name](data, socket: GameSocket) {
-		let {healedSocket, dmg, crit} = data;
+		let {healedSocket, dmg, crit, cause} = data;
 		
 		this.emitter.emit(statsConfig.SERVER_INNER.GAIN_HP.name, { 
 			hp: dmg, 
 			crit,
+			cause,
 		}, healedSocket);
 	}
 };

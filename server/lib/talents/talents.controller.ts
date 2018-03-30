@@ -23,11 +23,11 @@ export default class TalentsController extends MasterController {
 	public applySelfPerks(dmg: number, socket: GameSocket) {
 		const hp = this.getStealStatValue(talentsConfig.PERKS.HP_STEAL_CHANCE, talentsConfig.PERKS.HP_STEAL_MODIFIER, dmg, socket);
 		if (hp > 0) {
-			this.mobsRouter.getEmitter().emit(statsConfig.SERVER_INNER.GAIN_HP.name, { hp }, socket);
+			this.mobsRouter.getEmitter().emit(statsConfig.SERVER_INNER.GAIN_HP.name, { hp, cause: statsConfig.REGEN_CAUSE.STEAL }, socket);
 		}
 		const mp = this.getStealStatValue(talentsConfig.PERKS.MP_STEAL_CHANCE, talentsConfig.PERKS.MP_STEAL_MODIFIER, dmg, socket);
 		if (mp > 0) {
-			this.mobsRouter.getEmitter().emit(statsConfig.SERVER_INNER.GAIN_MP.name, { mp }, socket);
+			this.mobsRouter.getEmitter().emit(statsConfig.SERVER_INNER.GAIN_MP.name, { mp, cause: statsConfig.REGEN_CAUSE.STEAL }, socket);
 		}
 	}
 	
