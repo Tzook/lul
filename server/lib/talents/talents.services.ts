@@ -320,7 +320,7 @@ export default class TalentsServices extends MasterServices {
 	}
 
 	public getStealValue(value, percent): number {
-		return value * percent | 0;
+		return Math.ceil(value * percent);
 	}
 
 	public getTalentInfo(ability: string): TALENT_INFO|undefined {

@@ -21,16 +21,27 @@ export default class TalentsController extends MasterController {
 	}
 	
 	public applySelfPerks(dmg: number, socket: GameSocket) {
-		const lifeSteal = this.services.getAbilityPerkValue(talentsConfig.PERKS.LIFE_STEAL_KEY, socket);
-		const hp = this.services.getStealValue(dmg, lifeSteal);
+		const hp = this.getStealStatValue(talentsConfig.PERKS.HP_STEAL_CHANCE, talentsConfig.PERKS.HP_STEAL_MODIFIER, dmg, socket);
 		if (hp > 0) {
 			this.mobsRouter.getEmitter().emit(statsConfig.SERVER_INNER.GAIN_HP.name, { hp }, socket);
 		}
-		const manaSteal = this.services.getAbilityPerkValue(talentsConfig.PERKS.MANA_STEAL_KEY, socket);
-		const mp = this.services.getStealValue(dmg, manaSteal);
+		const mp = this.getStealStatValue(talentsConfig.PERKS.MP_STEAL_CHANCE, talentsConfig.PERKS.MP_STEAL_MODIFIER, dmg, socket);
 		if (mp > 0) {
 			this.mobsRouter.getEmitter().emit(statsConfig.SERVER_INNER.GAIN_MP.name, { mp }, socket);
 		}
+	}
+	
+	protected getStealStatValue(perkChanceName: string, perkModifierName: string, dmg, attacker: HURTER): number {
+		let value = 0;
+		let activated = this.services.isAbilityActivated(perkChanceName, attacker);	
+		console.log(perkChanceName, activated);
+		if (activated) {
+			const stealPercent = this.services.getAbilityPerkValue(perkModifierName, attacker);
+			value = this.services.getStealValue(dmg, stealPercent);
+			console.log(perkModifierName, {stealPercent, dmg, value});
+		}
+		return value;
+
 	}
 
 	public applyHurtPerks(dmg: number, crit: boolean, attacker: HURTER, target: PLAYER) {

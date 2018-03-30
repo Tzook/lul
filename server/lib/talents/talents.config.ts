@@ -76,11 +76,13 @@ export default {
         DEFENCE_BONUS: "defenceBonus",
         SPIKES_MODIFIER: "spikesModifier",
         
-		LIFE_STEAL_KEY: "hpSteal",
+		HP_STEAL_CHANCE: "hpStealChance",
+		HP_STEAL_MODIFIER: "hpStealModifier",
 		HP_REGEN_MODIFIER: "hpRegenModifier",
 		HP_REGEN_INTERVAL: "hpRegenInterval",
 		
-		MANA_STEAL_KEY: "mpSteal",
+		MP_STEAL_CHANCE: "mpStealChance",
+		MP_STEAL_MODIFIER: "mpStealModifier",
 		MP_REGEN_MODIFIER: "mpRegenModifier",
 		MP_REGEN_INTERVAL: "mpRegenInterval",
 		MP_COST: "mpCost",
