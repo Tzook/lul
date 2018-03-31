@@ -34,11 +34,9 @@ export default class TalentsController extends MasterController {
 	protected getStealStatValue(perkChanceName: string, perkModifierName: string, dmg, attacker: HURTER): number {
 		let value = 0;
 		let activated = this.services.isAbilityActivated(perkChanceName, attacker);	
-		console.log(perkChanceName, activated);
 		if (activated) {
 			const stealPercent = this.services.getAbilityPerkValue(perkModifierName, attacker);
 			value = this.services.getStealValue(dmg, stealPercent);
-			console.log(perkModifierName, {stealPercent, dmg, value});
 		}
 		return value;
 
@@ -224,21 +222,28 @@ export default class TalentsController extends MasterController {
 	protected tickDmg(dmg: number, crit: boolean, buffInstance: BUFF_INSTANCE, cause: string, interval: number, attacker: HURTER, target: PLAYER) {
 		isSocket(target) 
 			? this.tickSocketDmg(dmg, crit, buffInstance, cause, interval, 0, <GameSocket>target, <MOB_INSTANCE>attacker)
-			: this.tickMobDmg(dmg, crit, buffInstance, <MOB_INSTANCE>target, cause, interval, 0, <GameSocket>attacker);
+			: this.tickMobDmg(dmg, crit, buffInstance, <MOB_INSTANCE>target, cause, interval, 0, <GameSocket>attacker, (<GameSocket>attacker).character.stats.primaryAbility);
 	}
 
-	protected tickMobDmg(dmg: number, crit: boolean, buffInstance: BUFF_INSTANCE, mob: MOB_INSTANCE, cause: string, interval: number, tickIndex: number, socket: GameSocket) {
+	protected tickMobDmg(dmg: number, crit: boolean, buffInstance: BUFF_INSTANCE, mob: MOB_INSTANCE, cause: string, interval: number, tickIndex: number, socket: GameSocket, ability: string) {
 		let buffTimer = setTimeout(() => {
 			if (!socket.connected || !socket.alive || socket.character.room !== mob.room) {
 				return this.clearMobBuff(mob.room, mob.id, buffInstance);
 			}
-			this.tickMobDmg(dmg, crit, buffInstance, mob, cause, interval, tickIndex + 1, socket);
+			this.tickMobDmg(dmg, crit, buffInstance, mob, cause, interval, tickIndex + 1, socket, ability);
+			
+			// make sure the ticking is going on the correct ability that was used
+			const previousAbility = socket.character.stats.primaryAbility;
+			socket.character.stats.primaryAbility = ability;
+			
 			this.mobsRouter.getEmitter().emit(mobsConfig.SERVER_INNER.MOB_TAKE_DMG.name, {
 				mobId: mob.id, 
 				dmg,
 				cause,
 				crit,
 			}, socket);
+
+			socket.character.stats.primaryAbility = previousAbility;
 		}, interval * 1000 - (tickIndex === 0 ? 100 : 0)); // reducing 100 ms so all the ticks will fit in the time
 		
 		buffInstance.onPerkCleared = () => clearTimeout(buffTimer);

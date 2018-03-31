@@ -3,6 +3,7 @@ export default {
 		"HEAL_CHARS": {"name": "heal_chars", "alive": true, "log": true},
 		"HEAL_CHAR": {"name": "heal_char", "alive": true},
 		"CHANGED_ABILITY": {"name": "changed_ability_inner"},
+		"ACTIVATE_ABILITY": {"name": "activated_ability"},
 	},
 	"SERVER_GETS": {
 		"LOAD_ATTACK": {"name": "loaded_attack", "alive": true, "log": true},
@@ -23,5 +24,6 @@ export default {
 		BLEED: "bleed",
 		SPIKES: "spikes",
 		BURN: "burn",
-    }
+	},
+	ATTACK_INFO_ALIVE_TIME: 5000,
 }

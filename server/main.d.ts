@@ -158,6 +158,13 @@ interface GameSocket extends SocketIO.Socket {
     emitter: NodeJS.EventEmitter
 }
 
+interface ATTACK_INFO {
+    timerId: NodeJS.Timer
+    load: number
+    ability: string,
+    spell_key?: string,
+}
+
 interface DMG_RESULT {
     dmg: number
     crit: boolean

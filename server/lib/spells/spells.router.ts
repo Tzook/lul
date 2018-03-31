@@ -6,6 +6,7 @@ import { getMobDeadOrAlive, getMob } from '../mobs/mobs.controller';
 import mobsConfig from '../mobs/mobs.config';
 import { getMpUsage } from '../talents/talents.services';
 import { mobStopSpellsPicker, hasMobSpellsPicker, mobStartSpellsPicker, mobUsesSpell, canUseSpell, addSpellInfo, getSpell } from './spells.services';
+import { setAttackInfo, popAttackInfo } from '../combat/combat.services';
 
 export default class SpellsRouter extends SocketioRouterBase {
 
@@ -14,7 +15,10 @@ export default class SpellsRouter extends SocketioRouterBase {
     }
 
 	[spellsConfig.SERVER_GETS.USE_SPELL.name](data, socket: GameSocket) {
-		const {spell_key} = data;
+		const {spell_key, attack_id} = data;
+		if (!attack_id) {
+			return this.sendError(data, socket, "Must include an attack id");
+		}
 		const spell = getSpell(socket, spell_key);
 		if (!spell) {
 			return this.sendError(data, socket, "The primary ability does not have that spell.");	
@@ -28,6 +32,7 @@ export default class SpellsRouter extends SocketioRouterBase {
 
 		this.emitter.emit(statsConfig.SERVER_INNER.USE_MP.name, { mp }, socket);
 		
+		setAttackInfo(socket, attack_id, 0, {spell_key});
 		socket.broadcast.to(socket.character.room).emit(spellsConfig.CLIENT_GETS.USE_SPELL.name, {
 			char_id: socket.character._id,
             spell_key,
@@ -35,18 +40,23 @@ export default class SpellsRouter extends SocketioRouterBase {
 	}
 
 	[spellsConfig.SERVER_GETS.HIT_SPELL.name](data, socket: GameSocket) {
-		const {target_ids, spell_key} = data;
-		const spell = getSpell(socket, spell_key);
+		const {target_ids, attack_id} = data;
+		
+		const attackInfo = popAttackInfo(socket, attack_id);
+		if (!attackInfo) {
+			return this.sendError(data, socket, "Spell must be used before it hits");
+		}
+
+		const spell = getSpell(socket, attackInfo.spell_key);
 		if (!spell) {
 			return this.sendError(data, socket, "The primary ability does not have that spell.");	
-		} else if (!canUseSpell(socket, spell)) {
+		} else if (!canUseSpell(socket, spell, attackInfo.ability)) {
 			return this.sendError(data, socket, "Character does not meet the requirements to use that spell.");
 		}
 
 		socket.currentSpell = spell;
-		socket.lastAttackLoad = 0;
 		
-		this.emitter.emit(combatConfig.SERVER_GETS.USE_ABILITY.name, {target_ids}, socket);		
+		this.emitter.emit(combatConfig.SERVER_INNER.ACTIVATE_ABILITY.name, {target_ids, attackInfo}, socket);		
 		
 		socket.currentSpell = null;
 	}

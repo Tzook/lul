@@ -6,7 +6,7 @@ import mobsConfig from '../mobs/mobs.config';
 import TalentsRouter from '../talents/talents.router';
 import talentsConfig from '../talents/talents.config';
 import statsConfig from '../stats/stats.config';
-import CombatServices from './combat.services';
+import CombatServices, { setAttackInfo, popAttackInfo } from './combat.services';
 import { getMpUsage } from '../talents/talents.services';
 import { calculateDamage } from './combat.services';
 
@@ -29,9 +29,12 @@ export default class CombatRouter extends SocketioRouterBase {
 	}
 
 	[config.SERVER_GETS.PERFORM_ATTACK.name](data, socket: GameSocket) {
+		const attackId = data.attack_id;
+		if (!attackId) {
+			return this.sendError(data, socket, "Must include an attack id");
+		}
+
 		let {mp} = this.talentsRouter.getPrimaryTalentInfo(socket);
-		
-		socket.lastAttackLoad = null;
 		if (mp) {
 			mp = getMpUsage(mp, socket);
 			if (socket.character.stats.mp.now < mp) {
@@ -39,9 +42,9 @@ export default class CombatRouter extends SocketioRouterBase {
 			}
 			this.emitter.emit(statsConfig.SERVER_INNER.USE_MP.name, {mp}, socket);
 		}
-		
+
 		let load = this.middleware.getValidLoad(data.load);
-		socket.lastAttackLoad = load;
+		setAttackInfo(socket, attackId, load);
 		socket.broadcast.to(socket.character.room).emit(this.CLIENT_GETS.PERFORM_ATTACK.name, {
 			id: socket.character._id,
 			ability: socket.character.stats.primaryAbility,
@@ -73,20 +76,32 @@ export default class CombatRouter extends SocketioRouterBase {
 	}
 
 	[config.SERVER_GETS.USE_ABILITY.name](data, socket: GameSocket) {
-		if (typeof socket.lastAttackLoad !== "number") {
-			return this.sendError(data, socket, "Must perform attack before using it");
+		const {target_ids, attack_id} = data;
+		const attackInfo = popAttackInfo(socket, attack_id);
+		if (!attackInfo) {
+			return this.sendError(data, socket, "Attack must be performed before it is used");
 		}
-		const targetsInArea = data.target_ids || [];
+		
+		this.emitter.emit(config.SERVER_INNER.ACTIVATE_ABILITY.name, {target_ids, attackInfo}, socket);
+	}
+
+	[config.SERVER_INNER.ACTIVATE_ABILITY.name](data: {target_ids, attackInfo: ATTACK_INFO}, socket: GameSocket) {
+		const {attackInfo, target_ids: targetsInArea = []} = data;
 		const targetsHit = socket.getTargetsHit(targetsInArea);
 
-		const {hitType} = this.talentsRouter.getPrimaryTalentInfo(socket);
+		const {hitType} = this.talentsRouter.getAbilityInfo(attackInfo.ability);
+
+		const previousAbility = socket.character.stats.primaryAbility;
+		socket.character.stats.primaryAbility = attackInfo.ability;
+		socket.lastAttackLoad = attackInfo.load;
 
 		if (hitType == talentsConfig.HIT_TYPE_ATTACK) {
 			this.emitter.emit(mobsConfig.SERVER_INNER.MOBS_TAKE_DMG.name, {mobs: targetsHit}, socket);		
 		} else {
 			this.emitter.emit(config.SERVER_INNER.HEAL_CHARS.name, {charNames: targetsHit}, socket);		
 		}
-		socket.lastAttackLoad = null;
+
+		socket.character.stats.primaryAbility = previousAbility;
 	}
 
 	[config.SERVER_INNER.HEAL_CHARS.name](data, socket: GameSocket) {

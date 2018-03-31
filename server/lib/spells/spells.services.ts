@@ -37,8 +37,8 @@ function getSpellsArrayMap(spells: ABILITY_SPELL_MODEL[]){
 // Player spells:
 // ===============
 
-export function canUseSpell(socket: GameSocket, spell: ABILITY_SPELL_MODEL): boolean {
-    const ability = socket.character.stats.primaryAbility;
+export function canUseSpell(socket: GameSocket, spell: ABILITY_SPELL_MODEL, ability?: string): boolean {
+    ability = ability || socket.character.stats.primaryAbility;
     const talent = socket.character.talents._doc[ability];
     return talent && talent.lvl >= spell.lvl;
 }
