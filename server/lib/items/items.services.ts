@@ -36,7 +36,7 @@ export default class ItemsServices extends MasterServices {
             extendItemSchemaWithTalents(item, itemSchema);
             extendItemWithMobs(item, itemSchema);
 			this.pushStats(itemSchema, item, "req", REQUIRE_SCHEMA);
-			if (this.middleware.isMisc(itemSchema)) {
+			if (itemSchema.type == "misc") {
 				this.pushStats(itemSchema, item, "use", USE_SCHEMA);
 			}
 
