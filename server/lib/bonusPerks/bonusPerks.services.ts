@@ -6,6 +6,7 @@ import bonusPerksConfig from './bonusPerks.config';
 import * as _ from "underscore";
 import { getServices } from '../main/bootstrap';
 import { getConfig } from '../socketio/socketio.services';
+import talentsConfig from '../talents/talents.config';
 
 export default class BonusPerksServices extends MasterServices {
     public clientPerks: Set<string> = new Set();
@@ -31,22 +32,22 @@ function getClientPerks() {
     return bonusPerksServices.clientPerks;
 }
 
-export function createBonusPerks(socket: GameSocket) {
-    socket.bonusPerks = {};
+export function createBonusPerks(target: BONUS_PERKSABLE, char: Char) {
+    target.bonusPerks = {};
     for (var itemKey in EQUIPS_SCHEMA) {
-        let equip: ITEM_INSTANCE = socket.character.equips[itemKey];
-        addBonusPerks(equip, socket);
+        let equip: ITEM_INSTANCE = char.equips[itemKey];
+        addBonusPerks(equip, target);
     }
 }
 
-export function addBonusPerks({perks = {}}: {perks?: PERK_MAP}, target: PLAYER) {
+export function addBonusPerks({perks = {}}: PERKABLE, target: BONUS_PERKSABLE) {
     for (let perkName in perks || {}) {
         target.bonusPerks[perkName] = target.bonusPerks[perkName] || 0;
         target.bonusPerks[perkName] += perks[perkName];
     }
 }
 
-export function removeBonusPerks({perks = {}}: {perks?: PERK_MAP}, target: PLAYER) {
+export function removeBonusPerks({perks = {}}: PERKABLE, target: BONUS_PERKSABLE) {
     for (let perkName in perks || {}) {
         target.bonusPerks[perkName] -= perks[perkName];
         if (!target.bonusPerks[perkName]) {
@@ -75,8 +76,8 @@ export function getBonusPerks(target: PLAYER, ability?: string): PERKS_DIFF {
 }
 
 export function updateBonusPerks(socket: GameSocket, oldStats: PERKS_DIFF, newStats: PERKS_DIFF) {
-    if (oldStats.hpBonus != newStats.hpBonus || oldStats.mpBonus != newStats.mpBonus) {
-        const stats = {hp: newStats.hpBonus - oldStats.hpBonus, mp: newStats.mpBonus - oldStats.mpBonus};
+    if (oldStats[talentsConfig.PERKS.HP_BONUS] != newStats[talentsConfig.PERKS.HP_BONUS] || oldStats[talentsConfig.PERKS.MP_BONUS] != newStats[talentsConfig.PERKS.MP_BONUS]) {
+        const stats = {hp: newStats[talentsConfig.PERKS.HP_BONUS] - oldStats[talentsConfig.PERKS.HP_BONUS], mp: newStats[talentsConfig.PERKS.MP_BONUS] - oldStats[talentsConfig.PERKS.MP_BONUS]};
         socket.emitter.emit(statsConfig.SERVER_INNER.STATS_ADD.name, { stats, checkMaxStats: false }, socket);
     }
     
@@ -98,11 +99,11 @@ export function notifyBonusPerks(socket: GameSocket, diff: PERKS_DIFF) {
     let dataToSend = Object.assign({
         id: socket.character._id
     }, diff);
-    if (diff.hpBonus || _.isNumber(diff.hpBonus)) {
-        dataToSend.hpBonus = socket.maxHp;
+    if (diff[talentsConfig.PERKS.HP_BONUS] || _.isNumber(diff[talentsConfig.PERKS.HP_BONUS])) {
+        dataToSend[talentsConfig.PERKS.HP_BONUS] = socket.maxHp;
     }
-    if (diff.mpBonus || _.isNumber(diff.mpBonus)) {
-        dataToSend.mpBonus = socket.maxMp;
+    if (diff[talentsConfig.PERKS.MP_BONUS] || _.isNumber(diff[talentsConfig.PERKS.MP_BONUS])) {
+        dataToSend[talentsConfig.PERKS.MP_BONUS] = socket.maxMp;
     }
     socket.emit(bonusPerksConfig.CLIENT_GETS.UPDATE_CLIENT_PERKS.name, dataToSend);
     socket.broadcast.to(socket.character.room).emit(bonusPerksConfig.CLIENT_GETS.UPDATE_CLIENT_PERKS.name, dataToSend);

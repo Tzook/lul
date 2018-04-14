@@ -73,5 +73,6 @@ export default class StatsModel extends MasterModel {
         data.mp.now = data.mp.total = 20;
 
         obj[field] = data;
+		this.addFields(obj, data);
     }
 };

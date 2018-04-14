@@ -116,6 +116,9 @@ interface User extends Doc {
     characters: Char[]
 }
 
+interface BONUS_PERKSABLE {
+    bonusPerks: PERK_MAP
+}
 interface PERKABLE {
     perks?: PERK_MAP
 }

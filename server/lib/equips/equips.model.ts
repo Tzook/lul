@@ -59,5 +59,6 @@ export default class EquipsModel extends MasterModel {
             equips[type] = new ItemModel(itemInstance);
         }
         obj[field] = equips;
+		this.addFields(obj, data);
     }
 };

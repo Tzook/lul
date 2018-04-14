@@ -4,7 +4,7 @@ import SocketioRouterBase from "../socketio/socketio.router.base";
 
 export default class BonusPerksRouter extends SocketioRouterBase {
     public onConnected(socket: GameSocket) {
-        createBonusPerks(socket);
+        createBonusPerks(socket, socket.character);
         process.nextTick(() => updateBonusPerks(socket, getEmptyBonusPerks(), getBonusPerks(socket)));
 	}	
 	
