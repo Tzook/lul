@@ -12,7 +12,6 @@
         (function() {
             var BUILD_ASSETS_VERSION = 2;
             var PARTS_SIZE = 5;
-            var TOTAL_SIZE = 100000000;
             
             monkeyPatchAjaxes();
 
@@ -31,19 +30,15 @@
 
                     // since we have a really big file, we want to split it to multiple ajaxes
                     var promises = [];
+                    var loaded = [];
                     for (var i = 1; i <= PARTS_SIZE; i++) {
                         var finished = 0;
-                        var promise = get(t.parameters.url + "&part=" + i);
-                        promise.then(function() {
-                            finished += TOTAL_SIZE / PARTS_SIZE;
-                            t.parameters.onprogress({type: "progress", total: TOTAL_SIZE, loaded: finished, lengthComputable: TOTAL_SIZE});
-                        });
+                        var promise = getPart(t.parameters.url, i, t.parameters.onprogress);
                         promises.push(promise);
                     }
                     Promise.all(promises)
                         .then(function(parts) {
                             UnityLoader.Compression.decompress(joinBuffers(parts), function(result) {
-                                t.parameters.onprogress({type: "load", total: TOTAL_SIZE, loaded: finished, lengthComputable: TOTAL_SIZE});
                                 t.complete(result);
                             })
                         })
@@ -52,12 +47,31 @@
                         });
                     // mock this object's send so we can actually modify it
                     this.send = function() {};
+
+                    function getPart(url, part, onprogress) {
+                        loaded[part - 1] = 0;
+                        return new Promise((resolve, reject) => {
+                            var xhr = new XMLHttpRequest();
+                            xhr.open("GET", url + "&part=" + part);
+                            xhr.responseType = "arraybuffer";
+                            xhr.onload = function() {
+                                resolve(xhr.response);
+                            };
+                            xhr.addEventListener("progress", function(event) {
+                                loaded[part - 1] = event.loaded;
+                                var sum = 0;
+                                for (var i in loaded) {
+                                    sum += loaded[i];
+                                }
+                                onprogress({type: "progress", lengthComputable: true, loaded: sum, total: event.total * loaded.length});
+                            });
+                            xhr.send();
+                        });
+                    }
                 };
+
             }
 
-            function get(url) {
-                return fetch(url).then(function(response) {return response.arrayBuffer()});
-            }
 
             function joinBuffers(buffers) {
                 // taken from https://github.com/jessetane/array-buffer-concat/blob/master/index.js
