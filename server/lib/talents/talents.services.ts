@@ -282,7 +282,7 @@ export default class TalentsServices extends MasterServices {
 	protected addPerkValueBonuses(target: PLAYER, perkName: string, perkValue: number): number {
 		if (target.currentSpell) {
 			// send the higher value - perk or spell
-			let spellPerkValue = target.currentSpell.perks[perkName] || 0;
+			let spellPerkValue = (target.currentSpell.perks || {})[perkName] || 0;
 			perkValue = this.getBetterPerkValue(perkName, spellPerkValue, perkValue);
 		}
 		let bonusPerkValue = target.bonusPerks[perkName] || 0;
