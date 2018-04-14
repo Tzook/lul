@@ -1,29 +1,20 @@
-import * as path from 'path';
 import { EventEmitter } from 'events';
+import Routes from './routes';
 
 let routers = {};
 let services = {};
 let controllers = {};
 let globalEmitter = new EventEmitter();
-import * as express from "express";
 
 export default class Bootstrap {
     protected app;
 
     constructor(app) {
         this.app = app;
-
-        this.app.get('/', (req, res) => {
-            res.sendFile(path.resolve(`playground/index.html`));
-        });
-        this.app.get('/assets.html', (req, res) => {
-            res.sendFile(path.resolve(`playground/assets`));
-        });
-
-        this.app.use(express.static('playground'));
     }
-
+    
     public init() {
+        (new Routes(this.app)).init();
         let structure = require('../../../config/config.structure.json');
         var filesGroups = [];
         for (let i = 0; i < structure.folders.length; i++) {

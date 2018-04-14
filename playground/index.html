@@ -9,7 +9,78 @@
     <script src="TemplateData/UnityProgress.js"></script>  
     <script src="Build/UnityLoader.js"></script>
     <script>
-      var gameInstance = UnityLoader.instantiate("gameContainer", "Build/Desktop.json", {onProgress: UnityProgress});
+        (function() {
+            var BUILD_ASSETS_VERSION = 1;
+            var PARTS_SIZE = 20;
+            
+            monkeyPatchAjaxes();
+
+            function monkeyPatchAjaxes() {
+                var original = UnityLoader.downloadJob;
+                UnityLoader.downloadJob = function (e, t) {
+                    if (t.parameters.url.indexOf(".unityweb") === -1) {
+                        // continue with no modifications
+                        return original(e, t);
+                    }
+                    // add version to the build files so it will be revoked when build updates
+                    t.parameters.url += "?v=" + BUILD_ASSETS_VERSION;
+                    if (t.parameters.url.indexOf(".data") === -1) {
+                        return original(e, t);
+                    }
+
+                    // since we have a really big file, we want to split it to multiple ajaxes
+                    var promises = [];
+                    for (var i = 1; i <= PARTS_SIZE; i++) {
+                        var finished = 0;
+                        var promise = get(t.parameters.url + "&part=" + i);
+                        promise.then(function() {
+                            finished++;
+                            t.parameters.onprogress({type: "progress", total: PARTS_SIZE, loaded: finished, lengthComputable: PARTS_SIZE});
+                        });
+                        promises.push(promise);
+                    }
+                    Promise.all(promises)
+                        .then(function(parts) {
+                            UnityLoader.Compression.decompress(joinBuffers(parts), function(result) {
+                                t.parameters.onprogress({type: "load", total: PARTS_SIZE, loaded: finished, lengthComputable: PARTS_SIZE});
+                                t.complete(result);
+                            })
+                        })
+                        .catch(function(error) {
+                            console.log("error", error);
+                        });
+                    // mock this object's send so we can actually modify it
+                    this.send = function() {};
+                };
+            }
+
+            function get(url) {
+                return fetch(url).then(function(response) {return response.arrayBuffer()});
+            }
+
+            function joinBuffers(buffers) {
+                // taken from https://github.com/jessetane/array-buffer-concat/blob/master/index.js
+                var length = 0;
+                var buffer = null;
+
+                for (var i in buffers) {
+                    buffer = buffers[i];
+                    length += buffer.byteLength;
+                }
+
+                var joined = new Uint8Array(length);
+                var offset = 0;
+
+                for (var i in buffers) {
+                    buffer = buffers[i];
+                    joined.set(new Uint8Array(buffer), offset);
+                    offset += buffer.byteLength;
+                }
+
+                return joined;
+            }
+        })();
+        var gameInstance = UnityLoader.instantiate("gameContainer", "Build/Desktop.json", {onProgress: UnityProgress});
     </script>
   </head>
   <body>
