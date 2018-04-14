@@ -236,12 +236,7 @@ export default class SocketioRouter extends SocketioRouterBase {
                 });
             });
             
-        if (isProduction()) {
-            ["exit", "SIGINT", "SIGUSR1", "SIGUSR2", "SIGTERM"].forEach((eventType) => {
-                (<any>process).on(eventType, () => notifyUserAboutError(this.io, restartText, true));
-            });
-
-            (<any>process).on("uncaughtException", () => notifyUserAboutError(this.io, "Restarting server!\n(Had an error)", true));
-        }
+		(<any>process).on("SIGTERM", () => notifyUserAboutError(this.io, restartText, true));
+		(<any>process).on("exit", () => notifyUserAboutError(this.io, "Restarting server!\n(Had an error)", true));
 	}
  };
