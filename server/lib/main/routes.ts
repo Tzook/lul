@@ -3,7 +3,7 @@ import * as fs from 'fs';
 import * as util from 'util';
 import * as express from "express";
 
-const PARTS_SIZE = 20;
+const PARTS_SIZE = 5;
 
 export default class Routes {
     protected app: express.Application;
