@@ -126,7 +126,8 @@ export function slightlyTweakPerks(perksObject: PERK_MAP): PERK_MAP {
         let perkValue = perksObject[perkName];
     	result[perkName] = perkValue;
         continue;
-	// TODO fix the roundiness
+	    // TODO fix the roundiness
+        // @ts-ignore
         // get a random number between -0.1 and 0.1
         const random = Math.random() * offset * 2 - offset;
         let addition = perkValue * random;

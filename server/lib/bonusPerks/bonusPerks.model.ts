@@ -14,8 +14,7 @@ export const PRIORITY_BONUS_PERKS = PRIORITY_ITEM + 10;
 export default class BonusPerksModel extends MasterModel {
 
     init(files, app) {
-        // we need both equips and stats to be added to character
-        this.addFieldToModel = <any>_.after(2, this.addFieldToModel);   
+        
     }
 
     get priority() {
@@ -37,8 +36,8 @@ export default class BonusPerksModel extends MasterModel {
     }
 };
 
-
-function updateCharHpMp(char: Char) {
+// we need both equips and stats to be added to character
+var updateCharHpMp = _.after(2, function (char: Char) {
     // @ts-ignore
     let target: BONUS_PERKSABLE = {};
     createBonusPerks(target, char);
@@ -48,7 +47,7 @@ function updateCharHpMp(char: Char) {
     if (target.bonusPerks[talentsConfig.PERKS.MP_BONUS]) {
         char.stats.mp.now += target.bonusPerks[talentsConfig.PERKS.MP_BONUS];
     }
-}
+});
 
 export function extendItemSchemaWithTalents(item: any, itemSchema: ITEM_MODEL) {
     (item.perks || []).forEach(perk => {
