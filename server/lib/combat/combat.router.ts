@@ -98,25 +98,25 @@ export default class CombatRouter extends SocketioRouterBase {
 		if (hitType == talentsConfig.HIT_TYPE_ATTACK) {
 			this.emitter.emit(mobsConfig.SERVER_INNER.MOBS_TAKE_DMG.name, {mobs: targetsHit}, socket);		
 		} else {
-			this.emitter.emit(config.SERVER_INNER.HEAL_CHARS.name, {charNames: targetsHit}, socket);		
+			this.emitter.emit(config.SERVER_INNER.HEAL_CHARS.name, {charIds: targetsHit}, socket);		
 		}
 
 		socket.character.stats.primaryAbility = previousAbility;
 	}
 
 	[config.SERVER_INNER.HEAL_CHARS.name](data, socket: GameSocket) {
-		const {charNames} = data;
+		const {charIds} = data;
 
 		let cause = statsConfig.REGEN_CAUSE.HEAL;
-		for (let i = 0; i < charNames.length; i++) {
-			const charName = charNames[i];
-			const healedSocket = socket.map.get(charName);
+		for (let i = 0; i < charIds.length; i++) {
+			const charId = charIds[i];
+			const healedSocket = socket.map.get(charId);
 			if (!healedSocket || !healedSocket.connected) {
-				this.sendError({charName}, socket, "No such char id");
+				this.sendError({charId}, socket, "No such char id");
 			} else if (healedSocket.character.room !== socket.character.room) {
-				this.sendError({charName}, socket, "Cannot heal someone in a different room");
+				this.sendError({charId}, socket, "Cannot heal someone in a different room");
 			} else if (!healedSocket.alive) {
-				this.sendError({charName}, socket, "Cannot heal dead people. You ain't jesus");
+				this.sendError({charId}, socket, "Cannot heal dead people. You ain't jesus");
 			} else {
                 const dmgResult = calculateDamage(socket, healedSocket);
                 // don't heal above the missing hp of the individual
