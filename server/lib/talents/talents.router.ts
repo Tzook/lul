@@ -145,7 +145,8 @@ export default class TalentsRouter extends SocketioRouterBase {
 		talent.lvl++;
 		talent.points++;
 		this.emitter.emit(talentsConfig.SERVER_INNER.GENERATE_PERK_POOL.name, {talent, ability}, socket);		
-		socket.emit(talentsConfig.CLIENT_GETS.GAIN_ABILITY_LVL.name, {
+		this.io.to(socket.character.room).emit(talentsConfig.CLIENT_GETS.GAIN_ABILITY_LVL.name, {
+			id: socket.character._id,
 			ability,
 			lvl: talent.lvl,
 			points: talent.points,
