@@ -23,7 +23,6 @@ export default class Routes {
         });
 
         this.app.use('/Build/Desktop.data.unityweb', (req: express.Request, res: express.Response, next: express.NextFunction) => {
-            console.log("In!!", req.query);
             if (req.query.part >= 1 && req.query.part <= PARTS_SIZE) {
                 this.getBuildDataPart(req.query.part - 1)
                     .then(buffer => res.send(buffer))
