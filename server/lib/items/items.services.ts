@@ -68,7 +68,7 @@ export default class ItemsServices extends MasterServices {
 					this.itemsInfo.set(doc.key, doc);
 				});
 				console.log("got items");
-				getEmitter().emit(itemsConfig.GLOBAL_ITEMS_READY.name);				
+				getEmitter().emit(itemsConfig.GLOBAL_ITEMS_READY.name, this.itemsInfo);				
 				return this.itemsInfo;
 			});
 	}

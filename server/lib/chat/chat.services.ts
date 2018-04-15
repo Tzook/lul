@@ -20,6 +20,8 @@ export default class ChatServices extends MasterServices {
     protected talentsRouter: TalentsRouter;
     protected goldRouter: GoldRouter;
 
+    protected itemHints: Map<string, ITEM_MODEL> = new Map();
+
 	init(files, app) {
         this.statsRouter = files.routers.stats;
         this.roomsRouter = files.routers.rooms;
@@ -27,6 +29,12 @@ export default class ChatServices extends MasterServices {
         this.talentsRouter = files.routers.talents;
         this.goldRouter = files.routers.gold;
 		super.init(files, app);
+    }
+
+    public improveItemsKeysForHax(items: Map<string, ITEM_MODEL>) {
+        for (let [itemKey, item] of items) {
+            this.itemHints.set(getHintKey(itemKey), item);
+        }
     }
 
     public useHax(socket: GameSocket, msg: string): boolean {
@@ -143,10 +151,13 @@ export default class ChatServices extends MasterServices {
             case chatConfig.HAX.DROP.code: {
                 let itemInfo = this.itemsRouter.getItemInfo(parts[2]);
                 if (!itemInfo) {
+                    itemInfo = this.itemHints.get(getHintKey(parts[2]));
+                }
+                if (!itemInfo) {
                     this.statsRouter.sendError({msg}, socket, "Cannot hax - Item not found", true, true);
                     return true;
                 }
-                let itemInstance = this.itemsRouter.getItemInstance(parts[2]);
+                let itemInstance = this.itemsRouter.getItemInstance(itemInfo.key);
                 
                 if (itemInfo.cap > 1) {
                     const stack = +parts[3] > 0 ? +parts[3] : 1;
@@ -174,4 +185,8 @@ function pickPerk(pool: any, perksString: string): string {
         }
     }
     return _.sample(pool);
+}
+
+function getHintKey(key: string): string {
+    return key.toLowerCase().replace(/_/g, "")
 }

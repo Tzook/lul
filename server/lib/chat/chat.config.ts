@@ -1,4 +1,9 @@
+import itemsConfig from "../items/items.config";
+
 export default {
+	GLOBAL_EVENTS: {
+		GLOBAL_ITEMS_READY: Object.assign({}, itemsConfig.GLOBAL_ITEMS_READY),
+	},
 	"SERVER_GETS": {
 		"SHOUT": {"name": "shouted", "log": true},
 		"CHAT": {"name": "chatted", "log": true},

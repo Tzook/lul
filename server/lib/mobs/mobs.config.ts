@@ -14,7 +14,6 @@ export default {
 	GLOBAL_EVENTS: {
 		GLOBAL_ITEMS_READY: Object.assign({}, itemsConfig.GLOBAL_ITEMS_READY),
 		GLOBAL_MOBS_READY: {"name": "mobs_ready"},
-		
 	},
     "SERVER_INNER": {
         "LEFT_ROOM": {"name": "left_room"},
