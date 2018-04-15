@@ -40,12 +40,12 @@ export default class ChatServices extends MasterServices {
             targetSocket = socket.map.get(parts[1]);
             if (!targetSocket) {
                 this.statsRouter.sendError({msg}, socket, "Cannot hax - Target was not found", true, true);
-                return false;
+                return true;
             }
         } 
         if (!targetSocket.connected || !targetSocket.alive) {
             this.statsRouter.sendError({msg}, socket, "Cannot hax - Target is disconnected or dead", true, true);
-            return false;
+            return true;
         }
         
         let emitter = this.statsRouter.getEmitter();
@@ -54,7 +54,7 @@ export default class ChatServices extends MasterServices {
                 let haxStrings = _.map(chatConfig.HAX, ({code, param}: {code: string, param?: string}) => {
                         return code + " {name?}" + (param ? ` ${param}` : "");
                     });
-                return targetSocket.emit(chatConfig.CLIENT_GETS.WHISPER.name, {
+                targetSocket.emit(chatConfig.CLIENT_GETS.WHISPER.name, {
                     name: socket.character.name,
                     id: socket.character._id,
                     msg: "Available hax:\n" + haxStrings.join("\n"),
@@ -79,7 +79,6 @@ export default class ChatServices extends MasterServices {
                         await new Promise(resolve => setTimeout(resolve, 100));
                     }
                 })();
-                return true;
             }
                 
             case chatConfig.HAX.LVLPA.code: {
@@ -87,7 +86,7 @@ export default class ChatServices extends MasterServices {
                 const talent = targetSocket.character.talents._doc[ability];
                 if (!talent) {
                     this.statsRouter.sendError({msg}, socket, "Cannot hax - Primary ability is not a real ability", true, true);
-                    return false;
+                    return true;
                 }
                 let times = +parts[3] ? +parts[3] - talent.lvl : 1;
                 (async () => {
@@ -106,7 +105,6 @@ export default class ChatServices extends MasterServices {
                         await new Promise(resolve => setTimeout(resolve, 100));
                     }
                 })();
-                return true;
             }
                 
             case chatConfig.HAX.GAINPA.code: {
@@ -114,9 +112,9 @@ export default class ChatServices extends MasterServices {
                 const abilityInfo = this.talentsRouter.getAbilityInfo(ability);
                 if (!abilityInfo) {
                     this.statsRouter.sendError({msg}, socket, "Cannot hax - ability not found", true, true);
-                    return false;
+                    return true;
                 }
-                return emitter.emit(talentsConfig.SERVER_INNER.GAIN_ABILITY.name, {
+                emitter.emit(talentsConfig.SERVER_INNER.GAIN_ABILITY.name, {
                     ability
                 }, targetSocket);
             }
@@ -126,10 +124,10 @@ export default class ChatServices extends MasterServices {
                 let roomInfo = this.roomsRouter.getRoomInfo(room);
                 if (!roomInfo) {
                     this.statsRouter.sendError({msg}, socket, "Cannot hax - Room not found", true, true);
-                    return false;
+                    return true;
                 }
                 
-                return emitter.emit(roomsConfig.SERVER_INNER.MOVE_ROOM.name, {
+                emitter.emit(roomsConfig.SERVER_INNER.MOVE_ROOM.name, {
                     room, 
                 }, targetSocket);
             }
@@ -137,7 +135,7 @@ export default class ChatServices extends MasterServices {
             case chatConfig.HAX.GOLD.code: {
                 const amount = +parts[2] > 0 ? +parts[2] : 10000;
                 let goldItem = this.goldRouter.getGoldItem(amount);
-                return emitter.emit(itemsConfig.SERVER_INNER.ITEM_ADD.name, { 
+                emitter.emit(itemsConfig.SERVER_INNER.ITEM_ADD.name, { 
                     item: goldItem
                 }, targetSocket); 
             }
@@ -146,7 +144,7 @@ export default class ChatServices extends MasterServices {
                 let itemInfo = this.itemsRouter.getItemInfo(parts[2]);
                 if (!itemInfo) {
                     this.statsRouter.sendError({msg}, socket, "Cannot hax - Item not found", true, true);
-                    return false;
+                    return true;
                 }
                 let itemInstance = this.itemsRouter.getItemInstance(parts[2]);
                 
@@ -155,11 +153,13 @@ export default class ChatServices extends MasterServices {
                     itemInstance.stack = stack;
                 }
                 
-                return emitter.emit(dropsConfig.SERVER_INNER.ITEMS_DROP.name, {owner: targetSocket.character.name}, targetSocket, [itemInstance]);
+                emitter.emit(dropsConfig.SERVER_INNER.ITEMS_DROP.name, {
+                    owner: targetSocket.character.name
+                }, targetSocket, [itemInstance]);
             }
         }
 
-        return false;
+        return true;
     }
 };
 
