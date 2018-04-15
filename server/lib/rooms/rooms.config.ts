@@ -28,6 +28,7 @@ export default {
 		"BITCH_PLEASE": {"name": "bitch_please"},
 		"BITCH_CHOOSE": {"name": "actor_bitch"}
 	},
+	GLOBAL_ROOMS_READY: {name: "rooms_ready"},
 	"DEFAULT_ROOM": "IntroScene",
 	"BITCH_INTERVAL": 5000
 }

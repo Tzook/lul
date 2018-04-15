@@ -1,8 +1,10 @@
 import itemsConfig from "../items/items.config";
+import roomsConfig from "../rooms/rooms.config";
 
 export default {
 	GLOBAL_EVENTS: {
 		GLOBAL_ITEMS_READY: Object.assign({}, itemsConfig.GLOBAL_ITEMS_READY),
+		GLOBAL_ROOMS_READY: Object.assign({}, roomsConfig.GLOBAL_ROOMS_READY),
 	},
 	"SERVER_GETS": {
 		"SHOUT": {"name": "shouted", "log": true},

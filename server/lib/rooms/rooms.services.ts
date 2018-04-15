@@ -3,7 +3,8 @@ import MasterServices from '../master/master.services';
 import NpcsRouter from "../npcs/npcs.router";
 import * as _ from 'underscore';
 import { extendRoomSchemaWithTalents } from '../talents/talents.services';
-import { getServices } from '../main/bootstrap';
+import { getServices, getEmitter } from '../main/bootstrap';
+import roomsConfig from './rooms.config';
 
 const ROOM_NAME_INSTANCE_SEPARATOR = "~~";
 
@@ -62,6 +63,7 @@ export default class RoomsServices extends MasterServices {
 					this.roomsInfo.set(doc.name, doc);
 				});
 				console.log("got rooms");
+				getEmitter().emit(roomsConfig.GLOBAL_ROOMS_READY.name, this.roomsInfo);
 				return this.roomsInfo;
 			});
 	}
@@ -69,7 +71,6 @@ export default class RoomsServices extends MasterServices {
 	public getRoomInfo(room: string): ROOM_MODEL|undefined {
 		return this.roomsInfo.get(room);
 	}
-
 };  
 
 export function getRoomInstance(room: string) {

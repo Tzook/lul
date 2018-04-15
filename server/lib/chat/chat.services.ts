@@ -21,6 +21,7 @@ export default class ChatServices extends MasterServices {
     protected goldRouter: GoldRouter;
 
     protected itemHints: Map<string, ITEM_MODEL> = new Map();
+    protected roomHints: Map<string, ROOM_MODEL> = new Map();
 
 	init(files, app) {
         this.statsRouter = files.routers.stats;
@@ -34,6 +35,12 @@ export default class ChatServices extends MasterServices {
     public improveItemsKeysForHax(items: Map<string, ITEM_MODEL>) {
         for (let [itemKey, item] of items) {
             this.itemHints.set(getHintKey(itemKey), item);
+        }
+    }
+
+    public improveRoomsKeysForHax(rooms: Map<string, ROOM_MODEL>) {
+        for (let [roomKey, room] of rooms) {
+            this.roomHints.set(getHintKey(roomKey), room);
         }
     }
 
@@ -67,6 +74,7 @@ export default class ChatServices extends MasterServices {
                     id: socket.character._id,
                     msg: "Available hax:\n" + haxStrings.join("\n"),
                 });
+                break;
             }
                 
             case chatConfig.HAX.LVL.code: {
@@ -87,6 +95,7 @@ export default class ChatServices extends MasterServices {
                         await new Promise(resolve => setTimeout(resolve, 100));
                     }
                 })();
+                break;
             }
                 
             case chatConfig.HAX.LVLPA.code: {
@@ -113,6 +122,7 @@ export default class ChatServices extends MasterServices {
                         await new Promise(resolve => setTimeout(resolve, 100));
                     }
                 })();
+                break;
             }
                 
             case chatConfig.HAX.GAINPA.code: {
@@ -125,19 +135,24 @@ export default class ChatServices extends MasterServices {
                 emitter.emit(talentsConfig.SERVER_INNER.GAIN_ABILITY.name, {
                     ability
                 }, targetSocket);
+                break;
             }
                 
             case chatConfig.HAX.TP.code: {
                 let room = parts[2];
                 let roomInfo = this.roomsRouter.getRoomInfo(room);
                 if (!roomInfo) {
+                    roomInfo = this.roomHints.get(getHintKey(parts[2]));                    
+                }
+                if (!roomInfo) {
                     this.statsRouter.sendError({msg}, socket, "Cannot hax - Room not found", true, true);
                     return true;
                 }
                 
                 emitter.emit(roomsConfig.SERVER_INNER.MOVE_ROOM.name, {
-                    room, 
+                    room: roomInfo.name, 
                 }, targetSocket);
+                break;
             }
                 
             case chatConfig.HAX.GOLD.code: {
@@ -146,6 +161,7 @@ export default class ChatServices extends MasterServices {
                 emitter.emit(itemsConfig.SERVER_INNER.ITEM_ADD.name, { 
                     item: goldItem
                 }, targetSocket); 
+                break;
             }
                 
             case chatConfig.HAX.DROP.code: {
@@ -167,6 +183,7 @@ export default class ChatServices extends MasterServices {
                 emitter.emit(dropsConfig.SERVER_INNER.ITEMS_DROP.name, {
                     owner: targetSocket.character.name
                 }, targetSocket, [itemInstance]);
+                break;
             }
         }
 
