@@ -368,10 +368,12 @@ interface NPC_MODEL {
     endingQuests: string[]
     sell?: NPC_ITEM[]
     teleportRooms?: {
-        [room: string]: {
-            portal: string
-        }
+        [room: string]: NPC_TELEPORT_ROOM
     }
+}
+interface NPC_TELEPORT_ROOM {
+    portal: string,
+    party?: boolean
 }
 
 interface ABILITY_PERK_INSTANCE {

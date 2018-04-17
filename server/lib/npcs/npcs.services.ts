@@ -51,8 +51,12 @@ export default class NpcsServices extends MasterServices {
 
             (npc.teleportRooms || []).forEach(teleportRoom => {
                 npcModel.teleportRooms = npcModel.teleportRooms || {};
-                let {room, portal} = teleportRoom;
-                npcModel.teleportRooms[room] = {portal};   
+                let {room, portal, party} = teleportRoom;
+                let tpRoom: NPC_TELEPORT_ROOM = {portal};
+                if (party == "true") {
+                    tpRoom.party = true;
+                }
+                npcModel.teleportRooms[room] = tpRoom;
             });
 
             models.push(new this.Model(npcModel))
