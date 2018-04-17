@@ -136,7 +136,6 @@ export default class QuestsRouter extends SocketioRouterBase {
 					quests[questKey]++;
                     memberSocket.emit(config.CLIENT_GETS.QUEST_HUNT_PROGRESS.name, { id: questKey, mob_id: data.id, value: quests[questKey]});
                     fields.add("hunt");
-                    console.log("Hunt for quest", data.id, questKey, quests[questKey]);
                 }
             }
             this.services.markModified(memberSocket.character.quests, fields);
@@ -153,9 +152,35 @@ export default class QuestsRouter extends SocketioRouterBase {
 				quests[questKey] = Math.min(quests[questKey] + increment, questInfo.cond.ok[data.ok]);
 				socket.emit(config.CLIENT_GETS.QUEST_OK_PROGRESS.name, { id: questKey, ok: data.ok, value: quests[questKey]});
 				fields.add("ok");
-				console.log("Ok for quest", data.ok, questKey, quests[questKey]);
 			}
 		}
 		this.services.markModified(socket.character.quests, fields);
+	}
+
+	[config.SERVER_INNER.HURT_MOB.name]({dmg}: {dmg: number}, socket: GameSocket) {
+		let fields: Set<string> = new Set();
+		let quests = socket.character.quests.dmg;
+		for (let questKey in quests) {
+			let questInfo = this.services.getQuestInfo(questKey);
+			if (quests[questKey] < questInfo.cond.dmg) {
+				quests[questKey] = Math.min(quests[questKey] + dmg, questInfo.cond.dmg);
+				fields.add("dmg");				
+			}
+		}
+		this.services.markModified(socket.character.quests, fields);
+	}
+	
+	[config.SERVER_INNER.HEAL_CHAR.name]({dmg}: {dmg: number}, socket: GameSocket) {
+		let fields: Set<string> = new Set();
+		let quests = socket.character.quests.heal;
+		for (let questKey in quests) {
+			let questInfo = this.services.getQuestInfo(questKey);
+			if (quests[questKey] < questInfo.cond.heal) {
+				quests[questKey] = Math.min(quests[questKey] + dmg, questInfo.cond.heal);
+				fields.add("heal");				
+			}
+		}
+		this.services.markModified(socket.character.quests, fields);
+		
 	}
 };

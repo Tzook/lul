@@ -1,3 +1,6 @@
+import mobsConfig from "../mobs/mobs.config";
+import combatConfig from "../combat/combat.config";
+
 export default {
 	"ROUTES": {
 		"GENERATE": "/quests/generate"
@@ -10,7 +13,9 @@ export default {
 		}
 	},
 	"SERVER_INNER": {
-		"HUNT_MOB": {"name": "hunt_mob"}
+		"HUNT_MOB": {"name": "hunt_mob"},
+		HURT_MOB: Object.assign({}, mobsConfig.SERVER_INNER.HURT_MOB),
+		HEAL_CHAR: Object.assign({}, combatConfig.SERVER_INNER.HEAL_CHAR),
 	},
 	"SERVER_GETS": {
 		"QUEST_START": {"name": "quest_started", "alive": true, "log": true},

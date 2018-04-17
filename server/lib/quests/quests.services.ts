@@ -10,16 +10,26 @@ export default class QuestsServices extends MasterServices {
         quests.progress[questInfo.key] = {};
         let fields: Set<string> = new Set(["progress"]);
 
-        for (var mobKey in ((questInfo.cond || {}).hunt || {})) {
-            quests.hunt[mobKey] = quests.hunt[mobKey] || {};
-            quests.hunt[mobKey][questInfo.key] = 0;
-            fields.add("hunt");
-        }
-
-        for (var taskKey in ((questInfo.cond || {}).ok || {})) {
-            quests.ok[taskKey] = quests.ok[taskKey] || {};
-            quests.ok[taskKey][questInfo.key] = 0;
-            fields.add("ok");
+        if (questInfo.cond) {
+            for (var mobKey in (questInfo.cond.hunt || {})) {
+                quests.hunt[mobKey] = quests.hunt[mobKey] || {};
+                quests.hunt[mobKey][questInfo.key] = 0;
+                fields.add("hunt");
+            }
+    
+            for (var taskKey in (questInfo.cond.ok || {})) {
+                quests.ok[taskKey] = quests.ok[taskKey] || {};
+                quests.ok[taskKey][questInfo.key] = 0;
+                fields.add("ok");
+            }
+            if (questInfo.cond.dmg) {
+                quests.dmg[questInfo.key] = 0;
+                fields.add("dmg");
+            }
+            if (questInfo.cond.heal) {
+                quests.heal[questInfo.key] = 0;
+                fields.add("heal");
+            }
         }
 
         this.markModified(quests, fields);
@@ -38,20 +48,31 @@ export default class QuestsServices extends MasterServices {
     private removeQuest(quests: CHAR_QUESTS, questInfo: QUEST_MODEL) {
         delete quests.progress[questInfo.key];
         let fields: Set<string> = new Set(["progress"]);
-        for (var mobKey in ((questInfo.cond || {}).hunt || {})) {
-            delete quests.hunt[mobKey][questInfo.key];
-            if (_.isEmpty(quests.hunt[mobKey])) {
-                delete quests.hunt[mobKey];
+        if (questInfo.cond) {
+            for (var mobKey in (questInfo.cond.hunt || {})) {
+                delete quests.hunt[mobKey][questInfo.key];
+                if (_.isEmpty(quests.hunt[mobKey])) {
+                    delete quests.hunt[mobKey];
+                }
+                fields.add("hunt");
             }
-            fields.add("hunt");
-        }
-        for (var taskKey in ((questInfo.cond || {}).ok || {})) {
-            delete quests.ok[taskKey][questInfo.key];
-            if (_.isEmpty(quests.ok[taskKey])) {
-                delete quests.ok[taskKey];
+            for (var taskKey in (questInfo.cond.ok || {})) {
+                delete quests.ok[taskKey][questInfo.key];
+                if (_.isEmpty(quests.ok[taskKey])) {
+                    delete quests.ok[taskKey];
+                }
+                fields.add("ok");
             }
-            fields.add("ok");
+            if (questInfo.cond.dmg) {
+                delete quests.dmg[questInfo.key];
+                fields.add("dmg");
+            }
+            if (questInfo.cond.heal) {
+                delete quests.heal[questInfo.key];
+                fields.add("heal");
+            }
         }
+
         this.markModified(quests, fields);
     }
 
@@ -101,27 +122,44 @@ export default class QuestsServices extends MasterServices {
     }
 
     public questFinishUnmetReason(char: Char, itemsCounts: ITEMS_COUNTS, questInfo: QUEST_MODEL): string {
-        for (var itemKey in ((questInfo.cond || {}).loot || {})) {
-            let progress = itemKey === "gold" ? char.gold : itemsCounts.get(itemKey);
-            let target = questInfo.cond.loot[itemKey];
-            if (progress < target) {
-                return `loot ${progress} / ${target} ${itemKey}`;
+        if (questInfo.cond) {
+            for (var itemKey in (questInfo.cond.loot || {})) {
+                let progress = itemKey === "gold" ? char.gold : itemsCounts.get(itemKey);
+                let target = questInfo.cond.loot[itemKey];
+                if (progress < target) {
+                    return `loot ${progress} / ${target} ${itemKey}`;
+                }
+            }
+            for (var mobKey in (questInfo.cond.hunt || {})) {
+                let progress = char.quests.hunt[mobKey][questInfo.key];
+                let target = questInfo.cond.hunt[mobKey];
+                if (progress < target) {
+                    return `hunt ${progress} / ${target} ${mobKey}`;
+                }
+            }
+            for (var taskKey in (questInfo.cond.ok || {})) {
+                let progress = char.quests.ok[taskKey][questInfo.key];
+                let target = questInfo.cond.ok[taskKey];
+                if (progress < target) {
+                    return `task ${progress} / ${target} ${taskKey}`;
+                }
+            }
+            if (questInfo.cond.dmg) {
+                let progress = char.quests.dmg[questInfo.key];
+                let target = questInfo.cond.dmg;
+                if (progress < target) {
+                    return `dmg ${progress} / ${target}`;
+                }
+            }
+            if (questInfo.cond.heal) {
+                let progress = char.quests.heal[questInfo.key];
+                let target = questInfo.cond.heal;
+                if (progress < target) {
+                    return `heal ${progress} / ${target}`;
+                }
             }
         }
-        for (var mobKey in ((questInfo.cond || {}).hunt || {})) {
-            let progress = char.quests.hunt[mobKey][questInfo.key];
-            let target = questInfo.cond.hunt[mobKey];
-            if (progress < target) {
-                return `hunt ${progress} / ${target} ${mobKey}`;
-            }
-        }
-        for (var taskKey in ((questInfo.cond || {}).ok || {})) {
-            let progress = char.quests.ok[taskKey][questInfo.key];
-            let target = questInfo.cond.ok[taskKey];
-            if (progress < target) {
-                return `task ${progress} / ${target} ${taskKey}`;
-            }
-        }
+
         return "";
     }
 
