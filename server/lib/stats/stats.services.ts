@@ -39,11 +39,11 @@ export default class StatsServices extends MasterServices {
     }
 
     public getRegenHp(socket: GameSocket): number {
-        return socket.maxHp * socket.getHpRegenModifier() | 0;
+        return Math.ceil(socket.maxHp * socket.getHpRegenModifier());
     }
 
     public getRegenMp(socket: GameSocket): number {
-        return socket.maxMp * socket.getMpRegenModifier() | 0;
+        return Math.ceil(socket.maxMp * socket.getMpRegenModifier());
     }
 };
 // cache computations

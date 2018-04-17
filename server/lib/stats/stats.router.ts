@@ -165,6 +165,7 @@ export default class StatsRouter extends SocketioRouterBase {
 
     [config.SERVER_GETS.RELEASE_DEATH.name] (data, socket: GameSocket) {
         socket.character.stats.hp.now = socket.maxHp;
+        socket.character.stats.mp.now = socket.maxMp;
         socket.emit(config.CLIENT_GETS.RESURRECT.name, {});
         this.emitter.emit(roomsConfig.SERVER_INNER.MOVE_TO_TOWN.name, {}, socket);
     }
