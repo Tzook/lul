@@ -1,8 +1,9 @@
 
 import MasterController from '../master/master.controller';
-import PartyServices from './party.services';
+import PartyServices, { isMember, isLeader } from './party.services';
 import PartyMiddleware from './party.middleware';
 import config from './party.config';
+import { getController } from '../main/bootstrap';
 
 export default class PartyController extends MasterController {
     protected services: PartyServices;
@@ -65,7 +66,7 @@ export default class PartyController extends MasterController {
         socket.leave(party.name);
 
         party.members.delete(socket.character.name);
-        if (this.middleware.isLeader(socket.character.name, party)) {
+        if (isLeader(socket.character.name, party)) {
             if (party.members.size > 0) {
                 party.leader = this.services.pickLeader(socket, party);
                 this.io.to(party.name).emit(config.CLIENT_GETS.LEAD_PARTY.name, {
@@ -112,28 +113,16 @@ export default class PartyController extends MasterController {
         });
     }
 
-    public getPartyMembersInMap(socket: GameSocket): GameSocket[] {
-        let sockets = [];
-        let party = this.getCharParty(socket);
-        if (!party) {
-            sockets.push(socket);
-        } else {
-            for (let memberName of party.members) {
-                let memberSocket = socket.map.get(memberName);
-                if (memberSocket && memberSocket.character.room === socket.character.room && memberSocket.alive) {
-                    sockets.push(memberSocket);
-                }
-            }
-        }
-        return sockets;
-    }
-
     public arePartyMembers(name1: string, name2: string): boolean {
         let areMembers = false;
         let party = this.getParty(name1);
         if (party) {
-            areMembers = this.middleware.isMember(name2, party);
+            areMembers = isMember(name2, party);
         }
         return areMembers;
     }
 };
+
+export function getPartyController(): PartyController {
+    return getController("party");
+}

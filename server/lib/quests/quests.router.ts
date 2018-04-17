@@ -4,26 +4,24 @@ import QuestsController from './quests.controller';
 import QuestsServices from './quests.services';
 import ItemsRouter from '../items/items.router';
 import * as _ from 'underscore';
-import PartyRouter from '../party/party.router';
 import config from './quests.config';
 import statsConfig from '../stats/stats.config';
 import itemsConfig from '../items/items.config';
 import NpcsRouter from '../npcs/npcs.router';
 import talentsConfig from '../talents/talents.config';
 import { getRoomName } from '../rooms/rooms.services';
+import { getPartyMembersInMap } from '../party/party.services';
 
 export default class QuestsRouter extends SocketioRouterBase {
 	protected middleware: QuestsMiddleware;
 	protected controller: QuestsController;
 	protected services: QuestsServices;
 	protected itemsRouter: ItemsRouter;
-    protected partyRouter: PartyRouter;
     protected npcsRouter: NpcsRouter;
 
 	init(files, app) {
 		this.services = files.services;
 		this.itemsRouter = files.routers.items;
-		this.partyRouter = files.routers.party;
 		this.npcsRouter = files.routers.npcs;
 		super.init(files, app);
 	}
@@ -74,7 +72,7 @@ export default class QuestsRouter extends SocketioRouterBase {
 		} else if (unmetReason = this.services.questFinishUnmetReason(socket.character, this.itemsRouter.getItemsCounts(socket), questInfo)) {
 			this.sendError(data, socket, "Quest does not meet finishing criteria: " + unmetReason);
 		} else if (!(slots = this.itemsRouter.getItemsSlots(socket, (questInfo.reward || {}).items || []))) {
-			this.sendError(data, socket, `Need ${questInfo.reward.items.length} empty inventory slots!`, true, true);
+			this.sendError(data, socket, `Need ${questInfo.reward.items.length} empty inventory slots`, true, true);
 		} else {
 			this.services.finishQuest(socket.character.quests, questInfo);
 			socket.emit(config.CLIENT_GETS.QUEST_DONE.name, { id: questKey });
@@ -128,7 +126,7 @@ export default class QuestsRouter extends SocketioRouterBase {
 	}
 	
 	[config.SERVER_INNER.HUNT_MOB.name](data, socket: GameSocket) {
-		let partySockets = this.partyRouter.getPartyMembersInMap(socket);
+		let partySockets = getPartyMembersInMap(socket);
         for (let memberSocket of partySockets) {
 			let quests = memberSocket.character.quests.hunt[data.id] || {};
             let fields: Set<string> = new Set();

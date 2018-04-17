@@ -1,16 +1,14 @@
 import SocketioRouterBase from '../socketio/socketio.router.base';
-import PartyRouter from '../party/party.router';
 import config from '../chat/chat.config';
 import ChatServices from './chat.services';
+import { getCharParty } from '../party/party.services';
 
 export default class ChatRouter extends SocketioRouterBase {
 	protected services: ChatServices;
-	protected partyRouter: PartyRouter;
 	
 	init(files, app) {
 		super.init(files, app);
         this.services = files.services;
-        this.partyRouter = files.routers.party;
 	}
 
     [config.GLOBAL_EVENTS.GLOBAL_ITEMS_READY.name](data) {
@@ -53,7 +51,7 @@ export default class ChatRouter extends SocketioRouterBase {
 	}
 
 	[config.SERVER_GETS.PARTY_CHAT.name](data, socket: GameSocket) {
-		const party = this.partyRouter.getCharParty(socket);
+		const party = getCharParty(socket);
 		if (!party) {
 			this.sendError(data, socket, "Failed to find party for engaging in party chat");
 		} else {

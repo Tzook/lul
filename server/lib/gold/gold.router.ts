@@ -1,22 +1,20 @@
 import SocketioRouterBase from '../socketio/socketio.router.base';
 import ItemsRouter from '../items/items.router';
 import GoldMiddleware from './gold.middleware';
-import PartyRouter from '../party/party.router';
 import dropsConfig from '../drops/drops.config';
 import config from '../gold/gold.config';
 import GoldServices from './gold.services';
+import { getPartyMembersInMap } from '../party/party.services';
 
 export default class GoldRouter extends SocketioRouterBase {
 	protected middleware: GoldMiddleware;
 	protected services: GoldServices;
     protected itemsRouter: ItemsRouter;
-    protected partyRouter: PartyRouter;
 
 	init(files, app) {
 		super.init(files, app);
 		this.itemsRouter = files.routers.items;
 		this.services = files.services;
-        this.partyRouter = files.routers.party;
     }
     
     public getGoldItem(gold: number): ITEM_INSTANCE {
@@ -29,7 +27,7 @@ export default class GoldRouter extends SocketioRouterBase {
         if (!this.middleware.isGold(itemInfo)) {
             return;
         }
-        let partySockets = this.partyRouter.getPartyMembersInMap(socket);
+        let partySockets = getPartyMembersInMap(socket);
         // divide the gold equally among party members in room
         item.stack = Math.ceil(item.stack / partySockets.length);
         for (let memberSocket of partySockets) {

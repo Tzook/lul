@@ -78,7 +78,7 @@ export default class TalentsRouter extends SocketioRouterBase {
 		if (hasAbility(socket, ability)) {
 			return this.sendError(data, socket, "Cannot gain ability - Already has that primary ability.");
 		} else if (!this.services.getTalentInfo(ability)) {
-			return this.sendError(data, socket, "Cannot gain ability - No ability information.", true, true);
+			return this.sendError(data, socket, "Cannot gain ability - No ability information", true, true);
 		}
 		this.services.addAbility(socket, ability);
 		

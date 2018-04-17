@@ -7,6 +7,7 @@ import GoldRouter from '../gold/gold.router';
 import roomsConfig from '../rooms/rooms.config';
 import RoomsRouter from '../rooms/rooms.router';
 import { getRoomInstance, getRoomName } from '../rooms/rooms.services';
+import { getCharParty, isPartyLeader, getPartyMembersInMap } from '../party/party.services';
 
 export default class NpcsRouter extends SocketioRouterBase {
     protected services: NpcsServices;
@@ -128,9 +129,19 @@ export default class NpcsRouter extends SocketioRouterBase {
             room = getRoomInstance(room);
         }
 
-        this.emitter.emit(roomsConfig.SERVER_INNER.MOVE_ROOM.name, {
-            room,
-            targetPortal,
-        }, socket);
+        let moveSockets: GameSocket[] = [socket];
+        if (wantedRoom.party) {
+            const party = getCharParty(socket);
+            if (party && !isPartyLeader(socket, party)) {
+                return this.sendError(data, socket, "You are not the party leader", true, true);
+            }
+            moveSockets = getPartyMembersInMap(socket);
+        }
+        for (let moveSocket of moveSockets) {
+            this.emitter.emit(roomsConfig.SERVER_INNER.MOVE_ROOM.name, {
+                room,
+                targetPortal,
+            }, moveSocket);
+        }
     }
 };

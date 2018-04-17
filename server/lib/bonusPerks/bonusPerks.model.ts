@@ -37,6 +37,7 @@ export default class BonusPerksModel extends MasterModel {
 };
 
 // we need both equips and stats to be added to character
+// @ts-ignore // TODO fix
 var updateCharHpMp = _.after(2, function (char: Char) {
     // @ts-ignore
     let target: BONUS_PERKSABLE = {};

@@ -5,6 +5,7 @@ import PartyMiddleware from './party.middleware';
 import partyConfig from '../party/party.config';
 import knownsConfig from '../knowns/knowns.config';
 import statsConfig from '../stats/stats.config';
+import { isLeader, isPartyFull, isInvited, isMember } from './party.services';
 
 export default class PartyRouter extends SocketioRouterBase {
     protected controller: PartyController;
@@ -21,9 +22,9 @@ export default class PartyRouter extends SocketioRouterBase {
         let party = this.controller.getCharParty(socket);
         if (!party) {
             return this.sendError(data, socket, "Cannot invite - must be in a party", true, true);
-        } else if (!this.middleware.isLeader(socket.character.name, party)) {
+        } else if (!isLeader(socket.character.name, party)) {
             return this.sendError(data, socket, "Cannot invite - must be party leader", true, true);
-        } else if (this.middleware.isPartyFull(party)) {
+        } else if (isPartyFull(party)) {
             return this.sendError(data, socket, "Cannot invite - party is full", true, true);
         }
 
@@ -45,11 +46,11 @@ export default class PartyRouter extends SocketioRouterBase {
         let party = this.controller.getParty(data.leader_name);
         if (!party) {
             return this.sendError(data, socket, "Cannot join - party is disbanded", true, true);
-        } else if (!this.middleware.isInvited(party, socket)) {
+        } else if (!isInvited(party, socket)) {
             return this.sendError(data, socket, "Cannot join - not invited anymore", true, true);
-        } else if (!this.middleware.isLeader(data.leader_name, party)) {
+        } else if (!isLeader(data.leader_name, party)) {
             return this.sendError(data, socket, "Cannot join - party leader has changed", true, true);
-        } else if (this.middleware.isPartyFull(party)) {
+        } else if (isPartyFull(party)) {
             return this.sendError(data, socket, "Cannot join - party is full", true, true);
         }
         
@@ -69,9 +70,9 @@ export default class PartyRouter extends SocketioRouterBase {
         let party = this.controller.getCharParty(socket);
         if (!party) {
             return this.sendError(data, socket, "Cannot switch lead - must be in a party", true, true);
-        } else if (!this.middleware.isLeader(socket.character.name, party)) {
+        } else if (!isLeader(socket.character.name, party)) {
             return this.sendError(data, socket, "Cannot switch lead - must be party leader", true, true);
-        } else if (!this.middleware.isMember(data.char_name, party)) {
+        } else if (!isMember(data.char_name, party)) {
             return this.sendError(data, socket, "Cannot switch lead - character not in party", true, true);
         }
         this.controller.makeLeader(data.char_name, party);
@@ -81,16 +82,16 @@ export default class PartyRouter extends SocketioRouterBase {
         let party = this.controller.getCharParty(socket);
         if (!party) {
             return this.sendError(data, socket, "Cannot kick - must be in a party", true, true);
-        } else if (!this.middleware.isLeader(socket.character.name, party)) {
+        } else if (!isLeader(socket.character.name, party)) {
             return this.sendError(data, socket, "Cannot kick - must be party leader", true, true);
-        } else if (!this.middleware.isMember(data.char_name, party)) {
+        } else if (!isMember(data.char_name, party)) {
             return this.sendError(data, socket, "Cannot kick - character not in party", true, true);
         }
         this.controller.kickFromParty(socket, data.char_name, party);
     }
 
     [partyConfig.SERVER_INNER.TOOK_DMG.name] (data, socket: GameSocket) {
-        const party = this.getCharParty(socket);
+        const party = this.controller.getCharParty(socket);
         if (party) {
             this.io.to(party.name).emit(statsConfig.CLIENT_GETS.TAKE_DMG.name, {
                 name: socket.character.name,
@@ -113,14 +114,6 @@ export default class PartyRouter extends SocketioRouterBase {
             let party = this.controller.getCharParty(socket);
             return party && party.members || [];
         });
-    }
-
-    public getCharParty(socket: GameSocket): PARTY_MODEL|undefined {
-        return this.controller.getCharParty(socket);
-    }
-
-    public getPartyMembersInMap(socket: GameSocket): GameSocket[] {
-        return this.controller.getPartyMembersInMap(socket);
     }
 
     public arePartyMembers(name1: string, name2: string): boolean {

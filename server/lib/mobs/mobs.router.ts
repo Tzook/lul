@@ -4,7 +4,6 @@ import MobsMiddleware from './mobs.middleware';
 import MobsController from './mobs.controller';
 import RoomsRouter from '../rooms/rooms.router';
 import MobsServices, { getPartyShareExp, setMobsExtraDropsAfter2, getMobExtraDrops, shouldMobHaveExtraDrops } from './mobs.services';
-import PartyRouter from '../party/party.router';
 import config from '../mobs/mobs.config';
 import statsConfig from '../stats/stats.config';
 import dropsConfig from '../drops/drops.config';
@@ -15,18 +14,17 @@ import { isInInstance, getRoomName } from '../rooms/rooms.services';
 import { getMobDeadOrAlive } from './mobs.controller';
 import { applyDefenceModifier, getDamageTaken } from '../combat/combat.services';
 import mobsConfig from '../mobs/mobs.config';
+import { getPartyMembersInMap, getCharParty } from '../party/party.services';
 
 export default class MobsRouter extends SocketioRouterBase {
 	protected middleware: MobsMiddleware;
 	protected controller: MobsController;
     protected services: MobsServices;
 	protected roomsRouter: RoomsRouter;
-	protected partyRouter: PartyRouter;
 	protected combatRouter: CombatRouter;
 	
 	init(files, app) {
 		this.roomsRouter = files.routers.rooms;
-        this.partyRouter = files.routers.party;
         this.combatRouter = files.routers.combat;
         this.services = files.services;
 		super.init(files, app);
@@ -136,7 +134,7 @@ export default class MobsRouter extends SocketioRouterBase {
 				if (charSocket && charSocket.character.room === socket.character.room && charSocket.alive) {
 					// found char and he's alive in our room
 					let exp = this.services.getExp(mob, charDmg);
-					let party = this.partyRouter.getCharParty(charSocket);
+					let party = getCharParty(charSocket);
 					if (party) {
 						let currentPartyExp = (parties.get(party) || {exp: 0}).exp;
 						parties.set(party, {partySocketOwner: charSocket, exp: currentPartyExp + exp});
@@ -151,7 +149,7 @@ export default class MobsRouter extends SocketioRouterBase {
 				}
 			}
 			for (let [, {partySocketOwner, exp}] of parties) {
-				let partySockets = this.partyRouter.getPartyMembersInMap(partySocketOwner);
+				let partySockets = getPartyMembersInMap(partySocketOwner);
 				// split exp equally among party members
 				exp = getPartyShareExp(exp, partySockets);
 
