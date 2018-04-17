@@ -138,8 +138,12 @@ export default class QuestsServices extends MasterServices {
             {
                 let conditions: QUEST_CONDITIONS = {};
                 (quest.conditions || []).forEach(condition => {
-                    conditions[condition.condition] = conditions[condition.condition] || {};
-                    conditions[condition.condition][condition.conditionType] = +condition.targetProgress;
+                    if (condition.conditionType) {
+                        conditions[condition.condition] = conditions[condition.condition] || {};
+                        conditions[condition.condition][condition.conditionType] = +condition.targetProgress;
+                    } else {
+                        conditions[condition.condition] = +condition.targetProgress;
+                    }
                     questSchema.cond = conditions;
                 });
             }

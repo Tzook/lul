@@ -313,6 +313,8 @@ interface QUEST_CONDITIONS {
     ok?: {
         [taskKey: string]: number
     }
+    dmg?: number
+    heal?: number
 }
 interface REQUIRED_QUEST {
     key: string
@@ -346,6 +348,12 @@ interface CHAR_QUESTS {
         [taskKey: string]: {
             [questKey: string]: number
         }
+    }
+    dmg: {
+        [questKey: string]: number
+    }
+    heal: {
+        [questKey: string]: number
     }
 }
 

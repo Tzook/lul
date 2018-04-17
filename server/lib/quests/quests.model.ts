@@ -11,6 +11,8 @@ const QUEST_SCHEMA = {
         loot: mongoose.Schema.Types.Mixed,
         hunt: mongoose.Schema.Types.Mixed,
         ok: mongoose.Schema.Types.Mixed,
+        dmg: Number,
+        heal: Number,
     },
     req: {
         lvl: Number,
@@ -29,6 +31,8 @@ const CHAR_QUESTS = {
     done: {},
     hunt: {},
     ok: {},
+    dmg: {},
+    heal: {},
 };
 
 export const PRIORITY_QUESTS = PRIORITY_CHAR + 10;
