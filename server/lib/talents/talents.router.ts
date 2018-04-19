@@ -184,13 +184,13 @@ export default class TalentsRouter extends SocketioRouterBase {
 		});
 		talent.points--;
 		talent.pool = [];
+		if (talent.points > 0) {
+			this.emitter.emit(talentsConfig.SERVER_INNER.GENERATE_PERK_POOL.name, {talent, ability}, socket);		
+		}
 		socket.emit(talentsConfig.CLIENT_GETS.GAIN_ABILITY_PERK.name, {
 			ability,
 			perk,
 		});
-		if (talent.points > 0) {
-			this.emitter.emit(talentsConfig.SERVER_INNER.GENERATE_PERK_POOL.name, {talent, ability}, socket);		
-		}
 		this.services.markAbilityModified(socket, ability);
 	}
 	
