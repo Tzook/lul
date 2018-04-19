@@ -9,8 +9,8 @@
     <script src="TemplateData/UnityProgress.js"></script>  
     <script src="Build/UnityLoader.js"></script>
     <script>
+        var BUILD_ASSETS_VERSION = "0.06";
         (function() {
-            var BUILD_ASSETS_VERSION = 3;
             var PARTS_SIZE = 5;
             
             monkeyPatchAjaxes();
@@ -103,8 +103,11 @@
       <div id="gameContainer" style="width: 1280px; height: 720px"></div>
       <div class="footer">
         <div class="fullscreen" onclick="gameInstance.SetFullscreen(1)"></div>
-        <div class="title">LUL</div>
+        <div class="title">XPloria <small id="version"></small></div>
       </div>
     </div>
+    <script>
+        document.getElementById("version").innerText = "(v" + BUILD_ASSETS_VERSION + ")";
+    </script>
   </body>
 </html>
