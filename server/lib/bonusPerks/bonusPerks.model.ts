@@ -25,19 +25,19 @@ export default class BonusPerksModel extends MasterModel {
         this.addToSchema("Item", ITEMS_TALENTS_SCHEMA);
         this.addToSchema("ItemInstance", ITEMS_TALENTS_SCHEMA);
 
-        this.listenForFieldAddition("Equip", "bonusPerks");
-        this.listenForFieldAddition("Stats", "bonusPerks");
+        this.listenForFieldAddition("Equip", "bonusPerksEquips");
+        this.listenForFieldAddition("Stats", "bonusPerksStats");
         
         return Promise.resolve();
     }
     
     protected addFieldToModel(field, data, obj: Char, reqBody) {
-        // updateCharHpMp(obj);
+        console.log("Updating", field, data, typeof obj);
+        updateCharHpMp(obj);
     }
 };
 
 // we need both equips and stats to be added to character
-// @ts-ignore // TODO fix
 var updateCharHpMp = _.after(2, function (char: Char) {
     // @ts-ignore
     let target: BONUS_PERKSABLE = {};
