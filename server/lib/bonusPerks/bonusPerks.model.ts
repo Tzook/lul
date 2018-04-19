@@ -32,7 +32,6 @@ export default class BonusPerksModel extends MasterModel {
     }
     
     protected addFieldToModel(field, data, obj: Char, reqBody) {
-        console.log("Updating", field, data, typeof obj);
         updateCharHpMp(obj);
     }
 };
