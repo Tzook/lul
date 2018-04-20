@@ -42,7 +42,7 @@ export default class ItemsRouter extends SocketioRouterBase {
 		return map;
 	}
 
-	public getItemsSlots(socket: GameSocket, items: ITEM_INSTANCE[]): false|{[key: string]: number[]} {
+	public getItemsSlots(socket: GameSocket, items: ITEM_INSTANCE[]): AVAILABLE_SLOTS {
 		return this.middleware.getItemsSlots(socket, items);
     }
     

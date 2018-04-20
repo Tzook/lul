@@ -11,7 +11,7 @@ import { extendMobSchemaWithSpells, extendTalentsGenerationWithSpells } from '..
 
 export default class TalentsServices extends MasterServices {
 	private controller: TalentsController;
-	private abilitiesInfo: Map<string, TALENT_INFO> = new Map();
+	public abilitiesInfo: Map<string, TALENT_INFO> = new Map();
 	private perksInfo: Map<string, ABILITY_PERK_INSTANCE[]> = new Map();
 	// buffPerkChance => buffPerkDuration
 	private buffPerks: Map<string, string> = new Map();
@@ -42,7 +42,7 @@ export default class TalentsServices extends MasterServices {
 	}
 
 	public getEmptyCharAbility(ability: string): CHAR_ABILITY_TALENT {
-		let talentInfo = this.getTalentInfo(ability);
+		let talentInfo = getTalentInfo(ability);
 		let perks = Object.assign({}, talentInfo.initPerks);
 		return {
 			lvl: 1,
@@ -161,7 +161,7 @@ export default class TalentsServices extends MasterServices {
     
     public getDmgBonus(socket: GameSocket): number {
         const baseDmgBonus = this.getCharPerkValue(talentsConfig.PERKS.DMG_BONUS, socket);
-		const talentInfo = this.getTalentInfo(socket.character.stats.primaryAbility);
+		const talentInfo = getTalentInfo(socket.character.stats.primaryAbility);
         const abilityBonusPerk = talentInfo.powerType + talentsConfig.PERKS_INFO.ABILITY_DMG_BONUS_SUFFIX;
         const abilityDmgBonus = this.getCharPerkValue(abilityBonusPerk, socket);
         return baseDmgBonus + abilityDmgBonus;
@@ -260,10 +260,18 @@ export default class TalentsServices extends MasterServices {
             const perkConfig = this.getPerkConfig(perk);
             return perkConfig.default || 0;
         }
-        const level = (talent.perks[perk] || 0) + (socket.character.charTalents._doc[talentsConfig.CHAR_TALENT].perks[perk] || 0);
+        const level = (talent.perks[perk] || 0) + this.getCharTalentsLevel(socket, perk);
 		let perkValue = this.getPerkLevelValue(perk, level);
 		perkValue = this.addPerkValueBonuses(socket, perk, perkValue);
 		return perkValue;
+	}
+
+	protected getCharTalentsLevel(socket: GameSocket, perk: string): number {
+		let sum = 0;
+		for (let ability in socket.character.charTalents._doc) {
+			sum += socket.character.charTalents._doc[ability].perks[perk] || 0;
+		}
+		return sum;
 	}
 	
 	protected getMobPerkValue(perk: string, mob: MOB_INSTANCE): number {
@@ -323,12 +331,13 @@ export default class TalentsServices extends MasterServices {
 		return Math.ceil(value * percent);
 	}
 
-	public getTalentInfo(ability: string): TALENT_INFO|undefined {
-		return this.abilitiesInfo.get(ability);
-	}
-
 	public addAbility(socket: GameSocket, ability: string) {
-		socket.character.talents._doc[ability] = this.getEmptyCharAbility(ability);
+		const talent = this.getEmptyCharAbility(ability);
+		if (isCharAbility(ability)) {
+			socket.character.charTalents._doc[ability] = talent;
+		} else {
+			socket.character.talents._doc[ability] = talent;
+		}
 		this.markAbilityModified(socket, ability);
 	}
 
@@ -346,10 +355,12 @@ export default class TalentsServices extends MasterServices {
 				spells: [],
 				info: {
 					powerType: talent.powerType,
-					hitType: talent.hitType,
 					initPerks: {}
 				}
 			};
+			if (talent.hitType) {
+				talentSchema.info.hitType = talent.hitType;
+			}
 
 			(talent.perks || []).forEach(perk => {
 				let perkSchema = {
@@ -487,8 +498,13 @@ export function getTalentsServices(): TalentsServices {
     return getServices("talents");
 }
 
+export function getTalentInfo(ability: string): TALENT_INFO|undefined {
+	return getTalentsServices().abilitiesInfo.get(ability);
+}
+
 export function isCharAbility(ability: string): boolean {
-	return ability === talentsConfig.CHAR_TALENT;
+	let talentInfo = getTalentInfo(ability);
+	return talentInfo.hitType === undefined;
 }
 
 export function getTalent(socket: GameSocket, ability: string): CHAR_ABILITY_TALENT {

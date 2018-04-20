@@ -8,7 +8,6 @@ import config from './quests.config';
 import statsConfig from '../stats/stats.config';
 import itemsConfig from '../items/items.config';
 import NpcsRouter from '../npcs/npcs.router';
-import talentsConfig from '../talents/talents.config';
 import { getRoomName } from '../rooms/rooms.services';
 import { getPartyMembersInMap } from '../party/party.services';
 
@@ -60,7 +59,7 @@ export default class QuestsRouter extends SocketioRouterBase {
 		let npcKey = data.npc;
 		let questInfo = this.services.getQuestInfo(questKey);
 		let unmetReason;
-		let slots: {[key: string]: number[]}|false;
+		let slots: AVAILABLE_SLOTS;
 		if (!questInfo) {
 			this.sendError(data, socket, "Could not find a quest with such key so can't complete.");
 		} else if (!socket.character.quests.progress[questKey]) {
@@ -75,41 +74,40 @@ export default class QuestsRouter extends SocketioRouterBase {
 			this.sendError(data, socket, `Need ${questInfo.reward.items.length} empty inventory slots`, true, true);
 		} else {
 			this.services.finishQuest(socket.character.quests, questInfo);
-			socket.emit(config.CLIENT_GETS.QUEST_DONE.name, { id: questKey });
-			
-			_.forEach((questInfo.cond || {}).loot, (stack, key) => {
-				this.emitter.emit(itemsConfig.SERVER_INNER.ITEM_REMOVE.name, {item: { stack, key }}, socket);
-			});
-
-			// reward exp
-			if ((questInfo.reward || {}).exp) {
-				this.emitter.emit(statsConfig.SERVER_INNER.GAIN_EXP.name, { exp: questInfo.reward.exp }, socket);
-			}
-			
-			// reward ability
-			if ((questInfo.reward || {}).ability) {
-				this.emitter.emit(talentsConfig.SERVER_INNER.GAIN_ABILITY.name, { ability: questInfo.reward.ability }, socket);
-			}
-			
-			// reward stats
-			if ((questInfo.reward || {}).stats) {
-				this.emitter.emit(statsConfig.SERVER_INNER.GAIN_STATS.name, { stats: questInfo.reward.stats }, socket);
-			}
-
-			// reward items
-			_.forEach((questInfo.reward || {}).items, item => {
-				let instance = this.itemsRouter.getItemInstance(item.key);
-				if (instance) {
-					if (item.stack > 0) {
-						instance.stack = item.stack;
-					}
-					let itemSlots = slots[item.key];
-					this.emitter.emit(itemsConfig.SERVER_INNER.ITEM_ADD.name, { slots: itemSlots, item: instance }, socket);
-				} else {
-					this.sendError({key: item.key}, socket, "No item info! cannot reward item.");
-				}
-			});
+			this.emitter.emit(config.SERVER_INNER.QUEST_COMPLETED.name, {questInfo, slots}, socket);
 		}
+	}
+	
+	[config.SERVER_INNER.QUEST_COMPLETED.name]({questInfo, slots}: {questInfo: QUEST_MODEL, slots: AVAILABLE_SLOTS}, socket: GameSocket) {
+		socket.emit(config.CLIENT_GETS.QUEST_DONE.name, { id: questInfo.key });
+		
+		_.forEach((questInfo.cond || {}).loot, (stack, key) => {
+			this.emitter.emit(itemsConfig.SERVER_INNER.ITEM_REMOVE.name, {item: { stack, key }}, socket);
+		});
+	
+		// reward exp
+		if ((questInfo.reward || {}).exp) {
+			this.emitter.emit(statsConfig.SERVER_INNER.GAIN_EXP.name, { exp: questInfo.reward.exp }, socket);
+		}
+		
+		// reward stats
+		if ((questInfo.reward || {}).stats) {
+			this.emitter.emit(statsConfig.SERVER_INNER.GAIN_STATS.name, { stats: questInfo.reward.stats }, socket);
+		}
+	
+		// reward items
+		_.forEach((questInfo.reward || {}).items, item => {
+			let instance = this.itemsRouter.getItemInstance(item.key);
+			if (instance) {
+				if (item.stack > 0) {
+					instance.stack = item.stack;
+				}
+				let itemSlots = slots[item.key];
+				this.emitter.emit(itemsConfig.SERVER_INNER.ITEM_ADD.name, { slots: itemSlots, item: instance }, socket);
+			} else {
+				this.sendError({key: item.key}, socket, "No item info! cannot reward item.");
+			}
+		});
 	}
 
 	[config.SERVER_GETS.QUEST_ABORT.name](data, socket: GameSocket) {
@@ -181,6 +179,5 @@ export default class QuestsRouter extends SocketioRouterBase {
 			}
 		}
 		this.services.markModified(socket.character.quests, fields);
-		
 	}
 };

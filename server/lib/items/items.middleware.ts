@@ -72,7 +72,7 @@ export default class ItemsMiddleware extends MasterMiddleware {
         return stack <= 0 ? slots : [];
     }
 
-	public getItemsSlots(socket: GameSocket, items: ITEM_INSTANCE[]): false|{[key: string]: number[]} {
+	public getItemsSlots(socket: GameSocket, items: ITEM_INSTANCE[]): AVAILABLE_SLOTS {
 		let itemsToSlots = {};
 		let blacklist: Set<number> = new Set();
 		for (let item of items) {

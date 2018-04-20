@@ -1,7 +1,7 @@
 import SocketioRouterBase from '../socketio/socketio.router.base';
 import TalentsMiddleware from './talents.middleware';
 import TalentsController from './talents.controller';
-import TalentsServices, { getTalent, hasAbility } from './talents.services';
+import TalentsServices, { getTalent, hasAbility, getTalentInfo, isCharAbility } from './talents.services';
 import talentsConfig from '../talents/talents.config';
 import statsConfig from '../stats/stats.config';
 import StatsRouter from '../stats/stats.router';
@@ -58,11 +58,11 @@ export default class TalentsRouter extends SocketioRouterBase {
 	}
 
 	public getAbilityInfo(ability: string): TALENT_INFO|undefined {
-		return this.services.getTalentInfo(ability);
+		return getTalentInfo(ability);
 	}
 
 	public getPrimaryTalentInfo(socket: GameSocket): TALENT_INFO|undefined {
-		return this.services.getTalentInfo(socket.character.stats.primaryAbility);
+		return getTalentInfo(socket.character.stats.primaryAbility);
 	}
 	
 	[talentsConfig.SERVER_GETS.DISCONNECT.name](data, socket: GameSocket) {
@@ -77,13 +77,15 @@ export default class TalentsRouter extends SocketioRouterBase {
 		const {ability} = data;
 		if (hasAbility(socket, ability)) {
 			return this.sendError(data, socket, "Cannot gain ability - Already has that primary ability.");
-		} else if (!this.services.getTalentInfo(ability)) {
+		} else if (!getTalentInfo(ability)) {
 			return this.sendError(data, socket, "Cannot gain ability - No ability information", true, true);
 		}
 		this.services.addAbility(socket, ability);
 		
+		let talent = getTalent(socket, ability);
 		socket.emit(talentsConfig.CLIENT_GETS.GAIN_ABILITY.name, {
-			ability: socket.character.talents._doc[ability],
+			ability: talent,
+			isCharAbility: isCharAbility(ability),
 			key: ability
 		});
 	}
@@ -91,7 +93,7 @@ export default class TalentsRouter extends SocketioRouterBase {
 	[talentsConfig.SERVER_INNER.HURT_MOB.name]({dmg, mob, cause, crit}: {dmg: number, mob: MOB_INSTANCE, cause: string, crit: boolean}, socket: GameSocket) {
 		const mobModel = this.mobsRouter.getMobInfo(mob.mobId);
 		const exp = this.services.getAbilityExp(dmg, mobModel);
-		this.emitter.emit(talentsConfig.SERVER_INNER.GAIN_ABILITY_EXP.name, {exp}, socket);
+		this.emitter.emit(talentsConfig.SERVER_INNER.GAIN_PRIMARY_ABILITY_EXP.name, {exp}, socket);
 		if (mob.hp > 0 && cause !== combatConfig.HIT_CAUSE.BLEED && cause !== combatConfig.HIT_CAUSE.BURN && cause !== combatConfig.HIT_CAUSE.SPIKES) {
 			this.controller.applyHurtPerks(dmg, crit, socket, mob);
 		}
@@ -102,9 +104,9 @@ export default class TalentsRouter extends SocketioRouterBase {
 		let {dmg} = data;
 		
 		// TODO use a better formula for heal ability exp 
-		const exp = dmg; 
+		const exp = dmg * 2;
 
-		this.emitter.emit(talentsConfig.SERVER_INNER.GAIN_ABILITY_EXP.name, {exp}, socket);
+		this.emitter.emit(talentsConfig.SERVER_INNER.GAIN_PRIMARY_ABILITY_EXP.name, {exp}, socket);
 		this.controller.applySelfPerks(dmg, socket);
 	}
 	
@@ -117,12 +119,26 @@ export default class TalentsRouter extends SocketioRouterBase {
 		}
     }
 	
-	[talentsConfig.SERVER_INNER.GAIN_ABILITY_EXP.name]({exp}: {exp: number}, socket: GameSocket) {
+	[talentsConfig.SERVER_INNER.GAIN_CHAR_ABILITY_EXP.name]({exp, ability}: {exp: number, ability: string}, socket: GameSocket) {
+        let talent = socket.character.charTalents._doc[ability];
+        if (!talent) {
+			// add the ability if it doesn't exist
+			this.emitter.emit(talentsConfig.SERVER_INNER.GAIN_ABILITY.name, {ability}, socket);
+			talent = socket.character.charTalents._doc[ability];
+        }
+		this.emitter.emit(talentsConfig.SERVER_INNER.GAIN_ABILITY_EXP.name, {exp, talent, ability}, socket);
+	}
+	
+	[talentsConfig.SERVER_INNER.GAIN_PRIMARY_ABILITY_EXP.name]({exp}: {exp: number}, socket: GameSocket) {
 		const ability = socket.character.stats.primaryAbility;
         const talent = socket.character.talents._doc[ability];
         if (!talent) {
             return;
         }
+		this.emitter.emit(talentsConfig.SERVER_INNER.GAIN_ABILITY_EXP.name, {exp, talent, ability}, socket);
+	}
+	
+	[talentsConfig.SERVER_INNER.GAIN_ABILITY_EXP.name]({exp, talent, ability}: {exp: number, talent: CHAR_ABILITY_TALENT, ability: string}, socket: GameSocket) {
 		talent.exp += exp;
 		
 		const expNeededToLevel = this.statsRouter.getExp(talent.lvl);
@@ -226,5 +242,19 @@ export default class TalentsRouter extends SocketioRouterBase {
                 ability: statsConfig.ABILITY_MELEE
             }, socket);
         }
-    }
+	}
+	
+	[talentsConfig.SERVER_INNER.QUEST_COMPLETED.name]({questInfo}: {questInfo: QUEST_MODEL}, socket: GameSocket) {
+		// reward ability
+		if ((questInfo.reward || {}).ability) {
+			this.emitter.emit(talentsConfig.SERVER_INNER.GAIN_ABILITY.name, { ability: questInfo.reward.ability }, socket);
+		}
+		
+		if ((questInfo.reward || {}).exp) {
+			this.emitter.emit(talentsConfig.SERVER_INNER.GAIN_CHAR_ABILITY_EXP.name, { 
+				ability: talentsConfig.CHAR_QUESTS_TALENT,
+				exp: questInfo.reward.exp * 2
+			}, socket);
+		}
+	}
 };

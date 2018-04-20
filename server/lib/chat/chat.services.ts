@@ -99,18 +99,23 @@ export default class ChatServices extends MasterServices {
             }
                 
             case chatConfig.HAX.LVLPA.code: {
-                const ability = targetSocket.character.stats.primaryAbility;
-                const talent = targetSocket.character.talents._doc[ability];
+                const ability = parts[4] || targetSocket.character.stats.primaryAbility;
+                let talent = targetSocket.character.talents._doc[ability];
+                if (!talent) {
+                    talent = targetSocket.character.charTalents._doc[ability];
+                }
                 if (!talent) {
                     this.statsRouter.sendError({msg}, socket, "Cannot hax - Primary ability is not a real ability", true, true);
                     return true;
                 }
-                let times = +parts[3] ? +parts[3] - talent.lvl : 1;
+                let times = +parts[3] ? +parts[3] : 1;
                 (async () => {
                     for (let i = 0; i < times; i++) {
                         let abilityLvl = talent.lvl;
                         emitter.emit(talentsConfig.SERVER_INNER.GAIN_ABILITY_EXP.name, {
-                            exp: this.statsRouter.getExp(abilityLvl)
+                            exp: this.statsRouter.getExp(abilityLvl),
+                            talent,
+                            ability
                         }, targetSocket);
                         if (parts[2]) {
                             const perk = pickPerk(talent.pool, parts[2]);

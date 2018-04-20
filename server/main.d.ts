@@ -219,6 +219,7 @@ interface DROP_MODEL {
     minStack?: number,
     maxStack?: number,
 }
+type AVAILABLE_SLOTS = false|{[key: string]: number[]};
 
 // rooms
 interface PORTAL_MODEL {
@@ -409,7 +410,7 @@ interface ABILITY_SPELL_MODEL {
 type POWER_TYPES = "melee"|"range"|"magic";
 interface TALENT_INFO {
     powerType: POWER_TYPES
-    hitType: "atk"|"heal"
+    hitType?: "atk"|"heal"
     mp?: number
     initPerks?: PERK_MAP
 }

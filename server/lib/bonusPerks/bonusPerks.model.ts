@@ -3,7 +3,6 @@ import * as mongoose from 'mongoose';
 import { PRIORITY_ITEM } from '../items/items.model';
 import { createBonusPerks } from './bonusPerks.services';
 import talentsConfig from '../talents/talents.config';
-import _ = require('underscore');
 
 const ITEMS_TALENTS_SCHEMA = {
     perks: mongoose.Schema.Types.Mixed
@@ -12,6 +11,7 @@ const ITEMS_TALENTS_SCHEMA = {
 export const PRIORITY_BONUS_PERKS = PRIORITY_ITEM + 10;
 
 export default class BonusPerksModel extends MasterModel {
+    private equipsAndStatsFinished: boolean;
 
     init(files, app) {
         
@@ -32,12 +32,16 @@ export default class BonusPerksModel extends MasterModel {
     }
     
     protected addFieldToModel(field, data, obj: Char, reqBody) {
-        updateCharHpMp(obj);
+        // we need both equips and stats to be added to character
+        if (!this.equipsAndStatsFinished) {
+            this.equipsAndStatsFinished = true;
+        } else {
+            updateCharHpMp(obj);
+        }
     }
 };
 
-// we need both equips and stats to be added to character
-var updateCharHpMp = _.after(2, function (char: Char) {
+function updateCharHpMp (char: Char) {
     // @ts-ignore
     let target: BONUS_PERKSABLE = {};
     createBonusPerks(target, char);
@@ -47,7 +51,7 @@ var updateCharHpMp = _.after(2, function (char: Char) {
     if (target.bonusPerks[talentsConfig.PERKS.MP_BONUS]) {
         char.stats.mp.now += target.bonusPerks[talentsConfig.PERKS.MP_BONUS];
     }
-});
+}
 
 export function extendItemSchemaWithTalents(item: any, itemSchema: ITEM_MODEL) {
     (item.perks || []).forEach(perk => {

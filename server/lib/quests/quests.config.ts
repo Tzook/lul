@@ -14,6 +14,7 @@ export default {
 	},
 	"SERVER_INNER": {
 		"HUNT_MOB": {"name": "hunt_mob"},
+		QUEST_COMPLETED: {name: "quest_post_completed"},
 		HURT_MOB: Object.assign({}, mobsConfig.SERVER_INNER.HURT_MOB),
 		HEAL_CHAR: Object.assign({}, combatConfig.SERVER_INNER.HEAL_CHAR),
 	},

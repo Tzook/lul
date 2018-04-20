@@ -28,7 +28,7 @@ export default {
 		},
 		LVLPA: {
 			code: "/lvlpa",
-			param: "{perk1|perk2|*?} {lvl?}"
+			param: "{perk1|perk2|*?} {lvl?} {ability?}"
 		},
 		GAINPA: {
 			code: "/gainpa",

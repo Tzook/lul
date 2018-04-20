@@ -3,6 +3,7 @@ import roomsConfig from '../rooms/rooms.config';
 import mobsConfig from '../mobs/mobs.config';
 import socketioConfig from '../socketio/socketio.config';
 import combatConfig from '../combat/combat.config';
+import questsConfig from '../quests/quests.config';
 
 export default {
 	"ROUTES": {
@@ -25,12 +26,15 @@ export default {
 		HEAL_CHAR: Object.assign({}, combatConfig.SERVER_INNER.HEAL_CHAR),
 		MOB_DESPAWN: Object.assign({}, mobsConfig.SERVER_INNER.MOB_DESPAWN),
 		TOOK_DMG: Object.assign({}, statsConfig.SERVER_INNER.TOOK_DMG),		
-		GAIN_ABILITY_EXP: {name: "gain_ability_exp", alive: true, log: true},
+		GAIN_CHAR_ABILITY_EXP: {name: "gain_char_ability_exp", alive: true, log: true},
+		GAIN_PRIMARY_ABILITY_EXP: {name: "gain_primary_ability_exp", alive: true, log: true},
+		GAIN_ABILITY_EXP: {name: "gain_ability_exp", alive: true},
 		GAIN_ABILITY_LVL: {name: "gain_ability_lvl", alive: true, log: true},
 		GENERATE_PERK_POOL: {name: "generate_perk_pool", alive: true},
 		GAIN_LVL: Object.assign({}, statsConfig.SERVER_INNER.GAIN_LVL, {log: false}),
 		LEFT_ROOM: Object.assign({}, roomsConfig.SERVER_INNER.LEFT_ROOM),
 		PLAYER_HURT: Object.assign({}, mobsConfig.SERVER_INNER.PLAYER_HURT),
+		QUEST_COMPLETED: Object.assign({}, questsConfig.SERVER_INNER.QUEST_COMPLETED),
 	},
 	"SERVER_GETS": {
 		DISCONNECT: Object.assign({}, socketioConfig.SERVER_GETS.DISCONNECT),
@@ -109,6 +113,7 @@ export default {
 	HIT_TYPE_ATTACK: "atk",
 	HIT_TYPE_HEAL: "heal",
     CHAR_TALENT: "charTalent",
+    CHAR_QUESTS_TALENT: "quests",
 }
 
 
