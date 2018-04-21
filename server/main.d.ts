@@ -422,8 +422,13 @@ interface TALENT_MODEL {
     info: TALENT_INFO
 }
 
+type PERK_TYPE_PERCENT = "Percent";
+type PERK_TYPE_TIME = "Time";
+type PERK_TYPE_NUMBER = "Number";
+
 interface PERK_CONFIG {
-	value: number,
+    value: number,
+    type: PERK_TYPE_PERCENT | PERK_TYPE_TIME | PERK_TYPE_NUMBER
     max?: number,
     acc?: number,
 	default?: number, 

@@ -400,6 +400,7 @@ export default class TalentsServices extends MasterServices {
 		(perkCollection || []).forEach(perk => {
 			let perkModel: PERK_CONFIG = {
 				value: +perk.value,
+				type: perk.type,
 			};
 			if (+perk.max) {
 				perkModel.max = +perk.max;
