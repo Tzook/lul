@@ -46,7 +46,7 @@ export default class UserController extends MasterController {
     handleNewUser(req, res, next) {
         return this.services.saveNewUser(req.body)
             .then(d => {
-                req.body.user = d[0];
+                req.body.user = d;
                 req.LOG = this.LOGS.USER_REGISTERED_OK;
                 next();
             })
@@ -68,7 +68,7 @@ export default class UserController extends MasterController {
     serializeUser(user, done) {
         done(null, user.username);
     }
-
+    
     deserializeUser (username, done) {
         return this.services.getUser(username)
         .then (d => {

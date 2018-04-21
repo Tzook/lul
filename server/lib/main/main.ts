@@ -26,7 +26,7 @@ export default class Main {
 
 	useDb() {
 		mongoose.Promise = global.Promise;
-		mongoose.connect(getEnvVariable("dbUrl"), {useMongoClient: true});
+		mongoose.connect(getEnvVariable("dbUrl"));
 		mongoose.connection.on('error', console.error.bind(console, 'connection error:'));
 	}
 
