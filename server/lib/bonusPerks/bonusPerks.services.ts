@@ -1,6 +1,6 @@
 import MasterServices from '../master/master.services';
 import { EQUIPS_SCHEMA } from '../equips/equips.model';
-import { isSocket, getTalentsServices } from '../talents/talents.services';
+import { isSocket, getTalentsServices, getPerkType } from '../talents/talents.services';
 import statsConfig from '../stats/stats.config';
 import bonusPerksConfig from './bonusPerks.config';
 import * as _ from "underscore";
@@ -62,7 +62,7 @@ export function modifyBonusPerks(target: PLAYER, modificationsCallback: Function
 	const newStats = getBonusPerks(target);
 	if (isSocket(target)) {
 		// currently only socket supports these perks..
-		updateBonusPerks(<GameSocket>target, oldStats, newStats);
+		updateBonusPerks(target, oldStats, newStats);
 	}
 }
 
@@ -120,23 +120,22 @@ export function getEmptyBonusPerks(): PERKS_DIFF {
 
 export function slightlyTweakPerks(perksObject: PERK_MAP): PERK_MAP {
     let result: PERK_MAP = {};
-    const offset = bonusPerksConfig.PERK_VALUES_RANDOM_OFFSET;
 
     for (let perkName in perksObject) {
         let perkValue = perksObject[perkName];
-    	result[perkName] = perkValue;
-        continue;
-	    // TODO fix the roundiness
-        // @ts-ignore
-        // get a random number between -0.1 and 0.1
-        const random = Math.random() * offset * 2 - offset;
-        let addition = perkValue * random;
-
-        // round extra floating points
-        const numberParts = ("" + perkValue / 10).split(".");
-        const firstNoneZeroDigitIndex = numberParts[1] ? _.findIndex(numberParts[1].split(""), item => item !== "0") : -1;
+        const type = getPerkType(perkName);
         
-        result[perkName] = +(perkValue + addition).toFixed(firstNoneZeroDigitIndex + 1);
+        perkValue *= bonusPerksConfig.PERK_TYPE_TO_MODIFIER[type];
+        
+        const maxOffset = Math.max(perkValue * bonusPerksConfig.PERK_VALUES_RANDOM_OFFSET, 1); // it should increase by at least 1
+        perkValue += _.random(-maxOffset, maxOffset);
+        perkValue = Math.round(perkValue);
+        
+        perkValue /= bonusPerksConfig.PERK_TYPE_TO_MODIFIER[type];
+        
+        if (perkValue !== 0) {
+            result[perkName] = perkValue;
+        }
     }    
 
     return result;

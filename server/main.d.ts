@@ -426,9 +426,11 @@ type PERK_TYPE_PERCENT = "Percent";
 type PERK_TYPE_TIME = "Time";
 type PERK_TYPE_NUMBER = "Number";
 
+type PERK_TYPES = PERK_TYPE_PERCENT | PERK_TYPE_TIME | PERK_TYPE_NUMBER;
+
 interface PERK_CONFIG {
     value: number,
-    type: PERK_TYPE_PERCENT | PERK_TYPE_TIME | PERK_TYPE_NUMBER
+    type: PERK_TYPES
     max?: number,
     acc?: number,
 	default?: number, 

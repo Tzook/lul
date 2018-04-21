@@ -52,7 +52,7 @@ export default class TalentsController extends MasterController {
 		if (isSocket(attacker) || isMob(attacker)) {
 			let buffPerks = this.services.getBuffPerks();
 			for (let [perkChanceName, perkDurationName] of buffPerks) {
-				this.tryToApplyPerk(perkChanceName, perkDurationName, null, attacker, <PLAYER>attacker, (buffInstace) => this.addBuffBonusPerks(<PLAYER>attacker, perkChanceName), () => this.removeBuffBonusPerks(<PLAYER>attacker, perkChanceName));
+				this.tryToApplyPerk(perkChanceName, perkDurationName, null, attacker, <PLAYER>attacker, (buffInstace) => this.addBuffBonusPerks(attacker, perkChanceName), () => this.removeBuffBonusPerks(attacker, perkChanceName));
 			}
 		}
 	}
@@ -92,14 +92,14 @@ export default class TalentsController extends MasterController {
 
 	protected clearBuff(target: PLAYER, buffInstace: BUFF_INSTANCE) {
 		return isSocket(target) 
-			? this.clearSocketBuff(<GameSocket>target, buffInstace)
-			: this.clearMobBuff((<MOB_INSTANCE>target).room, (<MOB_INSTANCE>target).id, buffInstace);
+			? this.clearSocketBuff(target, buffInstace)
+			: this.clearMobBuff(target.room, target.id, buffInstace);
 		}
 		
 	protected addBuff(target: PLAYER, buffInstace: BUFF_INSTANCE) {
 		let buffs = isSocket(target) 
-			? this.getSocketPerkBuffs(<GameSocket>target, buffInstace.perkName, true)
-			: this.getMobPerkBuffs(<MOB_INSTANCE>target, buffInstace.perkName, true);
+			? this.getSocketPerkBuffs(target, buffInstace.perkName, true)
+			: this.getMobPerkBuffs(target, buffInstace.perkName, true);
 		buffs.add(buffInstace);
 	}
 
@@ -182,8 +182,8 @@ export default class TalentsController extends MasterController {
 
 	protected getPerkBuffs(target: PLAYER, perkName: string, createIfMissing: boolean = false) {
 		return isSocket(target) 
-			? this.getSocketPerkBuffs(<GameSocket>target, perkName, createIfMissing)
-			: this.getMobPerkBuffs(<MOB_INSTANCE>target, perkName, createIfMissing);
+			? this.getSocketPerkBuffs(target, perkName, createIfMissing)
+			: this.getMobPerkBuffs(target, perkName, createIfMissing);
 	}
 	
 	protected getSocketPerkBuffs(socket: GameSocket, perkName: string, createIfMissing: boolean = false) {
@@ -221,8 +221,8 @@ export default class TalentsController extends MasterController {
 
 	protected tickDmg(dmg: number, crit: boolean, buffInstance: BUFF_INSTANCE, cause: string, interval: number, attacker: HURTER, target: PLAYER) {
 		isSocket(target) 
-			? this.tickSocketDmg(dmg, crit, buffInstance, cause, interval, 0, <GameSocket>target, <MOB_INSTANCE>attacker)
-			: this.tickMobDmg(dmg, crit, buffInstance, <MOB_INSTANCE>target, cause, interval, 0, <GameSocket>attacker, (<GameSocket>attacker).character.stats.primaryAbility);
+			? this.tickSocketDmg(dmg, crit, buffInstance, cause, interval, 0, target, <MOB_INSTANCE>attacker)
+			: this.tickMobDmg(dmg, crit, buffInstance, target, cause, interval, 0, <GameSocket>attacker, (<GameSocket>attacker).character.stats.primaryAbility);
 	}
 
 	protected tickMobDmg(dmg: number, crit: boolean, buffInstance: BUFF_INSTANCE, mob: MOB_INSTANCE, cause: string, interval: number, tickIndex: number, socket: GameSocket, ability: string) {

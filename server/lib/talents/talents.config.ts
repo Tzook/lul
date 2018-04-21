@@ -109,14 +109,14 @@ export default {
         ABILITY_DMG_BONUS_SUFFIX: "DamageBonus",
         BURN_DMG_MODIFIER: 0.05,
         BURN_TICK_TIME: 0.25,
-    },
+	},
+	PERK_TYPES: {
+		PERCENT: "Percent",
+		NUMBER: "Number",
+		TIME: "Time",
+	},
 	HIT_TYPE_ATTACK: "atk",
 	HIT_TYPE_HEAL: "heal",
     CHAR_TALENT: "charTalent",
     CHAR_QUESTS_TALENT: "quests",
 }
-
-
-
-
-

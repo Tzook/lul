@@ -128,7 +128,7 @@ export default class TalentsServices extends MasterServices {
 		talent.perks[perk] = (talent.perks[perk] || 0) + 1;
 	}
 
-	protected getPerkConfig(perk: string): PERK_CONFIG {
+	public getPerkConfig(perk: string): PERK_CONFIG {
 		const config = this.socketioRouter.getConfig();
 		const perkConfig: PERK_CONFIG = config.perks[perk] || <any>{};
 		return perkConfig;
@@ -208,7 +208,7 @@ export default class TalentsServices extends MasterServices {
 	private isAttackBlocked(attacker: PLAYER, target: PLAYER) {
 		return this.isAbilityActivated(talentsConfig.PERKS.BLOCK_CHANCE, target)
 			// block if the socket is using a non-supported ability
-			|| (isSocket(attacker) && isAbilityNotSupportedInRoom(<GameSocket>attacker));
+			|| (isSocket(attacker) && isAbilityNotSupportedInRoom(attacker));
 	}
 
 	public getSpikesModifier(target: PLAYER): number {
@@ -247,10 +247,10 @@ export default class TalentsServices extends MasterServices {
 	
 	public getAbilityPerkValue(perk: string, target: HURTER, ability?: string): number {
 		return isSocket(target) 
-			? this.getCharPerkValue(perk, <GameSocket>target, ability)
+			? this.getCharPerkValue(perk, target, ability)
 			: isMob(target) 
-				? this.getMobPerkValue(perk, <MOB_INSTANCE>target)
-				: this.getGeneralPerkValue(perk, <MOB_INSTANCE>target);
+				? this.getMobPerkValue(perk, target)
+				: this.getGeneralPerkValue(perk, target);
 	}
 	
 	protected getCharPerkValue(perk: string, socket: GameSocket, ability?: string): number {
@@ -315,8 +315,8 @@ export default class TalentsServices extends MasterServices {
 
 	protected hasBuff(target: PLAYER, perkName: string): boolean {
 		return isSocket(target) 
-			? this.controller.isSocketInBuff(<GameSocket>target, perkName)
-			: isMobInBuff((<MOB_INSTANCE>target).room, (<MOB_INSTANCE>target).id, perkName);
+			? this.controller.isSocketInBuff(target, perkName)
+			: isMobInBuff(target.room, target.id, perkName);
 	}
 
 	public getBleedDmg(dmg: number): number {
@@ -534,24 +534,24 @@ export function isAbilityNotSupportedInRoom(socket: GameSocket, ability?: string
 	return roomInfo.abilities && !roomInfo.abilities[ability];
 }
 
-export function isSocket(target: HURTER): boolean {
+export function isSocket(target: HURTER): target is GameSocket {
 	return typeof (<GameSocket>target).user !== "undefined";
 }
 
-export function isMob(target: HURTER): boolean {
+export function isMob(target: HURTER): target is MOB_INSTANCE {
 	return typeof (<MOB_INSTANCE>target).mobId !== "undefined";
 }
 
 export function getRoom(target: PLAYER): string {
 	return isSocket(target) 
-		? (<GameSocket>target).character.room
-		: (<MOB_INSTANCE>target).room;
+		? target.character.room
+		: target.room;
 }
 
 export function getId(target: PLAYER): string {
 	return isSocket(target) 
-		? (<GameSocket>target).character._id
-		: (<MOB_INSTANCE>target).id;
+		? target.character._id
+		: target.id;
 }
 
 export function getMpUsage(mp: number, socket: GameSocket): number {
@@ -560,4 +560,8 @@ export function getMpUsage(mp: number, socket: GameSocket): number {
 
 export function applySpikes(dmg: number, spikesModifier: number): number {
     return Math.round(dmg * spikesModifier);
+}
+
+export function getPerkType(perkName: string): PERK_TYPES {
+	return getTalentsServices().getPerkConfig(perkName).type;
 }
