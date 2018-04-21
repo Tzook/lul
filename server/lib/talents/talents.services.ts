@@ -62,7 +62,7 @@ export default class TalentsServices extends MasterServices {
 	}
 
 	public getAbilityExp(dmg: number, mob: MOB_MODEL) {
-		return Math.min(dmg / mob.hp, 1) * mob.exp * 2 | 0 || 1;
+		return mob.exp ? Math.min(dmg / mob.hp, 1) * mob.exp * 2 | 0 || 1 : 0;
 	}
 
 	public getPerksPool(ability: string, talent: CHAR_ABILITY_TALENT): string[] {
