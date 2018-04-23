@@ -1,6 +1,6 @@
 import SocketioRouterBase from '../socketio/socketio.router.base';
 import stateConfig from './state.config';
-import StateServices from './state.services';
+import StateServices, { updateCharVar } from './state.services';
 
 export default class StateRouter extends SocketioRouterBase {
 	protected services: StateServices;
@@ -9,6 +9,7 @@ export default class StateRouter extends SocketioRouterBase {
 		this.services = files.services;
 		super.init(files, app);
 	}
+
 	[stateConfig.SERVER_GETS.UPDATE_ROOM_STATE.name](data, socket: GameSocket) {
 		let {key, value} = data;
 		
@@ -21,8 +22,19 @@ export default class StateRouter extends SocketioRouterBase {
 			value,
 		});
 	}
-
-	[stateConfig.SERVER_GETS.ENTERED_ROOM.name](data, socket: GameSocket) {
+	
+	[stateConfig.SERVER_GETS.UPDATE_CHAR_VAR.name](data, socket: GameSocket) {
+		let {key, value} = data;
+		if (!key) {
+			return this.sendError(data, socket, "Must provide a key");
+		}
+		let updatedVars = updateCharVar(socket, key, value);
+		if (!updatedVars) {
+			return this.sendError(data, socket, "Not allowed to update var");
+		}
+	}
+	
+	[stateConfig.SERVER_INNER.ENTERED_ROOM.name](data, socket: GameSocket) {
 		let roomState = this.services.getRoomState(socket.character.room);
 		for (let [key, value] of roomState) {
 			socket.emit(stateConfig.CLIENT_GETS.ROOM_STATE.name, {

@@ -94,6 +94,7 @@ interface PrivateChar extends PublicChar {
 }
 
 interface Char extends Doc {
+    markModified?: (path) => {}, 
     name: string;
     position: CHAR_POSITION,
     looks,
@@ -108,7 +109,7 @@ interface Char extends Doc {
     vars: CHAR_VARS
 }
 
-type CHAR_VAR = number|string;
+type CHAR_VAR = any;
 interface CHAR_VARS {
     [varName: string]: CHAR_VAR
 }

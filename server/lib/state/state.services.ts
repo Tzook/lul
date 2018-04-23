@@ -33,3 +33,25 @@ export default class StateServices extends MasterServices {
         return state;
     }
 };
+
+export function updateCharVar(socket: GameSocket, key: string, value: CHAR_VAR|undefined): boolean {
+    let charVars = socket.character.vars;
+    // TODO check if allowed to add more fields
+    let canModifyVars = true;
+    if (canModifyVars) {
+        if (value) {
+            charVars[key] = isNaN(value) ? value : +value;
+        } else {
+            charVars[key] = charVars[key] || 0;
+            if (isNaN(charVars[key])) {
+                canModifyVars = false;
+            } else {
+                charVars[key]++;
+            }
+        }
+    }
+    if (canModifyVars) {
+        socket.character.markModified("vars");
+    }
+    return canModifyVars;
+}
