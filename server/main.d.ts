@@ -90,6 +90,7 @@ interface PrivateChar extends PublicChar {
     quests: CHAR_QUESTS,
     charTalents: CHAR_TALENT_OBJECT
     talents: CHAR_TALENT_OBJECT
+    vars: CHAR_VARS
 }
 
 interface Char extends Doc {
@@ -104,6 +105,12 @@ interface Char extends Doc {
     quests: CHAR_QUESTS,
     charTalents: CHAR_TALENT_OBJECT
     talents: CHAR_TALENT_OBJECT
+    vars: CHAR_VARS
+}
+
+type CHAR_VAR = number|string;
+interface CHAR_VARS {
+    [varName: string]: CHAR_VAR
 }
 
 interface CHAR_TALENT_OBJECT {
