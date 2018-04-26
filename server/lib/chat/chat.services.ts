@@ -12,16 +12,20 @@ import * as _ from 'underscore';
 import ItemsRouter from '../items/items.router';
 import dropsConfig from '../drops/drops.config';
 import TalentsRouter from '../talents/talents.router';
+import MobsRouter from '../mobs/mobs.router';
+import mobsConfig from '../mobs/mobs.config';
 
 export default class ChatServices extends MasterServices {
     protected statsRouter: StatsRouter;
     protected roomsRouter: RoomsRouter;
     protected itemsRouter: ItemsRouter;
+    protected mobsRouter: MobsRouter;
     protected talentsRouter: TalentsRouter;
     protected goldRouter: GoldRouter;
 
     protected itemHints: Map<string, ITEM_MODEL> = new Map();
     protected roomHints: Map<string, ROOM_MODEL> = new Map();
+    protected mobHints: Map<string, MOB_MODEL> = new Map();
 
 	init(files, app) {
         this.statsRouter = files.routers.stats;
@@ -29,6 +33,7 @@ export default class ChatServices extends MasterServices {
         this.itemsRouter = files.routers.items;
         this.talentsRouter = files.routers.talents;
         this.goldRouter = files.routers.gold;
+        this.mobsRouter = files.routers.mobs;
 		super.init(files, app);
     }
 
@@ -41,6 +46,12 @@ export default class ChatServices extends MasterServices {
     public improveRoomsKeysForHax(rooms: Map<string, ROOM_MODEL>) {
         for (let [roomKey, room] of rooms) {
             this.roomHints.set(getHintKey(roomKey), room);
+        }
+    }
+
+    public improveMobsKeysForHax(mobs: Map<string, MOB_MODEL>) {
+        for (let [mobKey, mob] of mobs) {
+            this.mobHints.set(getHintKey(mobKey), mob);
         }
     }
 
@@ -188,6 +199,22 @@ export default class ChatServices extends MasterServices {
                 emitter.emit(dropsConfig.SERVER_INNER.ITEMS_DROP.name, {
                     owner: targetSocket.character.name
                 }, targetSocket, [itemInstance]);
+                break;
+            }
+                
+            case chatConfig.HAX.SPAWN.code: {
+                let mobInfo = this.mobsRouter.getMobInfo(parts[2]);
+                if (!mobInfo) {
+                    mobInfo = this.mobHints.get(getHintKey(parts[2]));
+                }
+                if (!mobInfo) {
+                    this.statsRouter.sendError({msg}, socket, "Cannot hax - Mob not found", true, true);
+                    return true;
+                }
+                
+                emitter.emit(mobsConfig.SERVER_INNER.MOB_SPAWN.name, {
+                    mobKey: mobInfo.mobId
+                }, targetSocket);
                 break;
             }
         }

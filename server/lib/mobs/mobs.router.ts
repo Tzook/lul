@@ -40,7 +40,7 @@ export default class MobsRouter extends SocketioRouterBase {
 		socket.threats = new Set();
 	}
 	
-	public getMobInfo(mobId: string): MOB_MODEL {
+	public getMobInfo(mobId: string): MOB_MODEL|undefined {
 		return this.services.getMobInfo(mobId);
 	}
 	

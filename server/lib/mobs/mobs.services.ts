@@ -11,9 +11,10 @@ export default class MobsServices extends MasterServices {
 	public mobsDrops: Map<number, DROP_MODEL[]> = new Map();
 	public mobsInfo: Map<string, MOB_MODEL> = new Map();
 
-	public getMobInfo(mobId: string): MOB_MODEL {
+	public getMobInfo(mobId: string): MOB_MODEL|undefined {
 		// always return a copy of the mob, so it can be modified freely
-		return Object.assign({}, this.mobsInfo.get(mobId));
+		const mob = this.mobsInfo.get(mobId);
+		return mob && Object.assign({}, mob);
 	}
 
 	public getMobRoomId(room: string, mobId: string): string {
@@ -81,7 +82,7 @@ export default class MobsServices extends MasterServices {
 					this.mobsInfo.set(doc.mobId, doc);
 				});
 				console.log("got mobs");
-				getEmitter().emit(mobsConfig.GLOBAL_EVENTS.GLOBAL_MOBS_READY.name);				
+				getEmitter().emit(mobsConfig.GLOBAL_EVENTS.GLOBAL_MOBS_READY.name, this.mobsInfo);				
 				return this.mobsInfo;
 			});
 	}

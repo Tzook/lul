@@ -19,6 +19,10 @@ export default class ChatRouter extends SocketioRouterBase {
 		this.services.improveRoomsKeysForHax(data);
     }
 
+    [config.GLOBAL_EVENTS.GLOBAL_MOBS_READY.name](data) {
+		this.services.improveMobsKeysForHax(data);
+    }
+
 	[config.SERVER_GETS.SHOUT.name](data, socket: GameSocket) {
 		socket.broadcast.emit(this.CLIENT_GETS.SHOUT.name, {
 			id: socket.character._id,

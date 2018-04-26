@@ -1,10 +1,12 @@
 import itemsConfig from "../items/items.config";
 import roomsConfig from "../rooms/rooms.config";
+import mobsConfig from "../mobs/mobs.config";
 
 export default {
 	GLOBAL_EVENTS: {
 		GLOBAL_ITEMS_READY: Object.assign({}, itemsConfig.GLOBAL_ITEMS_READY),
 		GLOBAL_ROOMS_READY: Object.assign({}, roomsConfig.GLOBAL_ROOMS_READY),
+		GLOBAL_MOBS_READY: Object.assign({}, mobsConfig.GLOBAL_EVENTS.GLOBAL_MOBS_READY),
 	},
 	"SERVER_GETS": {
 		"SHOUT": {"name": "shouted", "log": true},
@@ -45,6 +47,10 @@ export default {
 		DROP: {
 			code: "/drop",
 			param: "{item} {stack?}"
+		},
+		SPAWN: {
+			code: "/spawn",
+			param: "{mob}"
 		},
 	}
 }
