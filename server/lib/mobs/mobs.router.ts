@@ -226,6 +226,11 @@ export default class MobsRouter extends SocketioRouterBase {
 		});
 	}
 	
+	[config.SERVER_INNER.MOB_SPAWN.name](data: {mobKey: string, x?: number, y?: number, room?: string}, socket: GameSocket) {
+		let {mobKey, x = socket.character.position.x, y = socket.character.position.y, room = socket.character.room} = data;
+		this.controller.spawnMob(mobKey, x, y, room);
+	}
+	
 	[config.SERVER_INNER.MOB_DESPAWN.name](data, socket: GameSocket) {
 		let {mob} = data;
 		process.nextTick(() => this.controller.despawnMob(mob, socket));
