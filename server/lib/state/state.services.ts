@@ -1,4 +1,5 @@
 import MasterServices from '../master/master.services';
+import { getMapOfMap } from '../utils/maps';
 
 const MAX_STATE_SIZE = 100;
 export default class StateServices extends MasterServices {
@@ -23,14 +24,7 @@ export default class StateServices extends MasterServices {
     }
 
     protected getStateObject(room: string, createIfMissing: boolean): ROOM_STATE {
-        let state = this.roomStates.get(room);
-        if (!state) {
-            state = new Map();
-            if (createIfMissing) {
-                this.roomStates.set(room, state);
-            }
-        }
-        return state;
+		return getMapOfMap(this.roomStates, room, createIfMissing);        
     }
 };
 

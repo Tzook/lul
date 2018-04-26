@@ -7,6 +7,7 @@ import itemsConfig from '../items/items.config';
 import DropsServices from './drops.services';
 import PartyRouter from '../party/party.router';
 import config from '../drops/drops.config';
+import { getMapOfMap } from '../utils/maps';
 
 export default class DropsRouter extends SocketioRouterBase {
     private dropsMap: Map<string, Map<string, ITEM_DROP>> = new Map();
@@ -22,15 +23,8 @@ export default class DropsRouter extends SocketioRouterBase {
 		super.init(files, app);
 	}
 
-	private getRoomMap(room: string, createIfMissing: boolean = false) {
-		let map = this.dropsMap.get(room);
-		if (!map) {
-			map = new Map();
-			if (createIfMissing) {
-				this.dropsMap.set(room, map);
-			}
-		}
-		return map;
+	private getRoomMap(room: string, createIfMissing: boolean = false): Map<string, ITEM_DROP> {
+		return getMapOfMap(this.dropsMap, room, createIfMissing);
 	}
 
 	private removeItem(room: string, itemId: string) {

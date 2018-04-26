@@ -8,6 +8,7 @@ import * as _ from 'underscore';
 import combatConfig from '../combat/combat.config';
 import { getController } from '../main/bootstrap';
 import { modifyBonusPerks, addBonusPerks, removeBonusPerks } from '../bonusPerks/bonusPerks.services';
+import { getSetOfMap, getMapOfMap } from '../utils/maps';
 
 export default class TalentsController extends MasterController {
 	protected services: TalentsServices;
@@ -186,27 +187,13 @@ export default class TalentsController extends MasterController {
 			: this.getMobPerkBuffs(target, perkName, createIfMissing);
 	}
 	
-	protected getSocketPerkBuffs(socket: GameSocket, perkName: string, createIfMissing: boolean = false) {
-		let perkBuffs = socket.buffs.get(perkName);
-		if (!perkBuffs) {
-			perkBuffs = new Set();
-			if (createIfMissing) {
-				socket.buffs.set(perkName, perkBuffs);
-			}
-		}
-		return perkBuffs;
+	protected getSocketPerkBuffs(socket: GameSocket, perkName: string, createIfMissing: boolean = false): Set<BUFF_INSTANCE> {
+		return getSetOfMap(socket.buffs, perkName, createIfMissing);
 	}
 
-	protected getMobPerkBuffs(mob: MOB_INSTANCE, perkName: string, createIfMissing: boolean = false) {
+	protected getMobPerkBuffs(mob: MOB_INSTANCE, perkName: string, createIfMissing: boolean = false): Set<BUFF_INSTANCE> {
 		let mobBuffs = this.getMobBuffsInstance(mob.room, mob.id, createIfMissing);
-		let perkBuffs = mobBuffs.get(perkName);
-		if (!perkBuffs) {
-			perkBuffs = new Set();
-			if (createIfMissing) {
-				mobBuffs.set(perkName, perkBuffs);
-			}
-		}
-		return perkBuffs;
+		return getSetOfMap(mobBuffs, perkName, createIfMissing);
 	}
 
 	protected triggerBleed(dmg: number, crit: boolean, buffInstance: BUFF_INSTANCE, attacker: HURTER, target: PLAYER) {
@@ -285,27 +272,13 @@ export default class TalentsController extends MasterController {
 		return hasBuff;
 	}
 
-	protected getRoomBuffsInstance(room: string, createIfMissing: boolean = false) {
-		let roomBuffs = this.roomToBuff.get(room);
-		if (!roomBuffs) {
-			roomBuffs = new Map();
-			if (createIfMissing) {
-				this.roomToBuff.set(room, roomBuffs);
-			}
-		}
-		return roomBuffs;
+	protected getRoomBuffsInstance(room: string, createIfMissing: boolean = false): Map<string, Map<string, Set<BUFF_INSTANCE>>> {
+		return getMapOfMap(this.roomToBuff, room, createIfMissing);
 	}
-
-	public getMobBuffsInstance(room: string, mobId: string, createIfMissing: boolean = false) {
+	
+	public getMobBuffsInstance(room: string, mobId: string, createIfMissing: boolean = false): Map<string, Set<BUFF_INSTANCE>> {
 		let roomBuffs = this.getRoomBuffsInstance(room, createIfMissing);
-		let mobBuffs = roomBuffs.get(mobId);
-		if (!mobBuffs) {
-			mobBuffs = new Map();
-			if (createIfMissing) {
-				roomBuffs.set(mobId, mobBuffs);
-			}
-		}
-		return mobBuffs;
+		return getMapOfMap(roomBuffs, mobId, createIfMissing);
 	}
 
     // HTTP functions

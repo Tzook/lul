@@ -4,17 +4,19 @@ import * as _ from 'underscore';
 import MobsRouter from './mobs.router';
 import mobsConfig from '../mobs/mobs.config';
 import { getController } from '../main/bootstrap';
+import { getMapOfMap } from '../utils/maps';
 
 export default class MobsController extends MasterController {
 	protected services: MobsServices;
 	protected router: MobsRouter;
 	private roomsMobs: Map<string, ROOM_MOBS> = new Map();
-	private mobById: Map<string, MOB_INSTANCE> = new Map();
+	// room => mobid => mob
+	private mobById: Map<string, Map<string, MOB_INSTANCE>> = new Map();
 	private mobsJustDied: Map<string, MOB_INSTANCE> = new Map();
 
 	init(files, app) {
         this.router = files.router;
-        super.init(files, app);
+		super.init(files, app);
 	}
 
 	// Socket functions
@@ -23,8 +25,12 @@ export default class MobsController extends MasterController {
 		return this.roomsMobs.has(room);
 	}
 
+	private getMobsMap(room: string, createIfMissing: boolean = false): Map<string, MOB_INSTANCE> {
+		return getMapOfMap(this.mobById, room, createIfMissing);
+	}
+
 	public getMob(mobId: string, socket: GameSocket): MOB_INSTANCE|undefined {
-		return this.mobById.get(this.services.getMobRoomId(socket.character.room, mobId));
+		return this.getMobsMap(socket.character.room).get(mobId);
     }
     
 	public getMobJustDied(mobId: string, socket: GameSocket): MOB_INSTANCE|undefined {
@@ -49,7 +55,7 @@ export default class MobsController extends MasterController {
 	protected spawnMobs(spawnInfo: SPAWN_INSTANCE, mobsInSpawn: Map<string, MOB_INSTANCE>, room: string) {
 		let mobsToSpawn = spawnInfo.cap - mobsInSpawn.size;
 		if (mobsToSpawn > 0) {
-			let mob = this.spawnMob(spawnInfo, room);
+			let mob = this.spawnMob(spawnInfo.mobId, spawnInfo.x, spawnInfo.y, room);
 			mob.spawn = spawnInfo; // useful for when we delete the mob
 			mobsInSpawn.set(mob.id, mob);
 			
@@ -60,11 +66,11 @@ export default class MobsController extends MasterController {
 		}
 	}
 
-	protected spawnMob(spawnInfo: SPAWN_INSTANCE, room: string): MOB_INSTANCE {
-		let mob: MOB_INSTANCE = Object.assign(this.services.getMobInfo(spawnInfo.mobId), {
+	public spawnMob(mobKey: string, x: number, y: number, room: string): MOB_INSTANCE {
+		let mob: MOB_INSTANCE = Object.assign(this.services.getMobInfo(mobKey), {
 			id: _.uniqueId("mob-"),
-			x: spawnInfo.x,
-			y: spawnInfo.y,
+			x,
+			y,
 			dmgers: new Map(),
 			threat: {
 				top: "",
@@ -75,7 +81,7 @@ export default class MobsController extends MasterController {
 			bonusPerks:{}
 		});
 
-		this.mobById.set(this.services.getMobRoomId(room, mob.id), mob);
+		this.getMobsMap(room, true).set(mob.id, mob);
 		this.notifyAboutMob(mob, this.io.to(room));
 		return mob;
 	}
@@ -91,10 +97,8 @@ export default class MobsController extends MasterController {
 	}
 
 	public notifyAboutMobs(socket: GameSocket) {
-		this.roomsMobs.get(socket.character.room).spawns.forEach(spawn => {
-			spawn.mobs.forEach(mob => {
-				this.notifyAboutMob(mob, socket);
-			});
+		this.getMobsMap(socket.character.room).forEach(mob => {
+			this.notifyAboutMob(mob, socket);
 		});
 	}
 
@@ -167,17 +171,23 @@ export default class MobsController extends MasterController {
 		for (let [char,] of mob.threat.map) {
 			socket.map.get(char).threats.delete(mob);
 		}
-		mob.spawn.mobs.delete(mob.id);
-        const mobId = this.services.getMobRoomId(socket.character.room, mob.id);
-        this.mobById.delete(mobId);
+		const mobRoomId = this.services.getMobRoomId(socket.character.room, mob.id);
+		let mobsMap = this.getMobsMap(mob.room);
+		mobsMap.delete(mob.id);
+		if (mobsMap.size === 0) {
+			this.mobById.delete(mob.room);
+		}
         // allow the mob to live in memory for a bit longer, so he can still hurt characters
-		this.mobsJustDied.set(mobId, mob);
+		this.mobsJustDied.set(mobRoomId, mob);
 		const mobDeathDebounce = (mob.deathSpell ? (mob.deathSpell.duration || 0) * 1000 : 0) + mobsConfig.MOB_DEATH_DEBOUNCE;
-        setTimeout(() => this.mobsJustDied.delete(mobId), mobDeathDebounce);
-
-		if (mob.spawn.cap == mob.spawn.mobs.size + 1) {
-			// if it's the first mob that we kill, set a timer to respawn
-			this.setRespawnTimer(mob, socket.character.room);
+        setTimeout(() => this.mobsJustDied.delete(mobRoomId), mobDeathDebounce);
+		
+		if (mob.spawn) {
+			mob.spawn.mobs.delete(mob.id);
+			if (mob.spawn.cap == mob.spawn.mobs.size + 1) {
+				// if it's the first mob that we kill, set a timer to respawn
+				this.setRespawnTimer(mob, socket.character.room);
+			}
 		}
 	}
 
@@ -196,17 +206,18 @@ export default class MobsController extends MasterController {
 
 	public clearRoom(socket: GameSocket) {
 		const emitter = this.router.getEmitter();
-		// despawn all mobs
 		let map = this.roomsMobs.get(socket.character.room);
 		if (map) {
 			map.spawns.forEach(spawn => {
 				spawn.interval = -1; // make sure respawn doesn't occur
-				spawn.mobs.forEach(mob => {
-					emitter.emit(mobsConfig.SERVER_INNER.MOB_DESPAWN.name, { mob }, socket);	
-				});
 			});
 			this.roomsMobs.delete(socket.character.room);
 		}
+		
+		// despawn all mobs
+		this.getMobsMap(socket.character.room).forEach(mob => {
+			emitter.emit(mobsConfig.SERVER_INNER.MOB_DESPAWN.name, { mob }, socket);	
+		});
 	}
 
 	// HTTP functions
