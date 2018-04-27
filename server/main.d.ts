@@ -275,14 +275,17 @@ interface MOB_MODEL {
     spellMinTime?: number
     spellMaxTime?: number
 }
+type MOB_SPELL_SPAWN = string[];
 interface MOB_SPELL {
     perks: PERK_MAP
+    spawn?: MOB_SPELL_SPAWN
     chance: number
 }
 
 interface MOB_DEATH_SPELL {
     key: string,
     perks: PERK_MAP,
+    spawn?: MOB_SPELL_SPAWN
     duration: number
 }
 

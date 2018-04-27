@@ -57,6 +57,7 @@ export function extendMobSchemaWithSpells(mob: any, mobSchema: MOB_MODEL): void 
 		mobSchema.spells = mobSchema.spells || {};
         let spellSchema: MOB_SPELL = <MOB_SPELL>getPerksSchema(spell.perks);
         spellSchema.chance = +spell.chance;
+        extendMobSpellWithSpawn(spellSchema, spell);
         mobSchema.spells[spell.key] = spellSchema;
     });
     if (mob.spellsMinTime > 0 && mob.spellsMaxTime > 0) {
@@ -70,6 +71,14 @@ export function extendMobSchemaWithSpells(mob: any, mobSchema: MOB_MODEL): void 
         if (mob.deathRattle.duration > 0) {
             deathRattle.duration = +mob.deathRattle.duration;
         }
+        extendMobSpellWithSpawn(deathRattle, mob.deathRattle);
         mobSchema.deathSpell = deathRattle;
     }
+}
+
+function extendMobSpellWithSpawn(spell: MOB_DEATH_SPELL|MOB_SPELL, mobSpellSchema: any) {
+    (mobSpellSchema.spawnMobs || []).forEach(mobKey => {
+        spell.spawn = spell.spawn || [];
+        spell.spawn.push(mobKey);
+    });
 }
