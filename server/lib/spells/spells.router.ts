@@ -103,7 +103,7 @@ export default class SpellsRouter extends SocketioRouterBase {
 			mobStopSpellsPicker(mob);
         }
         if (mob.deathSpell) {
-            mobUsesSpell(mob, mob.deathSpell.key);
+            mobUsesSpell(mob, mob.deathSpell, mob.deathSpell.key);
         }
 	}
 }

@@ -5,6 +5,7 @@ import { isMobInBuff } from '../talents/talents.controller';
 import talentsConfig from "../talents/talents.config";
 import * as _ from 'underscore';
 import { pickRandomly } from "../drops/drops.services";
+import { spawnMob } from "../mobs/mobs.services";
 
 export default class SpellsServices extends MasterServices {
 	public mobsSpellsPickers: Map<string, NodeJS.Timer> = new Map();
@@ -60,8 +61,9 @@ function activateMobSpellTimer(mob: MOB_INSTANCE, justSkippedSpell: boolean) {
         const canUseSpell = canMobUseSpell(mob);
         if (canUseSpell) {
             const spellKey = pickSpell(mob);
-            if (spellKey)
-            mobUsesSpell(mob, spellKey);
+            if (spellKey) {
+                mobUsesSpell(mob, mob.spells[spellKey], spellKey);
+            }
         }
         // recursively use the spell
         activateMobSpellTimer(mob, !canUseSpell);
@@ -78,10 +80,13 @@ function getMobSpellRestTime(min: number, max: number): number {
     return _.random(min * 1000, max * 1000);
 }
 
-export function mobUsesSpell(mob: MOB_INSTANCE, spellKey: string) {
+export function mobUsesSpell(mob: MOB_INSTANCE, spell: MOB_SPELL_BASE, spellKey: string) {
     getSpellsServices().io.to(mob.room).emit(spellsConfig.CLIENT_GETS.MOB_USE_SPELL.name, {
         mob_id: mob.id,
         spell_key: spellKey,
+    });
+    (spell.spawn || []).forEach(mobKey => {
+        spawnMob(mobKey, mob.x, mob.y, mob.room, spell.perks);
     });
 }
 

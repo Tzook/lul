@@ -275,17 +275,16 @@ interface MOB_MODEL {
     spellMinTime?: number
     spellMaxTime?: number
 }
-type MOB_SPELL_SPAWN = string[];
-interface MOB_SPELL {
+interface MOB_SPELL_BASE {
+    spawn?: string[]
     perks: PERK_MAP
-    spawn?: MOB_SPELL_SPAWN
+}
+interface MOB_SPELL extends MOB_SPELL_BASE {
     chance: number
 }
 
-interface MOB_DEATH_SPELL {
+interface MOB_DEATH_SPELL extends MOB_SPELL_BASE {
     key: string,
-    perks: PERK_MAP,
-    spawn?: MOB_SPELL_SPAWN
     duration: number
 }
 

@@ -20,7 +20,6 @@ export default {
 		"MOB_TAKE_DMG": {"name": "mob_took_dmg"},
         "HURT_MOB": {"name": "hurt_mob"},
         "MISS_MOB": {"name": "miss_mob"},
-		"MOB_SPAWN": {"name": "mob_spawn", log: true},
 		"MOB_DESPAWN": {"name": "mob_despawn"},
 		"MOBS_TAKE_DMG": {"name": "mobs_took_dmg", "alive": true, log: true},
 		"MOB_AGGRO_CHANGED": {"name": "mob_aggro_changed"},

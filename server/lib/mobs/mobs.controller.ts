@@ -66,7 +66,7 @@ export default class MobsController extends MasterController {
 		}
 	}
 
-	public spawnMob(mobKey: string, x: number, y: number, room: string): MOB_INSTANCE {
+	public spawnMob(mobKey: string, x: number, y: number, room: string, bonusPerks: PERK_MAP = {}): MOB_INSTANCE {
 		let mob: MOB_INSTANCE = Object.assign(this.services.getMobInfo(mobKey), {
 			id: _.uniqueId("mob-"),
 			x,
@@ -78,7 +78,7 @@ export default class MobsController extends MasterController {
 			},
 			dmged: 0,
 			room,
-			bonusPerks:{}
+			bonusPerks
 		});
 
 		this.getMobsMap(room, true).set(mob.id, mob);

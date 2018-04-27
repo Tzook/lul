@@ -13,7 +13,7 @@ import ItemsRouter from '../items/items.router';
 import dropsConfig from '../drops/drops.config';
 import TalentsRouter from '../talents/talents.router';
 import MobsRouter from '../mobs/mobs.router';
-import mobsConfig from '../mobs/mobs.config';
+import { spawnMob } from '../mobs/mobs.services';
 
 export default class ChatServices extends MasterServices {
     protected statsRouter: StatsRouter;
@@ -212,9 +212,7 @@ export default class ChatServices extends MasterServices {
                     return true;
                 }
                 
-                emitter.emit(mobsConfig.SERVER_INNER.MOB_SPAWN.name, {
-                    mobKey: mobInfo.mobId
-                }, targetSocket);
+                spawnMob(mobInfo.mobId, targetSocket.character.position.x, targetSocket.character.position.y, targetSocket.character.room);
                 break;
             }
         }

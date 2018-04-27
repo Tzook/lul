@@ -6,6 +6,7 @@ import { extendMobSchemaWithTalents } from '../talents/talents.services';
 import mobsConfig from '../mobs/mobs.config';
 import { getServices, getEmitter } from '../main/bootstrap';
 import { getItemsInfo } from '../items/items.services';
+import { getMobsController } from './mobs.controller';
 
 export default class MobsServices extends MasterServices {
 	public mobsDrops: Map<number, DROP_MODEL[]> = new Map();
@@ -160,4 +161,8 @@ export function getPartyShareExp(totalExp: number, partySockets: GameSocket[]) {
     let expModifier = 1 + (partySockets.length - 1) * 0.1;
     let exp = Math.ceil(expModifier * totalExp / partySockets.length);
     return exp;
+}
+
+export function spawnMob(mobKey: string, x: number, y: number, room: string, bonusPerks: PERK_MAP = {}): MOB_INSTANCE {
+	return getMobsController().spawnMob(mobKey, x, y, room, bonusPerks);
 }
