@@ -78,12 +78,13 @@ export default class ChatServices extends MasterServices {
         switch (parts[0]) {
             case chatConfig.HAX.HELP.code: {
                 let haxStrings = _.map(chatConfig.HAX, ({code, param}: {code: string, param?: string}) => {
-                        return code + " {name?}" + (param ? ` ${param}` : "");
-                    });
+                    return code + " {name?}" + (param ? ` ${param}` : "");
+                });
+                haxStrings.unshift("Available hax:");
                 targetSocket.emit(chatConfig.CLIENT_GETS.WHISPER.name, {
                     name: socket.character.name,
                     id: socket.character._id,
-                    msg: "Available hax:\n" + haxStrings.join("\n"),
+                    msg: haxStrings.join("\n"),
                 });
                 break;
             }
@@ -161,8 +162,7 @@ export default class ChatServices extends MasterServices {
                     roomInfo = this.roomHints.get(getHintKey(parts[2]));                    
                 }
                 if (!roomInfo) {
-                    this.statsRouter.sendError({msg}, socket, "Cannot hax - Room not found", true, true);
-                    return true;
+                    return this.showMatchingResults(parts[2], this.roomHints, (room: ROOM_MODEL) => room.name, socket, targetSocket);
                 }
                 
                 emitter.emit(roomsConfig.SERVER_INNER.MOVE_ROOM.name, {
@@ -186,8 +186,7 @@ export default class ChatServices extends MasterServices {
                     itemInfo = this.itemHints.get(getHintKey(parts[2]));
                 }
                 if (!itemInfo) {
-                    this.statsRouter.sendError({msg}, socket, "Cannot hax - Item not found", true, true);
-                    return true;
+                    return this.showMatchingResults(parts[2], this.itemHints, (item: ITEM_MODEL) => item.key, socket, targetSocket);                    
                 }
                 let itemInstance = this.itemsRouter.getItemInstance(itemInfo.key);
                 
@@ -208,13 +207,42 @@ export default class ChatServices extends MasterServices {
                     mobInfo = this.mobHints.get(getHintKey(parts[2]));
                 }
                 if (!mobInfo) {
-                    this.statsRouter.sendError({msg}, socket, "Cannot hax - Mob not found", true, true);
-                    return true;
+                    return this.showMatchingResults(parts[2], this.mobHints, (mob: MOB_MODEL) => mob.mobId, socket, targetSocket);
                 }
                 
                 spawnMob(mobInfo.mobId, targetSocket.character.position.x, targetSocket.character.position.y, targetSocket.character.room);
                 break;
             }
+        }
+
+        return true;
+    }
+
+    protected showMatchingResults(requestedKey: string, map: Map<string, any>, displayKeyGetter: (element: any) => string, socket: GameSocket, targetSocket: GameSocket): true {
+        requestedKey = getHintKey(requestedKey);
+        let startingWithResults = [];
+        let containsResults = [];
+        map.forEach((element, actualKey) => {
+            if (actualKey.startsWith(requestedKey)) {
+                startingWithResults.push(displayKeyGetter(element));
+            } else if (actualKey.includes(requestedKey)) {
+                containsResults.push(displayKeyGetter(element));
+            }
+        });
+        startingWithResults.sort();
+        containsResults.sort();
+        const combined = startingWithResults.concat(containsResults);
+        const result = combined.slice(0, 10);
+        const notShownCount = combined.length - result.length;
+        
+        if (result.length > 0) {
+            targetSocket.emit(chatConfig.CLIENT_GETS.WHISPER.name, {
+                name: socket.character.name,
+                id: socket.character._id,
+                msg: "Did you mean:\n" + result.join(", ") + (notShownCount > 0 ? `... (${notShownCount} more)` : ""),
+            });
+        } else {
+            this.statsRouter.sendError({}, socket, "Cannot hax - key not found", true, true);    
         }
 
         return true;
