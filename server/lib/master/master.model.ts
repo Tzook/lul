@@ -67,7 +67,7 @@ export default class MasterModel {
         }
     }
 
-    protected listenForFieldAddition(model: string, field: string, data?) {
+    protected listenForFieldAddition(model: string, field: string, data: any = "") {
         emitter.on(model + "Field", this.addFieldToModel.bind(this, field, data));
     }
 

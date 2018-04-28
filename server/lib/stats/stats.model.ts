@@ -67,12 +67,12 @@ export default class StatsModel extends MasterModel {
     }
 
     protected addFieldToModel(field, data, obj: Char, reqBody) {
-        data = _.clone(STATS_SCHEMA);
+        const statsSchema: any = _.clone(STATS_SCHEMA);
 
-        data.hp.now = data.hp.total = 20;
-        data.mp.now = data.mp.total = 20;
+        statsSchema.hp.now = statsSchema.hp.total = 20;
+        statsSchema.mp.now = statsSchema.mp.total = 20;
 
-        obj[field] = data;
-		this.addFields(obj, data);
+        obj[field] = statsSchema;
+		this.addFields(obj, reqBody);
     }
 };
