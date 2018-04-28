@@ -1,4 +1,3 @@
-import mobsConfig from "../mobs/mobs.config";
 import combatConfig from "../combat/combat.config";
 
 export default {
@@ -15,7 +14,7 @@ export default {
 	"SERVER_INNER": {
 		"HUNT_MOB": {"name": "hunt_mob"},
 		QUEST_COMPLETED: {name: "quest_post_completed"},
-		HURT_MOB: Object.assign({}, mobsConfig.SERVER_INNER.HURT_MOB),
+		DMG_DEALT: Object.assign({}, combatConfig.SERVER_INNER.DMG_DEALT),
 		HEAL_CHAR: Object.assign({}, combatConfig.SERVER_INNER.HEAL_CHAR),
 	},
 	"SERVER_GETS": {

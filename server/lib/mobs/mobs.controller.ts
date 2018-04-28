@@ -1,5 +1,5 @@
 import MasterController from '../master/master.controller';
-import MobsServices, { getDamageRange, getSpawnIntervalTime } from './mobs.services';
+import MobsServices, { getDamageRange, getSpawnIntervalTime, getMobInfo } from './mobs.services';
 import * as _ from 'underscore';
 import MobsRouter from './mobs.router';
 import mobsConfig from '../mobs/mobs.config';
@@ -67,7 +67,7 @@ export default class MobsController extends MasterController {
 	}
 
 	public spawnMob(mobKey: string, x: number, y: number, room: string, bonusPerks: PERK_MAP = {}): MOB_INSTANCE {
-		let mob: MOB_INSTANCE = Object.assign(this.services.getMobInfo(mobKey), {
+		let mob: MOB_INSTANCE = Object.assign(getMobInfo(mobKey), {
 			id: _.uniqueId("mob-"),
 			x,
 			y,

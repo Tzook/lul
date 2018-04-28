@@ -130,8 +130,11 @@ interface BONUS_PERKSABLE {
 interface PERKABLE {
     perks?: PERK_MAP
 }
+interface WORLD_HURTER extends PERKABLE {
+    id: "world-dmg"
+}
 type PLAYER = GameSocket|MOB_INSTANCE;
-type HURTER = PLAYER|PERKABLE;
+type HURTER = PLAYER|WORLD_HURTER;
 
 interface GameSocket extends SocketIO.Socket {
     test?: boolean;

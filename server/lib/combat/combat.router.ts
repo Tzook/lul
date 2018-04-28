@@ -7,7 +7,7 @@ import TalentsRouter from '../talents/talents.router';
 import talentsConfig from '../talents/talents.config';
 import statsConfig from '../stats/stats.config';
 import CombatServices, { setAttackInfo, popAttackInfo } from './combat.services';
-import { getMpUsage } from '../talents/talents.services';
+import { getMpUsage, getId, getHp } from '../talents/talents.services';
 import { calculateDamage } from './combat.services';
 
 export default class CombatRouter extends SocketioRouterBase {
@@ -102,6 +102,18 @@ export default class CombatRouter extends SocketioRouterBase {
 		}
 
 		socket.character.stats.primaryAbility = previousAbility;
+	}
+
+	[config.SERVER_INNER.DMG_DEALT.name](data: {dmg, cause, crit, attacker: HURTER, target: PLAYER}, socket: GameSocket) {
+		const {dmg, cause, crit, attacker, target} = data;
+		this.io.to(socket.character.room).emit(config.CLIENT_GETS.DMG_DEALT.name, {
+			attacker_id: getId(attacker),
+			target_id: getId(target),
+            dmg,
+            cause,
+            crit,
+			hp: getHp(target),
+        });
 	}
 
 	[config.SERVER_INNER.HEAL_CHARS.name](data, socket: GameSocket) {

@@ -4,6 +4,7 @@ export default {
 		"HEAL_CHAR": {"name": "heal_char", "alive": true},
 		"CHANGED_ABILITY": {"name": "changed_ability_inner"},
 		"ACTIVATE_ABILITY": {"name": "activated_ability"},
+		DMG_DEALT: {name: "dmg_dealt"},
 	},
 	"SERVER_GETS": {
 		"LOAD_ATTACK": {"name": "loaded_attack", "alive": true, "log": true},
@@ -14,7 +15,8 @@ export default {
 	"CLIENT_GETS": {
 		"LOAD_ATTACK": {"name": "actor_load_attack"},
 		"PERFORM_ATTACK": {"name": "actor_perform_attack"},
-		"CHANGE_ABILITY": {"name": "actor_change_ability"}
+		"CHANGE_ABILITY": {"name": "actor_change_ability"},
+		DMG_DEALT: {"name": "take_damage"},
 	},
 	HIT_CAUSE: {
 		ATK: "attack",

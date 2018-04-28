@@ -4,8 +4,9 @@ import PartyController from './party.controller';
 import PartyMiddleware from './party.middleware';
 import partyConfig from '../party/party.config';
 import knownsConfig from '../knowns/knowns.config';
-import statsConfig from '../stats/stats.config';
 import { isLeader, isPartyFull, isInvited, isMember } from './party.services';
+import { isSocket } from '../talents/talents.services';
+import combatConfig from '../combat/combat.config';
 
 export default class PartyRouter extends SocketioRouterBase {
     protected controller: PartyController;
@@ -89,16 +90,19 @@ export default class PartyRouter extends SocketioRouterBase {
         }
         this.controller.kickFromParty(socket, data.char_name, party);
     }
-
-    [partyConfig.SERVER_INNER.TOOK_DMG.name] (data, socket: GameSocket) {
-        const party = this.controller.getCharParty(socket);
-        if (party) {
-            this.io.to(party.name).emit(statsConfig.CLIENT_GETS.TAKE_DMG.name, {
-                name: socket.character.name,
-                hp: socket.character.stats.hp.now
-            });
+    
+	[partyConfig.SERVER_INNER.DMG_DEALT.name](data: {dmg, cause, crit, attacker: HURTER, target: PLAYER}, socket: GameSocket) {
+        const {target} = data;
+        if (isSocket(target)) {
+            const party = this.controller.getCharParty(target);
+            if (party) {
+                this.io.to(party.name).emit(combatConfig.CLIENT_GETS.DMG_DEALT.name, {
+                    name: target.character.name,
+                    hp: target.character.stats.hp.now
+                });
+            }
         }
-    }
+	}
 
     public onConnected(socket: GameSocket) {
         // wait 2 ticks - one tick so the user gets his known list and then 2nd tick to tell him about his party members

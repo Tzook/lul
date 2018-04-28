@@ -93,6 +93,10 @@ function getMobsServices(): MobsServices {
 	return getServices("mobs");
 }
 
+export function getMobInfo(mobId: string): MOB_MODEL|undefined {
+	return getMobsServices().getMobInfo(mobId);
+}
+
 function setMobsExtraDrops() {
 	const mobsServices = getMobsServices();
 	

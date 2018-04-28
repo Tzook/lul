@@ -10,6 +10,7 @@ import itemsConfig from '../items/items.config';
 import NpcsRouter from '../npcs/npcs.router';
 import { getRoomName } from '../rooms/rooms.services';
 import { getPartyMembersInMap } from '../party/party.services';
+import { isSocket } from '../talents/talents.services';
 
 export default class QuestsRouter extends SocketioRouterBase {
 	protected middleware: QuestsMiddleware;
@@ -154,18 +155,21 @@ export default class QuestsRouter extends SocketioRouterBase {
 		}
 		this.services.markModified(socket.character.quests, fields);
 	}
-
-	[config.SERVER_INNER.HURT_MOB.name]({dmg}: {dmg: number}, socket: GameSocket) {
-		let fields: Set<string> = new Set();
-		let quests = socket.character.quests.dmg;
-		for (let questKey in quests) {
-			let questInfo = this.services.getQuestInfo(questKey);
-			if (quests[questKey] < questInfo.cond.dmg) {
-				quests[questKey] = Math.min(quests[questKey] + dmg, questInfo.cond.dmg);
-				fields.add("dmg");				
+	
+	[config.SERVER_INNER.DMG_DEALT.name](data: {dmg, cause, crit, attacker: HURTER, target: PLAYER}, socket: GameSocket) {
+		const {dmg, attacker} = data;
+		if (isSocket(attacker)) {
+			let fields: Set<string> = new Set();
+			let quests = attacker.character.quests.dmg;
+			for (let questKey in quests) {
+				let questInfo = this.services.getQuestInfo(questKey);
+				if (quests[questKey] < questInfo.cond.dmg) {
+					quests[questKey] = Math.min(quests[questKey] + dmg, questInfo.cond.dmg);
+					fields.add("dmg");				
+				}
 			}
+			this.services.markModified(attacker.character.quests, fields);
 		}
-		this.services.markModified(socket.character.quests, fields);
 	}
 	
 	[config.SERVER_INNER.HEAL_CHAR.name]({dmg}: {dmg: number}, socket: GameSocket) {

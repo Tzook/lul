@@ -52,7 +52,7 @@ export default class StatsRouter extends SocketioRouterBase {
 
     [config.SERVER_GETS.TAKE_WORLD_DAMAGE.name] (data: {dmg, perks?}, socket: GameSocket) {
         let {dmg, perks} = data;
-        let hurter: PERKABLE = {};
+        let hurter: WORLD_HURTER = {id: "world-dmg"};
         // convert perks array to an object
         if (_.isArray(perks)) {
             for (let perkObject of perks) {
@@ -75,12 +75,12 @@ export default class StatsRouter extends SocketioRouterBase {
     }
 
     [config.SERVER_INNER.TAKE_DMG.name] (data: {dmg, cause, crit, hurter}, socket: GameSocket) {
-        let dmg = data.dmg;
+        const {dmg, cause, crit, hurter} = data;
         let hpAfterDmg = this.services.getHpAfterDamage(socket.character.stats.hp.now, dmg);
         let hadFullHp = socket.character.stats.hp.now === socket.maxHp;
         socket.character.stats.hp.now = hpAfterDmg;
         
-        this.emitter.emit(config.SERVER_INNER.TOOK_DMG.name, data, socket);
+        this.emitter.emit(combatConfig.SERVER_INNER.DMG_DEALT.name, {dmg, cause, crit, attacker: hurter, target: socket }, socket);
 
         if (!socket.alive) {
             this.log({}, socket, "character is ded");
@@ -90,17 +90,6 @@ export default class StatsRouter extends SocketioRouterBase {
         } else {
             hadFullHp && this.regenHpInterval(socket);
         }
-    }
-
-    [config.SERVER_INNER.TOOK_DMG.name] (data: {dmg, cause, crit, hurter}, socket: GameSocket) {
-        let {dmg, cause, crit} = data;
-		this.io.to(socket.character.room).emit(config.CLIENT_GETS.TAKE_DMG.name, {
-			id: socket.character._id,
-            dmg,
-            cause,
-            crit,
-			hp: socket.character.stats.hp.now
-        });
     }
 
     [config.SERVER_INNER.USE_MP.name] (data, socket: GameSocket) {

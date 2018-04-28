@@ -1,7 +1,7 @@
 import SocketioRouterBase from '../socketio/socketio.router.base';
 import TalentsMiddleware from './talents.middleware';
 import TalentsController from './talents.controller';
-import TalentsServices, { getTalent, hasAbility, getTalentInfo, isCharAbility } from './talents.services';
+import TalentsServices, { getTalent, hasAbility, getTalentInfo, isCharAbility, isSocket, getHp } from './talents.services';
 import talentsConfig from '../talents/talents.config';
 import statsConfig from '../stats/stats.config';
 import StatsRouter from '../stats/stats.router';
@@ -90,14 +90,19 @@ export default class TalentsRouter extends SocketioRouterBase {
 		});
 	}
 	
-	[talentsConfig.SERVER_INNER.HURT_MOB.name]({dmg, mob, cause, crit}: {dmg: number, mob: MOB_INSTANCE, cause: string, crit: boolean}, socket: GameSocket) {
-		const mobModel = this.mobsRouter.getMobInfo(mob.mobId);
-		const exp = this.services.getAbilityExp(dmg, mobModel);
-		this.emitter.emit(talentsConfig.SERVER_INNER.GAIN_PRIMARY_ABILITY_EXP.name, {exp}, socket);
-		if (mob.hp > 0 && cause !== combatConfig.HIT_CAUSE.BLEED && cause !== combatConfig.HIT_CAUSE.BURN && cause !== combatConfig.HIT_CAUSE.SPIKES) {
-			this.controller.applyHurtPerks(dmg, crit, socket, mob);
+	[talentsConfig.SERVER_INNER.DMG_DEALT.name](data: {dmg, cause, crit, attacker: HURTER, target: PLAYER}, socket: GameSocket) {
+		const {dmg, cause, crit, attacker, target} = data;
+		if (isSocket(attacker)) {
+			const exp = this.services.getAbilityExp(dmg, target);
+			this.emitter.emit(talentsConfig.SERVER_INNER.GAIN_PRIMARY_ABILITY_EXP.name, {exp}, socket);
+			this.controller.applySelfPerks(dmg, socket);
 		}
-		this.controller.applySelfPerks(dmg, socket);
+		if (isSocket(target) && !target.alive) {
+			this.controller.clearSocketBuffs(target);			
+		}
+		if (getHp(target) > 0 && cause !== combatConfig.HIT_CAUSE.BLEED && cause !== combatConfig.HIT_CAUSE.BURN && cause !== combatConfig.HIT_CAUSE.SPIKES) {
+			this.controller.applyHurtPerks(dmg, crit, attacker, target);
+		}
 	}
 	
 	[talentsConfig.SERVER_INNER.HEAL_CHAR.name](data, socket: GameSocket) {
@@ -109,15 +114,6 @@ export default class TalentsRouter extends SocketioRouterBase {
 		this.emitter.emit(talentsConfig.SERVER_INNER.GAIN_PRIMARY_ABILITY_EXP.name, {exp}, socket);
 		this.controller.applySelfPerks(dmg, socket);
 	}
-	
-    [talentsConfig.SERVER_INNER.TOOK_DMG.name] (data, socket: GameSocket) {
-		let {dmg, hurter, cause, crit} = data;
-		if (!socket.alive) {
-			this.controller.clearSocketBuffs(socket);
-		} else if (cause !== combatConfig.HIT_CAUSE.BLEED && cause !== combatConfig.HIT_CAUSE.BURN) {
-			this.controller.applyHurtPerks(dmg, crit, hurter, socket);
-		}
-    }
 	
 	[talentsConfig.SERVER_INNER.GAIN_CHAR_ABILITY_EXP.name]({exp, ability}: {exp: number, ability: string}, socket: GameSocket) {
         let talent = socket.character.charTalents._doc[ability];

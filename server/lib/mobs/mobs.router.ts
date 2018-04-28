@@ -40,10 +40,6 @@ export default class MobsRouter extends SocketioRouterBase {
 		socket.threats = new Set();
 	}
 	
-	public getMobInfo(mobId: string): MOB_MODEL|undefined {
-		return this.services.getMobInfo(mobId);
-	}
-	
     [config.GLOBAL_EVENTS.GLOBAL_ITEMS_READY.name]() {
 		setMobsExtraDropsAfter2();
     }
@@ -123,7 +119,7 @@ export default class MobsRouter extends SocketioRouterBase {
 		}
 
 		this.controller.hurtMob(mob, dmg, socket);
-		this.emitter.emit(config.SERVER_INNER.HURT_MOB.name, { mob, dmg, cause, crit }, socket);
+		this.emitter.emit(combatConfig.SERVER_INNER.DMG_DEALT.name, { mob, dmg, cause, crit, attacker: socket, target: mob }, socket);
 		if (mob.hp === 0) {
 			this.emitter.emit(config.SERVER_INNER.MOB_DESPAWN.name, { mob }, socket);	
 
@@ -165,17 +161,6 @@ export default class MobsRouter extends SocketioRouterBase {
 			this.emitter.emit(dropsConfig.SERVER_INNER.GENERATE_DROPS.name, {x: mob.x, y: mob.y, owner: max.socket.character.name}, max.socket, drops);
 			this.emitter.emit(questsConfig.SERVER_INNER.HUNT_MOB.name, {id: mob.mobId}, max.socket);
 		}
-	}
-
-	[config.SERVER_INNER.HURT_MOB.name]({dmg, mob, cause, crit}: {dmg: number, mob: MOB_INSTANCE, cause: string, crit: boolean}, socket: GameSocket) {
-		this.io.to(socket.character.room).emit(config.CLIENT_GETS.MOB_TAKE_DMG.name, {
-			id: socket.character._id,
-			mob_id: mob.id,
-			dmg,
-			hp: mob.hp,
-			cause,
-			crit,
-		});
 	}
 
 	[config.SERVER_GETS.MOBS_MOVE.name](data, socket: GameSocket) {

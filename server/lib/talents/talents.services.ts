@@ -8,6 +8,7 @@ import { getRoomInfo, getRoomName } from '../rooms/rooms.services';
 import { getServices, getEmitter } from '../main/bootstrap';
 import { isMobInBuff } from './talents.controller';
 import { extendMobSchemaWithSpells, extendTalentsGenerationWithSpells } from '../spells/spells.model';
+import { getMobInfo } from '../mobs/mobs.services';
 
 export default class TalentsServices extends MasterServices {
 	private controller: TalentsController;
@@ -61,10 +62,23 @@ export default class TalentsServices extends MasterServices {
 		}
 	}
 
-	public getAbilityExp(dmg: number, mob: MOB_MODEL) {
-		return mob.exp ? Math.min(dmg / mob.hp, 1) * mob.exp * 2 | 0 || 1 : 0;
+	public getAbilityExp(dmg: number, target: PLAYER): number {
+		return isSocket(target)
+			? this.getAbilityExpFromSocket(dmg, target)
+			: this.getAbilityExpFromMob(dmg, target);
 	}
 
+	public getAbilityExpFromMob(dmg: number, target: MOB_INSTANCE): number {
+		const mobModel = getMobInfo(target.mobId);
+		return getAbilityExpFormula(dmg, mobModel.exp, mobModel.hp);
+	}
+	
+	public getAbilityExpFromSocket(dmg: number, target: GameSocket): number {
+		// TODO use a better formula for exp
+		const totalExp = target.character.stats.lvl * 20;
+		return getAbilityExpFormula(dmg, totalExp, target.maxHp);
+	}
+	
 	public getPerksPool(ability: string, talent: CHAR_ABILITY_TALENT): string[] {
 		let poolLvl = talent.lvl - (talent.points - 1);
 		let abilityInfo = this.perksInfo.get(ability);
@@ -548,10 +562,16 @@ export function getRoom(target: PLAYER): string {
 		: target.room;
 }
 
-export function getId(target: PLAYER): string {
+export function getId(target: HURTER): string {
 	return isSocket(target) 
 		? target.character._id
 		: target.id;
+}
+
+export function getHp(target: PLAYER): number {
+	return isSocket(target) 
+		? target.character.stats.hp.now
+		: target.hp;
 }
 
 export function getMpUsage(mp: number, socket: GameSocket): number {
@@ -564,4 +584,8 @@ export function applySpikes(dmg: number, spikesModifier: number): number {
 
 export function getPerkType(perkName: string): PERK_TYPES {
 	return getTalentsServices().getPerkConfig(perkName).type;
+}
+
+function getAbilityExpFormula(dmg: number, targetExp: number, targetMaxHealth: number): number {
+	return targetExp ? Math.min(dmg / targetMaxHealth, 1) * targetExp * 2 | 0 || 1 : 0;
 }
