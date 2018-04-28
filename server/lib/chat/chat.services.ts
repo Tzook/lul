@@ -162,7 +162,7 @@ export default class ChatServices extends MasterServices {
                     roomInfo = this.roomHints.get(getHintKey(parts[2]));                    
                 }
                 if (!roomInfo) {
-                    return this.showMatchingResults(parts[2], this.roomHints, (room: ROOM_MODEL) => room.name, socket, targetSocket);
+                    return this.showMatchingResults(parts[2], this.roomHints, (room: ROOM_MODEL) => room.name, socket);
                 }
                 
                 emitter.emit(roomsConfig.SERVER_INNER.MOVE_ROOM.name, {
@@ -186,7 +186,7 @@ export default class ChatServices extends MasterServices {
                     itemInfo = this.itemHints.get(getHintKey(parts[2]));
                 }
                 if (!itemInfo) {
-                    return this.showMatchingResults(parts[2], this.itemHints, (item: ITEM_MODEL) => item.key, socket, targetSocket);                    
+                    return this.showMatchingResults(parts[2], this.itemHints, (item: ITEM_MODEL) => item.key, socket);
                 }
                 let itemInstance = this.itemsRouter.getItemInstance(itemInfo.key);
                 
@@ -207,7 +207,7 @@ export default class ChatServices extends MasterServices {
                     mobInfo = this.mobHints.get(getHintKey(parts[2]));
                 }
                 if (!mobInfo) {
-                    return this.showMatchingResults(parts[2], this.mobHints, (mob: MOB_MODEL) => mob.mobId, socket, targetSocket);
+                    return this.showMatchingResults(parts[2], this.mobHints, (mob: MOB_MODEL) => mob.mobId, socket);
                 }
                 
                 spawnMob(mobInfo.mobId, targetSocket.character.position.x, targetSocket.character.position.y, targetSocket.character.room);
@@ -218,7 +218,7 @@ export default class ChatServices extends MasterServices {
         return true;
     }
 
-    protected showMatchingResults(requestedKey: string, map: Map<string, any>, displayKeyGetter: (element: any) => string, socket: GameSocket, targetSocket: GameSocket): true {
+    protected showMatchingResults(requestedKey: string, map: Map<string, any>, displayKeyGetter: (element: any) => string, socket: GameSocket): true {
         requestedKey = getHintKey(requestedKey);
         let startingWithResults = [];
         let containsResults = [];
@@ -236,7 +236,7 @@ export default class ChatServices extends MasterServices {
         const notShownCount = combined.length - result.length;
         
         if (result.length > 0) {
-            targetSocket.emit(chatConfig.CLIENT_GETS.WHISPER.name, {
+            socket.emit(chatConfig.CLIENT_GETS.WHISPER.name, {
                 name: socket.character.name,
                 id: socket.character._id,
                 msg: "Did you mean:\n" + result.join(", ") + (notShownCount > 0 ? `... (${notShownCount} more)` : ""),
