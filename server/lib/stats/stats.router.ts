@@ -7,7 +7,6 @@ import config from './stats.config';
 import roomsConfig from '../rooms/rooms.config';
 import * as _ from "underscore";
 import combatConfig from '../combat/combat.config';
-import { getCharParty } from '../party/party.services';
 
 export default class StatsRouter extends SocketioRouterBase {
     protected controller: StatsController;
@@ -120,9 +119,8 @@ export default class StatsRouter extends SocketioRouterBase {
         let gainedHp = this.controller.addHp(socket, hp);
 
         if (gainedHp) {
-            const party = getCharParty(socket);
-            const to = party ? this.io.to(party.name) : socket;
-            to.emit(config.CLIENT_GETS.GAIN_HP.name, {
+            // TODO what happens with party?
+            this.io.to(socket.character.room).emit(config.CLIENT_GETS.GAIN_HP.name, {
                 id: socket.character._id,
                 name: socket.character.name,
                 hp,
