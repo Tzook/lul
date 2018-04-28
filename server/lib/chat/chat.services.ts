@@ -263,5 +263,5 @@ function pickPerk(pool: any, perksString: string): string {
 }
 
 function getHintKey(key: string): string {
-    return key.toLowerCase().replace(/_/g, "")
+    return (key || "").toLowerCase().replace(/_/g, "")
 }
