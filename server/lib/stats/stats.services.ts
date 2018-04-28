@@ -48,3 +48,8 @@ export default class StatsServices extends MasterServices {
 };
 // cache computations
 StatsServices.prototype.getExp = <any>_.memoize(StatsServices.prototype.getExp);
+
+export function getLvlExpByChar(target: GameSocket): number {
+    // TODO use a better formula...
+    return target.character.stats.lvl * 20;
+}

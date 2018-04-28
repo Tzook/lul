@@ -1,3 +1,5 @@
+import combatConfig from "../combat/combat.config";
+
 export default {
 	"SERVER_INNER": {
 		"GAIN_EXP": {"name": "gain_exp", "alive": true, "log": true},
@@ -6,6 +8,7 @@ export default {
 		"GAIN_MP": {"name": "gain_mp", "alive": true, "log": true},
 		"GAIN_STATS": {"name": "gain_stats", "alive": true, "log": true},
 		"TAKE_DMG": {"name": "take_dmg", "alive": true},
+        DMG_DEALT: Object.assign({}, combatConfig.SERVER_INNER.DMG_DEALT),		
 		"USE_MP": {"name": "use_mp", "alive": true, "log": true},
 		"STATS_ADD": {"name": "stats_add", "alive": true},
 		"UPDATE_MAX_STATS": {"name": "update_max_stats"},

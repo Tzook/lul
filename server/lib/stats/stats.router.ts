@@ -1,12 +1,13 @@
 
 import SocketioRouterBase from '../socketio/socketio.router.base';
 import StatsController from './stats.controller';
-import StatsServices from './stats.services';
+import StatsServices, { getLvlExpByChar } from './stats.services';
 import { BASE_STATS_SCHEMA } from "./stats.model";
 import config from './stats.config';
 import roomsConfig from '../rooms/rooms.config';
 import * as _ from "underscore";
 import combatConfig from '../combat/combat.config';
+import { isSocket } from '../talents/talents.services';
 
 export default class StatsRouter extends SocketioRouterBase {
     protected controller: StatsController;
@@ -77,20 +78,30 @@ export default class StatsRouter extends SocketioRouterBase {
     [config.SERVER_INNER.TAKE_DMG.name] (data: {dmg, cause, crit, hurter}, socket: GameSocket) {
         const {dmg, cause, crit, hurter} = data;
         let hpAfterDmg = this.services.getHpAfterDamage(socket.character.stats.hp.now, dmg);
-        let hadFullHp = socket.character.stats.hp.now === socket.maxHp;
         socket.character.stats.hp.now = hpAfterDmg;
         
         this.emitter.emit(combatConfig.SERVER_INNER.DMG_DEALT.name, {dmg, cause, crit, attacker: hurter, target: socket }, socket);
-
-        if (!socket.alive) {
-            this.log({}, socket, "character is ded");
-            this.io.to(socket.character.room).emit(config.CLIENT_GETS.DEATH.name, {
-                id: socket.character._id,
-            });
-        } else {
-            hadFullHp && this.regenHpInterval(socket);
-        }
     }
+    
+	[config.SERVER_INNER.DMG_DEALT.name](data: {dmg, cause, crit, attacker: HURTER, target: PLAYER}, socket: GameSocket) {
+        const {attacker, target} = data;
+        
+        if (isSocket(target)) {
+            if (!target.alive) {
+                this.log({}, target, "character is ded");
+                this.io.to(target.character.room).emit(config.CLIENT_GETS.DEATH.name, {
+                    id: target.character._id,
+                });
+                if (isSocket(attacker)) {
+                    // in PVP, only the killer gets the mob exp
+                    const exp = getLvlExpByChar(target);
+                    this.emitter.emit(config.SERVER_INNER.GAIN_EXP.name, { exp }, attacker);                    
+                }
+            } else if (!target.hpRegenTimer) {
+                this.regenHpInterval(target);
+            }
+        }
+	}
 
     [config.SERVER_INNER.USE_MP.name] (data, socket: GameSocket) {
         const {mp} = data;
@@ -227,6 +238,8 @@ export default class StatsRouter extends SocketioRouterBase {
                     const hp = this.services.getRegenHp(socket);
                     this.emitter.emit(config.SERVER_INNER.GAIN_HP.name, { hp, cause: config.REGEN_CAUSE.REGEN }, socket);
                     this.regenHpInterval(socket);
+                } else {
+                    socket.hpRegenTimer = null;
                 }
             }, socket.getHpRegenInterval());
         } else {
@@ -241,6 +254,8 @@ export default class StatsRouter extends SocketioRouterBase {
                     const mp = this.services.getRegenMp(socket);
                     this.emitter.emit(config.SERVER_INNER.GAIN_MP.name, { mp, cause: config.REGEN_CAUSE.REGEN }, socket);
                     this.regenMpInterval(socket);
+                } else {
+                    socket.mpRegenTimer = null;
                 }
             }, socket.getMpRegenInterval());
         } else {

@@ -15,6 +15,7 @@ import { getMobDeadOrAlive } from './mobs.controller';
 import { applyDefenceModifier, getDamageTaken } from '../combat/combat.services';
 import mobsConfig from '../mobs/mobs.config';
 import { getPartyMembersInMap, getCharParty } from '../party/party.services';
+import { isMob } from '../talents/talents.services';
 
 export default class MobsRouter extends SocketioRouterBase {
 	protected middleware: MobsMiddleware;
@@ -120,16 +121,20 @@ export default class MobsRouter extends SocketioRouterBase {
 
 		this.controller.hurtMob(mob, dmg, socket);
 		this.emitter.emit(combatConfig.SERVER_INNER.DMG_DEALT.name, { mob, dmg, cause, crit, attacker: socket, target: mob }, socket);
-		if (mob.hp === 0) {
-			this.emitter.emit(config.SERVER_INNER.MOB_DESPAWN.name, { mob }, socket);	
+	}
+	
+	[config.SERVER_INNER.DMG_DEALT.name](data: {dmg, cause, crit, attacker: HURTER, target: PLAYER}, socket: GameSocket) {
+		const {target} = data;
+		if (isMob(target) && target.hp === 0) {
+			this.emitter.emit(config.SERVER_INNER.MOB_DESPAWN.name, { mob: target }, socket);	
 
 			let max = {dmg: 0, socket: null};
 			let parties: Map<PARTY_MODEL | GameSocket, {exp: number, partySocketOwner: GameSocket}> = new Map();
-			for (let [charId, charDmg] of mob.dmgers) {
+			for (let [charId, charDmg] of target.dmgers) {
 				let charSocket = socket.map.get(charId);
 				if (charSocket && charSocket.character.room === socket.character.room && charSocket.alive) {
 					// found char and he's alive in our room
-					let exp = this.services.getExp(mob, charDmg);
+					let exp = this.services.getExp(target, charDmg);
 					let party = getCharParty(charSocket);
 					if (party) {
 						let currentPartyExp = (parties.get(party) || {exp: 0}).exp;
@@ -137,7 +142,7 @@ export default class MobsRouter extends SocketioRouterBase {
 					} else {
 						this.emitter.emit(statsConfig.SERVER_INNER.GAIN_EXP.name, { exp }, charSocket);
 					}
-
+		
 					if (charDmg > max.dmg) {
 						max.dmg = charDmg;
 						max.socket = charSocket;
@@ -148,18 +153,18 @@ export default class MobsRouter extends SocketioRouterBase {
 				let partySockets = getPartyMembersInMap(partySocketOwner);
 				// split exp equally among party members
 				exp = getPartyShareExp(exp, partySockets);
-
+		
 				for (let memberSocket of partySockets) {
 					this.emitter.emit(statsConfig.SERVER_INNER.GAIN_EXP.name, { exp }, memberSocket);
 				}
 			}
-
-			let drops = mob.drops;
-			if (shouldMobHaveExtraDrops(mob)) {
-				drops = drops.concat(getMobExtraDrops(mob.lvl));
+		
+			let drops = target.drops;
+			if (shouldMobHaveExtraDrops(target)) {
+				drops = drops.concat(getMobExtraDrops(target.lvl));
 			}
-			this.emitter.emit(dropsConfig.SERVER_INNER.GENERATE_DROPS.name, {x: mob.x, y: mob.y, owner: max.socket.character.name}, max.socket, drops);
-			this.emitter.emit(questsConfig.SERVER_INNER.HUNT_MOB.name, {id: mob.mobId}, max.socket);
+			this.emitter.emit(dropsConfig.SERVER_INNER.GENERATE_DROPS.name, {x: target.x, y: target.y, owner: max.socket.character.name}, max.socket, drops);
+			this.emitter.emit(questsConfig.SERVER_INNER.HUNT_MOB.name, {id: target.mobId}, max.socket);
 		}
 	}
 

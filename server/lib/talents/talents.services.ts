@@ -9,6 +9,7 @@ import { getServices, getEmitter } from '../main/bootstrap';
 import { isMobInBuff } from './talents.controller';
 import { extendMobSchemaWithSpells, extendTalentsGenerationWithSpells } from '../spells/spells.model';
 import { getMobInfo } from '../mobs/mobs.services';
+import { getLvlExpByChar } from '../stats/stats.services';
 
 export default class TalentsServices extends MasterServices {
 	private controller: TalentsController;
@@ -74,9 +75,7 @@ export default class TalentsServices extends MasterServices {
 	}
 	
 	public getAbilityExpFromSocket(dmg: number, target: GameSocket): number {
-		// TODO use a better formula for exp
-		const totalExp = target.character.stats.lvl * 20;
-		return getAbilityExpFormula(dmg, totalExp, target.maxHp);
+		return getAbilityExpFormula(dmg, getLvlExpByChar(target), target.maxHp);
 	}
 	
 	public getPerksPool(ability: string, talent: CHAR_ABILITY_TALENT): string[] {

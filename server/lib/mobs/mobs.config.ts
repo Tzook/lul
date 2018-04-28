@@ -1,4 +1,5 @@
 import itemsConfig from "../items/items.config";
+import combatConfig from "../combat/combat.config";
 
 export default {
 	"ROUTES": {
@@ -16,6 +17,7 @@ export default {
 		GLOBAL_MOBS_READY: {"name": "mobs_ready"},
 	},
     "SERVER_INNER": {
+        DMG_DEALT: Object.assign({}, combatConfig.SERVER_INNER.DMG_DEALT),		
         "LEFT_ROOM": {"name": "left_room"},
 		"MOB_TAKE_DMG": {"name": "mob_took_dmg"},
         "MISS_MOB": {"name": "miss_mob"},
