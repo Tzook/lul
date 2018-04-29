@@ -87,7 +87,7 @@ export default class ChatServices extends MasterServices {
             }
                 
             case chatConfig.HAX.LVL.code: {
-                const times = +parts[3] ? +parts[3] - targetSocket.character.stats.lvl : 1;
+                const times = +parts[3] ? +parts[3] : 1;
                 (async () => {
                     for (let i = 0; i < times; i++) {
                         emitter.emit(statsConfig.SERVER_INNER.GAIN_EXP.name, {
