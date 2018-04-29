@@ -1,5 +1,5 @@
 import MasterController from '../master/master.controller';
-import MobsServices, { getDamageRange, getSpawnIntervalTime, getMobInfo } from './mobs.services';
+import MobsServices, { getSpawnIntervalTime, getMobInfo } from './mobs.services';
 import * as _ from 'underscore';
 import MobsRouter from './mobs.router';
 import mobsConfig from '../mobs/mobs.config';
@@ -155,14 +155,6 @@ export default class MobsController extends MasterController {
 		}
     }
 
-	public getHurtCharDmg(mob: MOB_INSTANCE, socket: GameSocket): DMG_RESULT {
-        let dmgModifierResult = socket.getDmgModifier(mob, socket);
-        let maxDmg = mob.dmg * dmgModifierResult.dmg;
-        let minDmg = maxDmg * socket.getMinDmgModifier(mob);
-		let dmg = getDamageRange(minDmg, maxDmg);
-		return {dmg, crit: dmgModifierResult.crit};
-	}
-
 	public despawnMob(mob: MOB_INSTANCE, socket: GameSocket) {
 		this.io.to(socket.character.room).emit(mobsConfig.CLIENT_GETS.MOB_DIE.name, {
 			mob_id: mob.id,
@@ -197,11 +189,6 @@ export default class MobsController extends MasterController {
 				this.spawnMobs(mob.spawn, mob.spawn.mobs, room);
 			}, getSpawnIntervalTime(mob.spawn));
 		}
-	}
-
-	public didHitMob(mobId: string, socket: GameSocket) {
-		let mob = this.getMob(mobId, socket);
-		return mob.hp > 0 && this.services.didHitMob(mob.lvl, socket.character.stats.lvl);
 	}
 
 	public clearRoom(socket: GameSocket) {

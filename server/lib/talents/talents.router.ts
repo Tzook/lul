@@ -1,18 +1,15 @@
 import SocketioRouterBase from '../socketio/socketio.router.base';
 import TalentsMiddleware from './talents.middleware';
 import TalentsController from './talents.controller';
-import TalentsServices, { getTalent, hasAbility, getTalentInfo, isCharAbility, isSocket, getHp } from './talents.services';
+import TalentsServices, { getTalent, hasAbility, getTalentInfo, isCharAbility, isSocket, getHp, isMob, applySpikes } from './talents.services';
 import talentsConfig from '../talents/talents.config';
 import statsConfig from '../stats/stats.config';
 import StatsRouter from '../stats/stats.router';
 import MobsRouter from '../mobs/mobs.router';
-import mobsConfig from '../mobs/mobs.config';
 import RoomsRouter from '../rooms/rooms.router';
 import combatConfig from '../combat/combat.config';
-import { applySpikes } from './talents.services';
-import { getMob } from '../mobs/mobs.controller';
-import { getDamageTaken } from '../combat/combat.services';
 import { modifyBonusPerks } from '../bonusPerks/bonusPerks.services';
+import { getDamageDealt } from '../combat/combat.services';
 
 export default class TalentsRouter extends SocketioRouterBase {
 	protected middleware: TalentsMiddleware;
@@ -90,18 +87,33 @@ export default class TalentsRouter extends SocketioRouterBase {
 		});
 	}
 	
-	[talentsConfig.SERVER_INNER.DMG_DEALT.name](data: {dmg, cause, crit, attacker: HURTER, target: PLAYER}, socket: GameSocket) {
+	[talentsConfig.SERVER_INNER.DMG_DEALT.name](data: {attacker: HURTER, target: PLAYER, dmg: number, cause: string, crit: boolean}, socket: GameSocket) {
 		const {dmg, cause, crit, attacker, target} = data;
 		if (isSocket(attacker)) {
 			const exp = this.services.getAbilityExp(dmg, target);
 			this.emitter.emit(talentsConfig.SERVER_INNER.GAIN_PRIMARY_ABILITY_EXP.name, {exp}, socket);
 			this.controller.applySelfPerks(dmg, socket);
 		}
+
 		if (isSocket(target) && !target.alive) {
 			this.controller.clearSocketBuffs(target);			
+		} else if ((isMob(attacker) || isSocket(attacker)) && isSocket(target) && cause === combatConfig.HIT_CAUSE.ATK && getHp(attacker) > 0) {
+			// spikes
+            let spikesModifier = this.services.getSpikesModifier(target);
+            if (spikesModifier > 0) {
+                let dmgResult = getDamageDealt(target, attacker, socket);
+				dmgResult.dmg = applySpikes(dmgResult.dmg, spikesModifier);
+				this.emitter.emit(combatConfig.SERVER_INNER.HURT_TARGET.name, {
+					attacker: target, 
+					target: attacker, 
+					cause: combatConfig.HIT_CAUSE.SPIKES, 
+					dmg: dmgResult.dmg, 
+					crit: dmgResult.crit
+				}, socket);
+            }
 		}
 		if (getHp(target) > 0 && cause !== combatConfig.HIT_CAUSE.BLEED && cause !== combatConfig.HIT_CAUSE.BURN && cause !== combatConfig.HIT_CAUSE.SPIKES) {
-			this.controller.applyHurtPerks(dmg, crit, attacker, target);
+			this.controller.applyHurtPerks(dmg, crit, attacker, target, socket);
 		}
 	}
 	
@@ -208,22 +220,6 @@ export default class TalentsRouter extends SocketioRouterBase {
 	
     [talentsConfig.SERVER_INNER.GAIN_LVL.name] (data, socket: GameSocket) {
 		this.emitter.emit(talentsConfig.SERVER_INNER.GAIN_ABILITY_LVL.name, {talent: socket.character.charTalents._doc[talentsConfig.CHAR_TALENT], ability: talentsConfig.CHAR_TALENT}, socket);
-    }
-    
-    [talentsConfig.SERVER_INNER.PLAYER_HURT.name]({mob, cause}: {mob: MOB_INSTANCE, cause: string}, socket: GameSocket) {
-        if (cause === combatConfig.HIT_CAUSE.ATK && getMob(mob.id, socket)) {
-            let spikesModifier = this.services.getSpikesModifier(socket);
-            if (spikesModifier > 0) {
-                let {dmg, crit} = getDamageTaken(socket, mob);
-                dmg = applySpikes(dmg, spikesModifier);
-                this.emitter.emit(mobsConfig.SERVER_INNER.MOB_TAKE_DMG.name, {
-                    mobId: mob.id, 
-                    dmg,
-                    crit,
-                    cause: combatConfig.HIT_CAUSE.SPIKES,
-                }, socket);
-            }
-        }
     }
 	
 	[talentsConfig.SERVER_INNER.MOB_DESPAWN.name](data: {mob: MOB_INSTANCE}, socket: GameSocket) {

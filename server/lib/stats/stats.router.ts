@@ -67,23 +67,26 @@ export default class StatsRouter extends SocketioRouterBase {
         if (!(dmg > 0)) {
             return this.sendError(data, socket, "Must mention how much damage to take");
         }
-        let cause = combatConfig.HIT_CAUSE.ATK;
-        this.emitter.emit(config.SERVER_INNER.TAKE_DMG.name, {
-            dmg,
-            cause,
-            hurter
-        }, socket);
+        let cause = combatConfig.HIT_CAUSE.WORLD;
+        this.emitter.emit(config.SERVER_INNER.DMG_DEALT.name, {attacker: hurter, target: socket, cause, dmg}, socket);
     }
 
-    [config.SERVER_INNER.TAKE_DMG.name] (data: {dmg, cause, crit, hurter}, socket: GameSocket) {
-        const {dmg, cause, crit, hurter} = data;
-        let hpAfterDmg = this.services.getHpAfterDamage(socket.character.stats.hp.now, dmg);
-        socket.character.stats.hp.now = hpAfterDmg;
-        
-        this.emitter.emit(combatConfig.SERVER_INNER.DMG_DEALT.name, {dmg, cause, crit, attacker: hurter, target: socket }, socket);
+    [config.SERVER_INNER.TARGET_BLOCKS.name] (data: {attacker: PLAYER, target: PLAYER}, socket: GameSocket) {
+        const {target} = data;
+        if (isSocket(target)) {
+            this.io.to(socket.character.room).emit(config.CLIENT_GETS.ATTACK_BLOCK.name, { id: target.character._id });            
+        }
+    }
+
+    [config.SERVER_INNER.HURT_TARGET.name] (data: {attacker: HURTER, target: PLAYER, dmg: number, cause: string, crit: boolean}, socket: GameSocket) {
+        const {dmg, target} = data;
+        if (isSocket(target)) {
+            let hpAfterDmg = this.services.getHpAfterDamage(target.character.stats.hp.now, dmg);
+            target.character.stats.hp.now = hpAfterDmg;
+        }
     }
     
-	[config.SERVER_INNER.DMG_DEALT.name](data: {dmg, cause, crit, attacker: HURTER, target: PLAYER}, socket: GameSocket) {
+	[config.SERVER_INNER.DMG_DEALT.name](data: {attacker: HURTER, target: PLAYER, dmg: number, cause: string, crit: boolean}, socket: GameSocket) {
         const {attacker, target} = data;
         
         if (isSocket(target)) {

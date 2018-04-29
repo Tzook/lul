@@ -6,9 +6,11 @@ import mobsConfig from '../mobs/mobs.config';
 import TalentsRouter from '../talents/talents.router';
 import talentsConfig from '../talents/talents.config';
 import statsConfig from '../stats/stats.config';
-import CombatServices, { setAttackInfo, popAttackInfo } from './combat.services';
-import { getMpUsage, getId, getHp } from '../talents/talents.services';
+import CombatServices, { setAttackInfo, popAttackInfo, getDamageDealt } from './combat.services';
+import { getMpUsage, getId, getHp, isMob, isSocket } from '../talents/talents.services';
 import { calculateDamage } from './combat.services';
+import { getMob } from '../mobs/mobs.controller';
+import { didHitMob } from '../mobs/mobs.services';
 
 export default class CombatRouter extends SocketioRouterBase {
 	protected services: CombatServices;
@@ -85,8 +87,8 @@ export default class CombatRouter extends SocketioRouterBase {
 		this.emitter.emit(config.SERVER_INNER.ACTIVATE_ABILITY.name, {target_ids, attackInfo}, socket);
 	}
 
-	[config.SERVER_INNER.ACTIVATE_ABILITY.name](data: {target_ids, attackInfo: ATTACK_INFO}, socket: GameSocket) {
-		const {attackInfo, target_ids: targetsInArea = []} = data;
+	[config.SERVER_INNER.ACTIVATE_ABILITY.name](data: {target_ids, attackInfo: ATTACK_INFO, cause?: string}, socket: GameSocket) {
+		const {attackInfo, target_ids: targetsInArea = [], cause} = data;
 		const targetsHit = socket.getTargetsHit(targetsInArea);
 
 		const {hitType} = this.talentsRouter.getAbilityInfo(attackInfo.ability);
@@ -96,7 +98,7 @@ export default class CombatRouter extends SocketioRouterBase {
 		socket.lastAttackLoad = attackInfo.load;
 
 		if (hitType == talentsConfig.HIT_TYPE_ATTACK) {
-			this.emitter.emit(mobsConfig.SERVER_INNER.MOBS_TAKE_DMG.name, {mobs: targetsHit}, socket);		
+			this.emitter.emit(config.SERVER_INNER.ATK_TARGETS.name, {attacker: socket, target_ids: targetsHit, cause}, socket);		
 		} else {
 			this.emitter.emit(config.SERVER_INNER.HEAL_CHARS.name, {charIds: targetsHit}, socket);		
 		}
@@ -104,7 +106,57 @@ export default class CombatRouter extends SocketioRouterBase {
 		socket.character.stats.primaryAbility = previousAbility;
 	}
 
-	[config.SERVER_INNER.DMG_DEALT.name](data: {dmg, cause, crit, attacker: HURTER, target: PLAYER}, socket: GameSocket) {
+	[config.SERVER_INNER.ATK_TARGETS.name](data: {attacker: PLAYER, target_ids: string[], cause?: string}, socket: GameSocket) {
+		let {attacker, target_ids, cause = config.HIT_CAUSE.ATK} = data;
+		
+		for (let targetId of target_ids) {
+			let target: PLAYER = getMob(targetId, socket);
+			if (!target) {
+				const targetSocket = socket.map.get(targetId);
+				if (targetSocket && targetSocket.connected && targetSocket.alive) {
+					target = targetSocket;
+				}
+			}
+			
+			if (!target) {
+				this.sendError(data, socket, "Target doesn't exist!");
+				continue;
+			}
+			// TODO change to be a check if PVP allowed
+			// if (isSocket(attacker) && isSocket(target)) {
+
+			// }
+			if (isMob(target) && isSocket(attacker) && !didHitMob(targetId, attacker)) {
+				this.emitter.emit(mobsConfig.SERVER_INNER.MISS_MOB.name, {mob: target, cause}, socket);
+			} else {
+				this.emitter.emit(config.SERVER_INNER.HIT_TARGET.name, {attacker, target, cause}, socket);
+			}
+			cause = config.HIT_CAUSE.AOE;
+		}
+	}
+
+	[config.SERVER_INNER.HIT_TARGET.name](data: {attacker: PLAYER, target: PLAYER, cause: string}, socket: GameSocket) {
+		let {attacker, target, cause} = data;
+
+		let {dmg, crit} = getDamageDealt(attacker, target, socket);
+
+		if (dmg === 0) {
+			this.emitter.emit(config.SERVER_INNER.TARGET_BLOCKS.name, {attacker, target}, socket);
+		} else {
+			this.emitter.emit(config.SERVER_INNER.HURT_TARGET.name, {attacker, target, cause, dmg, crit}, socket);
+		}
+	}
+			
+	[config.SERVER_INNER.TARGET_BLOCKS.name](data: {attacker: HURTER, target: PLAYER, cause: string, dmg: number, crit: boolean}, socket: GameSocket) {
+		//
+	}
+			
+	[config.SERVER_INNER.HURT_TARGET.name](data: {attacker: HURTER, target: PLAYER, cause: string, dmg: number, crit: boolean}, socket: GameSocket) {
+		const {dmg, cause, crit, attacker, target} = data;
+		this.emitter.emit(config.SERVER_INNER.DMG_DEALT.name, {dmg, cause, crit, attacker, target}, socket);
+	}
+
+	[config.SERVER_INNER.DMG_DEALT.name](data: {attacker: HURTER, target: PLAYER, dmg: number, cause: string, crit: boolean}, socket: GameSocket) {
 		const {dmg, cause, crit, attacker, target} = data;
 		this.io.to(socket.character.room).emit(config.CLIENT_GETS.DMG_DEALT.name, {
 			attacker_id: getId(attacker),

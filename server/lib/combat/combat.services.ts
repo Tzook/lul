@@ -1,8 +1,9 @@
 
 import MasterServices from '../master/master.services';
-import { getDamageRange } from '../mobs/mobs.services';
+import { getDamageRange, getHurtCharDmg } from '../mobs/mobs.services';
 import { getServices } from '../main/bootstrap';
 import combatConfig from './combat.config';
+import { isSocket } from '../talents/talents.services';
 
 export default class CombatServices extends MasterServices {
     public attacksInfos: Map<string, ATTACK_INFO> = new Map();
@@ -50,15 +51,17 @@ export function calculateDamage(socket: GameSocket, target: PLAYER): DMG_RESULT 
     return {dmg, crit: dmgModifier.crit};
 }
 	
-export function applyDefenceModifier(dmg: number, socket: GameSocket, attacker: GameSocket|MOB_INSTANCE, target: GameSocket|MOB_INSTANCE) {
+export function applyDefenceModifier(dmg: number, socket: GameSocket, attacker: PLAYER, target: PLAYER) {
     dmg = Math.max(0, dmg - socket.getDefenceBonus(target));
     dmg *= socket.getDefenceModifier(attacker, target);
     dmg = Math.ceil(dmg); // make sure we are always rounded
     return dmg;
 }
 
-export function getDamageTaken(socket: GameSocket, target: PLAYER): DMG_RESULT {
-    let dmgResult = calculateDamage(socket, target);
-    dmgResult.dmg = applyDefenceModifier(dmgResult.dmg, socket, socket, target);
+export function getDamageDealt(attacker: PLAYER, target: PLAYER, socket: GameSocket): DMG_RESULT {
+    let dmgResult = isSocket(attacker) 
+        ? calculateDamage(attacker, target)
+        : getHurtCharDmg(attacker, target, socket);
+    dmgResult.dmg = applyDefenceModifier(dmgResult.dmg, socket, attacker, target);
     return dmgResult;
 }

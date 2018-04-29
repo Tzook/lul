@@ -17,14 +17,13 @@ export default {
 		GLOBAL_MOBS_READY: {"name": "mobs_ready"},
 	},
     "SERVER_INNER": {
+        TARGET_BLOCKS: Object.assign({}, combatConfig.SERVER_INNER.TARGET_BLOCKS),		
+        HURT_TARGET: Object.assign({}, combatConfig.SERVER_INNER.HURT_TARGET),		
         DMG_DEALT: Object.assign({}, combatConfig.SERVER_INNER.DMG_DEALT),		
         "LEFT_ROOM": {"name": "left_room"},
-		"MOB_TAKE_DMG": {"name": "mob_took_dmg"},
         "MISS_MOB": {"name": "miss_mob"},
 		"MOB_DESPAWN": {"name": "mob_despawn"},
-		"MOBS_TAKE_DMG": {"name": "mobs_took_dmg", "alive": true, log: true},
 		"MOB_AGGRO_CHANGED": {"name": "mob_aggro_changed"},
-        "PLAYER_HURT": {"name": "player_hurt"}
     },
 	"SERVER_GETS": {
 		"ENTERED_ROOM": {"name": "entered_room"},
@@ -37,7 +36,6 @@ export default {
 		"MOB_TAKE_MISS": {"name": "mob_take_miss"},
 		"MOB_MOVE": {"name": "mob_move"},
 		"AGGRO": {"name": "aggro"},
-		"ATTACK_BLOCK": {"name": "actor_blocked"},
 		"MOB_ATTACK_BLOCK": {"name": "mob_blocked"},
     },
 	MISS_CHANCE_PER_LVL: 20,

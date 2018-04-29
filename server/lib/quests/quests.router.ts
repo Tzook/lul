@@ -156,7 +156,7 @@ export default class QuestsRouter extends SocketioRouterBase {
 		this.services.markModified(socket.character.quests, fields);
 	}
 	
-	[config.SERVER_INNER.DMG_DEALT.name](data: {dmg, cause, crit, attacker: HURTER, target: PLAYER}, socket: GameSocket) {
+	[config.SERVER_INNER.DMG_DEALT.name](data: {attacker: HURTER, target: PLAYER, dmg: number, cause: string, crit: boolean}, socket: GameSocket) {
 		const {dmg, attacker} = data;
 		if (isSocket(attacker)) {
 			let fields: Set<string> = new Set();

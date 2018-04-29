@@ -91,7 +91,7 @@ export default class PartyRouter extends SocketioRouterBase {
         this.controller.kickFromParty(socket, data.char_name, party);
     }
     
-	[partyConfig.SERVER_INNER.DMG_DEALT.name](data: {dmg, cause, crit, attacker: HURTER, target: PLAYER}, socket: GameSocket) {
+	[partyConfig.SERVER_INNER.DMG_DEALT.name](data: {attacker: HURTER, target: PLAYER, dmg: number, cause: string, crit: boolean}, socket: GameSocket) {
         const {target} = data;
         if (isSocket(target)) {
             const party = this.controller.getCharParty(target);

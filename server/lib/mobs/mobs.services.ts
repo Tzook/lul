@@ -2,7 +2,7 @@
 import MasterServices from '../master/master.services';
 import * as _ from "underscore";
 import { doesChanceWork } from '../drops/drops.services';
-import { extendMobSchemaWithTalents } from '../talents/talents.services';
+import { extendMobSchemaWithTalents, isSocket } from '../talents/talents.services';
 import mobsConfig from '../mobs/mobs.config';
 import { getServices, getEmitter } from '../main/bootstrap';
 import { getItemsInfo } from '../items/items.services';
@@ -169,4 +169,23 @@ export function getPartyShareExp(totalExp: number, partySockets: GameSocket[]) {
 
 export function spawnMob(mobKey: string, x: number, y: number, room: string, bonusPerks: PERK_MAP = {}): MOB_INSTANCE {
 	return getMobsController().spawnMob(mobKey, x, y, room, bonusPerks);
+}
+
+export function didHitMob(mobId: string, socket: GameSocket): boolean {
+	let mob = getMobsController().getMob(mobId, socket);
+	return mob.hp > 0 && getMobsServices().didHitMob(mob.lvl, socket.character.stats.lvl);
+}
+
+export function getHurtCharDmg(mob: MOB_INSTANCE, target: PLAYER, socket: GameSocket): DMG_RESULT {
+	let dmgModifierResult = socket.getDmgModifier(mob, target);
+	let maxDmg = mob.dmg * dmgModifierResult.dmg;
+	let minDmg = maxDmg * socket.getMinDmgModifier(mob);
+	let dmg = getDamageRange(minDmg, maxDmg);
+	return {dmg, crit: dmgModifierResult.crit};
+}
+
+export function addThreat(mob: MOB_INSTANCE, threat: number, attacker: PLAYER) {
+	if (isSocket(attacker)) {
+		getMobsController().addThreat(mob, threat, attacker);
+	}
 }

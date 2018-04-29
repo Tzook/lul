@@ -1,8 +1,6 @@
 import MasterController from '../master/master.controller';
 import TalentsServices, { getRoom, getId, isSocket, isMob } from './talents.services';
-import MobsRouter from '../mobs/mobs.router';
 import talentsConfig from '../talents/talents.config';
-import mobsConfig from '../mobs/mobs.config';
 import statsConfig from '../stats/stats.config';
 import * as _ from 'underscore';
 import combatConfig from '../combat/combat.config';
@@ -12,23 +10,21 @@ import { getSetOfMap, getMapOfMap } from '../utils/maps';
 
 export default class TalentsController extends MasterController {
 	protected services: TalentsServices;
-	protected mobsRouter: MobsRouter;
 	// room => mob => perk name => buff instance[]
 	protected roomToBuff: Map<string, Map<string, Map<string, Set<BUFF_INSTANCE>>>> = new Map();
 
 	init(files, app) {
-		this.mobsRouter = files.routers.mobs;
 		super.init(files, app);
 	}
 	
 	public applySelfPerks(dmg: number, socket: GameSocket) {
 		const hp = this.getStealStatValue(talentsConfig.PERKS.HP_STEAL_CHANCE, talentsConfig.PERKS.HP_STEAL_MODIFIER, dmg, socket);
 		if (hp > 0) {
-			this.mobsRouter.getEmitter().emit(statsConfig.SERVER_INNER.GAIN_HP.name, { hp, cause: statsConfig.REGEN_CAUSE.STEAL }, socket);
+			socket.emitter.emit(statsConfig.SERVER_INNER.GAIN_HP.name, { hp, cause: statsConfig.REGEN_CAUSE.STEAL }, socket);
 		}
 		const mp = this.getStealStatValue(talentsConfig.PERKS.MP_STEAL_CHANCE, talentsConfig.PERKS.MP_STEAL_MODIFIER, dmg, socket);
 		if (mp > 0) {
-			this.mobsRouter.getEmitter().emit(statsConfig.SERVER_INNER.GAIN_MP.name, { mp, cause: statsConfig.REGEN_CAUSE.STEAL }, socket);
+			socket.emitter.emit(statsConfig.SERVER_INNER.GAIN_MP.name, { mp, cause: statsConfig.REGEN_CAUSE.STEAL }, socket);
 		}
 	}
 	
@@ -43,12 +39,12 @@ export default class TalentsController extends MasterController {
 
 	}
 
-	public applyHurtPerks(dmg: number, crit: boolean, attacker: HURTER, target: PLAYER) {
+	public applyHurtPerks(dmg: number, crit: boolean, attacker: HURTER, target: PLAYER, socket: GameSocket) {
 		this.tryToApplyPerk(talentsConfig.PERKS.STUN_CHANCE, talentsConfig.PERKS.STUN_DURATION, talentsConfig.PERKS.STUN_RESISTANCE, attacker, target);
 		this.tryToApplyPerk(talentsConfig.PERKS.CRIPPLE_CHANCE, talentsConfig.PERKS.CRIPPLE_DURATION, talentsConfig.PERKS.CRIPPLE_RESISTANCE, attacker, target);
-		this.tryToApplyPerk(talentsConfig.PERKS.BLEED_CHANCE, talentsConfig.PERKS.BLEED_DURATION, talentsConfig.PERKS.BLEED_RESISTANCE, attacker, target, (buffInstace) => this.triggerBleed(dmg, crit, buffInstace, attacker, target));
+		this.tryToApplyPerk(talentsConfig.PERKS.BLEED_CHANCE, talentsConfig.PERKS.BLEED_DURATION, talentsConfig.PERKS.BLEED_RESISTANCE, attacker, target, (buffInstace) => this.triggerBleed(dmg, crit, buffInstace, attacker, target, socket));
 		this.tryToApplyPerk(talentsConfig.PERKS.FREEZE_CHANCE, talentsConfig.PERKS.FREEZE_DURATION, talentsConfig.PERKS.FREEZE_RESISTANCE, attacker, target);
-		this.tryToApplyPerk(talentsConfig.PERKS.BURN_CHANCE, talentsConfig.PERKS.BURN_DURATION, talentsConfig.PERKS.BURN_RESISTANCE, attacker, target, (buffInstace) => this.triggerBurn(dmg, crit, buffInstace, attacker, target));
+		this.tryToApplyPerk(talentsConfig.PERKS.BURN_CHANCE, talentsConfig.PERKS.BURN_DURATION, talentsConfig.PERKS.BURN_RESISTANCE, attacker, target, (buffInstace) => this.triggerBurn(dmg, crit, buffInstace, attacker, target, socket));
 		
 		if (isSocket(attacker) || isMob(attacker)) {
 			let buffPerks = this.services.getBuffPerks();
@@ -196,56 +192,40 @@ export default class TalentsController extends MasterController {
 		return getSetOfMap(mobBuffs, perkName, createIfMissing);
 	}
 
-	protected triggerBleed(dmg: number, crit: boolean, buffInstance: BUFF_INSTANCE, attacker: HURTER, target: PLAYER) {
+	protected triggerBleed(dmg: number, crit: boolean, buffInstance: BUFF_INSTANCE, attacker: HURTER, target: PLAYER, socket: GameSocket) {
 		let bleedDmg = this.services.getBleedDmg(dmg);
-		this.tickDmg(bleedDmg, crit, buffInstance, combatConfig.HIT_CAUSE.BLEED, talentsConfig.PERKS_INFO.BLEED_TICK_TIME, attacker, target);
+		this.tickDmg(bleedDmg, crit, buffInstance, combatConfig.HIT_CAUSE.BLEED, talentsConfig.PERKS_INFO.BLEED_TICK_TIME, attacker, target, socket);
 	}
 
-	protected triggerBurn(dmg: number, crit: boolean, buffInstance: BUFF_INSTANCE, attacker: HURTER, target: PLAYER) {
+	protected triggerBurn(dmg: number, crit: boolean, buffInstance: BUFF_INSTANCE, attacker: HURTER, target: PLAYER, socket: GameSocket) {
 		let burnDmg = this.services.getBurnDmg(dmg);
-		this.tickDmg(burnDmg, crit, buffInstance, combatConfig.HIT_CAUSE.BURN, talentsConfig.PERKS_INFO.BURN_TICK_TIME, attacker, target);
+		this.tickDmg(burnDmg, crit, buffInstance, combatConfig.HIT_CAUSE.BURN, talentsConfig.PERKS_INFO.BURN_TICK_TIME, attacker, target, socket);
 	}
 
-	protected tickDmg(dmg: number, crit: boolean, buffInstance: BUFF_INSTANCE, cause: string, interval: number, attacker: HURTER, target: PLAYER) {
-		isSocket(target) 
-			? this.tickSocketDmg(dmg, crit, buffInstance, cause, interval, 0, target, <MOB_INSTANCE>attacker)
-			: this.tickMobDmg(dmg, crit, buffInstance, target, cause, interval, 0, <GameSocket>attacker, (<GameSocket>attacker).character.stats.primaryAbility);
-	}
-
-	protected tickMobDmg(dmg: number, crit: boolean, buffInstance: BUFF_INSTANCE, mob: MOB_INSTANCE, cause: string, interval: number, tickIndex: number, socket: GameSocket, ability: string) {
+	protected tickDmg(dmg: number, crit: boolean, buffInstance: BUFF_INSTANCE, cause: string, interval: number, attacker: HURTER, target: PLAYER, socket: GameSocket, tickIndex = 0, ability?: string) {
+		if (!ability && isSocket(attacker)) {
+			// make sure we tick on the ability at the buff creation time
+			ability = attacker.character.stats.primaryAbility;
+		}
 		let buffTimer = setTimeout(() => {
-			if (!socket.connected || !socket.alive || socket.character.room !== mob.room) {
-				return this.clearMobBuff(mob.room, mob.id, buffInstance);
+			if (isSocket(attacker)) {
+				if (!attacker.connected || !attacker.alive || attacker.character.room !== getRoom(target)) {
+					return this.clearBuff(target, buffInstance);
+				}
+				// make sure the ticking is going on the correct ability that was used
+				var previousAbility = attacker.character.stats.primaryAbility;
+				attacker.character.stats.primaryAbility = ability;
 			}
-			this.tickMobDmg(dmg, crit, buffInstance, mob, cause, interval, tickIndex + 1, socket, ability);
-			
-			// make sure the ticking is going on the correct ability that was used
-			const previousAbility = socket.character.stats.primaryAbility;
-			socket.character.stats.primaryAbility = ability;
-			
-			this.mobsRouter.getEmitter().emit(mobsConfig.SERVER_INNER.MOB_TAKE_DMG.name, {
-				mobId: mob.id, 
-				dmg,
-				cause,
-				crit,
-			}, socket);
 
-			socket.character.stats.primaryAbility = previousAbility;
+			this.tickDmg(dmg, crit, buffInstance, cause, interval, attacker, target, socket, tickIndex + 1, ability);
+			
+			socket.emitter.emit(combatConfig.SERVER_INNER.HURT_TARGET.name, {attacker, target, cause, dmg, crit}, socket);			
+			
+			if (isSocket(attacker)) {
+				attacker.character.stats.primaryAbility = previousAbility;
+			}
 		}, interval * 1000 - (tickIndex === 0 ? 100 : 0)); // reducing 100 ms so all the ticks will fit in the time
 		
-		buffInstance.onPerkCleared = () => clearTimeout(buffTimer);
-	}
-
-	protected tickSocketDmg(dmg: number, crit: boolean, buffInstance: BUFF_INSTANCE, cause: string, interval: number, tickIndex: number, socket: GameSocket, hurter: MOB_INSTANCE) {
-		let buffTimer = setTimeout(() => {
-			this.tickSocketDmg(dmg, crit, buffInstance, cause, interval, tickIndex + 1, socket, hurter);
-			this.mobsRouter.getEmitter().emit(statsConfig.SERVER_INNER.TAKE_DMG.name, { 
-				dmg,
-				cause,
-				crit,
-				hurter,
-			}, socket);
-		}, interval * 1000 - (tickIndex === 0 ? 100 : 0)); // reducing 200 ms so all the ticks will fit in the time
 		buffInstance.onPerkCleared = () => clearTimeout(buffTimer);
 	}
 

@@ -124,7 +124,6 @@ export default class NpcsRouter extends SocketioRouterBase {
             return this.sendError(data, socket, "The wanted portal in the room does not exist.");
         }
 
-        // TODO check if room can even be an instance
         if (instance) {
             room = getRoomInstance(room);
         }

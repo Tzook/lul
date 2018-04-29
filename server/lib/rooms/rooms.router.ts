@@ -61,7 +61,6 @@ export default class RoomsRouter extends SocketioRouterBase {
 				this.sendError(data, socket, "No target portal in room!");
 			} else {
 				let targetPortal = targetRoomInfo.portals[portal.targetPortal];
-				// TODO check if room can even be an instance
 				let room = portal.targetRoom;
 				if (data.instance) {
 					room = getRoomInstance(room);

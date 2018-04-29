@@ -4,6 +4,10 @@ export default {
 		"HEAL_CHAR": {"name": "heal_char", "alive": true},
 		"CHANGED_ABILITY": {"name": "changed_ability_inner"},
 		"ACTIVATE_ABILITY": {"name": "activated_ability"},
+		ATK_TARGETS: {name: "atk_targets"},
+		HIT_TARGET: {name: "hit_target"},
+		TARGET_BLOCKS: {name: "TARGET_BLOCKS"},
+		HURT_TARGET: {name: "hurt_target"},
 		DMG_DEALT: {name: "dmg_dealt"},
 	},
 	"SERVER_GETS": {
@@ -19,6 +23,7 @@ export default {
 		DMG_DEALT: {"name": "take_damage"},
 	},
 	HIT_CAUSE: {
+		WORLD: "world",
 		ATK: "attack",
 		SPELL: "spell",
 		HEAL: "heal",

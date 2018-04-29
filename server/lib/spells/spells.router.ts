@@ -3,7 +3,6 @@ import spellsConfig from './spells.config';
 import statsConfig from '../stats/stats.config';
 import combatConfig from '../combat/combat.config';
 import { getMobDeadOrAlive, getMob } from '../mobs/mobs.controller';
-import mobsConfig from '../mobs/mobs.config';
 import { getMpUsage } from '../talents/talents.services';
 import { mobStopSpellsPicker, hasMobSpellsPicker, mobStartSpellsPicker, mobUsesSpell, canUseSpell, addSpellInfo, getSpell } from './spells.services';
 import { setAttackInfo, popAttackInfo } from '../combat/combat.services';
@@ -56,7 +55,7 @@ export default class SpellsRouter extends SocketioRouterBase {
 
 		socket.currentSpell = spell;
 		
-		this.emitter.emit(combatConfig.SERVER_INNER.ACTIVATE_ABILITY.name, {target_ids, attackInfo}, socket);		
+		this.emitter.emit(combatConfig.SERVER_INNER.ACTIVATE_ABILITY.name, {target_ids, attackInfo, cause: combatConfig.HIT_CAUSE.SPELL}, socket);		
 		
 		socket.currentSpell = null;
 	}
@@ -81,7 +80,7 @@ export default class SpellsRouter extends SocketioRouterBase {
 		
 		mob.currentSpell = spell;
 
-		this.emitter.emit(mobsConfig.SERVER_INNER.PLAYER_HURT.name, {mob, cause: combatConfig.HIT_CAUSE.SPELL}, socket);
+		this.emitter.emit(combatConfig.SERVER_INNER.ATK_TARGETS.name, {attacker: mob, target_ids: [socket.character.name], cause: combatConfig.HIT_CAUSE.SPELL}, socket);		
 
 		mob.currentSpell = null;
     }

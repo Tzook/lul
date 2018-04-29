@@ -32,7 +32,6 @@ export default {
 		GENERATE_PERK_POOL: {name: "generate_perk_pool", alive: true},
 		GAIN_LVL: Object.assign({}, statsConfig.SERVER_INNER.GAIN_LVL, {log: false}),
 		LEFT_ROOM: Object.assign({}, roomsConfig.SERVER_INNER.LEFT_ROOM),
-		PLAYER_HURT: Object.assign({}, mobsConfig.SERVER_INNER.PLAYER_HURT),
 		QUEST_COMPLETED: Object.assign({}, questsConfig.SERVER_INNER.QUEST_COMPLETED),
 	},
 	"SERVER_GETS": {
