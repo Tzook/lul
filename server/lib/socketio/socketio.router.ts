@@ -105,6 +105,7 @@ export default class SocketioRouter extends SocketioRouterBase {
 			socket.throttles = new Map();
 			this.map.set(socket.user._id.toString(), socket);
 			this.map.set(socket.character.name, socket);
+			this.map.set(socket.character._id.toString(), socket);
 			this.map.set(socket.id, socket);
 
             let emitter = new Emitter.EventEmitter();
@@ -200,6 +201,7 @@ export default class SocketioRouter extends SocketioRouterBase {
 			}
 			this.map.delete(socket.user._id.toString());
 			this.map.delete(socket.character.name);
+			this.map.delete(socket.character._id.toString());
 			this.map.delete(socket.id);
 		});
 	}

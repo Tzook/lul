@@ -119,7 +119,7 @@ export default class CombatRouter extends SocketioRouterBase {
 			}
 			
 			if (!target) {
-				this.sendError(data, socket, "Target doesn't exist!");
+				this.sendError({targetId}, socket, "Target doesn't exist!");
 				continue;
 			}
 			// TODO change to be a check if PVP allowed
