@@ -104,6 +104,7 @@ export default {
 		QUEST_EXP_BONUS: "questExpBonus",
 		QUEST_GOLD_BONUS: "questGoldBonus",
 		SHOP_DISCOUNT: "shopsDiscount",
+		SALE_MODIFIER: "saleModifier",
     },
     PERKS_INFO: {
         BLEED_DMG_MODIFIER: 0.1,

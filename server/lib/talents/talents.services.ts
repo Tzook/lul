@@ -603,3 +603,8 @@ export function getPurchaseCost(socket: GameSocket, gold: number): number {
 	const discount = getTalentsServices().getAbilityPerkValue(talentsConfig.PERKS.SHOP_DISCOUNT, socket);
 	return Math.round(gold * (1 - discount)) || 1;
 }
+
+export function getSellingCost(socket: GameSocket, gold: number, stack): number {
+	const modifier = getTalentsServices().getAbilityPerkValue(talentsConfig.PERKS.SALE_MODIFIER, socket);
+	return Math.round(gold * modifier * stack) || 1;
+}

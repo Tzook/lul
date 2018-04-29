@@ -8,7 +8,7 @@ import roomsConfig from '../rooms/rooms.config';
 import RoomsRouter from '../rooms/rooms.router';
 import { getRoomInstance, getRoomName } from '../rooms/rooms.services';
 import { getCharParty, isPartyLeader, getPartyMembersInMap } from '../party/party.services';
-import { getPurchaseCost } from '../talents/talents.services';
+import { getPurchaseCost, getSellingCost } from '../talents/talents.services';
 
 export default class NpcsRouter extends SocketioRouterBase {
     protected services: NpcsServices;
@@ -97,7 +97,7 @@ export default class NpcsRouter extends SocketioRouterBase {
         this.emitter.emit(itemsConfig.SERVER_INNER.ITEM_REMOVE.name, {item: { stack, key: item.key }, slot}, socket);
         
         let itemInfo = this.itemsRouter.getItemInfo(item.key);
-        let gold = this.services.getGoldValueForSale(itemInfo, stack);
+        let gold = getSellingCost(socket, itemInfo.gold, stack);
         let goldItem = this.goldRouter.getGoldItem(gold);
         this.emitter.emit(itemsConfig.SERVER_INNER.ITEM_ADD.name, { item: goldItem }, socket);        
 

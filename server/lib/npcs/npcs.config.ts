@@ -9,5 +9,4 @@ export default {
 	CLIENT_GETS: {
         TRANSACTION: {"name": "actor_transaction"}
     },
-    SELLING_VALUE: 0.5
 }
