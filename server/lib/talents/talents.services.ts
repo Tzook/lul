@@ -589,19 +589,17 @@ function getAbilityExpFormula(dmg: number, targetExp: number, targetMaxHealth: n
 	return targetExp ? Math.min(dmg / targetMaxHealth, 1) * targetExp * 2 | 0 || 1 : 0;
 }
 
-
 export function getQuestExpValue(socket: GameSocket, exp: number): number {
-	return Math.round((getQuestExpBonus(socket) + 1) * exp);
-}
-
-function getQuestExpBonus(socket: GameSocket): number {
-	return getTalentsServices().getAbilityPerkValue(talentsConfig.PERKS.QUEST_EXP_BONUS, socket);
+	const perkValue = getTalentsServices().getAbilityPerkValue(talentsConfig.PERKS.QUEST_EXP_BONUS, socket);
+	return Math.round((perkValue + 1) * exp);
 }
 
 export function getQuestGoldValue(socket: GameSocket, gold: number): number {
-	return Math.round((getQuestGoldBonus(socket) + 1) * gold);
+	const perkValue = getTalentsServices().getAbilityPerkValue(talentsConfig.PERKS.QUEST_GOLD_BONUS, socket);
+	return Math.round((perkValue + 1) * gold);
 }
 
-function getQuestGoldBonus(socket: GameSocket): number {
-	return getTalentsServices().getAbilityPerkValue(talentsConfig.PERKS.QUEST_GOLD_BONUS, socket);
+export function getPurchaseCost(socket: GameSocket, gold: number): number {
+	const discount = getTalentsServices().getAbilityPerkValue(talentsConfig.PERKS.SHOP_DISCOUNT, socket);
+	return Math.round(gold * (1 - discount)) || 1;
 }

@@ -8,6 +8,7 @@ import roomsConfig from '../rooms/rooms.config';
 import RoomsRouter from '../rooms/rooms.router';
 import { getRoomInstance, getRoomName } from '../rooms/rooms.services';
 import { getCharParty, isPartyLeader, getPartyMembersInMap } from '../party/party.services';
+import { getPurchaseCost } from '../talents/talents.services';
 
 export default class NpcsRouter extends SocketioRouterBase {
     protected services: NpcsServices;
@@ -57,6 +58,7 @@ export default class NpcsRouter extends SocketioRouterBase {
             return this.sendError(data, socket, "No item info! cannot buy item.");
         }
         let goldValue = itemInfo.gold * stack;
+        goldValue = getPurchaseCost(socket, goldValue);
         if (goldValue > socket.character.gold) {
             return this.sendError(data, socket, "Not enough money to buy the item.");
         }
