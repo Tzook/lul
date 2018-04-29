@@ -1,6 +1,6 @@
 
 import MasterMiddleware from '../master/master.middleware';
-import ItemsServices from './items.services';
+import ItemsServices, { isGold } from './items.services';
 import config from '../items/items.config';
 
 export const NO_SLOT = -1;
@@ -37,7 +37,7 @@ export default class ItemsMiddleware extends MasterMiddleware {
     }
 
     isGold(item: ITEM_INSTANCE) {
-        return item.key === "gold";
+        return isGold(item);
     }
 
     public getStackSlots(socket: GameSocket, item: ITEM_INSTANCE, itemInfo: ITEM_MODEL, blacklist: Set<number> = new Set()): number[] { 

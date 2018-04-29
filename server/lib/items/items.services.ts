@@ -119,3 +119,7 @@ function getItemsServices(): ItemsServices {
 export function getItemsInfo() {
 	return getItemsServices().itemsInfo;
 }
+
+export function isGold(item: ITEM_INSTANCE): boolean {
+	return item.key === "gold";
+}

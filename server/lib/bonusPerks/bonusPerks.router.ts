@@ -12,6 +12,10 @@ export default class BonusPerksRouter extends SocketioRouterBase {
 		setClientPerks();
     }
 	
+	[bonusPerksConfig.SERVER_GETS.ENTERED_ROOM.name](data, socket: GameSocket) {
+        notifyBonusPerks(socket, getBonusPerks(socket));
+    }
+	
 	[bonusPerksConfig.SERVER_INNER.CHANGED_ABILITY.name](data, socket: GameSocket) {
 		let {previousAbility} = data;
 

@@ -3,6 +3,7 @@ import equipsConfig from "../equips/equips.config";
 import statsConfig from "../stats/stats.config";
 import socketioConfig from "../socketio/socketio.config";
 import talentsConfig from "../talents/talents.config";
+import roomsConfig from "../rooms/rooms.config";
 
 export default {
 	GLOBAL_EVENTS: {
@@ -12,6 +13,9 @@ export default {
         CHANGED_ABILITY: Object.assign({}, combatConfig.SERVER_INNER.CHANGED_ABILITY),
         UPDATE_MAX_STATS: Object.assign({}, statsConfig.SERVER_INNER.UPDATE_MAX_STATS),
         WORE_EQUIP: Object.assign({}, equipsConfig.SERVER_INNER.WORE_EQUIP),
+    },
+    SERVER_GETS: {
+        ENTERED_ROOM: Object.assign({}, roomsConfig.SERVER_GETS.ENTERED_ROOM, {log: false}),
     },
     CLIENT_GETS: {
 		UPDATE_CLIENT_PERKS: {name: "update_client_perks"},

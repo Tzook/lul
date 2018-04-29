@@ -10,7 +10,8 @@ import itemsConfig from '../items/items.config';
 import NpcsRouter from '../npcs/npcs.router';
 import { getRoomName } from '../rooms/rooms.services';
 import { getPartyMembersInMap } from '../party/party.services';
-import { isSocket } from '../talents/talents.services';
+import { isSocket, getQuestExpValue, getQuestGoldValue } from '../talents/talents.services';
+import { isGold } from '../items/items.services';
 
 export default class QuestsRouter extends SocketioRouterBase {
 	protected middleware: QuestsMiddleware;
@@ -88,7 +89,7 @@ export default class QuestsRouter extends SocketioRouterBase {
 	
 		// reward exp
 		if ((questInfo.reward || {}).exp) {
-			this.emitter.emit(statsConfig.SERVER_INNER.GAIN_EXP.name, { exp: questInfo.reward.exp }, socket);
+			this.emitter.emit(statsConfig.SERVER_INNER.GAIN_EXP.name, { exp: getQuestExpValue(socket, questInfo.reward.exp) }, socket);
 		}
 		
 		// reward stats
@@ -101,7 +102,7 @@ export default class QuestsRouter extends SocketioRouterBase {
 			let instance = this.itemsRouter.getItemInstance(item.key);
 			if (instance) {
 				if (item.stack > 0) {
-					instance.stack = item.stack;
+					instance.stack = isGold(item) ? getQuestGoldValue(socket, item.stack) : item.stack;
 				}
 				let itemSlots = slots[item.key];
 				this.emitter.emit(itemsConfig.SERVER_INNER.ITEM_ADD.name, { slots: itemSlots, item: instance }, socket);

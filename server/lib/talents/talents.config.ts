@@ -100,6 +100,9 @@ export default {
 		BURN_DURATION: "burnDuration",
 		BURN_RESISTANCE: "burnResistance",
 		BURNT_TARGET_MODIFIER_KEY: "burntTargetModifier",
+
+		QUEST_EXP_BONUS: "questExpBonus",
+		QUEST_GOLD_BONUS: "questGoldBonus",
     },
     PERKS_INFO: {
         BLEED_DMG_MODIFIER: 0.1,

@@ -588,3 +588,20 @@ export function getPerkType(perkName: string): PERK_TYPES {
 function getAbilityExpFormula(dmg: number, targetExp: number, targetMaxHealth: number): number {
 	return targetExp ? Math.min(dmg / targetMaxHealth, 1) * targetExp * 2 | 0 || 1 : 0;
 }
+
+
+export function getQuestExpValue(socket: GameSocket, exp: number): number {
+	return Math.round((getQuestExpBonus(socket) + 1) * exp);
+}
+
+function getQuestExpBonus(socket: GameSocket): number {
+	return getTalentsServices().getAbilityPerkValue(talentsConfig.PERKS.QUEST_EXP_BONUS, socket);
+}
+
+export function getQuestGoldValue(socket: GameSocket, gold: number): number {
+	return Math.round((getQuestGoldBonus(socket) + 1) * gold);
+}
+
+function getQuestGoldBonus(socket: GameSocket): number {
+	return getTalentsServices().getAbilityPerkValue(talentsConfig.PERKS.QUEST_GOLD_BONUS, socket);
+}

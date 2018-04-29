@@ -34,7 +34,7 @@ export default class StateRouter extends SocketioRouterBase {
 		}
 	}
 	
-	[stateConfig.SERVER_INNER.ENTERED_ROOM.name](data, socket: GameSocket) {
+	[stateConfig.SERVER_GETS.ENTERED_ROOM.name](data, socket: GameSocket) {
 		let roomState = this.services.getRoomState(socket.character.room);
 		for (let [key, value] of roomState) {
 			socket.emit(stateConfig.CLIENT_GETS.ROOM_STATE.name, {
