@@ -38,8 +38,7 @@ export default {
 		"AGGRO": {"name": "aggro"},
 		"MOB_ATTACK_BLOCK": {"name": "mob_blocked"},
     },
-	MISS_CHANCE_PER_LVL: 20,
-    MISS_CHANCE_LVLS: 5,
+	MISS_CHANCE_PER_LVL: 10,
     MOB_DEATH_DEBOUNCE: 5000,
     SPAWN_INTERVAL_OFFSET: 1000,
 }

@@ -32,7 +32,7 @@ export default class MobsServices extends MasterServices {
 	}
 	
 	public didHitMob(mobLvl: number, myLvl: number): boolean {
-		const lvlDifference = myLvl - mobLvl + mobsConfig.MISS_CHANCE_LVLS;
+		const lvlDifference = myLvl - mobLvl + (100 / mobsConfig.MISS_CHANCE_PER_LVL);
 		const chance = lvlDifference * mobsConfig.MISS_CHANCE_PER_LVL;
 		return doesChanceWork(chance);
 	}
