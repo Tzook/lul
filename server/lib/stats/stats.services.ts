@@ -1,6 +1,6 @@
-
 import MasterServices from '../master/master.services';
 import * as _ from 'underscore';
+import { getServices } from '../main/bootstrap';
 
 export default class StatsServices extends MasterServices {
     public getExp(level: number) {
@@ -49,7 +49,15 @@ export default class StatsServices extends MasterServices {
 // cache computations
 StatsServices.prototype.getExp = <any>_.memoize(StatsServices.prototype.getExp);
 
+function getStatsServices(): StatsServices {
+    return getServices("stats");
+}
+
 export function getLvlExpByChar(target: GameSocket): number {
     // TODO use a better formula...
     return target.character.stats.lvl * 20;
+}
+
+export function getExp(level: number): number {
+    return getStatsServices().getExp(level);
 }

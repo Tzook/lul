@@ -6,6 +6,9 @@ import talentsConfig from "../talents/talents.config";
 import * as _ from 'underscore';
 import { pickRandomly } from "../drops/drops.services";
 import { spawnMob } from "../mobs/mobs.services";
+import { joinObjects } from "../utils/objects";
+import { markAbilityModified } from "../talents/talents.services";
+import { tweakPerks } from "../bonusPerks/bonusPerks.services";
 
 export default class SpellsServices extends MasterServices {
 	public mobsSpellsPickers: Map<string, NodeJS.Timer> = new Map();
@@ -47,6 +50,36 @@ export function canUseSpell(socket: GameSocket, spell: ABILITY_SPELL_MODEL, abil
 export function getSpell(socket: GameSocket, spellKey: string): ABILITY_SPELL_MODEL|undefined {
     const ability = socket.character.stats.primaryAbility;
     return getSpellsServices().spellsInfo.get(ability).get(spellKey);
+}
+
+export function getTalentSpell(socket: GameSocket, spellModel: ABILITY_SPELL_MODEL, ability: string): ACTIVE_SPELL {
+    let talent = socket.character.talents._doc[ability];
+    if (!talent.spells) {
+        talent.spells = {};
+    }
+    if (!talent.spells[spellModel.key]) {
+        talent.spells[spellModel.key] = getEmptySpell();
+        markAbilityModified(socket, ability);
+    }
+
+    return {perks: joinObjects(talent.spells[spellModel.key].bonusPerks, spellModel.perks), spell: spellModel};
+}
+
+function getEmptySpell(): CHAR_TALENT_SPELL {
+    return {
+        lvl: 1,
+        exp: 0,
+        bonusPerks: {}
+    }
+}
+
+export function upgradeSpellPerks(spellModel: ABILITY_SPELL_MODEL, talentSpell: CHAR_TALENT_SPELL) {
+    const addedPerks = tweakSpellPerks(spellModel.perks);
+    talentSpell.bonusPerks = joinObjects(talentSpell.bonusPerks, addedPerks);
+}
+
+function tweakSpellPerks(perksObject: PERK_MAP): PERK_MAP {
+    return tweakPerks(perksObject, spellsConfig.PERK_LEVEL_BONUS_OFFSET, false, true);
 }
 
 // Mob spells:

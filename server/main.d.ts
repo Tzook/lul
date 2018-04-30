@@ -167,7 +167,7 @@ interface GameSocket extends SocketIO.Socket {
     getHpRegenInterval: () => number
     getMpRegenInterval: () => number
     getMpUsageModifier: () => number
-    currentSpell?: ABILITY_SPELL_MODEL
+    currentSpell?: ACTIVE_SPELL
     buffs: Map<string, Set<BUFF_INSTANCE>>
     emitter: NodeJS.EventEmitter
 }
@@ -457,6 +457,18 @@ interface CHAR_ABILITY_TALENT {
     points: number, // available points to lvl
     pool: string[], 
     perks: PERK_MAP // the chosen points
+    spells?: CHAR_TALENT_SPELLS
+}
+interface CHAR_TALENT_SPELLS {
+    [key: string]: CHAR_TALENT_SPELL
+}
+interface CHAR_TALENT_SPELL {
+    lvl: number
+    exp: number
+    bonusPerks: PERK_MAP
+}
+interface ACTIVE_SPELL extends PERKABLE {
+    spell: ABILITY_SPELL_MODEL
 }
 
 interface PERKS_DIFF {

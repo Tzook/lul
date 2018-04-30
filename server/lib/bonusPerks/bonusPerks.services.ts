@@ -119,24 +119,35 @@ export function getEmptyBonusPerks(): PERKS_DIFF {
 }
 
 export function slightlyTweakPerks(perksObject: PERK_MAP): PERK_MAP {
-    let result: PERK_MAP = {};
+    return tweakPerks(perksObject, bonusPerksConfig.PERK_VALUES_RANDOM_OFFSET, true, false);
+}
 
+export function tweakPerks(perksObject: PERK_MAP, offset: number, includeBase: boolean, positiveOnly: boolean): PERK_MAP {
+    let result: PERK_MAP = {};
+    
     for (let perkName in perksObject) {
         let perkValue = perksObject[perkName];
         const type = getPerkType(perkName);
         
         perkValue *= bonusPerksConfig.PERK_TYPE_TO_MODIFIER[type];
         
-        const maxOffset = Math.max(perkValue * bonusPerksConfig.PERK_VALUES_RANDOM_OFFSET, 1); // it should increase by at least 1
-        perkValue += _.random(-maxOffset, maxOffset);
-        perkValue = Math.round(perkValue);
-        
-        perkValue /= bonusPerksConfig.PERK_TYPE_TO_MODIFIER[type];
+        const rawMaxOffset = perkValue * offset;
+        let maxOffset = Math.round(rawMaxOffset); 
+        if (maxOffset < 1) {
+            // if the value is too low, we can't always tweak it for 1 since it will be op.
+            // thus we tweak it for 1 but the chance for it is applied by the missing rarity
+            const random = Math.random();
+            if (random < rawMaxOffset) {
+                maxOffset = 1;
+            }
+        }
+        // it should increase by at least 1
+        perkValue = (includeBase ? perkValue : 0) + _.random(positiveOnly ? 0 : -maxOffset, maxOffset);
         
         if (perkValue !== 0) {
-            result[perkName] = perkValue;
+            result[perkName] = perkValue / bonusPerksConfig.PERK_TYPE_TO_MODIFIER[type];
         }
     }    
-
+    
     return result;
 }

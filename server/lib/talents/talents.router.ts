@@ -1,7 +1,7 @@
 import SocketioRouterBase from '../socketio/socketio.router.base';
 import TalentsMiddleware from './talents.middleware';
 import TalentsController from './talents.controller';
-import TalentsServices, { getTalent, hasAbility, getTalentInfo, isCharAbility, isSocket, getHp, isMob, applySpikes } from './talents.services';
+import TalentsServices, { getTalent, hasAbility, getTalentInfo, isCharAbility, isSocket, getHp, isMob, applySpikes, markAbilityModified } from './talents.services';
 import talentsConfig from '../talents/talents.config';
 import statsConfig from '../stats/stats.config';
 import StatsRouter from '../stats/stats.router';
@@ -91,8 +91,8 @@ export default class TalentsRouter extends SocketioRouterBase {
 		const {dmg, cause, crit, attacker, target} = data;
 		if (isSocket(attacker)) {
 			const exp = this.services.getAbilityExp(dmg, target);
-			this.emitter.emit(talentsConfig.SERVER_INNER.GAIN_PRIMARY_ABILITY_EXP.name, {exp}, socket);
-			this.controller.applySelfPerks(dmg, socket);
+			this.emitter.emit(talentsConfig.SERVER_INNER.GAIN_PRIMARY_ABILITY_EXP.name, {exp}, attacker);
+			this.controller.applySelfPerks(dmg, attacker);
 		}
 
 		if (isSocket(target) && !target.alive) {
@@ -162,7 +162,7 @@ export default class TalentsRouter extends SocketioRouterBase {
 		if (shouldLvl) {
 			this.emitter.emit(talentsConfig.SERVER_INNER.GAIN_ABILITY_LVL.name, {talent, ability}, socket);
 		}
-		this.services.markAbilityModified(socket, ability);
+		markAbilityModified(socket, ability);
 	}
 	
 	[talentsConfig.SERVER_INNER.GAIN_ABILITY_LVL.name]({talent, ability}: {talent: CHAR_ABILITY_TALENT, ability: string}, socket: GameSocket) {
@@ -175,7 +175,7 @@ export default class TalentsRouter extends SocketioRouterBase {
 			lvl: talent.lvl,
 			points: talent.points,
 		});
-		this.services.markAbilityModified(socket, ability);
+		markAbilityModified(socket, ability);
 	}
 	
 	[talentsConfig.SERVER_INNER.GENERATE_PERK_POOL.name]({talent, ability}: {talent: CHAR_ABILITY_TALENT, ability: string}, socket: GameSocket) {
@@ -191,7 +191,7 @@ export default class TalentsRouter extends SocketioRouterBase {
 			// no pool - so just take off a point
 			talent.points--;
 		}
-		this.services.markAbilityModified(socket, ability);
+		markAbilityModified(socket, ability);
 	}
 	
 	[talentsConfig.SERVER_GETS.CHOOSE_ABILITY_PERK.name](data, socket: GameSocket) {
@@ -215,7 +215,7 @@ export default class TalentsRouter extends SocketioRouterBase {
 			ability,
 			perk,
 		});
-		this.services.markAbilityModified(socket, ability);
+		markAbilityModified(socket, ability);
 	}
 	
     [talentsConfig.SERVER_INNER.GAIN_LVL.name] (data, socket: GameSocket) {

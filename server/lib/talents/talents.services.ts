@@ -55,14 +55,6 @@ export default class TalentsServices extends MasterServices {
 		};
 	}
 
-	public markAbilityModified(socket: GameSocket, ability: string) {
-		if (isCharAbility(ability)) {
-			socket.character.charTalents.markModified(ability);		
-		} else {
-			socket.character.talents.markModified(ability);		
-		}
-	}
-
 	public getAbilityExp(dmg: number, target: PLAYER): number {
 		return isSocket(target)
 			? this.getAbilityExpFromSocket(dmg, target)
@@ -351,7 +343,7 @@ export default class TalentsServices extends MasterServices {
 		} else {
 			socket.character.talents._doc[ability] = talent;
 		}
-		this.markAbilityModified(socket, ability);
+		markAbilityModified(socket, ability);
 	}
 
     // HTTP functions
@@ -607,4 +599,13 @@ export function getPurchaseCost(socket: GameSocket, gold: number): number {
 export function getSellingCost(socket: GameSocket, gold: number, stack): number {
 	const modifier = getTalentsServices().getAbilityPerkValue(talentsConfig.PERKS.SALE_MODIFIER, socket);
 	return Math.round(gold * modifier * stack) || 1;
+}
+
+export function markAbilityModified(socket: GameSocket, ability?: string) {
+	ability = ability || socket.character.stats.primaryAbility;
+	if (isCharAbility(ability)) {
+		socket.character.charTalents.markModified(ability);		
+	} else {
+		socket.character.talents.markModified(ability);		
+	}
 }

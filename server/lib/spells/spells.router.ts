@@ -3,9 +3,10 @@ import spellsConfig from './spells.config';
 import statsConfig from '../stats/stats.config';
 import combatConfig from '../combat/combat.config';
 import { getMobDeadOrAlive, getMob } from '../mobs/mobs.controller';
-import { getMpUsage } from '../talents/talents.services';
-import { mobStopSpellsPicker, hasMobSpellsPicker, mobStartSpellsPicker, mobUsesSpell, canUseSpell, addSpellInfo, getSpell } from './spells.services';
+import { getMpUsage, markAbilityModified } from '../talents/talents.services';
+import { mobStopSpellsPicker, hasMobSpellsPicker, mobStartSpellsPicker, mobUsesSpell, canUseSpell, addSpellInfo, getSpell, getTalentSpell, upgradeSpellPerks } from './spells.services';
 import { setAttackInfo, popAttackInfo } from '../combat/combat.services';
+import { getExp } from '../stats/stats.services';
 
 export default class SpellsRouter extends SocketioRouterBase {
 
@@ -53,11 +54,42 @@ export default class SpellsRouter extends SocketioRouterBase {
 			return this.sendError(data, socket, "Character does not meet the requirements to use that spell.");
 		}
 
-		socket.currentSpell = spell;
+		const talentSpell = getTalentSpell(socket, spell, attackInfo.ability);
+
+		socket.currentSpell = talentSpell;
 		
 		this.emitter.emit(combatConfig.SERVER_INNER.ACTIVATE_ABILITY.name, {target_ids, attackInfo, cause: combatConfig.HIT_CAUSE.SPELL}, socket);		
 		
 		socket.currentSpell = null;
+	}
+	
+	[spellsConfig.SERVER_INNER.GAIN_PRIMARY_ABILITY_EXP.name]({exp}: {exp: number}, socket: GameSocket) {
+		if (socket.currentSpell) {
+			const spellKey = socket.currentSpell.spell.key;
+			const talentSpell = socket.character.talents._doc[socket.character.stats.primaryAbility].spells[spellKey];
+			talentSpell.exp += exp;
+			const expNeededToLevel = getExp(talentSpell.lvl);
+			const shouldLvl = talentSpell.exp >= expNeededToLevel;
+			if (shouldLvl) {
+				talentSpell.exp = 0;
+			}
+			socket.emit(spellsConfig.CLIENT_GETS.GAIN_SPELL_EXP.name, {
+				spellKey,
+				exp,
+				now: talentSpell.exp
+			});
+			if (shouldLvl) {
+				talentSpell.lvl++;
+				upgradeSpellPerks(socket.currentSpell.spell, talentSpell);
+				socket.emit(spellsConfig.CLIENT_GETS.GAIN_SPELL_LVL.name, {
+					spellKey,
+					ability: socket.character.stats.primaryAbility,
+					lvl: talentSpell.lvl,
+					perks: talentSpell.bonusPerks
+				});
+			}
+			markAbilityModified(socket);
+		}
 	}
 
 	[spellsConfig.SERVER_GETS.HURT_BY_SPELL.name](data, socket: GameSocket) {
