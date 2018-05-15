@@ -8,7 +8,8 @@ const ABILITY_SPELL_SCHEMA = (<any>mongoose.Schema)({
     key: String,
     lvl: Number,
     mp: Number,
-    perks: mongoose.Schema.Types.Mixed
+    perks: mongoose.Schema.Types.Mixed,
+    cd: Number,
 }, {_id: false});
 
 const MOB_SPELLS_SCHEMA = {
@@ -45,6 +46,9 @@ export function extendTalentsGenerationWithSpells(talent: any, talentSchema: TAL
             mp: spell.mana,
             perks: {},
         };
+        if (spell.cooldown > 0) {
+            spellSchema.cd = +spell.cooldown;
+        }
         (spell.perks || []).forEach(perk => {
             spellSchema.perks[perk.key] = +perk.value;
         });

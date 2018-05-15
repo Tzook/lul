@@ -418,6 +418,7 @@ interface ABILITY_SPELL_MODEL {
     lvl: number,
     mp: number,
     perks: PERK_MAP
+    cd?: number
 }
 
 type POWER_TYPES = "melee"|"range"|"magic";
