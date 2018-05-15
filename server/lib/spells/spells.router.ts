@@ -4,11 +4,14 @@ import statsConfig from '../stats/stats.config';
 import combatConfig from '../combat/combat.config';
 import { getMobDeadOrAlive, getMob } from '../mobs/mobs.controller';
 import { getMpUsage, markAbilityModified } from '../talents/talents.services';
-import { mobStopSpellsPicker, hasMobSpellsPicker, mobStartSpellsPicker, mobUsesSpell, canUseSpell, addSpellInfo, getSpell, getTalentSpell, upgradeSpellPerks, isSpellInCooldown, setSpellInCooldown } from './spells.services';
+import { mobStopSpellsPicker, hasMobSpellsPicker, mobStartSpellsPicker, mobUsesSpell, canUseSpell, addSpellInfo, getSpell, getTalentSpell, upgradeSpellPerks, isSpellInCooldown, setSpellInCooldown, updateAboutCooldowns } from './spells.services';
 import { setAttackInfo, popAttackInfo } from '../combat/combat.services';
 import { getExp } from '../stats/stats.services';
 
 export default class SpellsRouter extends SocketioRouterBase {
+	[spellsConfig.SERVER_GETS.ENTERED_ROOM.name](data, socket: GameSocket) {
+		updateAboutCooldowns(socket);
+    }
 
     [spellsConfig.GLOBAL_EVENTS.GLOBAL_TALENT_READY.name]({doc}: {doc: TALENT_MODEL}) {
         addSpellInfo(doc.ability, doc.spells);

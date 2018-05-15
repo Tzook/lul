@@ -15,8 +15,8 @@ export default class SpellsServices extends MasterServices {
 	public mobsSpellsPickers: Map<string, NodeJS.Timer> = new Map();
 	// primary ability => lvl|key => spell
     public spellsInfo: Map<string, Map<number|string, ABILITY_SPELL_MODEL>> = new Map();
-    // char name => spell key => cooldown timer
-    public spellsCooldowns: Map<string, Map<string, NodeJS.Timer>> = new Map();
+    // char name => spell key => cooldown date 
+    public spellsCooldowns: Map<string, Map<string, number>> = new Map();
 }
 
 export function getSpellsServices(): SpellsServices {
@@ -43,7 +43,6 @@ function getSpellsArrayMap(spells: ABILITY_SPELL_MODEL[]){
 
 // Player spells:
 // ===============
-
 export function canUseSpell(socket: GameSocket, spell: ABILITY_SPELL_MODEL, ability?: string): boolean {
     ability = ability || socket.character.stats.primaryAbility;
     const talent = socket.character.talents._doc[ability];
@@ -89,19 +88,47 @@ function tweakSpellPerks(perksObject: PERK_MAP): PERK_MAP {
 // ============
 export function isSpellInCooldown(socket: GameSocket, spell: ABILITY_SPELL_MODEL): boolean {
     const charSpellsCooldowns = getMapOfMap(getSpellsServices().spellsCooldowns, socket.character.name);
-    console.log(charSpellsCooldowns);
     return charSpellsCooldowns.has(spell.key);
 }
 
 export function setSpellInCooldown(socket: GameSocket, spell: ABILITY_SPELL_MODEL) {
     const charSpellsCooldowns = getMapOfMap(getSpellsServices().spellsCooldowns, socket.character.name, true);
-    const timerId = setTimeout(() => charSpellsCooldowns.delete(spell.key), spell.cd * 1000);
-    charSpellsCooldowns.set(spell.key, timerId);
+    const cooldown = getSpellCooldown(socket, spell);
+    setTimeout(() => charSpellsCooldowns.delete(spell.key), cooldown * 1000);
+    charSpellsCooldowns.set(spell.key, Date.now());
+    updateAboutCooldown(socket, spell.key, cooldown);
 }
 
-export function getSpellsInCooldown(socket: GameSocket): string[] {
+function getSpellCooldown(socket: GameSocket, spell: ABILITY_SPELL_MODEL): number {
+    return spell.cd;
+}
+
+function getSpellsInCooldown(socket: GameSocket): Map<string, number> {
     const charSpellsCooldowns = getMapOfMap(getSpellsServices().spellsCooldowns, socket.character.name);
-    return Array.from(charSpellsCooldowns.keys());
+    let resultMap: Map<string, number> = new Map();
+    const now = Date.now();
+    for (let [spellKey, time] of charSpellsCooldowns) {
+        // TODO this will only work on primary abilities' spells
+        const spell = getSpell(socket, spellKey);
+        const cooldown = getSpellCooldown(socket, spell);
+        const timePassed = (now - time) / 1000;
+        resultMap.set(spellKey, cooldown - timePassed);
+    }
+    return resultMap;
+}
+
+function updateAboutCooldown(socket: GameSocket, key: string, cd: number) {
+    socket.emit(spellsConfig.CLIENT_GETS.SPELL_COOLDOWN.name, {
+        spell_key: key,
+        cooldown: cd
+    });
+}
+
+export function updateAboutCooldowns(socket: GameSocket) {
+    const spells = getSpellsInCooldown(socket);
+    for (let [spellKey, cooldown] of spells) {
+        updateAboutCooldown(socket, spellKey, cooldown);
+    }
 }
 
 // Mob spells:
