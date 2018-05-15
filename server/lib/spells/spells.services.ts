@@ -7,7 +7,7 @@ import * as _ from 'underscore';
 import { pickRandomly } from "../drops/drops.services";
 import { spawnMob } from "../mobs/mobs.services";
 import { joinObjects } from "../utils/objects";
-import { markAbilityModified } from "../talents/talents.services";
+import { markAbilityModified, getSpellCooldown } from "../talents/talents.services";
 import { tweakPerks } from "../bonusPerks/bonusPerks.services";
 import { getMapOfMap } from "../utils/maps";
 
@@ -94,13 +94,10 @@ export function isSpellInCooldown(socket: GameSocket, spell: ABILITY_SPELL_MODEL
 export function setSpellInCooldown(socket: GameSocket, spell: ABILITY_SPELL_MODEL) {
     const charSpellsCooldowns = getMapOfMap(getSpellsServices().spellsCooldowns, socket.character.name, true);
     const cooldown = getSpellCooldown(socket, spell);
+    console.log("Cooldown is ", cooldown);
     setTimeout(() => charSpellsCooldowns.delete(spell.key), cooldown * 1000);
     charSpellsCooldowns.set(spell.key, Date.now());
     updateAboutCooldown(socket, spell.key, cooldown);
-}
-
-function getSpellCooldown(socket: GameSocket, spell: ABILITY_SPELL_MODEL): number {
-    return spell.cd;
 }
 
 function getSpellsInCooldown(socket: GameSocket): Map<string, number> {

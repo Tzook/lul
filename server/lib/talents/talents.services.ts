@@ -301,6 +301,7 @@ export default class TalentsServices extends MasterServices {
 		let bonusPerkValue = target.bonusPerks[perkName] || 0;
 		let safePerkValueWithBonus = this.getSafePerkValue(perkName, perkValue + bonusPerkValue);
 		// we want to add the bonus up to the max value, after that take the original value
+		// TODO fix negative bonus perks not working
 		perkValue = this.getBetterPerkValue(perkName, perkValue, safePerkValueWithBonus);
 		return perkValue;
 	}
@@ -596,9 +597,14 @@ export function getPurchaseCost(socket: GameSocket, gold: number): number {
 	return Math.round(gold * (1 - discount)) || 1;
 }
 
-export function getSellingCost(socket: GameSocket, gold: number, stack): number {
+export function getSellingCost(socket: GameSocket, gold: number, stack: number): number {
 	const modifier = getTalentsServices().getAbilityPerkValue(talentsConfig.PERKS.SALE_MODIFIER, socket);
 	return Math.round(gold * modifier * stack) || 1;
+}
+
+export function getSpellCooldown(socket: GameSocket, spell: ABILITY_SPELL_MODEL): number {
+	const modifier = getTalentsServices().getAbilityPerkValue(talentsConfig.PERKS.COOLDOWN_MODIFIER, socket);
+	return (spell.cd || 0) * modifier;
 }
 
 export function markAbilityModified(socket: GameSocket, ability?: string) {

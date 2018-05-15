@@ -91,6 +91,8 @@ export default {
 		MP_REGEN_INTERVAL: "mpRegenInterval",
 		MP_COST: "mpCost",
 		
+		COOLDOWN_MODIFIER: "cooldownModifier",
+		
 		FREEZE_CHANCE: "freezeChance",
 		FREEZE_DURATION: "freezeDuration",
 		FREEZE_RESISTANCE: "freezeResistance",
