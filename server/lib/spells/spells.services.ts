@@ -9,11 +9,14 @@ import { spawnMob } from "../mobs/mobs.services";
 import { joinObjects } from "../utils/objects";
 import { markAbilityModified } from "../talents/talents.services";
 import { tweakPerks } from "../bonusPerks/bonusPerks.services";
+import { getMapOfMap } from "../utils/maps";
 
 export default class SpellsServices extends MasterServices {
 	public mobsSpellsPickers: Map<string, NodeJS.Timer> = new Map();
 	// primary ability => lvl|key => spell
-	public spellsInfo: Map<string, Map<number|string, ABILITY_SPELL_MODEL>> = new Map();
+    public spellsInfo: Map<string, Map<number|string, ABILITY_SPELL_MODEL>> = new Map();
+    // char name => spell key => cooldown timer
+    public spellsCooldowns: Map<string, Map<string, NodeJS.Timer>> = new Map();
 }
 
 export function getSpellsServices(): SpellsServices {
@@ -80,6 +83,25 @@ export function upgradeSpellPerks(spellModel: ABILITY_SPELL_MODEL, talentSpell: 
 
 function tweakSpellPerks(perksObject: PERK_MAP): PERK_MAP {
     return tweakPerks(perksObject, spellsConfig.PERK_LEVEL_BONUS_OFFSET, false, true);
+}
+
+// Cooldowns:
+// ============
+export function isSpellInCooldown(socket: GameSocket, spell: ABILITY_SPELL_MODEL): boolean {
+    const charSpellsCooldowns = getMapOfMap(getSpellsServices().spellsCooldowns, socket.character.name);
+    console.log(charSpellsCooldowns);
+    return charSpellsCooldowns.has(spell.key);
+}
+
+export function setSpellInCooldown(socket: GameSocket, spell: ABILITY_SPELL_MODEL) {
+    const charSpellsCooldowns = getMapOfMap(getSpellsServices().spellsCooldowns, socket.character.name, true);
+    const timerId = setTimeout(() => charSpellsCooldowns.delete(spell.key), spell.cd * 1000);
+    charSpellsCooldowns.set(spell.key, timerId);
+}
+
+export function getSpellsInCooldown(socket: GameSocket): string[] {
+    const charSpellsCooldowns = getMapOfMap(getSpellsServices().spellsCooldowns, socket.character.name);
+    return Array.from(charSpellsCooldowns.keys());
 }
 
 // Mob spells:

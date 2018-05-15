@@ -4,7 +4,7 @@ import statsConfig from '../stats/stats.config';
 import combatConfig from '../combat/combat.config';
 import { getMobDeadOrAlive, getMob } from '../mobs/mobs.controller';
 import { getMpUsage, markAbilityModified } from '../talents/talents.services';
-import { mobStopSpellsPicker, hasMobSpellsPicker, mobStartSpellsPicker, mobUsesSpell, canUseSpell, addSpellInfo, getSpell, getTalentSpell, upgradeSpellPerks } from './spells.services';
+import { mobStopSpellsPicker, hasMobSpellsPicker, mobStartSpellsPicker, mobUsesSpell, canUseSpell, addSpellInfo, getSpell, getTalentSpell, upgradeSpellPerks, isSpellInCooldown, setSpellInCooldown } from './spells.services';
 import { setAttackInfo, popAttackInfo } from '../combat/combat.services';
 import { getExp } from '../stats/stats.services';
 
@@ -25,13 +25,19 @@ export default class SpellsRouter extends SocketioRouterBase {
 		} else if (!canUseSpell(socket, spell)) {
 			return this.sendError(data, socket, "Character does not meet the requirements to use that spell.");
 		}
+
+		if (isSpellInCooldown(socket, spell)) {
+			return this.sendError(data, socket, "Spell is in cooldown.");
+		}
+
 		let mp = getMpUsage(spell.mp, socket);
 		if (socket.character.stats.mp.now < mp) {
 			return this.sendError(data, socket, "Not enough mana to activate the spell.");
 		}
 
 		this.emitter.emit(statsConfig.SERVER_INNER.USE_MP.name, { mp }, socket);
-		
+		setSpellInCooldown(socket, spell);
+
 		setAttackInfo(socket, attack_id, 0, {spell_key});
 		socket.broadcast.to(socket.character.room).emit(spellsConfig.CLIENT_GETS.USE_SPELL.name, {
 			char_id: socket.character._id,
