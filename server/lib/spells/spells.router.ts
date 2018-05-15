@@ -22,7 +22,7 @@ export default class SpellsRouter extends SocketioRouterBase {
 		if (!attack_id) {
 			return this.sendError(data, socket, "Must include an attack id");
 		}
-		const spell = getSpell(socket, spell_key);
+		const spell = getSpell(spell_key);
 		if (!spell) {
 			return this.sendError(data, socket, "The primary ability does not have that spell.");	
 		} else if (!canUseSpell(socket, spell)) {
@@ -56,7 +56,7 @@ export default class SpellsRouter extends SocketioRouterBase {
 			return this.sendError(data, socket, "Spell must be used before it hits");
 		}
 
-		const spell = getSpell(socket, attackInfo.spell_key);
+		const spell = getSpell(attackInfo.spell_key);
 		if (!spell) {
 			return this.sendError(data, socket, "The primary ability does not have that spell.");	
 		} else if (!canUseSpell(socket, spell, attackInfo.ability)) {

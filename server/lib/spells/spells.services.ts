@@ -13,8 +13,8 @@ import { getMapOfMap } from "../utils/maps";
 
 export default class SpellsServices extends MasterServices {
 	public mobsSpellsPickers: Map<string, NodeJS.Timer> = new Map();
-	// primary ability => lvl|key => spell
-    public spellsInfo: Map<string, Map<number|string, ABILITY_SPELL_MODEL>> = new Map();
+	// spell key => spell
+    public spellsInfo: Map<string, ABILITY_SPELL_MODEL> = new Map();
     // char name => spell key => cooldown date 
     public spellsCooldowns: Map<string, Map<string, number>> = new Map();
 }
@@ -26,20 +26,11 @@ export function getSpellsServices(): SpellsServices {
 // Spells Info:
 // =============
 export function addSpellInfo(ability: string, spells: ABILITY_SPELL_MODEL[]) {
-    const spellsArray = getSpellsArrayMap(spells);
-    getSpellsServices().spellsInfo.set(ability, spellsArray);
-}
-function getSpellsArrayMap(spells: ABILITY_SPELL_MODEL[]){
-    let result = new Map();
-
-    for (let i = 0; i < spells.length; i++) {
-        const spell = spells[i];
-        result.set(spell.lvl, spell);
-        result.set(spell.key, spell);
+    const spellsServices = getSpellsServices();
+    for (let spell of spells) {
+        spellsServices.spellsInfo.set(spell.key, spell);
     }
-
-    return result;
-};
+}
 
 // Player spells:
 // ===============
@@ -49,9 +40,8 @@ export function canUseSpell(socket: GameSocket, spell: ABILITY_SPELL_MODEL, abil
     return talent && talent.lvl >= spell.lvl;
 }
 
-export function getSpell(socket: GameSocket, spellKey: string): ABILITY_SPELL_MODEL|undefined {
-    const ability = socket.character.stats.primaryAbility;
-    return getSpellsServices().spellsInfo.get(ability).get(spellKey);
+export function getSpell(spellKey: string): ABILITY_SPELL_MODEL|undefined {
+    return getSpellsServices().spellsInfo.get(spellKey);
 }
 
 export function getTalentSpell(socket: GameSocket, spellModel: ABILITY_SPELL_MODEL, ability: string): ACTIVE_SPELL {
@@ -106,7 +96,7 @@ function getSpellsInCooldown(socket: GameSocket): Map<string, number> {
     const now = Date.now();
     for (let [spellKey, time] of charSpellsCooldowns) {
         // TODO this will only work on primary abilities' spells
-        const spell = getSpell(socket, spellKey);
+        const spell = getSpell(spellKey);
         const cooldown = getSpellCooldown(socket, spell);
         const timePassed = (now - time) / 1000;
         resultMap.set(spellKey, cooldown - timePassed);
