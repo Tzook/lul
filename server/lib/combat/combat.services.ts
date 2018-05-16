@@ -65,3 +65,13 @@ export function getDamageDealt(attacker: PLAYER, target: PLAYER, socket: GameSoc
     dmgResult.dmg = applyDefenceModifier(dmgResult.dmg, socket, attacker, target);
     return dmgResult;
 }
+
+export function extendRoomWithCombat(scene: any, roomSchema: ROOM_MODEL): void {
+    if (scene.pvp == "true") {
+        roomSchema.pvp = true;
+    } else {
+        let roomUpdateObject: any = roomSchema;
+        roomUpdateObject.$unset = roomUpdateObject.$unset || {};
+        roomUpdateObject.$unset.pvp = true;
+    }
+}

@@ -256,6 +256,7 @@ interface ROOM_MODEL {
         [key: string]: PORTAL_MODEL
     },
     spawns: SPAWN_MODEL[],
+    pvp?: boolean,
     abilities?: ROOM_ABILITIES
 }
 interface ROOM_ABILITIES {

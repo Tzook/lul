@@ -5,6 +5,7 @@ import * as _ from 'underscore';
 import { extendRoomSchemaWithTalents } from '../talents/talents.services';
 import { getServices, getEmitter } from '../main/bootstrap';
 import roomsConfig from './rooms.config';
+import { extendRoomWithCombat } from '../combat/combat.services';
 
 const ROOM_NAME_INSTANCE_SEPARATOR = "~~";
 
@@ -48,6 +49,7 @@ export default class RoomsServices extends MasterServices {
 			spawns
         };
         extendRoomSchemaWithTalents(scene, room);
+        extendRoomWithCombat(scene, room);
         let roomModel = new this.Model(room);
 
         let npcsPromise = this.npcsRouter.updateNpcs(scene.name, scene.NPC);
