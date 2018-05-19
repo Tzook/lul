@@ -11,8 +11,6 @@ const ITEMS_TALENTS_SCHEMA = {
 export const PRIORITY_BONUS_PERKS = PRIORITY_ITEM + 10;
 
 export default class BonusPerksModel extends MasterModel {
-    private equipsAndStatsFinished: boolean;
-
     init(files, app) {
         
     }
@@ -33,15 +31,8 @@ export default class BonusPerksModel extends MasterModel {
     
     protected addFieldToModel(field, data, obj: Char, reqBody) {
         // we need both equips and stats to be added to character
-        if (!this.equipsAndStatsFinished) {
-            this.equipsAndStatsFinished = true;
-        } else {
-            // obj should exist, but it used to throw an error for some reason. this check will be removed one day
-            if (obj && obj.stats) {
-                updateCharHpMp(obj);
-            } else {
-                console.log("Got invalid stats", obj);
-            }
+        if (obj.stats && obj.equips) {
+            updateCharHpMp(obj);
         }
     }
 };
