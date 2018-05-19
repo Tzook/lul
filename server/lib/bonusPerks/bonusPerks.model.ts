@@ -37,8 +37,10 @@ export default class BonusPerksModel extends MasterModel {
             this.equipsAndStatsFinished = true;
         } else {
             // obj should exist, but it used to throw an error for some reason. this check will be removed one day
-            if (obj) {
+            if (obj && obj.stats) {
                 updateCharHpMp(obj);
+            } else {
+                console.log("Got invalid stats", obj);
             }
         }
     }
