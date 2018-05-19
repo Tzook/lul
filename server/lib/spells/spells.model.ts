@@ -10,6 +10,8 @@ const ABILITY_SPELL_SCHEMA = (<any>mongoose.Schema)({
     mp: Number,
     perks: mongoose.Schema.Types.Mixed,
     cd: Number,
+    condBuff: mongoose.Schema.Types.Mixed,
+    clearBuffs: mongoose.Schema.Types.Mixed,
 }, {_id: false});
 
 const MOB_SPELLS_SCHEMA = {
@@ -41,17 +43,14 @@ export default class SpellsModel extends MasterModel {
 export function extendTalentsGenerationWithSpells(talent: any, talentSchema: TALENT_MODEL) {
     (talent.spells || []).forEach(spell => {
         let spellSchema: ABILITY_SPELL_MODEL = {
+            ...getBaseSpell(spell),
             key: spell.key,
             lvl: spell.level,
             mp: spell.mana,
-            perks: {},
         };
         if (spell.cooldown > 0) {
             spellSchema.cd = +spell.cooldown;
         }
-        (spell.perks || []).forEach(perk => {
-            spellSchema.perks[perk.key] = +perk.value;
-        });
         talentSchema.spells.push(spellSchema);
     });
 }
@@ -59,8 +58,10 @@ export function extendTalentsGenerationWithSpells(talent: any, talentSchema: TAL
 export function extendMobSchemaWithSpells(mob: any, mobSchema: MOB_MODEL): void {
 	(mob.spells || []).forEach(spell => {
 		mobSchema.spells = mobSchema.spells || {};
-        let spellSchema: MOB_SPELL = <MOB_SPELL>getPerksSchema(spell.perks);
-        spellSchema.chance = +spell.chance;
+        let spellSchema: MOB_SPELL = {
+            ...getBaseSpell(spell),
+            chance: +spell.chance,
+        };
         extendMobSpellWithSpawn(spellSchema, spell);
         mobSchema.spells[spell.key] = spellSchema;
     });
@@ -70,14 +71,32 @@ export function extendMobSchemaWithSpells(mob: any, mobSchema: MOB_MODEL): void 
     }
     
     if (mob.deathRattle) {
-        let deathRattle: MOB_DEATH_SPELL = <MOB_DEATH_SPELL>getPerksSchema(mob.deathRattle.perks);
-        deathRattle.key = mob.deathRattle.key;
+        let deathRattle: MOB_DEATH_SPELL = {
+            ...getBaseSpell(mob.deathRattle),
+            key: mob.deathRattle.key,
+        }
         if (mob.deathRattle.duration > 0) {
             deathRattle.duration = +mob.deathRattle.duration;
         }
         extendMobSpellWithSpawn(deathRattle, mob.deathRattle);
         mobSchema.deathSpell = deathRattle;
     }
+}
+
+function getBaseSpell(spell: any): SPELL_BASE {
+    let spellSchema: SPELL_BASE = {
+        perks: getPerksSchema(spell.perks),
+    };
+    (spell.hitIfTargetHasBuff || []).forEach(buffName => {
+        spellSchema.condBuff = spellSchema.condBuff || [];
+        spellSchema.condBuff.push(buffName);
+    });
+    (spell.clearTargetBuffs || []).forEach(buffName => {
+        spellSchema.clearBuffs = spellSchema.clearBuffs || [];
+        spellSchema.clearBuffs.push(buffName);
+    });
+    console.log("Got base spell", spell, spellSchema);
+    return spellSchema;
 }
 
 function extendMobSpellWithSpawn(spell: MOB_DEATH_SPELL|MOB_SPELL, mobSpellSchema: any) {

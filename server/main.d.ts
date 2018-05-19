@@ -263,6 +263,12 @@ interface ROOM_ABILITIES {
     [key: string]: true
 }
 
+interface SPELL_BASE {
+    perks: PERK_MAP
+    condBuff?: string[]
+    clearBuffs?: string[]
+}
+
 // mobs
 interface MOB_MODEL {
     mobId: string, // a unique id for this type of mobs
@@ -279,17 +285,15 @@ interface MOB_MODEL {
     spellMinTime?: number
     spellMaxTime?: number
 }
-interface MOB_SPELL_BASE {
+interface MOB_SPELL_BASE extends SPELL_BASE {
     spawn?: string[]
-    perks: PERK_MAP
 }
 interface MOB_SPELL extends MOB_SPELL_BASE {
     chance: number
 }
-
 interface MOB_DEATH_SPELL extends MOB_SPELL_BASE {
     key: string,
-    duration: number
+    duration?: number
 }
 
 interface MOB_INSTANCE extends MOB_MODEL {
@@ -414,11 +418,10 @@ interface PERK_MAP {
     [perkKey: string]: number
 }
 
-interface ABILITY_SPELL_MODEL {
+interface ABILITY_SPELL_MODEL extends SPELL_BASE {
     key: string,
     lvl: number,
     mp: number,
-    perks: PERK_MAP
     cd?: number
 }
 

@@ -418,7 +418,7 @@ export default class TalentsServices extends MasterServices {
 				perkModel.default = +perk.default;
 			}
 			if (perk.bonusPerks) {
-				let {perks} = getPerksSchema(perk.bonusPerks);
+				let perks = getPerksSchema(perk.bonusPerks);
 				perkModel.bonusPerks = perks;
 			}
 			if (perk.client === "true") {
@@ -481,15 +481,12 @@ export function extendMobSchemaWithTalents(mob: any, mobSchema: MOB_MODEL): void
     extendMobSchemaWithSpells(mob, mobSchema);
 }
 
-export function getPerksSchema(perkList?: any[]): {perks: PERK_MAP} {
+export function getPerksSchema(perkList?: any[]): PERK_MAP {
     let perks: PERK_MAP = {};
     (perkList || []).forEach(perk => {
         perks[perk.key] = +perk.value;
     });
-    let perksObjectResult = {
-        perks,
-    };
-    return perksObjectResult;
+    return perks;
 }
 
 export function extendRoomSchemaWithTalents(scene: any, roomSchema: ROOM_MODEL): void {
