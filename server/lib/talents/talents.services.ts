@@ -97,6 +97,10 @@ export default class TalentsServices extends MasterServices {
 	protected isBelowMax(perkConfig: PERK_CONFIG, value: number): boolean {
 		return !perkConfig.max || (perkConfig.value > 0 ? value < perkConfig.max : value > perkConfig.max);
 	}
+
+	protected isValueNegative(perkConfig: PERK_CONFIG, value: number): boolean {
+		return perkConfig.value > 0 ? value < 0 : value > 0;
+	}
 	
 	protected getPerkLevelValue(perk: string, level: number): number {
 		const perkConfig = this.getPerkConfig(perk);
@@ -108,14 +112,6 @@ export default class TalentsServices extends MasterServices {
 		// 1 * x + 2 * x + ... + n * x = (1 + 2 + 3 + ... + n) * x
 		const accelerationPoint = sumValuesUntilLevel * acceleration;
 		return initialValue + level * valueModifier + accelerationPoint;
-	}
-	
-	protected getSafePerkValue(perk: string, value: number) {
-		const perkConfig = this.getPerkConfig(perk);
-		if (!this.isBelowMax(perkConfig, value)) {
-			value = perkConfig.max;
-		}
-		return value;
 	}
 	
 	protected pickPool(pool: string[], perksOffered: number): string[] {
@@ -292,22 +288,44 @@ export default class TalentsServices extends MasterServices {
 	protected addPerkValueBonuses(target: PLAYER, perkName: string, perkValue: number): number {
 		if (target.currentSpell) {
 			// send the higher value - perk or spell
-			let spellPerkValue = (target.currentSpell.perks || {})[perkName] || 0;
-			perkValue = this.getBetterPerkValue(perkName, spellPerkValue, perkValue);
+			const spellPerkValue = (target.currentSpell.perks || {})[perkName];
+			if (spellPerkValue !== undefined) {
+				perkValue = this.getBetterPerkValue(perkName, spellPerkValue, perkValue);
+			}
 		}
-		let bonusPerkValue = target.bonusPerks[perkName] || 0;
-		let safePerkValueWithBonus = this.getSafePerkValue(perkName, perkValue + bonusPerkValue);
-		// we want to add the bonus up to the max value, after that take the original value
-		// TODO fix negative bonus perks not working
-		perkValue = this.getBetterPerkValue(perkName, perkValue, safePerkValueWithBonus);
-		return perkValue;
+		const bonusPerkValue = target.bonusPerks[perkName] || 0;
+		const resultPerkValue = this.addBonusPerkSafely(perkName, perkValue, bonusPerkValue);
+		return resultPerkValue;
 	}
-
+	
 	protected getBetterPerkValue(perk: string, ...values: number[]): number {
 		const perkConfig = this.getPerkConfig(perk);
 		return perkConfig.value > 0 ? Math.max(...values) : Math.min(...values);
 	}
+	
+	protected addBonusPerkSafely(perk: string, perkValue: number, bonusValue: number) {
+		const perkConfig = this.getPerkConfig(perk);
+		let resultValue = perkValue;
+		// if original value is below max - just add the value and verify it's not past max
+		if (this.isBelowMax(perkConfig, perkValue)) {
+			resultValue = this.getSafePerkValue(perk, perkValue + bonusValue);
+		} else {
+			// if original value is above max - simply add it if it's a negative value
+			if (this.isValueNegative(perkConfig, bonusValue)) {
+				resultValue = perkValue + bonusValue;
+			}
+		}
+		return resultValue;
+	}
 
+	protected getSafePerkValue(perk: string, value: number) {
+		const perkConfig = this.getPerkConfig(perk);
+		if (!this.isBelowMax(perkConfig, value)) {
+			value = perkConfig.max;
+		}
+		return value;
+	}
+	
 	protected isFrozen(target: PLAYER): boolean {
 		return hasBuff(target, talentsConfig.PERKS.FREEZE_CHANCE);
 	}

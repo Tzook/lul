@@ -74,7 +74,6 @@ export default class DropsRouter extends SocketioRouterBase {
 						itemInstance.stack = this.services.getRandomStack(drop.minStack, drop.maxStack);
 					}
                     items.push(itemInstance);
-                    console.log("Dropping item from drop!", drop, itemInstance);
                 }
 			} else {
 				this.sendError({key: drop.key}, socket, "No item info! cannot drop item.");

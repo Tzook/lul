@@ -87,7 +87,6 @@ export function isSpellInCooldown(socket: GameSocket, spell: ABILITY_SPELL_MODEL
 export function setSpellInCooldown(socket: GameSocket, spell: ABILITY_SPELL_MODEL) {
     const charSpellsCooldowns = getMapOfMap(getSpellsServices().spellsCooldowns, socket.character.name, true);
     const cooldown = getSpellCooldown(socket, spell);
-    console.log("Cooldown is ", cooldown);
     setTimeout(() => charSpellsCooldowns.delete(spell.key), cooldown * 1000);
     charSpellsCooldowns.set(spell.key, Date.now());
     updateAboutCooldown(socket, spell.key, cooldown);
@@ -98,7 +97,6 @@ function getSpellsInCooldown(socket: GameSocket): Map<string, number> {
     let resultMap: Map<string, number> = new Map();
     const now = Date.now();
     for (let [spellKey, time] of charSpellsCooldowns) {
-        // TODO this will only work on primary abilities' spells
         const spell = getSpell(spellKey);
         const cooldown = getSpellCooldown(socket, spell);
         const timePassed = (now - time) / 1000;
