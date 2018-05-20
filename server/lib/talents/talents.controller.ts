@@ -51,6 +51,10 @@ export default class TalentsController extends MasterController {
 			for (let [perkChanceName, perkDurationName] of buffPerks) {
 				this.tryToApplyPerk(perkChanceName, perkDurationName, null, attacker, <PLAYER>attacker, (buffInstace) => this.addBuffBonusPerks(attacker, perkChanceName), () => this.removeBuffBonusPerks(attacker, perkChanceName));
 			}
+
+			if (attacker.currentSpell && attacker.currentSpell.clearBuffs) {
+				this.clearBuffs(target, attacker.currentSpell.clearBuffs);
+			}
 		}
 	}
 
@@ -152,15 +156,6 @@ export default class TalentsController extends MasterController {
 			this.roomToBuff.delete(room);
 		}
 		buffInstance.onPerkCleared();
-	} 
-	
-	public clearMobBuffs(room: string, mobId: string) {
-		let mobsBuff = this.getMobBuffsInstance(room, mobId);
-		for (let [,perkBuffs] of mobsBuff) {
-			for (let buffInstance of perkBuffs) {
-				this.clearMobBuff(room, mobId, buffInstance);
-			}
-		}
 	}
 	
 	protected clearSocketBuff(socket: GameSocket, buffInstance: BUFF_INSTANCE): void {
@@ -173,8 +168,26 @@ export default class TalentsController extends MasterController {
 		buffInstance.onPerkCleared();
 	}
 	
-	public clearSocketBuffs(socket: GameSocket): void {
-		socket.buffs.forEach(perkBuffs => perkBuffs.forEach(buffInstance => this.clearSocketBuff(socket, buffInstance)));
+	public clearBuffs(target: PLAYER, buffNames?: string[]): void {
+		const buffs = this.getBuffs(target);
+		if (buffNames) {
+			buffNames.forEach(buffName => {
+				getSetOfMap(buffs, buffName).forEach(buffInstance => this.clearBuff(target, buffInstance));
+			});
+		} else {
+			buffs.forEach(perkBuffs => perkBuffs.forEach(buffInstance => this.clearBuff(target, buffInstance)));
+		}
+		
+		this.io.to(getRoom(target)).emit(talentsConfig.CLIENT_GETS.CLEARED_BUFF.name, {
+			target_id: getId(target),
+			buff_names: buffNames,
+		});
+	}
+
+	protected getBuffs(target: PLAYER) {
+		return isSocket(target) 
+			? target.buffs 
+			: this.getMobBuffsInstance(target.room, target.id);
 	}
 
 	protected getPerkBuffs(target: PLAYER, perkName: string, createIfMissing: boolean = false) {
@@ -247,11 +260,6 @@ export default class TalentsController extends MasterController {
 		}
 	}
 
-	public isSocketInBuff(socket: GameSocket, perkName: string): boolean {
-		const hasBuff = socket.buffs.has(perkName);
-		return hasBuff;
-	}
-
 	protected getRoomBuffsInstance(room: string, createIfMissing: boolean = false): Map<string, Map<string, Set<BUFF_INSTANCE>>> {
 		return getMapOfMap(this.roomToBuff, room, createIfMissing);
 	}
@@ -282,12 +290,6 @@ export default class TalentsController extends MasterController {
 	}
 };
 
-function getTalentsController(): TalentsController {
+export function getTalentsController(): TalentsController {
     return getController("talents");
-}
-
-export function isMobInBuff(room: string, mobId: string, perkName: string): boolean {
-    const mobBuffs = getTalentsController().getMobBuffsInstance(room, mobId);
-    const hasBuff = mobBuffs.has(perkName);
-    return hasBuff;
 }

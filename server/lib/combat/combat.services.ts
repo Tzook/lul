@@ -4,6 +4,8 @@ import { getDamageRange, getHurtCharDmg } from '../mobs/mobs.services';
 import { getServices } from '../main/bootstrap';
 import combatConfig from './combat.config';
 import { isSocket } from '../talents/talents.services';
+import { getMob } from '../mobs/mobs.controller';
+import { sendError } from '../socketio/socketio.router.base';
 
 export default class CombatServices extends MasterServices {
     public attacksInfos: Map<string, ATTACK_INFO> = new Map();
@@ -74,4 +76,26 @@ export function extendRoomWithCombat(scene: any, roomSchema: ROOM_MODEL): void {
         roomUpdateObject.$unset = roomUpdateObject.$unset || {};
         roomUpdateObject.$unset.pvp = true;
     }
+}
+
+export function getValidTargets(socket: GameSocket, targetIds: string[]): PLAYER[] {
+    let targets: PLAYER[] = [];
+
+    for (let targetId of targetIds) {
+        let target: PLAYER = getMob(targetId, socket);
+        if (!target) {
+            const targetSocket = socket.map.get(targetId);
+            if (targetSocket && targetSocket.connected && targetSocket.alive) {
+                target = targetSocket;
+            }
+        }
+        
+        if (!target) {
+            sendError({targetId}, socket, "Target doesn't exist!");
+        } else {
+            targets.push(target);
+        }
+    }
+
+    return targets;
 }

@@ -6,10 +6,9 @@ import mobsConfig from '../mobs/mobs.config';
 import TalentsRouter from '../talents/talents.router';
 import talentsConfig from '../talents/talents.config';
 import statsConfig from '../stats/stats.config';
-import CombatServices, { setAttackInfo, popAttackInfo, getDamageDealt } from './combat.services';
+import CombatServices, { setAttackInfo, popAttackInfo, getDamageDealt, getValidTargets } from './combat.services';
 import { getMpUsage, getId, getHp, isMob, isSocket } from '../talents/talents.services';
 import { calculateDamage } from './combat.services';
-import { getMob } from '../mobs/mobs.controller';
 import { didHitMob } from '../mobs/mobs.services';
 
 export default class CombatRouter extends SocketioRouterBase {
@@ -108,25 +107,15 @@ export default class CombatRouter extends SocketioRouterBase {
 
 	[config.SERVER_INNER.ATK_TARGETS.name](data: {attacker: PLAYER, target_ids: string[], cause?: string}, socket: GameSocket) {
 		let {attacker, target_ids, cause = config.HIT_CAUSE.ATK} = data;
+
+		const targets = getValidTargets(socket, target_ids);
 		
-		for (let targetId of target_ids) {
-			let target: PLAYER = getMob(targetId, socket);
-			if (!target) {
-				const targetSocket = socket.map.get(targetId);
-				if (targetSocket && targetSocket.connected && targetSocket.alive) {
-					target = targetSocket;
-				}
-			}
-			
-			if (!target) {
-				this.sendError({targetId}, socket, "Target doesn't exist!");
-				continue;
-			}
+		for (let target of targets) {
 			// TODO change to be a check if PVP allowed
 			// if (isSocket(attacker) && isSocket(target)) {
 
 			// }
-			if (isMob(target) && isSocket(attacker) && !didHitMob(targetId, attacker)) {
+			if (isMob(target) && isSocket(attacker) && !didHitMob(target, attacker)) {
 				this.emitter.emit(mobsConfig.SERVER_INNER.MISS_MOB.name, {mob: target, cause}, socket);
 			} else {
 				this.emitter.emit(config.SERVER_INNER.HIT_TARGET.name, {attacker, target, cause}, socket);

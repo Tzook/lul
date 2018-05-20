@@ -11,6 +11,7 @@ import * as passportSocketIo from 'passport.socketio';
 import { isProduction, getEnvVariable } from '../main/main';
 import { notifyUserAboutError } from './socketio.router.base';
 import * as _ from "underscore";
+import { getRouter } from '../main/bootstrap';
 
 export default class SocketioRouter extends SocketioRouterBase {
 	protected middleware: SocketioMiddleware;
@@ -242,3 +243,7 @@ export default class SocketioRouter extends SocketioRouterBase {
 		(<any>process).on("exit", () => notifyUserAboutError(this.io, "Restarting server!\n(Had an error)", true));
 	}
  };
+
+ export function getSocketioRouter(): SocketioRouter {
+	 return getRouter('socketio');
+ }

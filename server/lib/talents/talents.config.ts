@@ -46,6 +46,7 @@ export default {
 		GAIN_ABILITY_PERK: {name: "ability_gain_perk"},
 		ACTIVATED_BUFF: {name: "buff_activated"},
 		RESISTED_BUFF: {name: "buff_resisted"},
+		CLEARED_BUFF: {name: "buff_cleared"},
 		GAIN_ABILITY: {name: "actor_gain_ability"},
 	},
 	PERKS: {

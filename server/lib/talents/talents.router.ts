@@ -63,7 +63,7 @@ export default class TalentsRouter extends SocketioRouterBase {
 	}
 	
 	[talentsConfig.SERVER_GETS.DISCONNECT.name](data, socket: GameSocket) {
-		this.controller.clearSocketBuffs(socket);		
+		this.controller.clearBuffs(socket);		
 	}
 
 	[talentsConfig.SERVER_GETS.ENTERED_ROOM.name](data, socket: GameSocket) {
@@ -96,7 +96,7 @@ export default class TalentsRouter extends SocketioRouterBase {
 		}
 
 		if (isSocket(target) && !target.alive) {
-			this.controller.clearSocketBuffs(target);			
+			this.controller.clearBuffs(target);			
 		} else if ((isMob(attacker) || isSocket(attacker)) && isSocket(target) && cause === combatConfig.HIT_CAUSE.ATK && getHp(attacker) > 0) {
 			// spikes
             let spikesModifier = this.services.getSpikesModifier(target);
@@ -224,7 +224,7 @@ export default class TalentsRouter extends SocketioRouterBase {
 	
 	[talentsConfig.SERVER_INNER.MOB_DESPAWN.name](data: {mob: MOB_INSTANCE}, socket: GameSocket) {
 		let {mob} = data;
-		this.controller.clearMobBuffs(socket.character.room, mob.id);
+		this.controller.clearBuffs(mob);
 	}
     
 	[talentsConfig.SERVER_INNER.LEFT_ROOM.name](data, socket: GameSocket) {

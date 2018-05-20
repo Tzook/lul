@@ -3,16 +3,14 @@ import SocketioRouter from '../socketio/socketio.router';
 import * as _ from 'underscore';
 import { doesChanceWorkFloat } from '../drops/drops.services';
 import talentsConfig from "../talents/talents.config";
-import TalentsController from './talents.controller';
 import { getRoomInfo, getRoomName } from '../rooms/rooms.services';
 import { getServices, getEmitter } from '../main/bootstrap';
-import { isMobInBuff } from './talents.controller';
+import { getTalentsController } from './talents.controller';
 import { extendMobSchemaWithSpells, extendTalentsGenerationWithSpells } from '../spells/spells.model';
 import { getMobInfo } from '../mobs/mobs.services';
 import { getLvlExpByChar } from '../stats/stats.services';
 
 export default class TalentsServices extends MasterServices {
-	private controller: TalentsController;
 	public abilitiesInfo: Map<string, TALENT_INFO> = new Map();
 	private perksInfo: Map<string, ABILITY_PERK_INSTANCE[]> = new Map();
 	// buffPerkChance => buffPerkDuration
@@ -21,7 +19,6 @@ export default class TalentsServices extends MasterServices {
 	protected socketioRouter: SocketioRouter;
 	
 	init(files, app) {
-		this.controller = files.controller;
 		super.init(files, app);
 		this.socketioRouter = files.routers.socketio;
 	}
@@ -312,17 +309,11 @@ export default class TalentsServices extends MasterServices {
 	}
 
 	protected isFrozen(target: PLAYER): boolean {
-		return this.hasBuff(target, talentsConfig.PERKS.FREEZE_CHANCE);
+		return hasBuff(target, talentsConfig.PERKS.FREEZE_CHANCE);
 	}
 
 	protected isBurnt(target: PLAYER): boolean {
-		return this.hasBuff(target, talentsConfig.PERKS.BURN_CHANCE);
-	}
-
-	protected hasBuff(target: PLAYER, perkName: string): boolean {
-		return isSocket(target) 
-			? this.controller.isSocketInBuff(target, perkName)
-			: isMobInBuff(target.room, target.id, perkName);
+		return hasBuff(target, talentsConfig.PERKS.BURN_CHANCE);
 	}
 
 	public getBleedDmg(dmg: number): number {
@@ -553,7 +544,7 @@ export function getRoom(target: PLAYER): string {
 
 export function getId(target: HURTER): string {
 	return isSocket(target) 
-		? target.character._id
+		? target.character._id.toString()
 		: target.id;
 }
 
@@ -611,4 +602,30 @@ export function markAbilityModified(socket: GameSocket, ability?: string) {
 	} else {
 		socket.character.talents.markModified(ability);		
 	}
+}
+
+function hasBuff(target: PLAYER, perkName: string): boolean {
+	return isSocket(target) 
+		? isSocketInBuff(target, perkName)
+		: isMobInBuff(target.room, target.id, perkName);
+}
+
+export function hasAnyBuff(target: PLAYER, perkNames: string[]): boolean {
+	for (let perkName of perkNames) {
+		if (hasBuff(target, perkName)) {
+			return true;
+		}
+	}
+	return false;
+}
+
+export function isMobInBuff(room: string, mobId: string, perkName: string): boolean {
+    const mobBuffs = getTalentsController().getMobBuffsInstance(room, mobId);
+    const hasBuff = mobBuffs.has(perkName);
+    return hasBuff;
+}
+
+export function isSocketInBuff(socket: GameSocket, perkName: string): boolean {
+	const hasBuff = socket.buffs.has(perkName);
+	return hasBuff;
 }

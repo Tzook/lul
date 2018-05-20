@@ -171,8 +171,7 @@ export function spawnMob(mobKey: string, x: number, y: number, room: string, bon
 	return getMobsController().spawnMob(mobKey, x, y, room, bonusPerks);
 }
 
-export function didHitMob(mobId: string, socket: GameSocket): boolean {
-	let mob = getMobsController().getMob(mobId, socket);
+export function didHitMob(mob: MOB_INSTANCE, socket: GameSocket): boolean {
 	return mob.hp > 0 && getMobsServices().didHitMob(mob.lvl, socket.character.stats.lvl);
 }
 

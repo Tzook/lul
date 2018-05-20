@@ -308,7 +308,7 @@ interface MOB_INSTANCE extends MOB_MODEL {
     }
     dmged: number
     spawn?: SPAWN_INSTANCE,
-    currentSpell?: PERKABLE
+    currentSpell?: MOB_SPELL_BASE
     bonusPerks: PERK_MAP
 }
 interface ROOM_MOBS {
@@ -472,8 +472,8 @@ interface CHAR_TALENT_SPELL {
     exp: number
     bonusPerks: PERK_MAP
 }
-interface ACTIVE_SPELL extends PERKABLE {
-    spell: ABILITY_SPELL_MODEL
+interface ACTIVE_SPELL extends ABILITY_SPELL_MODEL {
+    // perks are modified here and are not the original
 }
 
 interface PERKS_DIFF {

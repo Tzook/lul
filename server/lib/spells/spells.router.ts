@@ -4,8 +4,8 @@ import statsConfig from '../stats/stats.config';
 import combatConfig from '../combat/combat.config';
 import { getMobDeadOrAlive, getMob } from '../mobs/mobs.controller';
 import { getMpUsage, markAbilityModified } from '../talents/talents.services';
-import { mobStopSpellsPicker, hasMobSpellsPicker, mobStartSpellsPicker, mobUsesSpell, canUseSpell, addSpellInfo, getSpell, getTalentSpell, upgradeSpellPerks, isSpellInCooldown, setSpellInCooldown, updateAboutCooldowns } from './spells.services';
-import { setAttackInfo, popAttackInfo } from '../combat/combat.services';
+import { mobStopSpellsPicker, hasMobSpellsPicker, mobStartSpellsPicker, mobUsesSpell, canUseSpell, addSpellInfo, getSpell, getTalentSpell, upgradeSpellPerks, isSpellInCooldown, setSpellInCooldown, updateAboutCooldowns, getTargetIdsHurtBySpell } from './spells.services';
+import { setAttackInfo, popAttackInfo, getValidTargets } from '../combat/combat.services';
 import { getExp } from '../stats/stats.services';
 
 export default class SpellsRouter extends SocketioRouterBase {
@@ -67,14 +67,19 @@ export default class SpellsRouter extends SocketioRouterBase {
 
 		socket.currentSpell = talentSpell;
 		
-		this.emitter.emit(combatConfig.SERVER_INNER.ACTIVATE_ABILITY.name, {target_ids, attackInfo, cause: combatConfig.HIT_CAUSE.SPELL}, socket);		
+		const validTargets = getValidTargets(socket, target_ids);
+		const validTargetIds = getTargetIdsHurtBySpell(talentSpell, validTargets);
+
+		if (validTargetIds.length > 0) {
+			this.emitter.emit(combatConfig.SERVER_INNER.ACTIVATE_ABILITY.name, {target_ids: validTargetIds, attackInfo, cause: combatConfig.HIT_CAUSE.SPELL}, socket);
+		}
 		
 		socket.currentSpell = null;
 	}
 	
 	[spellsConfig.SERVER_INNER.GAIN_PRIMARY_ABILITY_EXP.name]({exp}: {exp: number}, socket: GameSocket) {
 		if (socket.currentSpell) {
-			const spellKey = socket.currentSpell.spell.key;
+			const spellKey = socket.currentSpell.key;
 			const talentSpell = socket.character.talents._doc[socket.character.stats.primaryAbility].spells[spellKey];
 			talentSpell.exp += exp;
 			const expNeededToLevel = getExp(talentSpell.lvl);
@@ -89,7 +94,7 @@ export default class SpellsRouter extends SocketioRouterBase {
 			});
 			if (shouldLvl) {
 				talentSpell.lvl++;
-				upgradeSpellPerks(socket.currentSpell.spell, talentSpell);
+				upgradeSpellPerks(socket.currentSpell, talentSpell);
 				socket.emit(spellsConfig.CLIENT_GETS.GAIN_SPELL_LVL.name, {
 					spellKey,
 					ability: socket.character.stats.primaryAbility,
@@ -107,7 +112,7 @@ export default class SpellsRouter extends SocketioRouterBase {
 		if (!mob) {
 			return this.sendError(data, socket, "Mob doesn't exist");
 		}
-		let spell;
+		let spell: MOB_SPELL_BASE;
 		if (getMob(mob_id, socket)) {
 			// mob is still alive
 			spell = (mob.spells || {})[spell_key];
@@ -121,7 +126,11 @@ export default class SpellsRouter extends SocketioRouterBase {
 		
 		mob.currentSpell = spell;
 
-		this.emitter.emit(combatConfig.SERVER_INNER.ATK_TARGETS.name, {attacker: mob, target_ids: [socket.character.name], cause: combatConfig.HIT_CAUSE.SPELL}, socket);		
+		const validTargetIds = getTargetIdsHurtBySpell(spell, [socket]);
+
+		if (validTargetIds.length > 0) {
+			this.emitter.emit(combatConfig.SERVER_INNER.ATK_TARGETS.name, {attacker: mob, target_ids: validTargetIds, cause: combatConfig.HIT_CAUSE.SPELL}, socket);
+		}
 
 		mob.currentSpell = null;
     }

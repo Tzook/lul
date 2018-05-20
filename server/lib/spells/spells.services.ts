@@ -1,13 +1,13 @@
 import MasterServices from "../master/master.services";
 import { getServices } from "../main/bootstrap";
 import spellsConfig from "./spells.config";
-import { isMobInBuff } from '../talents/talents.controller';
+import { isMobInBuff } from '../talents/talents.services';
 import talentsConfig from "../talents/talents.config";
 import * as _ from 'underscore';
 import { pickRandomly } from "../drops/drops.services";
 import { spawnMob } from "../mobs/mobs.services";
 import { joinObjects } from "../utils/objects";
-import { markAbilityModified, getSpellCooldown } from "../talents/talents.services";
+import { markAbilityModified, getSpellCooldown, getId, hasAnyBuff } from "../talents/talents.services";
 import { tweakPerks } from "../bonusPerks/bonusPerks.services";
 import { getMapOfMap } from "../utils/maps";
 
@@ -54,7 +54,10 @@ export function getTalentSpell(socket: GameSocket, spellModel: ABILITY_SPELL_MOD
         markAbilityModified(socket, ability);
     }
 
-    return {perks: joinObjects(talent.spells[spellModel.key].bonusPerks, spellModel.perks), spell: spellModel};
+    return {
+        ...spellModel,
+        perks: joinObjects(talent.spells[spellModel.key].bonusPerks, spellModel.perks)
+    };
 }
 
 function getEmptySpell(): CHAR_TALENT_SPELL {
@@ -174,4 +177,18 @@ export function mobStopSpellsPicker(mob: MOB_INSTANCE) {
 
 function canMobUseSpell(mob: MOB_INSTANCE): boolean {
     return !isMobInBuff(mob.room, mob.id, talentsConfig.PERKS.STUN_CHANCE);
+}
+
+// Events methods:
+// ============
+export function getTargetIdsHurtBySpell(spell: SPELL_BASE, targets: PLAYER[]): string[] {
+    let resultTargetIds: string[] = [];
+
+    for (let target of targets) {
+        if (!spell.condBuff || hasAnyBuff(target, spell.condBuff)) {
+            resultTargetIds.push(getId(target));
+        }
+    }
+
+    return resultTargetIds
 }

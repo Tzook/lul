@@ -3,6 +3,7 @@ import MasterRouter from '../master/master.router';
 import Emitter = require('events');
 import config from './socketio.config';
 import { logger } from '../main/logger';
+import { getSocketioRouter } from './socketio.router';
 
 export default class SocketioRouterBase extends MasterRouter {
 	protected io: SocketIO.Namespace;
@@ -65,6 +66,13 @@ export default class SocketioRouterBase extends MasterRouter {
 		return Object.assign({name: socket.character.name, event}, data);
 	}
 };
+
+
+
+export function sendError(data: any, socket: GameSocket, error: string, emit = true, display = false) {
+	const socketioRouter = getSocketioRouter();
+	return socketioRouter.sendError(data, socket, error, emit, display);
+}
 
 export function notifyUserAboutError(to: NodeJS.EventEmitter, error: string, display: boolean) {
 	to.emit(config.CLIENT_GETS.EVENT_ERROR.name, {
