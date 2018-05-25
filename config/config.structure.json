@@ -30,6 +30,7 @@
         "bonusPerks",
 		"use",
         "state",
+        "dungeon",
         "github"
 	],
 	"skip": 	 { "master": 1 }
