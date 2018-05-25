@@ -1,5 +1,6 @@
 
-import Response from './master.response';
+import Response, { sendErrorResponse } from './master.response';
+import masterConfig from './master.config';
 
 export default class MasterMiddleware extends Response {
 
@@ -29,11 +30,15 @@ export default class MasterMiddleware extends Response {
     }
 
 	isBoss(req, res, next) {
-		// if user is authenticated in the session, carry on
-		if (req.user && req.user.boss) {
-			next();
-		} else {
-			this.sendError(res, this.LOGS.MASTER_NOT_AUTHORIZED);
-		}
+		isBoss(req, res, next);
     }
 };
+
+export function isBoss(req, res, next) {
+	// if user is authenticated in the session, carry on
+	if (req.user && req.user.boss) {
+		next();
+	} else {
+		sendErrorResponse(res, masterConfig.LOGS.MASTER_NOT_AUTHORIZED);
+	}
+}
