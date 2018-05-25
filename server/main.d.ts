@@ -490,3 +490,27 @@ interface BUFF_INSTANCE {
 }
 
 interface ROOM_STATE extends Map<string, string> {}
+
+// Dungeons
+// ========
+
+interface DUNGEON_REWARD {
+    key: string,
+    chance: number,
+    stack: number,
+}
+interface DUNGEON_STAGE {
+    rooms: string[],
+    rareRooms: string[],
+    rewards: DUNGEON_REWARD[],
+}
+interface DUNGEON {
+    key: string,
+    minLvl: number,
+    maxLvl: number,
+    time: number,
+    beginRoom: string,
+    stages: DUNGEON_STAGE[],
+    perksPool: PERK_MAP[],
+    rareBonuses: string[],
+}
