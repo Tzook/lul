@@ -34,13 +34,20 @@ export default class RoomsServices extends MasterServices {
 		});
 		let spawns: SPAWN_MODEL[] = [];
 		(scene.Spawners || []).forEach(spawner => {
-			spawns.push({
+			let spawnerModel: SPAWN_MODEL = {
 				mobId: spawner.MonsterKey,
 				cap: spawner.SpawnCap,
 				interval: spawner.RespawnTime,
 				x: spawner.PositionX,
 				y: spawner.PositionY
-			});
+			};
+			if (spawner.Bulk && spawner.Bulk !== "None") {
+				spawnerModel.bulk = spawner.Bulk.toLowerCase();
+			}
+			if (spawner.SpawnTimes > 0) {
+				spawnerModel.times = +spawner.SpawnTimes;
+			}
+			spawns.push(spawnerModel);
 		});
 		let room: ROOM_MODEL = {
 			name: scene.name,

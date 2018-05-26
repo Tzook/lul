@@ -53,16 +53,16 @@ export default class MobsController extends MasterController {
 	}
 
 	protected spawnMobs(spawnInfo: SPAWN_INSTANCE, mobsInSpawn: Map<string, MOB_INSTANCE>, room: string) {
-		let mobsToSpawn = spawnInfo.cap - mobsInSpawn.size;
-		if (mobsToSpawn > 0) {
+		spawnInfo.times && spawnInfo.times--;
+		const spawnCount = spawnInfo.bulk ? spawnInfo.cap - mobsInSpawn.size : 1;
+		for (let i = 0; i < spawnCount; i++) {
 			let mob = this.spawnMob(spawnInfo.mobId, spawnInfo.x, spawnInfo.y, room);
 			mob.spawn = spawnInfo; // useful for when we delete the mob
 			mobsInSpawn.set(mob.id, mob);
-			
-			if (mobsToSpawn > 1) {
-				// we still have a mob to spawn - set an interval
-				this.setRespawnTimer(mob, room);
-			}
+		}
+		if (spawnInfo.cap - mobsInSpawn.size > 1) {
+			// we still have a mob to spawn - set an interval
+			this.setRespawnTimer(spawnInfo, room);
 		}
 	}
 
@@ -176,19 +176,27 @@ export default class MobsController extends MasterController {
 		
 		if (mob.spawn) {
 			mob.spawn.mobs.delete(mob.id);
-			if (mob.spawn.cap == mob.spawn.mobs.size + 1) {
-				// if it's the first mob that we kill, set a timer to respawn
-				this.setRespawnTimer(mob, socket.character.room);
+			// if it's in bulk, only the last one should begin
+			// else, if it's the first mob that we kill
+			const mobsCountToRespawn = mob.spawn.bulk === "wave" ? 0 : mob.spawn.cap - 1;
+			if (mob.spawn.mobs.size === mobsCountToRespawn) {
+				this.setRespawnTimer(mob.spawn, socket.character.room);
 			}
 		}
 	}
 
-	protected setRespawnTimer(mob: MOB_INSTANCE, room: string) {
-		if (mob.spawn.interval >= 0) {
+	protected setRespawnTimer(spawn: SPAWN_INSTANCE, room: string) {
+		if (this.canSpawn(spawn)) {
 			setTimeout(() => {
-				this.spawnMobs(mob.spawn, mob.spawn.mobs, room);
-			}, getSpawnIntervalTime(mob.spawn));
+				if (this.canSpawn(spawn)) {
+					this.spawnMobs(spawn, spawn.mobs, room);
+				}
+			}, getSpawnIntervalTime(spawn));
 		}
+	}
+
+	protected canSpawn(spawn: SPAWN_INSTANCE): boolean {
+		return spawn.interval >= 0 && spawn.times !== 0;
 	}
 
 	public clearRoom(socket: GameSocket) {
@@ -196,7 +204,7 @@ export default class MobsController extends MasterController {
 		let map = this.roomsMobs.get(socket.character.room);
 		if (map) {
 			map.spawns.forEach(spawn => {
-				spawn.interval = -1; // make sure respawn doesn't occur
+				spawn.times = 0; // make sure respawn doesn't occur
 			});
 			this.roomsMobs.delete(socket.character.room);
 		}
