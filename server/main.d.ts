@@ -493,7 +493,6 @@ interface ROOM_STATE extends Map<string, string> {}
 
 // Dungeons
 // ========
-
 interface DUNGEON_REWARD {
     key: string,
     chance: number,
@@ -513,4 +512,10 @@ interface DUNGEON {
     stages: DUNGEON_STAGE[],
     perksPool: PERK_MAP[],
     rareBonuses: string[],
+}
+interface RUNNING_DUNGEON {
+    startTime: number,
+    timerId: NodeJS.Timer,
+    dungeon: DUNGEON,
+    currentStageIndex: number,
 }

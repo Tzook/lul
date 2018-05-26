@@ -9,7 +9,11 @@ export default {
 			STATUS: "OK"
 		}
 	},
-	SERVER_INNER: {},
-	SERVER_GETS: {},
+	SERVER_INNER: {
+	},
+	SERVER_GETS: {
+		"DUNGEON_START": {"name": "started_dungeon", "alive": true, "log": true},		
+	},
 	CLIENT_GETS: {},
+	DUNGEON_PARTY_SIZE: 5,
 }
