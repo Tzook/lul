@@ -7,6 +7,8 @@ import { pickRandomly } from "../drops/drops.services";
 import { pickRandomIndexes } from "../utils/random";
 import dungeonConfig from "./dungeon.config";
 import { getIo } from "../socketio/socketio.router";
+import { addBonusPerks, removeBonusPerks } from "../bonusPerks/bonusPerks.services";
+import { joinObjects } from "../utils/objects";
 
 export default class DungeonServices extends MasterServices {
     public dungeonsInfo: Map<string, DUNGEON> = new Map(); 
@@ -42,6 +44,7 @@ export function startDungeon(socket: GameSocket, dungeon: DUNGEON) {
         timerId,
         dungeon,
         currentStageIndex: -1,
+        perksBonus: {},
     };
     dungeonServices.runningDungeons.set(party, runningDungeon);
     
@@ -60,6 +63,10 @@ export function abortDungeon(socket: GameSocket) {
     const runningDungeon = dungeonServices.runningDungeons.get(party);
     clearTimeout(runningDungeon.timerId);
     dungeonServices.runningDungeons.delete(party);
+
+    for (let memberSocket of getPartyMembersInMap(socket)) {
+        removeBonusPerks({perks: runningDungeon.perksBonus}, memberSocket);
+    }
 }
 
 export function nextStage(socket: GameSocket) {
@@ -75,10 +82,10 @@ export function nextStage(socket: GameSocket) {
         room = getRoomInstance(currentStage.rooms[roomIndex].key);
     }
 
-    for (let moveSocket of getPartyMembersInMap(socket)) {
+    for (let memberSocket of getPartyMembersInMap(socket)) {
         socket.emitter.emit(roomsConfig.SERVER_INNER.MOVE_ROOM.name, {
             room
-        }, moveSocket);
+        }, memberSocket);
     }
 
     if (currentStage.rewards.length > 0) {
@@ -88,4 +95,13 @@ export function nextStage(socket: GameSocket) {
             pool: runningDungeon.buffsPool
         });
     }
+}
+
+export function pickDungeonBuff(socket: GameSocket, index: number) {
+    const runningDungeon = getRunningDungeon(socket);
+
+    for (let memberSocket of getPartyMembersInMap(socket)) {
+        addBonusPerks({perks: runningDungeon.buffsPool[index]}, memberSocket);
+    }
+    runningDungeon.perksBonus = joinObjects(runningDungeon.perksBonus, runningDungeon.buffsPool[index]);
 }

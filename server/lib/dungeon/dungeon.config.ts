@@ -12,8 +12,9 @@ export default {
 	SERVER_INNER: {
 	},
 	SERVER_GETS: {
-		"DUNGEON_START": {"name": "started_dungeon", "alive": true, "log": true},		
-		"DUNGEON_NEXT_STAGE": {"name": "continued_dungeon", "alive": true, "log": true},		
+		DUNGEON_START: {name: "started_dungeon", "alive": true, "log": true},		
+		DUNGEON_NEXT_STAGE: {name: "continued_dungeon", "alive": true, "log": true},		
+		DUNGEON_PICK_BUFF: {name: "picked_dungeon_buff", "alive": true, "log": true},		
 	},
 	CLIENT_GETS: {
 		DUNGEON_STAGE_BUFFS: {name: "dungeon_buffs_pool"},
