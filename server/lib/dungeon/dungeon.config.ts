@@ -13,6 +13,7 @@ export default {
 	},
 	SERVER_GETS: {
 		"DUNGEON_START": {"name": "started_dungeon", "alive": true, "log": true},		
+		"DUNGEON_NEXT_STAGE": {"name": "continued_dungeon", "alive": true, "log": true},		
 	},
 	CLIENT_GETS: {},
 	DUNGEON_PARTY_SIZE: 5,

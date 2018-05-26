@@ -25,7 +25,7 @@ export default class MobsController extends MasterController {
 		return this.roomsMobs.has(room);
 	}
 
-	private getMobsMap(room: string, createIfMissing: boolean = false): Map<string, MOB_INSTANCE> {
+	public getMobsMap(room: string, createIfMissing: boolean = false): Map<string, MOB_INSTANCE> {
 		return getMapOfMap(this.mobById, room, createIfMissing);
 	}
 

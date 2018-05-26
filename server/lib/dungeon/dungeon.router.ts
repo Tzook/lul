@@ -2,8 +2,9 @@ import SocketioRouterBase from '../socketio/socketio.router.base';
 import { isBoss } from '../master/master.middleware';
 import dungeonConfig from './dungeon.config';
 import DungeonController from './dungeon.controller';
-import { getDungeonInfo, startDungeon } from './dungeon.services';
+import { getDungeonInfo, startDungeon, getRunningDungeon, nextStage } from './dungeon.services';
 import { getCharParty, isPartyLeader, getPartyMembersInMap } from '../party/party.services';
+import { getMobsInRoom } from '../mobs/mobs.services';
 
 export default class DungeonRouter extends SocketioRouterBase {
     protected controller: DungeonController;
@@ -43,5 +44,21 @@ export default class DungeonRouter extends SocketioRouterBase {
 		}
 		
 		startDungeon(socket, dungeon);
+    }
+	
+	[dungeonConfig.SERVER_GETS.DUNGEON_NEXT_STAGE.name](data, socket: GameSocket) {
+		const runningDungeon = getRunningDungeon(socket);
+		if (!runningDungeon) {
+			return this.sendError(data, socket, `Must be in a dungeon!`, true, true);
+		}
+		if (!isPartyLeader(socket, getCharParty(socket))) {
+			return this.sendError(data, socket, `You are not the party leader`, true, true);
+		}
+		const roomMobs = getMobsInRoom(socket.character.room);
+		if (roomMobs.size > 0) {
+			return this.sendError(data, socket, `There are ${roomMobs.size} mobs remaining!`, true, true);
+		}
+
+		nextStage(socket);
     }
 }

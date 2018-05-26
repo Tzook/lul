@@ -45,7 +45,7 @@ export function startDungeon(socket: GameSocket, dungeon: DUNGEON) {
     nextStage(socket);
 }
 
-function getRunningDungeon(socket: GameSocket): RUNNING_DUNGEON {
+export function getRunningDungeon(socket: GameSocket): RUNNING_DUNGEON|undefined {
     const dungeonServices = getDungeonServices();
     const party = getCharParty(socket);
     return dungeonServices.runningDungeons.get(party);

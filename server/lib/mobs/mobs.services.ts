@@ -188,3 +188,7 @@ export function addThreat(mob: MOB_INSTANCE, threat: number, attacker: PLAYER) {
 		getMobsController().addThreat(mob, threat, attacker);
 	}
 }
+
+export function getMobsInRoom(room: string): Map<string, MOB_INSTANCE> {
+	return getMobsController().getMobsMap(room);
+}
