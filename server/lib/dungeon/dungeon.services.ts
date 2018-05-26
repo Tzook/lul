@@ -7,8 +7,9 @@ import { pickRandomly } from "../drops/drops.services";
 import { pickRandomIndexes } from "../utils/random";
 import dungeonConfig from "./dungeon.config";
 import { getIo } from "../socketio/socketio.router";
-import { addBonusPerks, removeBonusPerks } from "../bonusPerks/bonusPerks.services";
+import { addBonusPerks, removeBonusPerks, modifyBonusPerks } from "../bonusPerks/bonusPerks.services";
 import { joinObjects } from "../utils/objects";
+import statsConfig from "../stats/stats.config";
 
 export default class DungeonServices extends MasterServices {
     public dungeonsInfo: Map<string, DUNGEON> = new Map(); 
@@ -38,15 +39,17 @@ export function getDungeonInfo(key: string): DUNGEON|undefined {
 export function startDungeon(socket: GameSocket, dungeon: DUNGEON) {
     const dungeonServices = getDungeonServices();
     const party = getCharParty(socket);
-    const timerId = setTimeout(() => abortDungeon(socket), dungeon.time);
+    const timerId = setTimeout(() => finishDungeon(socket), dungeon.time);
     const runningDungeon: RUNNING_DUNGEON = {
         startTime: Date.now(),
         timerId,
         dungeon,
         currentStageIndex: -1,
         perksBonus: {},
+        members: new Set(party.members),
     };
     dungeonServices.runningDungeons.set(party, runningDungeon);
+    party.kickLocked = true;
     
     nextStage(socket);
 }
@@ -57,15 +60,30 @@ export function getRunningDungeon(socket: GameSocket): RUNNING_DUNGEON|undefined
     return dungeonServices.runningDungeons.get(party);
 }
 
-export function abortDungeon(socket: GameSocket) {
+export function finishDungeon(socket: GameSocket, teleportOut: boolean = true) {
     const dungeonServices = getDungeonServices();
     const party = getCharParty(socket);
-    const runningDungeon = dungeonServices.runningDungeons.get(party);
+    const runningDungeon = getRunningDungeon(socket);
     clearTimeout(runningDungeon.timerId);
     dungeonServices.runningDungeons.delete(party);
+    
+    for (let memberSocket of getPartyMembersInMap(socket, true)) {
+        removeFromDungeon(memberSocket, teleportOut);
+    }
+    party.kickLocked = false;
+}
 
-    for (let memberSocket of getPartyMembersInMap(socket)) {
-        removeBonusPerks({perks: runningDungeon.perksBonus}, memberSocket);
+export function removeFromDungeon(memberSocket: GameSocket, teleportOut: boolean) {
+    const runningDungeon = getRunningDungeon(memberSocket);
+
+    if (runningDungeon.members.has(memberSocket.character.name) {
+        modifyBonusPerks(memberSocket, () => {
+            removeBonusPerks({perks: runningDungeon.perksBonus}, memberSocket);
+        });
+        runningDungeon.members.delete(memberSocket.character.name);
+    }
+    if (teleportOut) {
+        memberSocket.emitter.emit(roomsConfig.SERVER_INNER.MOVE_TO_TOWN.name, {}, memberSocket);
     }
 }
 
@@ -74,34 +92,42 @@ export function nextStage(socket: GameSocket) {
     runningDungeon.currentStageIndex++;
     const currentStage = runningDungeon.dungeon.stages[runningDungeon.currentStageIndex];
 
-    let room;
     if (!currentStage) {
-        room = runningDungeon.dungeon.beginRoom;
+        finishDungeon(socket);
     } else {
         const roomIndex = pickRandomly(currentStage.rooms);
-        room = getRoomInstance(currentStage.rooms[roomIndex].key);
+        const room = getRoomInstance(currentStage.rooms[roomIndex].key);
+        for (let memberSocket of getPartyMembersInMap(socket, true)) {
+            if (memberSocket.alive) {
+                // living members continue. dead ones are resurrected.
+                memberSocket.emitter.emit(roomsConfig.SERVER_INNER.MOVE_ROOM.name, { room }, memberSocket);
+            } else {
+                memberSocket.emitter.emit(statsConfig.SERVER_GETS.RELEASE_DEATH.name, {}, memberSocket);
+            }
+        }
+    
+        if (currentStage.rewards.length > 0) {
+            setBuffsPool(socket);
+        }
     }
+}
 
-    for (let memberSocket of getPartyMembersInMap(socket)) {
-        socket.emitter.emit(roomsConfig.SERVER_INNER.MOVE_ROOM.name, {
-            room
-        }, memberSocket);
-    }
-
-    if (currentStage.rewards.length > 0) {
-        const buffIndexes = pickRandomIndexes(runningDungeon.dungeon.perksPool, dungeonConfig.DUNGEON_OFFERED_BUFFS);
-        runningDungeon.buffsPool = buffIndexes.map(index => runningDungeon.dungeon.perksPool[index]);
-        getIo().to(socket.character.room).emit(dungeonConfig.CLIENT_GETS.DUNGEON_STAGE_BUFFS.name, {
-            pool: runningDungeon.buffsPool
-        });
-    }
+function setBuffsPool(socket: GameSocket) {
+    const runningDungeon = getRunningDungeon(socket);
+    const buffIndexes = pickRandomIndexes(runningDungeon.dungeon.perksPool, dungeonConfig.DUNGEON_OFFERED_BUFFS);
+    runningDungeon.buffsPool = buffIndexes.map(index => runningDungeon.dungeon.perksPool[index]);
+    getIo().to(socket.character.room).emit(dungeonConfig.CLIENT_GETS.DUNGEON_STAGE_BUFFS.name, {
+        pool: runningDungeon.buffsPool
+    });
 }
 
 export function pickDungeonBuff(socket: GameSocket, index: number) {
     const runningDungeon = getRunningDungeon(socket);
 
-    for (let memberSocket of getPartyMembersInMap(socket)) {
-        addBonusPerks({perks: runningDungeon.buffsPool[index]}, memberSocket);
+    for (let memberSocket of getPartyMembersInMap(socket, true)) {
+        modifyBonusPerks(memberSocket, () => {
+            addBonusPerks({perks: runningDungeon.buffsPool[index]}, memberSocket);
+        });
     }
     runningDungeon.perksBonus = joinObjects(runningDungeon.perksBonus, runningDungeon.buffsPool[index]);
 }

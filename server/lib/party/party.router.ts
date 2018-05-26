@@ -64,7 +64,8 @@ export default class PartyRouter extends SocketioRouterBase {
         if (!party) {
             return this.sendError(data, socket, "Cannot leave - must be in a party", true, true);
         }
-        this.controller.leaveParty(socket, party);
+        // wait for next tick so we can clean up party things
+        process.nextTick(() => this.controller.leaveParty(socket, party));
 	}
 
 	[partyConfig.SERVER_GETS.LEAD_PARTY.name](data, socket: GameSocket) {
@@ -87,6 +88,8 @@ export default class PartyRouter extends SocketioRouterBase {
             return this.sendError(data, socket, "Cannot kick - must be party leader", true, true);
         } else if (!isMember(data.char_name, party)) {
             return this.sendError(data, socket, "Cannot kick - character not in party", true, true);
+        } else if (party.kickLocked) {
+            return this.sendError(data, socket, "Cannot kick - party is locked", true, true);
         }
         this.controller.kickFromParty(socket, data.char_name, party);
     }

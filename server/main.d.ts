@@ -382,6 +382,7 @@ interface PARTY_MODEL {
     leader: string // leader name
     members: Set<string> // list of member names
     invitees: Map<string, NodeJS.Timer> // invitee name to its clear-timeout id
+    kickLocked: boolean, // if the party is locked so you can't kick 
 }
 
 // Npcs
@@ -523,4 +524,5 @@ interface RUNNING_DUNGEON {
     currentStageIndex: number,
     buffsPool?: PERK_MAP[],
     perksBonus: PERK_MAP,
+    members: Set<string>,
 }

@@ -2,7 +2,7 @@ import SocketioRouterBase from '../socketio/socketio.router.base';
 import { isBoss } from '../master/master.middleware';
 import dungeonConfig from './dungeon.config';
 import DungeonController from './dungeon.controller';
-import { getDungeonInfo, startDungeon, getRunningDungeon, nextStage, pickDungeonBuff } from './dungeon.services';
+import { getDungeonInfo, startDungeon, getRunningDungeon, nextStage, pickDungeonBuff, removeFromDungeon, finishDungeon } from './dungeon.services';
 import { getCharParty, isPartyLeader, getPartyMembersInMap } from '../party/party.services';
 import { getMobsInRoom } from '../mobs/mobs.services';
 
@@ -78,5 +78,25 @@ export default class DungeonRouter extends SocketioRouterBase {
 		}
 
 		pickDungeonBuff(socket, data.buff_index);
-    }
+	}
+
+	[dungeonConfig.SERVER_INNER.LEAVE_PARTY.name](data, socket: GameSocket) {
+		this.leaving(socket, true);
+	}
+
+	[dungeonConfig.SERVER_INNER.MOVE_TO_TOWN.name](data, socket: GameSocket) {
+		this.leaving(socket, false);
+	}
+	
+	private leaving(socket: GameSocket, teleportOut: boolean) {
+		const runningDungeon = getRunningDungeon(socket);
+		if (runningDungeon) {
+			if (runningDungeon.members.size === 1) {
+				// last man in the dungeon
+				finishDungeon(socket, teleportOut);
+			} else {
+				removeFromDungeon(socket, teleportOut);
+			}
+		}
+	}
 }

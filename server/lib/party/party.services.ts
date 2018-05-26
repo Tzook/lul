@@ -25,7 +25,7 @@ export function getCharParty(socket: GameSocket) {
     return getPartyController().getCharParty(socket);
 }
 
-export function getPartyMembersInMap(socket: GameSocket): GameSocket[] {
+export function getPartyMembersInMap(socket: GameSocket, includeDead: boolean = false): GameSocket[] {
     let sockets = [];
     let party = getCharParty(socket);
     if (!party) {
@@ -33,7 +33,7 @@ export function getPartyMembersInMap(socket: GameSocket): GameSocket[] {
     } else {
         for (let memberName of party.members) {
             let memberSocket = socket.map.get(memberName);
-            if (memberSocket && memberSocket.character.room === socket.character.room && memberSocket.alive) {
+            if (memberSocket && memberSocket.character.room === socket.character.room && (includeDead || memberSocket.alive)) {
                 sockets.push(memberSocket);
             }
         }

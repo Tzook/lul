@@ -25,11 +25,22 @@ export default class PartyController extends MasterController {
 
     public createParty(socket: GameSocket) {
         socket.emit(config.CLIENT_GETS.CREATE_PARTY.name, {});
+        let cachedKickLocked = 0;
         let party: PARTY_MODEL = {
             name: this.services.getPartyName(),
             leader: socket.character.name,
             members: new Set([socket.character.name]),
             invitees: new Map(),
+            get kickLocked() {
+                return !!cachedKickLocked;
+            },
+            set kickLocked(value: boolean) {
+                if (value) {
+                    cachedKickLocked++;
+                } else {
+                    cachedKickLocked--;
+                }
+            },
         };
         this.charToParty.set(socket.character.name, party);
         socket.join(party.name);

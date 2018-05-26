@@ -1,3 +1,6 @@
+import partyConfig from "../party/party.config";
+import roomsConfig from "../rooms/rooms.config";
+
 export default {
 	ROUTES: {
 		GENERATE: "/dungeons/generate"
@@ -10,6 +13,8 @@ export default {
 		}
 	},
 	SERVER_INNER: {
+		LEAVE_PARTY: Object.assign({}, partyConfig.SERVER_GETS.LEAVE_PARTY, {log: false}),		
+        MOVE_TO_TOWN: Object.assign({}, roomsConfig.SERVER_INNER.MOVE_TO_TOWN, {log: false}),
 	},
 	SERVER_GETS: {
 		DUNGEON_START: {name: "started_dungeon", "alive": true, "log": true},		
