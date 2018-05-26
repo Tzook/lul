@@ -6,7 +6,7 @@ import { logger } from '../main/logger';
 import { getSocketioRouter } from './socketio.router';
 
 export default class SocketioRouterBase extends MasterRouter {
-	protected io: SocketIO.Namespace;
+	public io: SocketIO.Namespace;
 	protected emitter: Emitter.EventEmitter;
 	public CLIENT_GETS;
 	public SERVER_GETS;

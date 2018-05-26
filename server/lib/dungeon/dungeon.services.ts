@@ -4,6 +4,9 @@ import { getCharParty, getPartyMembersInMap } from "../party/party.services";
 import roomsConfig from "../rooms/rooms.config";
 import { getRoomInstance } from "../rooms/rooms.services";
 import { pickRandomly } from "../drops/drops.services";
+import { pickRandomIndexes } from "../utils/random";
+import dungeonConfig from "./dungeon.config";
+import { getIo } from "../socketio/socketio.router";
 
 export default class DungeonServices extends MasterServices {
     public dungeonsInfo: Map<string, DUNGEON> = new Map(); 
@@ -76,5 +79,13 @@ export function nextStage(socket: GameSocket) {
         socket.emitter.emit(roomsConfig.SERVER_INNER.MOVE_ROOM.name, {
             room
         }, moveSocket);
+    }
+
+    if (currentStage.rewards.length > 0) {
+        const buffIndexes = pickRandomIndexes(runningDungeon.dungeon.perksPool, dungeonConfig.DUNGEON_OFFERED_BUFFS);
+        runningDungeon.buffsPool = buffIndexes.map(index => runningDungeon.dungeon.perksPool[index]);
+        getIo().to(socket.character.room).emit(dungeonConfig.CLIENT_GETS.DUNGEON_STAGE_BUFFS.name, {
+            pool: runningDungeon.buffsPool
+        });
     }
 }

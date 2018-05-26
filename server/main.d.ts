@@ -521,4 +521,5 @@ interface RUNNING_DUNGEON {
     timerId: NodeJS.Timer,
     dungeon: DUNGEON,
     currentStageIndex: number,
+    buffsPool?: PERK_MAP[]
 }

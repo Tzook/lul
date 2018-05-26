@@ -247,3 +247,7 @@ export default class SocketioRouter extends SocketioRouterBase {
  export function getSocketioRouter(): SocketioRouter {
 	 return getRouter('socketio');
  }
+
+ export function getIo(): SocketIO.Namespace {
+	return getSocketioRouter().io;
+ }

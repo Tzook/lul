@@ -15,7 +15,10 @@ export default {
 		"DUNGEON_START": {"name": "started_dungeon", "alive": true, "log": true},		
 		"DUNGEON_NEXT_STAGE": {"name": "continued_dungeon", "alive": true, "log": true},		
 	},
-	CLIENT_GETS: {},
+	CLIENT_GETS: {
+		DUNGEON_STAGE_BUFFS: {name: "dungeon_buffs_pool"},
+	},
 	DUNGEON_PARTY_SIZE: 5,
 	DUNGEON_RARE_ROOM_RARITY: 3,
+	DUNGEON_OFFERED_BUFFS: 3,
 }
