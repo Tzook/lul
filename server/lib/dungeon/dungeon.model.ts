@@ -1,6 +1,7 @@
 import MasterModel from "../master/master.model";
 import * as mongoose from 'mongoose';
 import * as _ from 'underscore';
+import { setDungeonsInfo } from "./dungeon.services";
 
 export const PRIORITY_DUNGEON = 10;
 
@@ -39,9 +40,19 @@ export default class DungeonModel extends MasterModel {
     
     createModel() {
         this.setModel('Dungeon');
+		setTimeout(warmDungeons); // timeout so the Model can be set
         return Promise.resolve();
     }
 };
+
+function warmDungeons(): Promise<any> {
+    const DungeonModel = mongoose.model('Dungeon');
+    return DungeonModel.find({}).lean()
+        .then((docs: DUNGEON[]) => {
+            console.log("got dungeons");
+            setDungeonsInfo(docs);
+        });
+}
 
 export function generateDungeons(dungeons: any): Promise<any> {
     console.log("Generating dungeons from data:", dungeons);
