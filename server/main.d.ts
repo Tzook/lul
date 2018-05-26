@@ -498,9 +498,12 @@ interface DUNGEON_REWARD {
     chance: number,
     stack: number,
 }
+interface DUNGEON_ROOM {
+    key: string,
+    chance: number,
+}
 interface DUNGEON_STAGE {
-    rooms: string[],
-    rareRooms: string[],
+    rooms: DUNGEON_ROOM[],
     rewards: DUNGEON_REWARD[],
 }
 interface DUNGEON {

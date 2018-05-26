@@ -16,4 +16,5 @@ export default {
 	},
 	CLIENT_GETS: {},
 	DUNGEON_PARTY_SIZE: 5,
+	DUNGEON_RARE_ROOM_RARITY: 3,
 }

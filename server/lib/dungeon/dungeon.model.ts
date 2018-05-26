@@ -2,6 +2,7 @@ import MasterModel from "../master/master.model";
 import * as mongoose from 'mongoose';
 import * as _ from 'underscore';
 import { setDungeonsInfo } from "./dungeon.services";
+import dungeonConfig from "./dungeon.config";
 
 export const PRIORITY_DUNGEON = 10;
 
@@ -11,9 +12,13 @@ const DUNGEON_REWARD_MODEL = (<any>mongoose.Schema)({
     stack: Number,
 }, {_id: false});
 
+const DUNGEON_ROOM_MODEL = (<any>mongoose.Schema)({
+    key: String,
+    chance: Number,
+}, {_id: false});
+
 const DUNGEON_STAGE_MODEL = (<any>mongoose.Schema)({
-    rooms: [String],
-    rareRooms: [String],
+    rooms: [DUNGEON_ROOM_MODEL],
     rewards: [DUNGEON_REWARD_MODEL],
 }, {_id: false});
 
@@ -74,8 +79,7 @@ export function generateDungeons(dungeons: any): Promise<any> {
 
         (dungeon.stages || []).forEach(stage => {
             dungeonSchema.stages.push({
-                rooms: stage.rooms || [],
-                rareRooms: stage.rareRooms || [],
+                rooms: getRooms(stage),
                 rewards: getRewards(stage),
             });
         });
@@ -92,6 +96,21 @@ export function generateDungeons(dungeons: any): Promise<any> {
     return DungeonModel.remove({})
         .then(d => DungeonModel.create(dungeonModels));
 };
+
+function getRooms(stage): DUNGEON_ROOM[] {
+    const basicRooms: string[] = stage.rooms || [];
+    const rareRooms: string[] = stage.rareRooms || [];
+    const totalRarity = basicRooms.length * dungeonConfig.DUNGEON_RARE_ROOM_RARITY + rareRooms.length;
+    const dungeonBasicRooms: DUNGEON_ROOM[] = basicRooms.map(room => ({
+        key: room,
+        chance: dungeonConfig.DUNGEON_RARE_ROOM_RARITY / totalRarity,
+    }));
+    const dungeonRareRooms: DUNGEON_ROOM[] = rareRooms.map(room => ({
+        key: room,
+        chance: 1 / totalRarity,
+    }));
+    return dungeonBasicRooms.concat(dungeonRareRooms);
+}
 
 function getRewards(stage): DUNGEON_REWARD[] {
     const rewards = stage.rewards || [];
