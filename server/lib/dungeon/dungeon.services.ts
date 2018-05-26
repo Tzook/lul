@@ -10,6 +10,8 @@ import { getIo } from "../socketio/socketio.router";
 import { addBonusPerks, removeBonusPerks, modifyBonusPerks } from "../bonusPerks/bonusPerks.services";
 import { joinObjects } from "../utils/objects";
 import statsConfig from "../stats/stats.config";
+import { getItemInstance } from "../items/items.services";
+import dropsConfig from "../drops/drops.config";
 
 export default class DungeonServices extends MasterServices {
     public dungeonsInfo: Map<string, DUNGEON> = new Map(); 
@@ -47,6 +49,7 @@ export function startDungeon(socket: GameSocket, dungeon: DUNGEON) {
         currentStageIndex: -1,
         perksBonus: {},
         members: new Set(party.members),
+        haveRewards: new Set(),
     };
     dungeonServices.runningDungeons.set(party, runningDungeon);
     party.kickLocked = true;
@@ -108,6 +111,9 @@ export function nextStage(socket: GameSocket) {
     
         if (currentStage.rewards.length > 0) {
             setBuffsPool(socket);
+            runningDungeon.haveRewards = new Set(runningDungeon.members);
+        } else {
+            runningDungeon.haveRewards.clear();
         }
     }
 }
@@ -130,4 +136,26 @@ export function pickDungeonBuff(socket: GameSocket, index: number) {
         });
     }
     runningDungeon.perksBonus = joinObjects(runningDungeon.perksBonus, runningDungeon.buffsPool[index]);
+}
+
+export function unlockDungeonReward(socket: GameSocket) {
+    const runningDungeon = getRunningDungeon(socket);
+    runningDungeon.haveRewards.delete(socket.character.name);
+
+    const possibleRewards = runningDungeon.dungeon.stages[runningDungeon.currentStageIndex].rewards;
+    const pickedIndex = pickRandomly(possibleRewards);
+    const reward: DUNGEON_REWARD = possibleRewards[pickedIndex];
+    
+    let itemInstance = getItemInstance(reward.key);
+    if (!itemInstance) {
+        throw new Error(`Item ${reward.key} does not exist in dungeon stage ${runningDungeon.currentStageIndex}`);
+    }
+                
+    if (reward.stack > 1) {
+        itemInstance.stack = reward.stack;
+    }
+    
+    socket.emitter.emit(dropsConfig.SERVER_INNER.ITEMS_DROP.name, {
+        owner: socket.character.name
+    }, socket, [itemInstance]);
 }

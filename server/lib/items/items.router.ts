@@ -1,7 +1,7 @@
 import SocketioRouterBase from '../socketio/socketio.router.base';
 import ItemsMiddleware from './items.middleware';
 import ItemsController from './items.controller';
-import ItemsServices from './items.services';
+import ItemsServices, { getItemInstance } from './items.services';
 import dropsConfig from '../drops/drops.config';
 import config from '../items/items.config';
 
@@ -30,7 +30,7 @@ export default class ItemsRouter extends SocketioRouterBase {
 	}
 
 	public getItemInstance(key: string): ITEM_INSTANCE|undefined {
-		return this.services.getItemInstance(key);
+		return getItemInstance(key);
 	}
 
 	public getItemsCounts(socket: GameSocket) {

@@ -527,4 +527,5 @@ interface RUNNING_DUNGEON {
     buffsPool?: PERK_MAP[],
     perksBonus: PERK_MAP,
     members: Set<string>,
+    haveRewards: Set<string>,
 }

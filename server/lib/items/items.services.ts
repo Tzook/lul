@@ -77,26 +77,6 @@ export default class ItemsServices extends MasterServices {
 		return this.itemsInfo.get(key);
 	}
 
-	public getItemInstance(key: string): ITEM_INSTANCE|undefined {
-		// always return a copy of the item, so it can be modified freely
-		let itemInfo = this.getItemInfo(key);
-		let instance: ITEM_INSTANCE;
-		if (itemInfo) {
-			instance = {
-				key: itemInfo.key
-			};
-			if (itemInfo.stats) {
-				for (var statKey in itemInfo.stats) {
-					instance[statKey] = itemInfo.stats[statKey];
-				}
-			}
-			if (itemInfo.perks) {
-                instance.perks = slightlyTweakPerks(itemInfo.perks);
-            }
-		}
-		return instance
-	}
-
 	public clearInvalidItems(socket: GameSocket) {
 		let items = socket.character.items;
 		for (let i = 0; i < items.length; i++) {
@@ -122,4 +102,24 @@ export function getItemsInfo() {
 
 export function isGold(item: ITEM_INSTANCE): boolean {
 	return item.key === "gold";
+}
+
+export function getItemInstance(key: string): ITEM_INSTANCE|undefined {
+	// always return a copy of the item, so it can be modified freely
+	let itemInfo = getItemsServices().getItemInfo(key);
+	let instance: ITEM_INSTANCE;
+	if (itemInfo) {
+		instance = {
+			key: itemInfo.key
+		};
+		if (itemInfo.stats) {
+			for (var statKey in itemInfo.stats) {
+				instance[statKey] = itemInfo.stats[statKey];
+			}
+		}
+		if (itemInfo.perks) {
+			instance.perks = slightlyTweakPerks(itemInfo.perks);
+		}
+	}
+	return instance
 }
