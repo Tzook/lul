@@ -3,6 +3,7 @@ import { getServices } from "../main/bootstrap";
 import { getCharParty, getPartyMembersInMap } from "../party/party.services";
 import roomsConfig from "../rooms/rooms.config";
 import { getRoomInstance } from "../rooms/rooms.services";
+import { pickRandomly } from "../drops/drops.services";
 
 export default class DungeonServices extends MasterServices {
     public dungeonsInfo: Map<string, DUNGEON> = new Map(); 
@@ -58,15 +59,17 @@ export function abortDungeon(socket: GameSocket) {
     dungeonServices.runningDungeons.delete(party);
 }
 
-function nextStage(socket: GameSocket) {
+export function nextStage(socket: GameSocket) {
     const runningDungeon = getRunningDungeon(socket);
     runningDungeon.currentStageIndex++;
-    
+    const currentStage = runningDungeon.dungeon.stages[runningDungeon.currentStageIndex];
+
     let room;
-    if (runningDungeon.currentStageIndex > runningDungeon.dungeon.stages.length) {
+    if (!currentStage) {
         room = runningDungeon.dungeon.beginRoom;
     } else {
-        room = getRoomInstance("TODO");
+        const roomIndex = pickRandomly(currentStage.rooms);
+        room = getRoomInstance(currentStage.rooms[roomIndex].key);
     }
 
     for (let moveSocket of getPartyMembersInMap(socket)) {
