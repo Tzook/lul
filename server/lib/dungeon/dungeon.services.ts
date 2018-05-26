@@ -76,7 +76,7 @@ export function finishDungeon(socket: GameSocket, teleportOut: boolean = true) {
 export function removeFromDungeon(memberSocket: GameSocket, teleportOut: boolean) {
     const runningDungeon = getRunningDungeon(memberSocket);
 
-    if (runningDungeon.members.has(memberSocket.character.name) {
+    if (runningDungeon.members.has(memberSocket.character.name)) {
         modifyBonusPerks(memberSocket, () => {
             removeBonusPerks({perks: runningDungeon.perksBonus}, memberSocket);
         });
