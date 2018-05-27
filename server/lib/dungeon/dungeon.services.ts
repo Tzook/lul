@@ -156,6 +156,7 @@ export function unlockDungeonReward(socket: GameSocket) {
     }
     
     socket.emitter.emit(dropsConfig.SERVER_INNER.ITEMS_DROP.name, {
-        owner: socket.character.name
+        owner: socket.character.name,
+        partyLoot: false
     }, socket, [itemInstance]);
 }

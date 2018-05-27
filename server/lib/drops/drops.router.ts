@@ -48,10 +48,11 @@ export default class DropsRouter extends SocketioRouterBase {
             return this.sendError(data, socket, "Item does not exist");
 		}
         let itemDrop = map.get(itemId);
-        let owner = itemDrop.owner;
-        if (owner && (owner !== socket.character.name && !this.partyRouter.arePartyMembers(owner, socket.character.name))) {
-            return this.sendError(data, socket, `Item owner is ${owner} and you are ${socket.character.name}.`);
-        }
+        if (itemDrop.owner && itemDrop.owner !== socket.character.name) {
+			if (itemDrop.partyLoot === false || !this.partyRouter.arePartyMembers(itemDrop.owner, socket.character.name)) {
+				return this.sendError(data, socket, `Item owner is ${itemDrop.owner}`);
+			}
+		} 
         let callback = () => {
             this.removeItem(socket.character.room, itemId);
             this.io.to(socket.character.room).emit(this.CLIENT_GETS.ITEM_PICK.name, {
@@ -110,7 +111,6 @@ export default class DropsRouter extends SocketioRouterBase {
 			setTimeout(() => {
 				if (map.has(itemId)) {
 					this.removeItem(room, itemId);
-					console.log('removing item', itemId);
 					this.io.to(room).emit(this.CLIENT_GETS.ITEM_DISAPPEAR.name, {
 						item_id: itemId
 					});
@@ -118,13 +118,15 @@ export default class DropsRouter extends SocketioRouterBase {
 			}, config.ITEM_DROP_LIFE_TIME);
             
             if (data.owner) {
-                itemData.owner = data.owner;
+				itemData.owner = data.owner;
+				if (data.partyLoot !== undefined) {
+					itemData.partyLoot = data.partyLoot;
+				}
 
                 setTimeout(() => {
                     let item = map.get(itemId);
                     if (item) {
                         delete item.owner;
-                        console.log('removing owner from item', itemId);
                         this.io.to(room).emit(this.CLIENT_GETS.ITEM_OWNER_GONE.name, {
                             item_id: itemId
                         });

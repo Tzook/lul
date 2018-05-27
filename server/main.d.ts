@@ -217,6 +217,7 @@ interface ITEM_DROP {
     y: number, 
     item_id: string, 
     owner?: string
+    partyLoot?: boolean
     item: ITEM_INSTANCE
 }
 interface ITEM_INSTANCE extends BASE_STATS_MODEL {
