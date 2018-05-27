@@ -457,6 +457,7 @@ interface PERK_CONFIG {
 	default?: number, 
     bonusPerks?: PERK_MAP, 
     client?: true
+    party?: true
 }
 
 interface CHAR_ABILITY_TALENT {

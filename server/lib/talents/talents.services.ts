@@ -433,6 +433,9 @@ export default class TalentsServices extends MasterServices {
 			if (perk.client === "true") {
 				perkModel.client = true;
 			}
+			if (perk.party === "true") {
+				perkModel.party = true;
+			}
 			perks[perk.key] = perkModel;
 		});
 
