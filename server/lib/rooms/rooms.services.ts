@@ -59,10 +59,11 @@ export default class RoomsServices extends MasterServices {
         extendRoomWithCombat(scene, room);
         let roomModel = new this.Model(room);
 
-        let npcsPromise = this.npcsRouter.updateNpcs(scene.name, scene.NPC);
-		
-		let updatedDocPromise = this.Model.findOneAndUpdate({name: room.name}, roomModel, {new: true, upsert: true});
-		return Promise.all([updatedDocPromise, npcsPromise]);
+		const allRooms = (scene.all || "").split(",");
+        const npcsPromise = this.npcsRouter.updateNpcs(scene.name, scene.NPC, allRooms);
+		const removeUnneededScenesPromise = this.Model.remove({name: {$nin: allRooms}});
+		const updatedDocPromise = this.Model.findOneAndUpdate({name: room.name}, roomModel, {new: true, upsert: true});
+		return Promise.all([updatedDocPromise, removeUnneededScenesPromise, npcsPromise]);
 	}
 
 	public getRooms(): Promise<Map<string, ROOM_MODEL>> {

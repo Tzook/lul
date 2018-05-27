@@ -24,8 +24,8 @@ export default class NpcsRouter extends SocketioRouterBase {
 		super.init(files, app);
 	}
 
-    public updateNpcs(room: string, npcs: any[]): Promise<any> {
-        return this.services.updateNpcs(room, npcs);
+    public updateNpcs(room: string, npcs: any[], allRooms: string[]): Promise<any> {
+        return this.services.updateNpcs(room, npcs, allRooms);
     }
 
     public doesNpcGiveQuest(npcKey: string, questKey: string): boolean {

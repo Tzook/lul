@@ -21,7 +21,7 @@ export default class NpcsServices extends MasterServices {
 
     // HTTP functions
 	// =================
-    public updateNpcs(room: string, npcs: any[] = []): Promise<any> {
+    public updateNpcs(room: string, npcs: any[] = [], allRooms: string[]): Promise<any> {
         let models: NPC_MODEL[] = [];
         for (let i = 0; i < npcs.length; i++) {
             let npc = npcs[i];
@@ -60,7 +60,9 @@ export default class NpcsServices extends MasterServices {
 
             models.push(new this.Model(npcModel))
         }
+        // both removes can probably be done in one action but w/e
         return this.Model.remove({room})
+            .then(d => this.Model.remove({room: {$nin: allRooms}}))
             .then(d => this.Model.insertMany(models));
     }
 
