@@ -190,7 +190,7 @@ export default class SocketioRouter extends SocketioRouterBase {
 	}
 
 	[config.SERVER_GETS.DISCONNECT.name](data, socket: GameSocket) {
-		process.nextTick(() => {
+		setImmediate(() => {
 			if (!this.map.has(socket.id)) {
 				return;
 			}

@@ -96,14 +96,16 @@ export default class RoomsRouter extends SocketioRouterBase {
 	[config.SERVER_INNER.MOVE_ROOM.name](data: {room: string, targetPortal?: PORTAL_MODEL}, socket: GameSocket) {
 		let {room, targetPortal} = data;
 		targetPortal = targetPortal || this.controller.pickRandomPortal(this.services.getRoomInfo(room));
-		socket.leave(socket.character.room);
-
-        this.emitter.emit(config.SERVER_INNER.LEFT_ROOM.name, {}, socket);
-
-		socket.character.room = room;
-		socket.character.position.x = targetPortal.x;
-		socket.character.position.y = targetPortal.y;
-		this.notifyAboutRoom(socket);
+		process.nextTick(() => {
+			socket.leave(socket.character.room);
+			
+			this.emitter.emit(config.SERVER_INNER.LEFT_ROOM.name, {}, socket);
+			
+			socket.character.room = room;
+			socket.character.position.x = targetPortal.x;
+			socket.character.position.y = targetPortal.y;
+			this.notifyAboutRoom(socket);
+		});
 	}
 
 	[config.SERVER_GETS.DISCONNECT.name](data, socket: GameSocket) {
