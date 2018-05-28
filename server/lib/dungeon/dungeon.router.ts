@@ -30,11 +30,8 @@ export default class DungeonRouter extends SocketioRouterBase {
 		if (!isPartyLeader(socket, party)) {
 			return this.sendError(data, socket, `You are not the party leader`, true, true);
 		}
-		if (party.members.size !== dungeonConfig.DUNGEON_PARTY_SIZE) {
-			return this.sendError(data, socket, `Dungeon is for a party of ${dungeonConfig.DUNGEON_PARTY_SIZE} people`, true, true);
-		}
 		const partyMembers = getPartyMembersInMap(socket);
-		if (partyMembers.length !== dungeonConfig.DUNGEON_PARTY_SIZE) {
+		if (partyMembers.length > dungeonConfig.DUNGEON_PARTY_SIZE) {
 			return this.sendError(data, socket, `The party needs to be alive and in the same room`, true, true);
 		}
 		for (let memberSocket of partyMembers) {
