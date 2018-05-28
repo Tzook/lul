@@ -47,10 +47,10 @@ export default class SocketioRouterBase extends MasterRouter {
 		emit && notifyUserAboutError(socket, error, display);
 	}
 
-	public fatal(socket: GameSocket, error: Error, event?: string) {
+	public fatal(to: NodeJS.EventEmitter|GameSocket, error: Error, event?: string) {
 		event = event || this.getEventName();
-		logger.error(error.toString(), this.getMeta(socket, error, event));
-		notifyUserAboutError(socket, "A bad error occurred. Relog ASAP.", true);
+		logger.error(error.toString(), this.getMeta(to, error, event));
+		notifyUserAboutError(to, "Restarting server!\nHad an error: " + error.message, true);
 	}
 	
 	private getEventName(): string {
@@ -62,16 +62,20 @@ export default class SocketioRouterBase extends MasterRouter {
 		return event;
 	}
 
-	private getMeta(socket: GameSocket, data, event: string) {
-		return Object.assign({name: socket.character.name, event}, data);
+	private getMeta(to: NodeJS.EventEmitter|GameSocket, data, event: string) {
+		const extraMetadata = typeof (<any>to).character === "undefined" ? {} : {name: (<GameSocket>to).character.name};
+		return Object.assign({event}, extraMetadata, data);
 	}
 };
-
-
 
 export function sendError(data: any, socket: GameSocket, error: string, emit = true, display = false) {
 	const socketioRouter = getSocketioRouter();
 	return socketioRouter.sendError(data, socket, error, emit, display);
+}
+
+export function sendFatal(to: NodeJS.EventEmitter|GameSocket, error: Error, event?: string) {
+	const socketioRouter = getSocketioRouter();
+	return socketioRouter.fatal(to, error, event);
 }
 
 export function notifyUserAboutError(to: NodeJS.EventEmitter, error: string, display: boolean) {

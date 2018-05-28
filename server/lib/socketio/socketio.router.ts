@@ -1,5 +1,5 @@
 
-import SocketioRouterBase from './socketio.router.base';
+import SocketioRouterBase, { sendFatal } from './socketio.router.base';
 import Emitter = require('events');
 import MasterRouter from '../master/master.router';
 import * as Heroku from 'heroku-client';
@@ -240,7 +240,7 @@ export default class SocketioRouter extends SocketioRouterBase {
             });
             
 		(<any>process).on("SIGTERM", () => notifyUserAboutError(this.io, restartText, true));
-		(<any>process).on("exit", () => notifyUserAboutError(this.io, "Restarting server!\n(Had an error)", true));
+		(<any>process).on("uncaughtException", (error) => sendFatal(this.io, error));
 	}
  };
 

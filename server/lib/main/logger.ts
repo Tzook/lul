@@ -3,7 +3,7 @@ require('winston-mongodb');
 
 const consoleTransport = new winston.transports.Console({
     colorize: true,
-    prettyPrint: true
+    prettyPrint: true,
 });
 const loggerInstance = new winston.Logger({
     transports: [
