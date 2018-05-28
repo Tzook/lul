@@ -79,7 +79,7 @@ export default class RoomsServices extends MasterServices {
 	}
 
 	public getRoomInfo(room: string): ROOM_MODEL|undefined {
-		return this.roomsInfo.get(room);
+		return this.roomsInfo.get(room) || this.roomsInfo.get(getRoomInstanceName(room));
 	}
 };  
 
@@ -87,9 +87,13 @@ export function getRoomInstance(room: string) {
 	return _.uniqueId(room + ROOM_NAME_INSTANCE_SEPARATOR);
 };
 
-export function getRoomName(socket: GameSocket) {
-	return socket.character.room.split(ROOM_NAME_INSTANCE_SEPARATOR)[0];
+export function getRoomName(socket: GameSocket): string {
+	return getRoomInstanceName(socket.character.room);
 };
+
+function getRoomInstanceName(room: string): string {
+	return room.split(ROOM_NAME_INSTANCE_SEPARATOR)[0];
+}
 
 export function isInInstance(socket: GameSocket) {
 	return socket.character.room.includes(ROOM_NAME_INSTANCE_SEPARATOR);
