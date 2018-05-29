@@ -506,6 +506,7 @@ interface DUNGEON_REWARD {
 interface DUNGEON_ROOM {
     key: string,
     chance: number,
+    time?: number,
 }
 interface DUNGEON_STAGE {
     rooms: DUNGEON_ROOM[],
@@ -524,10 +525,13 @@ interface DUNGEON {
 interface RUNNING_DUNGEON {
     startTime: number,
     timerId: NodeJS.Timer,
+    roomTimerId?: NodeJS.Timer,
     dungeon: DUNGEON,
     currentStageIndex: number,
+    currentRoomIndex: number,
     buffsPool?: PERK_MAP[],
     perksBonus: PERK_MAP,
     members: Set<string>,
     haveRewards: Set<string>,
+    poc: GameSocket,
 }

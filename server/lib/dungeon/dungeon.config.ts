@@ -13,14 +13,14 @@ export default {
 		}
 	},
 	SERVER_INNER: {
-		LEAVE_PARTY: Object.assign({}, partyConfig.SERVER_GETS.LEAVE_PARTY, {log: false}),		
-        MOVE_TO_TOWN: Object.assign({}, roomsConfig.SERVER_INNER.MOVE_TO_TOWN, {log: false}),
+		MOVE_TO_TOWN: Object.assign({}, roomsConfig.SERVER_INNER.MOVE_TO_TOWN, {log: false}),
 	},
 	SERVER_GETS: {
 		DUNGEON_START: {name: "started_dungeon", "alive": true, "log": true},		
 		DUNGEON_NEXT_STAGE: {name: "continued_dungeon", "alive": true, "log": true},		
 		DUNGEON_PICK_BUFF: {name: "picked_dungeon_buff", "alive": true, "log": true},		
 		DUNGEON_UNLOCK_REWARD: {name: "unlocked_dungeon_reward", "alive": true, "log": true},		
+		LEAVE_PARTY: Object.assign({}, partyConfig.SERVER_GETS.LEAVE_PARTY, {log: false}),		
 	},
 	CLIENT_GETS: {
 		DUNGEON_STAGE_BUFFS: {name: "dungeon_buffs_pool"},

@@ -2,7 +2,7 @@ import SocketioRouterBase from '../socketio/socketio.router.base';
 import { isBoss } from '../master/master.middleware';
 import dungeonConfig from './dungeon.config';
 import DungeonController from './dungeon.controller';
-import { getDungeonInfo, startDungeon, getRunningDungeon, nextStage, pickDungeonBuff, removeFromDungeon, finishDungeon, unlockDungeonReward } from './dungeon.services';
+import { getDungeonInfo, startDungeon, getRunningDungeon, nextStage, pickDungeonBuff, removeFromDungeon, finishDungeon, unlockDungeonReward, getCurrentDungeonRoom } from './dungeon.services';
 import { getCharParty, isPartyLeader, getPartyMembersInMap } from '../party/party.services';
 import { getMobsInRoom } from '../mobs/mobs.services';
 
@@ -48,8 +48,8 @@ export default class DungeonRouter extends SocketioRouterBase {
 		if (!runningDungeon) {
 			return this.sendError(data, socket, `Must be in a dungeon`, true, true);
 		}
-		if (!isPartyLeader(socket, getCharParty(socket))) {
-			return this.sendError(data, socket, `You are not the party leader`, true, true);
+		if (getCurrentDungeonRoom(socket).time) {
+			return this.sendError(data, socket, `Room is limited by time - cannot finish it manually`, true, true);
 		}
 		const roomMobs = getMobsInRoom(socket.character.room);
 		if (roomMobs.size > 0) {
@@ -63,9 +63,6 @@ export default class DungeonRouter extends SocketioRouterBase {
 		const runningDungeon = getRunningDungeon(socket);
 		if (!runningDungeon) {
 			return this.sendError(data, socket, `Must be in a dungeon`, true, true);
-		}
-		if (!isPartyLeader(socket, getCharParty(socket))) {
-			return this.sendError(data, socket, `You are not the party leader`, true, true);
 		}
 		if (!runningDungeon.buffsPool) {
 			return this.sendError(data, socket, `There are no buffs available`, true, true);
@@ -82,9 +79,6 @@ export default class DungeonRouter extends SocketioRouterBase {
 		if (!runningDungeon) {
 			return this.sendError(data, socket, `Must be in a dungeon`, true, true);
 		}
-		if (!isPartyLeader(socket, getCharParty(socket))) {
-			return this.sendError(data, socket, `You are not the party leader`, true, true);
-		}
 		if (!runningDungeon.haveRewards.has(socket.character.name)) {
 			return this.sendError(data, socket, `No reward available`, true, true);
 		}
@@ -92,7 +86,7 @@ export default class DungeonRouter extends SocketioRouterBase {
 		unlockDungeonReward(socket);
 	}
 
-	[dungeonConfig.SERVER_INNER.LEAVE_PARTY.name](data, socket: GameSocket) {
+	[dungeonConfig.SERVER_GETS.LEAVE_PARTY.name](data, socket: GameSocket) {
 		this.leaving(socket, true);
 	}
 

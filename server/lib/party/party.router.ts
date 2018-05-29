@@ -65,7 +65,7 @@ export default class PartyRouter extends SocketioRouterBase {
             return this.sendError(data, socket, "Cannot leave - must be in a party", true, true);
         }
         // wait for next tick so we can clean up party things
-        process.nextTick(() => this.controller.leaveParty(socket, party));
+        setImmediate(() => this.controller.leaveParty(socket, party));
 	}
 
 	[partyConfig.SERVER_GETS.LEAD_PARTY.name](data, socket: GameSocket) {

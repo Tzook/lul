@@ -15,7 +15,7 @@ export default class Response {
         return this.services.replaceTokens(ERROR.MSG, tokens)
         .then(error => {
             console.error("Sending an error:", error);
-            sendErrorResponse(res, ERROR);
+            sendErrorResponse(res, Object.assign({}, ERROR, {error}));
         });
     }
     

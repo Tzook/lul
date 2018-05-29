@@ -47,9 +47,11 @@ export function startDungeon(socket: GameSocket, dungeon: DUNGEON) {
         timerId,
         dungeon,
         currentStageIndex: -1,
+        currentRoomIndex: -1,
         perksBonus: {},
         members: new Set(party.members),
         haveRewards: new Set(),
+        poc: socket,
     };
     dungeonServices.runningDungeons.set(party, runningDungeon);
     party.kickLocked = true;
@@ -68,6 +70,7 @@ export function finishDungeon(socket: GameSocket, teleportOut: boolean = true) {
     const party = getCharParty(socket);
     const runningDungeon = getRunningDungeon(socket);
     clearTimeout(runningDungeon.timerId);
+    clearTimeout(runningDungeon.roomTimerId);
     dungeonServices.runningDungeons.delete(party);
     
     for (let memberSocket of getPartyMembersInMap(socket, true)) {
@@ -84,22 +87,38 @@ export function removeFromDungeon(memberSocket: GameSocket, teleportOut: boolean
             removeBonusPerks({perks: runningDungeon.perksBonus}, memberSocket);
         });
         runningDungeon.members.delete(memberSocket.character.name);
+        if (memberSocket === runningDungeon.poc && runningDungeon.members.size > 0) {
+            const newPoc = Array.from(runningDungeon.members)[0];
+            runningDungeon.poc = memberSocket.map.get(newPoc);
+        }
     }
     if (teleportOut) {
         memberSocket.emitter.emit(roomsConfig.SERVER_INNER.MOVE_TO_TOWN.name, {}, memberSocket);
     }
 }
 
+export function getCurrentDungeonStage(socket: GameSocket): DUNGEON_STAGE {
+    const runningDungeon = getRunningDungeon(socket);
+    return runningDungeon.dungeon.stages[runningDungeon.currentStageIndex];    
+}
+
+export function getCurrentDungeonRoom(socket: GameSocket): DUNGEON_ROOM {
+    const runningDungeon = getRunningDungeon(socket);
+    const currentStage = getCurrentDungeonStage(socket);
+    return currentStage.rooms[runningDungeon.currentRoomIndex];
+}
+
 export function nextStage(socket: GameSocket) {
     const runningDungeon = getRunningDungeon(socket);
     runningDungeon.currentStageIndex++;
-    const currentStage = runningDungeon.dungeon.stages[runningDungeon.currentStageIndex];
+    const currentStage = getCurrentDungeonStage(socket);
 
     if (!currentStage) {
         finishDungeon(socket);
     } else {
-        const roomIndex = pickRandomly(currentStage.rooms);
-        const room = getRoomInstance(currentStage.rooms[roomIndex].key);
+        runningDungeon.currentRoomIndex = <number>pickRandomly(currentStage.rooms);
+        const currentRoom = getCurrentDungeonRoom(socket);
+        const room = getRoomInstance(currentRoom.key);
         for (let memberSocket of getPartyMembersInMap(socket, true)) {
             if (memberSocket.alive) {
                 // living members continue. dead ones are resurrected.
@@ -114,6 +133,10 @@ export function nextStage(socket: GameSocket) {
             runningDungeon.haveRewards = new Set(runningDungeon.members);
         } else {
             runningDungeon.haveRewards.clear();
+        }
+
+        if (currentRoom.time) {
+            runningDungeon.roomTimerId = setTimeout(() => nextStage(runningDungeon.poc), currentRoom.time);
         }
     }
 }
@@ -142,7 +165,7 @@ export function unlockDungeonReward(socket: GameSocket) {
     const runningDungeon = getRunningDungeon(socket);
     runningDungeon.haveRewards.delete(socket.character.name);
 
-    const possibleRewards = runningDungeon.dungeon.stages[runningDungeon.currentStageIndex].rewards;
+    const possibleRewards = getCurrentDungeonStage(socket).rewards;
     const pickedIndex = pickRandomly(possibleRewards);
     const reward: DUNGEON_REWARD = possibleRewards[pickedIndex];
     

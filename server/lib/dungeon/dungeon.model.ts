@@ -15,6 +15,7 @@ const DUNGEON_REWARD_MODEL = (<any>mongoose.Schema)({
 const DUNGEON_ROOM_MODEL = (<any>mongoose.Schema)({
     key: String,
     chance: Number,
+    time: Number,
 }, {_id: false});
 
 const DUNGEON_STAGE_MODEL = (<any>mongoose.Schema)({
@@ -98,17 +99,29 @@ export function generateDungeons(dungeons: any): Promise<any> {
 };
 
 function getRooms(stage): DUNGEON_ROOM[] {
-    const basicRooms: string[] = stage.rooms || [];
-    const rareRooms: string[] = stage.rareRooms || [];
+    const basicRooms: any[] = stage.rooms || [];
+    const rareRooms: any[] = stage.rareRooms || [];
     const totalRarity = basicRooms.length * dungeonConfig.DUNGEON_RARE_ROOM_RARITY + rareRooms.length;
-    const dungeonBasicRooms: DUNGEON_ROOM[] = basicRooms.map(room => ({
-        key: room,
-        chance: dungeonConfig.DUNGEON_RARE_ROOM_RARITY / totalRarity,
-    }));
-    const dungeonRareRooms: DUNGEON_ROOM[] = rareRooms.map(room => ({
-        key: room,
-        chance: 1 / totalRarity,
-    }));
+    const dungeonBasicRooms: DUNGEON_ROOM[] = basicRooms.map(room => {
+        let newRoom: DUNGEON_ROOM = {
+            key: room.key,
+            chance: dungeonConfig.DUNGEON_RARE_ROOM_RARITY / totalRarity,
+        };
+        if (room.time > 0) {
+            newRoom.time = room.time * 60 * 1000;
+        }
+        return newRoom;
+    });
+    const dungeonRareRooms: DUNGEON_ROOM[] = rareRooms.map(room => {
+        let newRoom: DUNGEON_ROOM = {
+            key: room.key,
+            chance: 1 / totalRarity,
+        };
+        if (room.time > 0) {
+            newRoom.time = room.time * 60 * 1000;
+        }
+        return newRoom;
+    });
     return dungeonBasicRooms.concat(dungeonRareRooms);
 }
 
