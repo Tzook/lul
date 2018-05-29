@@ -71,12 +71,12 @@ export function finishDungeon(socket: GameSocket, teleportOut: boolean = true) {
     const runningDungeon = getRunningDungeon(socket);
     clearTimeout(runningDungeon.timerId);
     clearTimeout(runningDungeon.roomTimerId);
-    dungeonServices.runningDungeons.delete(party);
     
     for (let memberSocket of getPartyMembersInMap(socket, true)) {
         removeFromDungeon(memberSocket, teleportOut);
     }
     party.kickLocked = false;
+    dungeonServices.runningDungeons.delete(party);
 }
 
 export function removeFromDungeon(memberSocket: GameSocket, teleportOut: boolean) {

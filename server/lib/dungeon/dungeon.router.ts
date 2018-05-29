@@ -5,6 +5,7 @@ import DungeonController from './dungeon.controller';
 import { getDungeonInfo, startDungeon, getRunningDungeon, nextStage, pickDungeonBuff, removeFromDungeon, finishDungeon, unlockDungeonReward, getCurrentDungeonRoom } from './dungeon.services';
 import { getCharParty, isPartyLeader, getPartyMembersInMap } from '../party/party.services';
 import { getMobsInRoom } from '../mobs/mobs.services';
+import roomsConfig from '../rooms/rooms.config';
 
 export default class DungeonRouter extends SocketioRouterBase {
     protected controller: DungeonController;
@@ -87,21 +88,20 @@ export default class DungeonRouter extends SocketioRouterBase {
 	}
 
 	[dungeonConfig.SERVER_GETS.LEAVE_PARTY.name](data, socket: GameSocket) {
-		this.leaving(socket, true);
+		const runningDungeon = getRunningDungeon(socket);
+		if (runningDungeon) {
+			this.emitter.emit(roomsConfig.SERVER_INNER.MOVE_TO_TOWN.name, {}, socket);
+		}		
 	}
 
 	[dungeonConfig.SERVER_INNER.MOVE_TO_TOWN.name](data, socket: GameSocket) {
-		this.leaving(socket, false);
-	}
-	
-	private leaving(socket: GameSocket, teleportOut: boolean) {
 		const runningDungeon = getRunningDungeon(socket);
 		if (runningDungeon) {
 			if (runningDungeon.members.size === 1) {
 				// last man in the dungeon
-				finishDungeon(socket, teleportOut);
+				finishDungeon(socket, false);
 			} else {
-				removeFromDungeon(socket, teleportOut);
+				removeFromDungeon(socket, false);
 			}
 		}
 	}
