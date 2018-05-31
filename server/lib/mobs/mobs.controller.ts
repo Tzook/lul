@@ -43,26 +43,32 @@ export default class MobsController extends MasterController {
 		};
 		roomInfo.spawns.forEach(spawnInfo => {
 			let spawn: SPAWN_INSTANCE = Object.assign({}, spawnInfo);
-			
 			let mobsInSpawn: Map<string, MOB_INSTANCE> = new Map();
-			this.spawnMobs(spawn, mobsInSpawn, room);
 			spawn.mobs = mobsInSpawn;
 			roomMobs.spawns.push(spawn);
+			
+			if (spawn.delay) {
+				setTimeout(() => this.spawnMobs(spawn, mobsInSpawn, room), spawn.delay);
+			} else {
+				this.spawnMobs(spawn, mobsInSpawn, room);
+			}
 		});
 		this.roomsMobs.set(room, roomMobs);
 	}
 
 	protected spawnMobs(spawnInfo: SPAWN_INSTANCE, mobsInSpawn: Map<string, MOB_INSTANCE>, room: string) {
-		spawnInfo.times && spawnInfo.times--;
-		const spawnCount = spawnInfo.bulk ? spawnInfo.cap - mobsInSpawn.size : 1;
-		for (let i = 0; i < spawnCount; i++) {
-			let mob = this.spawnMob(spawnInfo.mobId, spawnInfo.x, spawnInfo.y, room);
-			mob.spawn = spawnInfo; // useful for when we delete the mob
-			mobsInSpawn.set(mob.id, mob);
-		}
-		if (spawnInfo.cap - mobsInSpawn.size > 1) {
-			// we still have a mob to spawn - set an interval
-			this.setRespawnTimer(spawnInfo, room);
+		if (this.canSpawn(spawnInfo)) {
+			spawnInfo.times && spawnInfo.times--;
+			const spawnCount = spawnInfo.bulk ? spawnInfo.cap - mobsInSpawn.size : 1;
+			for (let i = 0; i < spawnCount; i++) {
+				let mob = this.spawnMob(spawnInfo.mobId, spawnInfo.x, spawnInfo.y, room);
+				mob.spawn = spawnInfo; // useful for when we delete the mob
+				mobsInSpawn.set(mob.id, mob);
+			}
+			if (spawnInfo.cap - mobsInSpawn.size > 1) {
+				// we still have a mob to spawn - set an interval
+				this.setRespawnTimer(spawnInfo, room);
+			}
 		}
 	}
 
@@ -187,16 +193,12 @@ export default class MobsController extends MasterController {
 
 	protected setRespawnTimer(spawn: SPAWN_INSTANCE, room: string) {
 		if (this.canSpawn(spawn)) {
-			setTimeout(() => {
-				if (this.canSpawn(spawn)) {
-					this.spawnMobs(spawn, spawn.mobs, room);
-				}
-			}, getSpawnIntervalTime(spawn));
+			setTimeout(() => this.spawnMobs(spawn, spawn.mobs, room), getSpawnIntervalTime(spawn));
 		}
 	}
 
 	protected canSpawn(spawn: SPAWN_INSTANCE): boolean {
-		return spawn.interval >= 0 && spawn.times !== 0;
+		return spawn.times !== 0;
 	}
 
 	public clearRoom(socket: GameSocket) {

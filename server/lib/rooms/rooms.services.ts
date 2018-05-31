@@ -47,6 +47,9 @@ export default class RoomsServices extends MasterServices {
 			if (spawner.SpawnTimes > 0) {
 				spawnerModel.times = +spawner.SpawnTimes;
 			}
+			if (spawner.InitialDelay > 0) {
+				spawnerModel.delay = +spawner.InitialDelay * 1000;
+			}
 			spawns.push(spawnerModel);
 		});
 		let room: ROOM_MODEL = {

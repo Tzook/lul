@@ -248,6 +248,7 @@ interface SPAWN_MODEL {
     y: number,
     bulk?: "wave"|"asap"
     times?: number
+    delay?: number
 }
 interface SPAWN_INSTANCE extends SPAWN_MODEL {
     mobs?: Map<string, MOB_INSTANCE>, // mobs spawned in the spawn
