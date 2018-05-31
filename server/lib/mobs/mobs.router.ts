@@ -1,7 +1,7 @@
 
 import SocketioRouterBase from '../socketio/socketio.router.base';
 import MobsMiddleware from './mobs.middleware';
-import MobsController from './mobs.controller';
+import MobsController, { getMob } from './mobs.controller';
 import RoomsRouter from '../rooms/rooms.router';
 import MobsServices, { getPartyShareExp, setMobsExtraDropsAfter2, getMobExtraDrops, shouldMobHaveExtraDrops, addThreat } from './mobs.services';
 import config from '../mobs/mobs.config';
@@ -172,6 +172,25 @@ export default class MobsRouter extends SocketioRouterBase {
 		this.emitter.emit(combatConfig.SERVER_INNER.ATK_TARGETS.name, {attacker: mob, target_ids: [socket.character.name]}, socket);		
     }
 	
+	[config.SERVER_GETS.MOB_AGGRO_INIT.name](data: {mob_id: string, char_id: string}, socket: GameSocket) {
+		let {char_id, mob_id} = data;
+		const mob = getMob(mob_id, socket);
+		if (!mob) {
+			return this.sendError(data, socket, "Mob doesn't exist!");
+		}
+		const matchingChar = socket.map.get(char_id);
+		if (!matchingChar || !matchingChar.alive || matchingChar.character.room !== socket.character.room) {
+			return this.sendError(data, socket, "Aggro target must be alive in the same room");
+		}
+		if (mob.threat.top) {
+			return this.sendError(data, socket, "Someone already aggros this mob");
+		}
+		this.emitter.emit(config.SERVER_INNER.MOB_AGGRO_CHANGED.name, {
+			mob,
+			id: char_id,
+		}, socket);
+	}
+
 	[config.SERVER_INNER.MOB_AGGRO_CHANGED.name](data: {mob: MOB_INSTANCE, id?: string}) {
 		let {id, mob} = data;			
 		this.io.to(mob.room).emit(config.CLIENT_GETS.AGGRO.name, {

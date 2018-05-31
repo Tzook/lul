@@ -26,6 +26,7 @@ export default {
 		"MOB_AGGRO_CHANGED": {"name": "mob_aggro_changed"},
     },
 	"SERVER_GETS": {
+		"MOB_AGGRO_INIT": {"name": "mob_init_aggro", "throttle": 0},
 		"ENTERED_ROOM": {"name": "entered_room"},
 		"MOBS_MOVE": {"name": "mobs_moved", "throttle": 0, "bitch": true},
 		"PLAYER_TAKE_DMG": {"name": "took_dmg", "alive": true, log: true}

@@ -17,7 +17,7 @@ export default class SocketioRouter extends SocketioRouterBase {
 	protected middleware: SocketioMiddleware;
 	protected services: SocketioServices;
 	protected routers: SocketioRouterBase[];
-	protected map: Map<string, GameSocket>;
+	public map: Map<string, GameSocket>;
 
 	constructor() {
 		super();
@@ -250,4 +250,8 @@ export default class SocketioRouter extends SocketioRouterBase {
 
  export function getIo(): SocketIO.Namespace {
 	return getSocketioRouter().io;
+ }
+
+ export function getSockets(): Map<string, GameSocket> {
+	 return getSocketioRouter().map;
  }

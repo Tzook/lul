@@ -5,6 +5,7 @@ import MobsRouter from './mobs.router';
 import mobsConfig from '../mobs/mobs.config';
 import { getController } from '../main/bootstrap';
 import { getMapOfMap } from '../utils/maps';
+import { getSockets } from '../socketio/socketio.router';
 
 export default class MobsController extends MasterController {
 	protected services: MobsServices;
@@ -88,23 +89,29 @@ export default class MobsController extends MasterController {
 		});
 
 		this.getMobsMap(room, true).set(mob.id, mob);
-		this.notifyAboutMob(mob, this.io.to(room));
+		this.notifyAboutMob(mob, () => this.io.to(room));
 		return mob;
 	}
 
-	protected notifyAboutMob(mob: MOB_INSTANCE, to: SocketIO.Namespace|SocketIO.Socket) {
-		to.emit(mobsConfig.CLIENT_GETS.MOB_SPAWN.name, {
+	protected notifyAboutMob(mob: MOB_INSTANCE, getTo: () => SocketIO.Namespace|SocketIO.Socket) {
+		getTo().emit(mobsConfig.CLIENT_GETS.MOB_SPAWN.name, {
 			mob_id: mob.id,
 			x: mob.x,
 			y: mob.y,
 			key: mob.mobId,
 			hp: mob.hp,
 		});
+		if (mob.threat.top) {
+			getTo().emit(mobsConfig.CLIENT_GETS.AGGRO.name, {
+				id: getSockets().get(mob.threat.top).character._id,
+				mob_id: mob.id,
+			})
+		}
 	}
 
 	public notifyAboutMobs(socket: GameSocket) {
 		this.getMobsMap(socket.character.room).forEach(mob => {
-			this.notifyAboutMob(mob, socket);
+			this.notifyAboutMob(mob, () => socket);
 		});
 	}
 
