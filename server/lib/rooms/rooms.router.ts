@@ -130,7 +130,14 @@ export default class RoomsRouter extends SocketioRouterBase {
 	}
 
     public onConnected(socket: GameSocket) {
-		process.nextTick(() => this.notifyAboutRoom(socket));
+		process.nextTick(() => {
+			if (isInInstance(socket)) {
+				// make sure you don't login in a room instance
+				this.emitter.emit(config.SERVER_INNER.MOVE_TO_TOWN.name, {}, socket);
+			} else {
+				this.notifyAboutRoom(socket)
+			}
+		});
 	}
 	
 	protected notifyAboutRoom(socket: GameSocket) {
