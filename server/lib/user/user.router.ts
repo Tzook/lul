@@ -58,7 +58,9 @@ export default class UserRouter extends MasterRouter {
 		}));
 		app.use(passport.initialize());
 		app.use((req, res, next) => {
-			passport.authenticate('session', {}, (error) => controller.deserializeError(error, res))(req, res, next);
+			passport.authenticate('session', {}, (error) => {
+				controller.performLogout(req, res, () => controller.deserializeError(error, res))
+			})(req, res, next);
 		});
 		passport.use(new LocalStrategy(middleware.authenticateUser.bind(middleware)));
         passport.serializeUser(controller.serializeUser.bind(controller));

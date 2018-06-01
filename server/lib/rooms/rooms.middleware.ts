@@ -9,7 +9,7 @@ export default class RoomsMiddleware extends MasterMiddleware {
     }
     public getPrivateCharInfo(socket: GameSocket): PrivateChar {
         // some properties should not be sent even when private
-        let {save, toJSON, stats, markModified, ...otherCharProperties} = socket.character.toJSON();
+        let {set, save, toJSON, stats, markModified, ...otherCharProperties} = socket.character.toJSON();
         let fullStats = extendStatsWithMax(stats, socket);
         return {stats: fullStats, ...otherCharProperties};
     }

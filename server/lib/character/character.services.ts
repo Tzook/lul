@@ -53,10 +53,13 @@ export function getCharacterServices(): CharacterServices {
     return getServices("character");
 }
 
+export function getCharacterUser(name: string): Promise<User> {
+	return getCharacterServices().getCharacter(name);
+}
+
 export function checkIsNameUnique(name, error) {
 	return new Promise((resolve, reject) => {
-		const characterServices = getCharacterServices();
-		characterServices.getCharacter(name)
+		getCharacterUser(name)
 		.then(d => {
 			d ? reject(error) : resolve();
 		})

@@ -1,5 +1,7 @@
 
 import MasterMiddleware from '../master/master.middleware';
+import { isBanned, getBanExplanation } from '../ban/ban.services';
+import userConfig from './user.config';
 let passport = require('passport');
 
 export default class UserMiddleware extends MasterMiddleware {
@@ -48,14 +50,16 @@ export default class UserMiddleware extends MasterMiddleware {
 
     passportLocalAuthenticate(req, res, next) {
 		passport.authenticate('local', (e, d, info) => {
-			if (!e) {
-				req.body.user = d;
-				next();
-			} else {
+			if (e) {
 				if (typeof e !== 'object' || !e.LOG) {
 					e = {LOG: this.LOGS.MASTER_INTERNAL_ERROR, params: {e, fn: "passportLocalAuthenticate", file: "user.middleware.js"}};
 				}
 				this.sendError(res, e.LOG, e.params);
+			} else if (isBanned(d)) {
+				this.sendError(res, userConfig.LOGS.USER_BANNED, {message: getBanExplanation(d)});
+			} else {
+				req.body.user = d;
+				next();
 			}
 		})(req, res, next);
     }

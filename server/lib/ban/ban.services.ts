@@ -23,12 +23,25 @@ export function banYears(socket: GameSocket, years: number, reason?: string) {
 }
 
 export function ban(socket: GameSocket, date: Date, reason?: string) {
-    socket.user.banEnd = date;
-    if (reason) {
-        socket.user.banReason = reason;
-    }
+    banUser(socket.user, date, reason);
     sendError({}, socket, getBanExplanation(socket.user), true, true);
     socket.disconnect();
+}
+
+export function banUser(user: User, date: Date, reason?: string) {
+    user.banEnd = date;
+    if (reason) {
+        user.banReason = reason;
+    }
+}
+
+export function unbanUser(user: User) {
+    user.set('banEnd', undefined, {strict: false});
+    user.set('banReason', undefined, {strict: false});
+}
+
+export function isBanned(user: User): boolean {
+    return user.banEnd && user.banEnd > new Date();
 }
 
 export function getBanExplanation(user: User): string {

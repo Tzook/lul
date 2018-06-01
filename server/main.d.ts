@@ -11,6 +11,7 @@ interface EVENT {
 
 interface Doc {
     _id: any;
+    set?: (key: string, value: any, options: any) => {}
     save?(fn?: (err: any, product: this, numAffected: number) => void): Promise<this>;
     toJSON: () => this
 }

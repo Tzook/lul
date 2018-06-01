@@ -3,7 +3,7 @@ import MasterController from '../master/master.controller';
 import UserServices from './user.services';
 import { Response } from 'express';
 import userConfig from './user.config';
-import { getBanExplanation } from '../ban/ban.services';
+import { getBanExplanation, isBanned } from '../ban/ban.services';
 
 export default class UserController extends MasterController {
     protected services: UserServices;
@@ -75,7 +75,7 @@ export default class UserController extends MasterController {
             .then ((user: User): any => {
                 if (!user) {
                     return Promise.reject("No user found");
-                } else if (user.banEnd && user.banEnd > new Date()) {
+                } else if (isBanned(user)) {
                     return Promise.reject(getBanExplanation(user));
                 } else {
                     done(null, user);
