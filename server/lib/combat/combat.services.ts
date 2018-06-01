@@ -5,7 +5,7 @@ import { getServices } from '../main/bootstrap';
 import combatConfig from './combat.config';
 import { isSocket } from '../talents/talents.services';
 import { getMob } from '../mobs/mobs.controller';
-import { sendError } from '../socketio/socketio.router.base';
+import { sendError } from '../socketio/socketio.errors';
 
 export default class CombatServices extends MasterServices {
     public attacksInfos: Map<string, ATTACK_INFO> = new Map();

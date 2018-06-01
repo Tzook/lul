@@ -3,6 +3,7 @@ import MasterController from '../master/master.controller';
 import UserServices from './user.services';
 import { Response } from 'express';
 import userConfig from './user.config';
+import { getBanExplanation } from '../ban/ban.services';
 
 export default class UserController extends MasterController {
     protected services: UserServices;
@@ -71,19 +72,25 @@ export default class UserController extends MasterController {
     
     deserializeUser (username, done) {
         return this.services.getUser(username)
-        .then (d => {
-            if (d) {
-                done(null, d);
-            } else {
-                done(null, false); // found no user
-            }
-        })
-        .catch(e => {
-            done(e, null); // error
-        });
+            .then ((user: User): any => {
+                if (!user) {
+                    return Promise.reject("No user found");
+                } else if (user.banEnd && user.banEnd > new Date()) {
+                    return Promise.reject(getBanExplanation(user));
+                } else {
+                    done(null, user);
+                }
+            })
+            .catch(e => {
+                done(e, null); // error
+            });
     }
 
 	deserializeError(e, res) {
-        this.sendError(res, this.LOGS.MASTER_INTERNAL_ERROR, {e, fn: "deserializeUser", file: "user.controller.js"});
+        if (e.includes("ban")) {
+            this.sendError(res, userConfig.LOGS.USER_BANNED, {message: e});
+        } else {
+            this.sendError(res, this.LOGS.MASTER_INTERNAL_ERROR, {e, fn: "deserializeUser", file: "user.controller.js"});
+        }
 	}
 };

@@ -1,5 +1,5 @@
 
-import SocketioRouterBase, { sendFatal } from './socketio.router.base';
+import SocketioRouterBase from './socketio.router.base';
 import Emitter = require('events');
 import MasterRouter from '../master/master.router';
 import * as Heroku from 'heroku-client';
@@ -9,9 +9,9 @@ import config from './socketio.config';
 require('./socketio.fixer');
 import * as passportSocketIo from 'passport.socketio';
 import { isProduction, getEnvVariable } from '../main/main';
-import { notifyUserAboutError } from './socketio.router.base';
 import * as _ from "underscore";
 import { getRouter } from '../main/bootstrap';
+import { notifyUserAboutError, sendFatal } from './socketio.errors';
 
 export default class SocketioRouter extends SocketioRouterBase {
 	protected middleware: SocketioMiddleware;
@@ -66,18 +66,21 @@ export default class SocketioRouter extends SocketioRouterBase {
 	}
 
 	onAuthorizeSuccess(req, next: Function) {
-		for (let i = 0; i < req.user.characters.length; i++) {
-			if (req.user.characters[i]._id.equals(req._query.id)) {
-				req.character = req.user.characters[i];
+		const user: User = req.user;
+		for (let i = 0; i < user.characters.length; i++) {
+			if (user.characters[i]._id.equals(req._query.id)) {
+				req.character = user.characters[i];
 				break;
 			}
 		}
+		let errorMessage;
 		if (!req.character) {
-			let errorMessage = 'no character param OR no such character in user, param was' + req._query.id;
-			console.error(errorMessage);
-			next(new Error(errorMessage));
-		} else if (this.map.has(req.user._id.toString())) {
-			let errorMessage = `Users character is already logged in: ${req._query.id}~`;
+			errorMessage = 'no character param OR no such character in user, param was' + req._query.id;
+		} else if (this.map.has(user._id.toString())) {
+			errorMessage = `Users character is already logged in: ${req._query.id}~`;
+		}
+		
+		if (errorMessage) {
 			console.error(errorMessage);
 			next(new Error(errorMessage));
 		} else {

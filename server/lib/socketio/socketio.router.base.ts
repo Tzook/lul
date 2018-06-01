@@ -1,9 +1,8 @@
 
 import MasterRouter from '../master/master.router';
 import Emitter = require('events');
-import config from './socketio.config';
 import { logger } from '../main/logger';
-import { getSocketioRouter } from './socketio.router';
+import { notifyUserAboutError } from './socketio.errors';
 
 export default class SocketioRouterBase extends MasterRouter {
 	public io: SocketIO.Namespace;
@@ -67,20 +66,3 @@ export default class SocketioRouterBase extends MasterRouter {
 		return Object.assign({event}, extraMetadata, data);
 	}
 };
-
-export function sendError(data: any, socket: GameSocket, error: string, emit = true, display = false) {
-	const socketioRouter = getSocketioRouter();
-	return socketioRouter.sendError(data, socket, error, emit, display);
-}
-
-export function sendFatal(to: NodeJS.EventEmitter|GameSocket, error: Error, event?: string) {
-	const socketioRouter = getSocketioRouter();
-	return socketioRouter.fatal(to, error, event);
-}
-
-export function notifyUserAboutError(to: NodeJS.EventEmitter, error: string, display: boolean) {
-	to.emit(config.CLIENT_GETS.EVENT_ERROR.name, {
-		error,
-		display,
-	});
-}

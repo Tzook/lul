@@ -18,14 +18,6 @@ export default class UserMiddleware extends MasterMiddleware {
 		]);
 	}
 
-	isLoggedOut(req, res, next) {
-		if (!req.user) {
-			next();
-		} else {
-			this.sendError(res, this.LOGS.USER_NOT_LOGGED_OUT);
-		}
-	}
-
 	isUsernameUnique(req, res, next) {
 		return this.services.getUser(req.body.username)
 		.then(d => this.services.isEmpty(d, {LOG: this.LOGS.USER_USERNAME_CAUGHT, params: {username: req.body.username}}))

@@ -122,6 +122,8 @@ interface CHAR_TALENT_OBJECT {
 interface User extends Doc {
     boss?: boolean // user with extended priviledges
     characters: Char[]
+    banEnd?: Date // end of ban date
+    banReason?: string
 }
 
 interface BONUS_PERKSABLE {

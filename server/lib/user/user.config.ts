@@ -7,11 +7,6 @@ export default {
 		"USER_SESSION": "/user/session"
 	},
 	"LOGS": {
-		"USER_NOT_LOGGED_OUT": {
-			"MSG": "Cannot do this request with a user already logged in.",
-			"CODE": "USER_1",
-			"STATUS": "UNAUTHORIZED"
-		},
 		"USER_LOGGED_OUT_OK": {
 			"MSG": "Logged out successfully.",
 			"CODE": "USER_2",
@@ -51,6 +46,11 @@ export default {
 			"MSG": "User successfully deleted.",
 			"CODE": "USER_9",
 			"STATUS": "OK"
+		},
+		"USER_BANNED": {
+			"MSG": "{message}",
+			"CODE": "USER_10",
+			"STATUS": "UNAUTHORIZED"
 		}
     },
     "UNICORN": "unicorn"

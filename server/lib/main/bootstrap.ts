@@ -43,7 +43,12 @@ export default class Bootstrap {
             try {
                 let path = `../${feature}/${feature}.${structure.templates[j]}`;
                 files[structure.templates[j]] = new (require(path).default)();
-            } catch (e) {}
+            } catch (e) {
+                let error: Error = e;
+                if (!error.message.includes("Cannot find module")) {
+                    console.error("Had an error initiating file", feature, structure.templates[j], error);
+                }
+            }
         } 
         // load config files
         files.config = require(`../${feature}/${feature}.config`).default;
