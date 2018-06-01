@@ -31,7 +31,7 @@ export default class ChatRouter extends SocketioRouterBase {
 	}
 
 	[config.SERVER_GETS.CHAT.name](data, socket: GameSocket) {
-		if (socket.user.boss && this.services.useHax(socket, data.msg)) {
+		if (socket.user.boss && this.services.useHax(socket, data.msg || "")) {
 			this.log({hax: data.msg}, socket, "User used hax");
 			return;
 		}
