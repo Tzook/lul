@@ -153,7 +153,7 @@ export default class ChatServices extends MasterServices {
             }
                 
             case chatConfig.HAX.TP.code: {
-                let room = parts[2];
+                let room = parts[2] || "";
                 let roomInfo = this.roomsRouter.getRoomInfo(room);
                 if (!roomInfo) {
                     roomInfo = this.roomHints.get(getHintKey(parts[2]));                    
