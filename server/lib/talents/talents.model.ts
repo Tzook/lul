@@ -29,6 +29,7 @@ const TALENT_SCHEMA = {
 const CONFIG_PERK_SCHEMA = mongoose.Schema.Types.Mixed;
 
 const CHAR_TALENTS_SCHEMA = mongoose.Schema.Types.Mixed;
+const CHAR_MAIN_ABILITIES = [String];
 
 const MOB_PERKS_SCHEMA = {
     perks: mongoose.Schema.Types.Mixed,
@@ -71,6 +72,7 @@ export default class TalentsModel extends MasterModel {
         this.listenForFieldAddition("Character", "charTalents", () => ({
             [talentsConfig.CHAR_TALENT]: this.services.getEmptyCharAbility(talentsConfig.CHAR_TALENT)
         }));
+        this.addToSchema("Character", {mainAbilities: CHAR_MAIN_ABILITIES});
         
         this.addToSchema("Mobs", MOB_PERKS_SCHEMA);
         
