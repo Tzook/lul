@@ -108,7 +108,7 @@ function getRooms(stage): DUNGEON_ROOM[] {
             chance: dungeonConfig.DUNGEON_RARE_ROOM_RARITY / totalRarity,
         };
         if (room.time > 0) {
-            newRoom.time = room.time * 60 * 1000;
+            newRoom.time = room.time * 1000;
         }
         return newRoom;
     });
@@ -118,7 +118,7 @@ function getRooms(stage): DUNGEON_ROOM[] {
             chance: 1 / totalRarity,
         };
         if (room.time > 0) {
-            newRoom.time = room.time * 60 * 1000;
+            newRoom.time = room.time * 1000;
         }
         return newRoom;
     });

@@ -538,4 +538,5 @@ interface RUNNING_DUNGEON {
     members: Set<string>,
     haveRewards: Set<string>,
     poc: GameSocket,
+    finished?: boolean
 }

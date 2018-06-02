@@ -66,15 +66,20 @@ export function getRunningDungeon(socket: GameSocket): RUNNING_DUNGEON|undefined
 }
 
 export function finishDungeon(socket: GameSocket, teleportOut: boolean = true) {
-    const dungeonServices = getDungeonServices();
-    const party = getCharParty(socket);
     const runningDungeon = getRunningDungeon(socket);
+    if (runningDungeon.finished) {
+        return;
+    }
+    runningDungeon.finished = true;
     clearTimeout(runningDungeon.timerId);
     clearTimeout(runningDungeon.roomTimerId);
     
     for (let memberSocket of getPartyMembersInMap(socket, true)) {
         removeFromDungeon(memberSocket, teleportOut);
     }
+    // cleanup
+    const dungeonServices = getDungeonServices();
+    const party = getCharParty(socket);
     party.kickLocked = false;
     dungeonServices.runningDungeons.delete(party);
 }
