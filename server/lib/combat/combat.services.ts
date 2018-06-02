@@ -6,6 +6,8 @@ import combatConfig from './combat.config';
 import { isSocket } from '../talents/talents.services';
 import { getMob } from '../mobs/mobs.controller';
 import { sendError } from '../socketio/socketio.errors';
+import statsConfig from '../stats/stats.config';
+import * as _ from 'underscore';
 
 export default class CombatServices extends MasterServices {
     public attacksInfos: Map<string, ATTACK_INFO> = new Map();
@@ -98,4 +100,21 @@ export function getValidTargets(socket: GameSocket, targetIds: string[]): PLAYER
     }
 
     return targets;
+}
+
+export function hasMainAbility(socket: GameSocket, ability: string): boolean {
+	return _.contains(getMainAbilities(socket), ability);
+}
+
+function getMainAbilities(socket: GameSocket): string[] {
+	return _.isEmpty(socket.character.mainAbilities) ? [statsConfig.ABILITY_MELEE] : socket.character.mainAbilities;
+}
+
+export function addMainAbility(socket: GameSocket, ability: string) {
+	let mainAbilities = getMainAbilities(socket);
+	mainAbilities.push(ability);
+	if (mainAbilities.length > 2) {
+		mainAbilities.shift();
+    }
+    socket.character.mainAbilities = mainAbilities;
 }

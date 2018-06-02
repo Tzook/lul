@@ -6,8 +6,8 @@ import mobsConfig from '../mobs/mobs.config';
 import TalentsRouter from '../talents/talents.router';
 import talentsConfig from '../talents/talents.config';
 import statsConfig from '../stats/stats.config';
-import CombatServices, { setAttackInfo, popAttackInfo, getDamageDealt, getValidTargets } from './combat.services';
-import { getMpUsage, getId, getHp, isMob, isSocket } from '../talents/talents.services';
+import CombatServices, { setAttackInfo, popAttackInfo, getDamageDealt, getValidTargets, hasMainAbility, addMainAbility } from './combat.services';
+import { getMpUsage, getId, getHp, isMob, isSocket, hasAbility } from '../talents/talents.services';
 import { calculateDamage } from './combat.services';
 import { didHitMob } from '../mobs/mobs.services';
 
@@ -67,13 +67,27 @@ export default class CombatRouter extends SocketioRouterBase {
 			this.emitter.emit(config.SERVER_INNER.CHANGED_ABILITY.name, {previousAbility, ability}, socket);
 		}
 	}
-
+	
 	[config.SERVER_INNER.CHANGED_ABILITY.name](data, socket: GameSocket) {
 		let {ability} = data;
 		socket.broadcast.to(socket.character.room).emit(this.CLIENT_GETS.CHANGE_ABILITY.name, {
 			id: socket.character._id,
 			ability,
 		});
+	}
+	
+	[config.SERVER_GETS.SELECT_MAIN_ABILITY.name](data, socket: GameSocket) {
+		let {ability} = data;
+		if (!ability) {
+			this.sendError(data, socket, "Must send what ability to main");
+		} else if (!hasAbility(socket, ability)) {
+			this.sendError(data, socket, "Character doesn't have that ability");
+		} else if (hasMainAbility(socket, ability)) {
+			this.sendError(data, socket, "Ability is already mained");
+		// } else if (false) { // TODO
+		// 	this.sendError(data, socket, "Cannot main abilities in that room");
+		}
+		addMainAbility(socket, ability);
 	}
 
 	[config.SERVER_GETS.USE_ABILITY.name](data, socket: GameSocket) {

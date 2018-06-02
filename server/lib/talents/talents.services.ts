@@ -9,6 +9,7 @@ import { getTalentsController } from './talents.controller';
 import { extendMobSchemaWithSpells, extendTalentsGenerationWithSpells } from '../spells/spells.model';
 import { getMobInfo } from '../mobs/mobs.services';
 import { getLvlExpByChar } from '../stats/stats.services';
+import { hasMainAbility } from '../combat/combat.services';
 
 export default class TalentsServices extends MasterServices {
 	public abilitiesInfo: Map<string, TALENT_INFO> = new Map();
@@ -532,7 +533,7 @@ export function hasAbility(socket: GameSocket, ability: string): boolean {
 }
 
 export function canUseAbility(socket: GameSocket, ability: string): boolean {
-	return hasAbility(socket, ability) || isAbilitySupportedInRoom(socket, ability);
+	return hasMainAbility(socket, ability) || isAbilitySupportedInRoom(socket, ability);
 }
 
 export function isAbilitySupportedInRoom(socket: GameSocket, ability?: string, room?: string): boolean {

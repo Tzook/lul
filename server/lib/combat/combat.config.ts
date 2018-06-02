@@ -15,12 +15,14 @@ export default {
 		"PERFORM_ATTACK": {"name": "performed_attack", "alive": true, "log": true},
 		"CHANGE_ABILITY": {"name": "changed_ability", "alive": true, "log": true},
 		"USE_ABILITY": {"name": "used_ability", "alive": true, "log": true},
+		"SELECT_MAIN_ABILITY": {"name": "selected_main_ability", "alive": true, "log": true},
 	},
 	"CLIENT_GETS": {
 		"LOAD_ATTACK": {"name": "actor_load_attack"},
 		"PERFORM_ATTACK": {"name": "actor_perform_attack"},
 		"CHANGE_ABILITY": {"name": "actor_change_ability"},
 		DMG_DEALT: {"name": "take_damage"},
+		SELECT_MAIN_ABILITY: {"name": "select_main_ability"},
 	},
 	HIT_CAUSE: {
 		WORLD: "world",
