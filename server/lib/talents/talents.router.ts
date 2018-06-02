@@ -1,5 +1,4 @@
 import SocketioRouterBase from '../socketio/socketio.router.base';
-import TalentsMiddleware from './talents.middleware';
 import TalentsController from './talents.controller';
 import TalentsServices, { getTalent, hasAbility, getTalentInfo, isCharAbility, isSocket, getHp, isMob, applySpikes, markAbilityModified } from './talents.services';
 import talentsConfig from '../talents/talents.config';
@@ -10,9 +9,9 @@ import RoomsRouter from '../rooms/rooms.router';
 import combatConfig from '../combat/combat.config';
 import { modifyBonusPerks } from '../bonusPerks/bonusPerks.services';
 import { getDamageDealt } from '../combat/combat.services';
+import { isBoss } from '../master/master.middleware';
 
 export default class TalentsRouter extends SocketioRouterBase {
-	protected middleware: TalentsMiddleware;
 	protected controller: TalentsController;
 	protected services: TalentsServices;
 	protected statsRouter: StatsRouter;
@@ -29,7 +28,7 @@ export default class TalentsRouter extends SocketioRouterBase {
 
 	protected initRoutes(app) {
 		app.post(this.ROUTES.GENERATE,
-			this.middleware.isBoss.bind(this.middleware),
+			isBoss,
 			this.controller.generateTalents.bind(this.controller));
 	}	
 	
