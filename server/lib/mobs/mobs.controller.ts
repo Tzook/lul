@@ -66,7 +66,7 @@ export default class MobsController extends MasterController {
 				mob.spawn = spawnInfo; // useful for when we delete the mob
 				mobsInSpawn.set(mob.id, mob);
 			}
-			if (spawnInfo.cap - mobsInSpawn.size > 1) {
+			if (spawnInfo.cap - mobsInSpawn.size >= 1) {
 				// we still have a mob to spawn - set an interval
 				this.setRespawnTimer(spawnInfo, room);
 			}
