@@ -267,6 +267,7 @@ interface ROOM_MODEL {
     spawns: SPAWN_MODEL[],
     pvp?: boolean,
     abilities?: ROOM_ABILITIES
+    mainable?: boolean
 }
 interface ROOM_ABILITIES {
     [key: string]: true

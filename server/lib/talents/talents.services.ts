@@ -508,7 +508,7 @@ export function extendRoomSchemaWithTalents(scene: any, roomSchema: ROOM_MODEL):
         abilities = abilities || {};
         abilities[ability] = true;
     });
-    roomSchema.abilities = abilities;
+	roomSchema.abilities = abilities;
 }
 
 export function getTalentsServices(): TalentsServices {

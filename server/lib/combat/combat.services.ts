@@ -8,6 +8,7 @@ import { getMob } from '../mobs/mobs.controller';
 import { sendError } from '../socketio/socketio.errors';
 import statsConfig from '../stats/stats.config';
 import * as _ from 'underscore';
+import { getRoomInfo } from '../rooms/rooms.services';
 
 export default class CombatServices extends MasterServices {
     public attacksInfos: Map<string, ATTACK_INFO> = new Map();
@@ -78,6 +79,13 @@ export function extendRoomWithCombat(scene: any, roomSchema: ROOM_MODEL): void {
         roomUpdateObject.$unset = roomUpdateObject.$unset || {};
         roomUpdateObject.$unset.pvp = true;
     }
+	if (scene.canSetMainAbility === "true") {
+        roomSchema.mainable = true;
+	} else {
+        let roomUpdateObject: any = roomSchema;
+        roomUpdateObject.$unset = roomUpdateObject.$unset || {};
+        roomUpdateObject.$unset.mainable = true;
+    }
 }
 
 export function getValidTargets(socket: GameSocket, targetIds: string[]): PLAYER[] {
@@ -107,7 +115,11 @@ export function hasMainAbility(socket: GameSocket, ability: string): boolean {
 }
 
 function getMainAbilities(socket: GameSocket): string[] {
-	return _.isEmpty(socket.character.mainAbilities) ? [statsConfig.ABILITY_MELEE] : socket.character.mainAbilities;
+    return _.isEmpty(socket.character.mainAbilities) ? [statsConfig.ABILITY_MELEE] : socket.character.mainAbilities;
+}
+
+export function canSetMainAbility(socket: GameSocket): boolean {
+    return getRoomInfo(socket.character.room).mainable;
 }
 
 export function addMainAbility(socket: GameSocket, ability: string) {
