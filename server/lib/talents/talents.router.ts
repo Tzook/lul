@@ -86,6 +86,13 @@ export default class TalentsRouter extends SocketioRouterBase {
 		});
 	}
 	
+	[talentsConfig.SERVER_INNER.ATK_TARGETS.name](data: {attacker: HURTER, target: PLAYER, dmg: number, cause: string, crit: boolean}, socket: GameSocket) {
+		const {attacker} = data;
+		if (isSocket(attacker) || isMob(attacker)) {
+			this.controller.applySelfBuffPerks(attacker);
+		}
+	}
+
 	[talentsConfig.SERVER_INNER.DMG_DEALT.name](data: {attacker: HURTER, target: PLAYER, dmg: number, cause: string, crit: boolean}, socket: GameSocket) {
 		const {dmg, cause, crit, attacker, target} = data;
 		if (isSocket(attacker)) {

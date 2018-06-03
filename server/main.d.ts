@@ -498,7 +498,7 @@ interface BUFF_INSTANCE {
     perkName: string,
     duration: number,
     initTime: number,
-    onPerkCleared?: Function,
+    onPerkCleared?: (buffTarget: PLAYER) => void,
 }
 
 interface ROOM_STATE extends Map<string, string> {}

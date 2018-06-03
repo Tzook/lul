@@ -1,5 +1,5 @@
 import MasterServices from '../master/master.services';
-import SocketioRouter from '../socketio/socketio.router';
+import SocketioRouter, { getSocketioRouter } from '../socketio/socketio.router';
 import * as _ from 'underscore';
 import { doesChanceWorkFloat } from '../drops/drops.services';
 import talentsConfig from "../talents/talents.config";
@@ -84,7 +84,7 @@ export default class TalentsServices extends MasterServices {
 	protected filterPool(pool: string[], charPerks: PERK_MAP): string[] {
 		let newPool = [];
 		pool.forEach(perk => {
-			const perkConfig = this.getPerkConfig(perk);
+			const perkConfig = getPerkConfig(perk);
 			const level = charPerks[perk] || 0;
 			const charPerkValue = this.getPerkLevelValue(perk, level);
 			if (this.isBelowMax(perkConfig, charPerkValue)) {
@@ -104,7 +104,7 @@ export default class TalentsServices extends MasterServices {
 	}
 	
 	protected getPerkLevelValue(perk: string, level: number): number {
-		const perkConfig = this.getPerkConfig(perk);
+		const perkConfig = getPerkConfig(perk);
 		const initialValue = perkConfig.default || 0;
 		const acceleration = perkConfig.acc || 0;
 		const valueModifier = perkConfig.value;
@@ -128,17 +128,15 @@ export default class TalentsServices extends MasterServices {
 	}
 
 	public getPerkConfig(perk: string): PERK_CONFIG {
-		const config = this.socketioRouter.getConfig();
-		const perkConfig: PERK_CONFIG = config.perks[perk] || <any>{};
-		return perkConfig;
+		return getPerkConfig(perk);
     }
     
     public getPerkDefault(perk: string): number {
-        return this.getPerkConfig(perk).default || 0;
+        return getPerkConfig(perk).default || 0;
     }
     
     public getBonusPerks(perk: string): PERK_MAP {
-        return this.getPerkConfig(perk).bonusPerks || {};
+        return getPerkConfig(perk).bonusPerks || {};
     }
 
 	public getTargetsHit(targetIds: string[], socket: GameSocket): string[] {
@@ -256,7 +254,7 @@ export default class TalentsServices extends MasterServices {
 		ability = ability || socket.character.stats.primaryAbility;
         const talent = socket.character.talents._doc[ability];
         if (!talent) {
-            const perkConfig = this.getPerkConfig(perk);
+            const perkConfig = getPerkConfig(perk);
             return perkConfig.default || 0;
         }
         const level = (talent.perks[perk] || 0) + this.getCharTalentsLevel(socket, perk);
@@ -300,12 +298,12 @@ export default class TalentsServices extends MasterServices {
 	}
 	
 	protected getBetterPerkValue(perk: string, ...values: number[]): number {
-		const perkConfig = this.getPerkConfig(perk);
+		const perkConfig = getPerkConfig(perk);
 		return perkConfig.value > 0 ? Math.max(...values) : Math.min(...values);
 	}
 	
 	protected addBonusPerkSafely(perk: string, perkValue: number, bonusValue: number) {
-		const perkConfig = this.getPerkConfig(perk);
+		const perkConfig = getPerkConfig(perk);
 		let resultValue = perkValue;
 		// if original value is below max - just add the value and verify it's not past max
 		if (this.isBelowMax(perkConfig, perkValue)) {
@@ -320,7 +318,7 @@ export default class TalentsServices extends MasterServices {
 	}
 
 	protected getSafePerkValue(perk: string, value: number) {
-		const perkConfig = this.getPerkConfig(perk);
+		const perkConfig = getPerkConfig(perk);
 		if (!this.isBelowMax(perkConfig, value)) {
 			value = perkConfig.max;
 		}
@@ -584,8 +582,14 @@ export function applySpikes(dmg: number, spikesModifier: number): number {
     return Math.round(dmg * spikesModifier);
 }
 
+export function getPerkConfig(perkName: string): PERK_CONFIG {
+	const config = getSocketioRouter().getConfig();
+	const perkConfig: PERK_CONFIG = config.perks[perkName] || <any>{};
+	return perkConfig;
+}
+
 export function getPerkType(perkName: string): PERK_TYPES {
-	return getTalentsServices().getPerkConfig(perkName).type;
+	return getPerkConfig(perkName).type;
 }
 
 function getAbilityExpFormula(dmg: number, targetExp: number, targetMaxHealth: number): number {

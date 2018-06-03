@@ -24,6 +24,7 @@ export default {
 		GAIN_ABILITY: {name: "gain_ability", alive: true, log: true},
 		HEAL_CHAR: Object.assign({}, combatConfig.SERVER_INNER.HEAL_CHAR),
 		MOB_DESPAWN: Object.assign({}, mobsConfig.SERVER_INNER.MOB_DESPAWN),
+		ATK_TARGETS: Object.assign({}, combatConfig.SERVER_INNER.ATK_TARGETS),		
 		DMG_DEALT: Object.assign({}, combatConfig.SERVER_INNER.DMG_DEALT),		
 		GAIN_CHAR_ABILITY_EXP: {name: "gain_char_ability_exp", alive: true, log: true},
 		GAIN_PRIMARY_ABILITY_EXP: {name: "gain_primary_ability_exp", alive: true, log: true},
