@@ -8,10 +8,10 @@ import SocketioServices from './socketio.services';
 import config from './socketio.config';
 require('./socketio.fixer');
 import * as passportSocketIo from 'passport.socketio';
-import { isProduction, getEnvVariable } from '../main/main';
 import * as _ from "underscore";
 import { getRouter } from '../main/bootstrap';
 import { notifyUserAboutError, sendFatal } from './socketio.errors';
+import { getEnvVariable, isLocal } from '../main/env';
 
 export default class SocketioRouter extends SocketioRouterBase {
 	protected middleware: SocketioMiddleware;
@@ -96,7 +96,7 @@ export default class SocketioRouter extends SocketioRouterBase {
 
 	initListeners() {
 		this.io.on(this.ROUTES.BEGIN_CONNECTION, (socket: GameSocket) => {
-			if (!isProduction() && socket.request._query.test === 'true') {
+			if (isLocal() && socket.request._query.test === 'true') {
 				socket.test = true;
 			}
 			socket.user = socket.client.request.user;

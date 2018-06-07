@@ -1,8 +1,8 @@
 
 import MasterServices from '../master/master.services';
 import { getServices } from '../main/bootstrap';
-import { getEnvVariable } from '../main/main';
 import * as Octokit from "@octokit/rest";
+import { getEnvVariable } from '../main/env';
 
 export default class GithubServices extends MasterServices {
     public githubClient: Octokit;

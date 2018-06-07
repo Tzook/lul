@@ -13,9 +13,9 @@ let 	express 		= require('express'),
 // Internal
 import Bootstrap from './bootstrap';
 import { setLogger } from './logger';
-import { Request } from 'express';
 import { getController } from './bootstrap';
 import Response from '../master/master.response';
+import { isSecure, getEnvVariable, isLocal } from './env';
 
 export default class Main {
 	private app;
@@ -51,7 +51,7 @@ export default class Main {
 	}
 
     redirectIfNotSecure() {
-        if (isProduction()) {
+        if (!isLocal()) {
             this.app.use((req, res, next) => {
                 if (isSecure(req)) {
                     // request was via https, so do no special handling
@@ -87,7 +87,7 @@ export default class Main {
 	
 	connectToDbAndBootstrap() {
 		this.app.db.once('open', () => {
-			if (isProduction()) {
+			if (!isLocal()) {
 				setLogger(this.app.db.db);
 			}
 			console.info("\t+*+*+ Connected to mongodb! on MongoLab +*+*+");
@@ -96,19 +96,3 @@ export default class Main {
 		});
 	}
 };
-
-export function isProduction(): boolean {
-	return process.env.NODE_ENV === "production";
-}
-
-export function isSecure(req: Request): boolean {
-    return req.headers["x-forwarded-proto"] === "https";
-}
-
-export function isFromWeb(req: Request): boolean {
-	return req.headers.host === "lul.herokuapp.com" || req.headers.host === "localhost:5000";
-}
-
-export function getEnvVariable(key: string) {
-    return process.env[key] ? process.env[key] : require('../../../config/.env.json')[key];
-}
