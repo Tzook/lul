@@ -1,11 +1,11 @@
 <p align="center">
-    <img alt="LUL" src="https://images.mmorpg.com/images/mmorpg_logo.png" width="400"/>
+    <img alt="XPloria" src="https://images.mmorpg.com/images/mmorpg_logo.png" width="400"/>
 </p>
 
-# LUL
+# XPloria
 
 
-A server for LUL, an MMORG (Massive Multiplayer Online Role-Playing Game).
+A server for XPloria, an MMORG (Massive Multiplayer Online Role-Playing Game).
 Written in Node.JS, Socket.io and TypeScript.
 Covered with End to End automations, using Protractor.
 

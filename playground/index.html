@@ -3,7 +3,7 @@
   <head>
     <meta charset="utf-8">
     <meta http-equiv="Content-Type" content="text/html; charset=utf-8">
-    <title>Unity WebGL Player | LUL</title>
+    <title>XPloria</title>
     <link rel="shortcut icon" href="TemplateData/favicon.ico">
     <link rel="stylesheet" href="TemplateData/style.css">
     <script src="TemplateData/UnityProgress.js"></script>  
@@ -11,7 +11,7 @@
     <script>
         var BUILD_ASSETS_VERSION = "0.08";
         (function() {
-            var PARTS_SIZE = 5;
+            var PARTS_SIZE = 4;
             
             monkeyPatchAjaxes();
 
@@ -63,15 +63,15 @@
                                 for (var i in loaded) {
                                     sum += loaded[i];
                                 }
-                                onprogress({type: "progress", lengthComputable: true, loaded: sum, total: event.total * loaded.length});
+                                var total = event.total * loaded.length;
+                                gameInstance.progress.percent.innerText = Math.min(99, sum / total * 100 | 0) + "%";
+                                onprogress({type: "progress", lengthComputable: true, loaded: sum, total: total});
                             });
                             xhr.send();
                         });
                     }
                 };
-
             }
-
 
             function joinBuffers(buffers) {
                 // taken from https://github.com/jessetane/array-buffer-concat/blob/master/index.js
@@ -103,11 +103,8 @@
       <div id="gameContainer" style="width: 1280px; height: 720px"></div>
       <div class="footer">
         <div class="fullscreen" onclick="gameInstance.SetFullscreen(1)"></div>
-        <div class="title">XPloria <small id="version"></small></div>
+        <div class="title">Fullscreen</div>
       </div>
     </div>
-    <script>
-        document.getElementById("version").innerText = "(v" + BUILD_ASSETS_VERSION + ")";
-    </script>
   </body>
 </html>
