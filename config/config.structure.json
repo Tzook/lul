@@ -31,7 +31,8 @@
 		"use",
         "state",
         "dungeon",
-        "ban",
+		"ban",
+		"secondary",
         "github"
 	],
 	"skip": 	 { "master": 1 }

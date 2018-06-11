@@ -22,11 +22,15 @@ export function setAttackInfo(socket: GameSocket, id: string, load: number, addi
     const attackInfosMap = getCombatServices().attacksInfos;
     const key = getAttackInfoMapKey(socket, id);
     const timerId = setTimeout(() => attackInfosMap.delete(key), combatConfig.ATTACK_INFO_ALIVE_TIME);
-    attackInfosMap.set(key, Object.assign({
+    attackInfosMap.set(key, createAttackInfo(socket, load, timerId, additionInfo));
+}
+
+export function createAttackInfo(socket: GameSocket, load: number, timerId?: NodeJS.Timer, additionInfo?: {}): ATTACK_INFO {
+    return Object.assign({
         timerId,
         load,
         ability: socket.character.stats.primaryAbility,
-    }, additionInfo));
+    }, additionInfo)
 }
 
 export function popAttackInfo(socket: GameSocket, id: string): ATTACK_INFO {
