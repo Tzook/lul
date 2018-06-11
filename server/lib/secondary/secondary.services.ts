@@ -30,5 +30,5 @@ export function getSecondaryMode(socket: GameSocket): boolean {
 }
 
 export function getRoomSecondaryModes(socket: GameSocket, createIfMissing: boolean = false): Set<GameSocket> {
-    return getSetOfMap(getSecondaryServices().secondaryModes, socket.character.room);
+    return getSetOfMap(getSecondaryServices().secondaryModes, socket.character.room, createIfMissing);
 }
