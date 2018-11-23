@@ -126,7 +126,7 @@ export default class CombatRouter extends SocketioRouterBase {
 		for (let target of targets) {
 			if (isSocket(attacker) && isSocket(target)) {
 				// TODO change to be a check if PVP allowed
-				continue; 
+				
 			}
 			if (isMob(target) && isSocket(attacker) && !didHitMob(target, attacker)) {
 				this.emitter.emit(mobsConfig.SERVER_INNER.MISS_MOB.name, {mob: target, cause}, socket);
