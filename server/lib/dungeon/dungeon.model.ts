@@ -1,27 +1,36 @@
+import * as mongoose from "mongoose";
+import * as _ from "underscore";
 import MasterModel from "../master/master.model";
-import * as mongoose from 'mongoose';
-import * as _ from 'underscore';
-import { setDungeonsInfo } from "./dungeon.services";
 import dungeonConfig from "./dungeon.config";
+import { setDungeonsInfo } from "./dungeon.services";
 
 export const PRIORITY_DUNGEON = 10;
 
-const DUNGEON_REWARD_MODEL = (<any>mongoose.Schema)({
-    key: String,
-    chance: Number,
-    stack: Number,
-}, {_id: false});
+const DUNGEON_REWARD_MODEL = (<any>mongoose.Schema)(
+    {
+        key: String,
+        chance: Number,
+        stack: Number,
+    },
+    { _id: false },
+);
 
-const DUNGEON_ROOM_MODEL = (<any>mongoose.Schema)({
-    key: String,
-    chance: Number,
-    time: Number,
-}, {_id: false});
+const DUNGEON_ROOM_MODEL = (<any>mongoose.Schema)(
+    {
+        key: String,
+        chance: Number,
+        time: Number,
+    },
+    { _id: false },
+);
 
-const DUNGEON_STAGE_MODEL = (<any>mongoose.Schema)({
-    rooms: [DUNGEON_ROOM_MODEL],
-    rewards: [DUNGEON_REWARD_MODEL],
-}, {_id: false});
+const DUNGEON_STAGE_MODEL = (<any>mongoose.Schema)(
+    {
+        rooms: [DUNGEON_ROOM_MODEL],
+        rewards: [DUNGEON_REWARD_MODEL],
+    },
+    { _id: false },
+);
 
 const DUNGEON_MODEL = {
     key: String,
@@ -36,24 +45,24 @@ const DUNGEON_MODEL = {
 
 export default class DungeonModel extends MasterModel {
     init(files, app) {
-
         this.schema = DUNGEON_MODEL;
     }
 
     get priority() {
         return PRIORITY_DUNGEON;
     }
-    
+
     createModel() {
-        this.setModel('Dungeon');
-		setTimeout(warmDungeons); // timeout so the Model can be set
+        this.setModel("Dungeon");
+        setTimeout(warmDungeons); // timeout so the Model can be set
         return Promise.resolve();
     }
-};
+}
 
 function warmDungeons(): Promise<any> {
-    const DungeonModel = mongoose.model('Dungeon');
-    return DungeonModel.find({}).lean()
+    const DungeonModel = mongoose.model("Dungeon");
+    return DungeonModel.find({})
+        .lean()
         .then((docs: DUNGEON[]) => {
             console.log("got dungeons");
             setDungeonsInfo(docs);
@@ -62,8 +71,8 @@ function warmDungeons(): Promise<any> {
 
 export function generateDungeons(dungeons: any): Promise<any> {
     console.log("Generating dungeons from data:", dungeons);
-    const DungeonModel = mongoose.model('Dungeon');
-    
+    const DungeonModel = mongoose.model("Dungeon");
+
     let dungeonModels = [];
 
     (dungeons || []).forEach(dungeon => {
@@ -86,7 +95,7 @@ export function generateDungeons(dungeons: any): Promise<any> {
         });
 
         addDungeonBonusPerkMaps(dungeonSchema.perksPool, dungeon.perksPool || [], [1]);
-        dungeon.perksCombinations.forEach(perksCombination => {
+        (dungeon.perksCombinations || []).forEach(perksCombination => {
             addDungeonBonusPerkMaps(dungeonSchema.perksPool, dungeon.perksPool || [], perksCombination.multiplyers || []);
         });
 
@@ -94,9 +103,8 @@ export function generateDungeons(dungeons: any): Promise<any> {
         dungeonModels.push(dungeonModel);
     });
 
-    return DungeonModel.remove({})
-        .then(d => DungeonModel.create(dungeonModels));
-};
+    return DungeonModel.remove({}).then(d => DungeonModel.create(dungeonModels));
+}
 
 function getRooms(stage): DUNGEON_ROOM[] {
     const basicRooms: any[] = stage.rooms || [];
@@ -136,16 +144,16 @@ function getRewards(stage): DUNGEON_REWARD[] {
 }
 
 function addDungeonBonusPerkMaps(perkMaps: PERK_MAP[], perksPool: any[], multiplyers: number[]): void {
-    addDungeonBonusPerkMapsRecursive(
-        perkMaps, 
-        {}, 
-        perksPool,
-        new Set(), 
-        multiplyers, 
-        0
-    );
+    addDungeonBonusPerkMapsRecursive(perkMaps, {}, perksPool, new Set(), multiplyers, 0);
 }
-function addDungeonBonusPerkMapsRecursive(perkMaps: PERK_MAP[], currentPerkMap: PERK_MAP, perksPool: any[], blacklistedPerks: Set<string>, multiplyers: number[], multiplyerIndex: number): void {
+function addDungeonBonusPerkMapsRecursive(
+    perkMaps: PERK_MAP[],
+    currentPerkMap: PERK_MAP,
+    perksPool: any[],
+    blacklistedPerks: Set<string>,
+    multiplyers: number[],
+    multiplyerIndex: number,
+): void {
     if (multiplyerIndex >= multiplyers.length) {
         // finished handling all multiplyers
         perkMaps.push(currentPerkMap);
@@ -163,12 +171,12 @@ function addDungeonBonusPerkMapsRecursive(perkMaps: PERK_MAP[], currentPerkMap: 
         newBlacklistPerks.add(perkObj.key);
 
         addDungeonBonusPerkMapsRecursive(
-            perkMaps, 
-            {...currentPerkMap, [perkObj.key]: value},
+            perkMaps,
+            { ...currentPerkMap, [perkObj.key]: value },
             perksPool,
             newBlacklistPerks,
             multiplyers,
             multiplyerIndex + 1,
-        )
+        );
     }
 }

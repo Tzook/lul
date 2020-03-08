@@ -1,29 +1,28 @@
-
-import MasterController from '../master/master.controller';
-import PartyServices, { isMember, isLeader } from './party.services';
-import PartyMiddleware from './party.middleware';
-import config from './party.config';
-import { getController } from '../main/bootstrap';
+import { getController } from "../main/bootstrap";
+import MasterController from "../master/master.controller";
+import config from "./party.config";
+import PartyMiddleware from "./party.middleware";
+import PartyServices, { isLeader, isMember } from "./party.services";
 
 export default class PartyController extends MasterController {
     protected services: PartyServices;
     protected middleware: PartyMiddleware;
     private charToParty: Map<string, PARTY_MODEL> = new Map();
 
-	init(files, app) {
-		this.middleware = files.middleware;
-		super.init(files, app);
-	}
+    init(files, app) {
+        this.middleware = files.middleware;
+        super.init(files, app);
+    }
 
-    public getCharParty(socket: GameSocket): PARTY_MODEL|undefined {
+    public getCharParty(socket: GameSocket): PARTY_MODEL | undefined {
         return this.getParty(socket.character.name);
     }
 
-    public getParty(name: string): PARTY_MODEL|undefined {
-        return this.charToParty.get(name);;
+    public getParty(name: string): PARTY_MODEL | undefined {
+        return this.charToParty.get(name);
     }
 
-    public createParty(socket: GameSocket) {
+    public createParty(socket: GameSocket): PARTY_MODEL {
         socket.emit(config.CLIENT_GETS.CREATE_PARTY.name, {});
         let cachedKickLocked = 0;
         let party: PARTY_MODEL = {
@@ -44,16 +43,20 @@ export default class PartyController extends MasterController {
         };
         this.charToParty.set(socket.character.name, party);
         socket.join(party.name);
+        return party;
     }
 
     public inviteToParty(inviteeSocket: GameSocket, party: PARTY_MODEL) {
         inviteeSocket.emit(config.CLIENT_GETS.INVITE_TO_PARTY.name, {
-            leader_name: party.leader
+            leader_name: party.leader,
         });
-        party.invitees.set(inviteeSocket.character.name, setTimeout(() => {
-            // remove the invitation after a certain amount of time
-            party.invitees.delete(inviteeSocket.character.name);
-        }, config.INVITE_EXPIRE_TIME));
+        party.invitees.set(
+            inviteeSocket.character.name,
+            setTimeout(() => {
+                // remove the invitation after a certain amount of time
+                party.invitees.delete(inviteeSocket.character.name);
+            }, config.INVITE_EXPIRE_TIME),
+        );
     }
 
     public joinParty(socket: GameSocket, party: PARTY_MODEL) {
@@ -62,7 +65,7 @@ export default class PartyController extends MasterController {
         party.members.add(socket.character.name);
         this.tellPartyMembers(socket, party);
         this.io.to(party.name).emit(config.CLIENT_GETS.JOIN_PARTY.name, {
-            char_name: socket.character.name
+            char_name: socket.character.name,
         });
 
         this.charToParty.set(socket.character.name, party);
@@ -72,7 +75,7 @@ export default class PartyController extends MasterController {
 
     public leaveParty(socket: GameSocket, party: PARTY_MODEL) {
         this.io.to(party.name).emit(config.CLIENT_GETS.LEAVE_PARTY.name, {
-            char_name: socket.character.name
+            char_name: socket.character.name,
         });
         socket.leave(party.name);
 
@@ -81,10 +84,10 @@ export default class PartyController extends MasterController {
             if (party.members.size > 0) {
                 party.leader = this.services.pickLeader(socket, party);
                 this.io.to(party.name).emit(config.CLIENT_GETS.LEAD_PARTY.name, {
-                    char_name: party.leader
+                    char_name: party.leader,
                 });
             } else {
-                // party is disbanded. 
+                // party is disbanded.
                 // remove pending invitations
                 for (let [, timeout] of party.invitees) {
                     clearTimeout(timeout);
@@ -97,14 +100,14 @@ export default class PartyController extends MasterController {
 
     public makeLeader(charName: string, party: PARTY_MODEL) {
         this.io.to(party.name).emit(config.CLIENT_GETS.LEAD_PARTY.name, {
-            char_name: charName
+            char_name: charName,
         });
         party.leader = charName;
     }
 
     public kickFromParty(socket: GameSocket, charName: string, party: PARTY_MODEL) {
         this.io.to(party.name).emit(config.CLIENT_GETS.KICK_FROM_PARTY.name, {
-            char_name: charName
+            char_name: charName,
         });
 
         let kickedSocket = socket.map.get(charName);
@@ -112,7 +115,7 @@ export default class PartyController extends MasterController {
             // party member is online - remove him
             kickedSocket.leave(party.name);
         }
-        
+
         party.members.delete(charName);
         this.charToParty.delete(charName);
     }
@@ -120,7 +123,7 @@ export default class PartyController extends MasterController {
     public tellPartyMembers(socket: GameSocket, party: PARTY_MODEL) {
         socket.emit(config.CLIENT_GETS.PARTY_MEMBERS.name, {
             leader_name: party.leader,
-            chars_names: Array.from(party.members)
+            chars_names: Array.from(party.members),
         });
     }
 
@@ -132,7 +135,7 @@ export default class PartyController extends MasterController {
         }
         return areMembers;
     }
-};
+}
 
 export function getPartyController(): PartyController {
     return getController("party");

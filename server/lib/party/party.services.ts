@@ -1,8 +1,7 @@
-
-import MasterServices from '../master/master.services';
-import * as _ from 'underscore';
-import partyConfig from './party.config';
-import { getPartyController } from './party.controller';
+import * as _ from "underscore";
+import MasterServices from "../master/master.services";
+import partyConfig from "./party.config";
+import { getPartyController } from "./party.controller";
 
 export default class PartyServices extends MasterServices {
     public getPartyName() {
@@ -19,9 +18,13 @@ export default class PartyServices extends MasterServices {
         // no one is online - pick the first one
         return party.members.values().next().value;
     }
-};
+}
 
-export function getCharParty(socket: GameSocket) {
+export function createParty(socket: GameSocket): PARTY_MODEL {
+    return getPartyController().createParty(socket);
+}
+
+export function getCharParty(socket: GameSocket): PARTY_MODEL {
     return getPartyController().getCharParty(socket);
 }
 
@@ -54,7 +57,7 @@ export function isMember(name: string, party: PARTY_MODEL): boolean {
 }
 
 export function isPartyFull(party: PARTY_MODEL): boolean {
-    return party.members.size  + 1 >= partyConfig.MAX_PARTY_MEMBERS;
+    return party.members.size + 1 >= partyConfig.MAX_PARTY_MEMBERS;
 }
 
 export function isInvited(party: PARTY_MODEL, socket: GameSocket): boolean {
