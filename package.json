@@ -4,7 +4,8 @@
     "description": "very lel..",
     "main": "main.js",
     "scripts": {
-        "build": "git checkout master && git merge development && node output\\lib\\scripts\\cloneDb.js && git push origin master && git checkout development",
+        "// b explanation": "not sure what it's needed for atm, but let's keep it here",
+        "b": "git checkout master && git merge development && node output\\lib\\scripts\\cloneDb.js && git push origin master && git checkout development",
         "s": "gulp watch",
         "// start-explanation": "1) verify n exists. 2) verify node latest version exists while keeping the machine's original node version installed. 3) start app with node latest version",
         "start": "INSTALL_V=12.14.1 && ([ -a /usr/local/bin/n ] || sudo npm i -g n) && ([ -d /usr/local/n/versions/node/$INSTALL_V ] || (CURRENT_V=$(node -v) && sudo n $INSTALL_V && sudo n $CURRENT_V)) && n use $INSTALL_V node_modules/.bin/gulp watch --color",
