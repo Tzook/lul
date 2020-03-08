@@ -1,110 +1,110 @@
 <!DOCTYPE html>
 <html lang="en-us">
-  <head>
-    <meta charset="utf-8">
-    <meta http-equiv="Content-Type" content="text/html; charset=utf-8">
-    <title>XPloria</title>
-    <link rel="shortcut icon" href="TemplateData/favicon.ico">
-    <link rel="stylesheet" href="TemplateData/style.css">
-    <script src="TemplateData/UnityProgress.js"></script>  
-    <script src="Build/UnityLoader.js"></script>
-    <script>
-        var BUILD_ASSETS_VERSION = "0.10";
-        (function() {
-            var PARTS_SIZE = 4;
-            
-            monkeyPatchAjaxes();
+    <head>
+        <meta charset="utf-8" />
+        <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+        <title>XPloria</title>
+        <link rel="shortcut icon" href="TemplateData/favicon.ico" />
+        <link rel="stylesheet" href="TemplateData/style.css" />
+        <script src="TemplateData/UnityProgress.js"></script>
+        <script src="Build/UnityLoader.js"></script>
+        <script>
+            var BUILD_ASSETS_VERSION = "0.10";
+            (function() {
+                var PARTS_SIZE = 4;
 
-            function monkeyPatchAjaxes() {
-                var original = UnityLoader.downloadJob;
-                UnityLoader.downloadJob = function (e, t) {
-                    if (t.parameters.url.indexOf(".unityweb") === -1) {
-                        // continue with no modifications
-                        return original(e, t);
-                    }
-                    // add version to the build files so it will be revoked when build updates
-                    t.parameters.url += "?v=" + BUILD_ASSETS_VERSION;
-                    if (t.parameters.url.indexOf(".data") === -1) {
-                        return original(e, t);
-                    }
+                monkeyPatchAjaxes();
 
-                    // since we have a really big file, we want to split it to multiple ajaxes
-                    var promises = [];
-                    var loaded = [];
-                    for (var i = 1; i <= PARTS_SIZE; i++) {
-                        var finished = 0;
-                        var promise = getPart(t.parameters.url, i, t.parameters.onprogress);
-                        promises.push(promise);
-                    }
-                    Promise.all(promises)
-                        .then(function(parts) {
-                            UnityLoader.Compression.decompress(joinBuffers(parts), function(result) {
-                                t.complete(result);
+                function monkeyPatchAjaxes() {
+                    var original = UnityLoader.downloadJob;
+                    UnityLoader.downloadJob = function(e, t) {
+                        if (t.parameters.url.indexOf(".unityweb") === -1) {
+                            // continue with no modifications
+                            return original(e, t);
+                        }
+                        // add version to the build files so it will be revoked when build updates
+                        t.parameters.url += "?v=" + BUILD_ASSETS_VERSION;
+                        if (t.parameters.url.indexOf(".data") === -1) {
+                            return original(e, t);
+                        }
+
+                        // since we have a really big file, we want to split it to multiple ajaxes
+                        var promises = [];
+                        var loaded = [];
+                        for (var i = 1; i <= PARTS_SIZE; i++) {
+                            var finished = 0;
+                            var promise = getPart(t.parameters.url, i, t.parameters.onprogress);
+                            promises.push(promise);
+                        }
+                        Promise.all(promises)
+                            .then(function(parts) {
+                                UnityLoader.Compression.decompress(joinBuffers(parts), function(result) {
+                                    t.complete(result);
+                                });
                             })
-                        })
-                        .catch(function(error) {
-                            console.log("error", error);
-                        });
-                    // mock this object's send so we can actually modify it
-                    this.send = function() {};
-
-                    function getPart(url, part, onprogress) {
-                        loaded[part - 1] = 0;
-                        return new Promise((resolve, reject) => {
-                            var xhr = new XMLHttpRequest();
-                            xhr.open("GET", url + "&part=" + part);
-                            xhr.responseType = "arraybuffer";
-                            xhr.onload = function() {
-                                resolve(xhr.response);
-                            };
-                            xhr.addEventListener("progress", function(event) {
-                                loaded[part - 1] = event.loaded;
-                                var sum = 0;
-                                for (var i in loaded) {
-                                    sum += loaded[i];
-                                }
-                                var total = event.total * loaded.length;
-                                gameInstance.progress.percent.innerText = Math.min(99, sum / total * 100 | 0) + "%";
-                                onprogress({type: "progress", lengthComputable: true, loaded: sum, total: total});
+                            .catch(function(error) {
+                                console.log("error", error);
                             });
-                            xhr.send();
-                        });
+                        // mock this object's send so we can actually modify it
+                        this.send = function() {};
+
+                        function getPart(url, part, onprogress) {
+                            loaded[part - 1] = 0;
+                            return new Promise((resolve, reject) => {
+                                var xhr = new XMLHttpRequest();
+                                xhr.open("GET", url + "&part=" + part);
+                                xhr.responseType = "arraybuffer";
+                                xhr.onload = function() {
+                                    resolve(xhr.response);
+                                };
+                                xhr.addEventListener("progress", function(event) {
+                                    loaded[part - 1] = event.loaded;
+                                    var sum = 0;
+                                    for (var i in loaded) {
+                                        sum += loaded[i];
+                                    }
+                                    var total = event.total * loaded.length;
+                                    // gameInstance.progress.innerText = Math.min(99, ((sum / total) * 100) | 0) + "%";
+                                    onprogress({ type: "progress", lengthComputable: true, loaded: sum, total: total });
+                                });
+                                xhr.send();
+                            });
+                        }
+                    };
+                }
+
+                function joinBuffers(buffers) {
+                    // taken from https://github.com/jessetane/array-buffer-concat/blob/master/index.js
+                    var length = 0;
+                    var buffer = null;
+
+                    for (var i in buffers) {
+                        buffer = buffers[i];
+                        length += buffer.byteLength;
                     }
-                };
-            }
 
-            function joinBuffers(buffers) {
-                // taken from https://github.com/jessetane/array-buffer-concat/blob/master/index.js
-                var length = 0;
-                var buffer = null;
+                    var joined = new Uint8Array(length);
+                    var offset = 0;
 
-                for (var i in buffers) {
-                    buffer = buffers[i];
-                    length += buffer.byteLength;
+                    for (var i in buffers) {
+                        buffer = buffers[i];
+                        joined.set(new Uint8Array(buffer), offset);
+                        offset += buffer.byteLength;
+                    }
+
+                    return joined;
                 }
-
-                var joined = new Uint8Array(length);
-                var offset = 0;
-
-                for (var i in buffers) {
-                    buffer = buffers[i];
-                    joined.set(new Uint8Array(buffer), offset);
-                    offset += buffer.byteLength;
-                }
-
-                return joined;
-            }
-        })();
-        var gameInstance = UnityLoader.instantiate("gameContainer", "Build/Desktop.json", {onProgress: UnityProgress});
-    </script>
-  </head>
-  <body>
-    <div class="webgl-content">
-      <div id="gameContainer" style="width: 1280px; height: 720px"></div>
-      <div class="footer">
-        <div class="fullscreen" onclick="gameInstance.SetFullscreen(1)"></div>
-        <div class="title">XPloria</div>
-      </div>
-    </div>
-  </body>
+            })();
+            var gameInstance = UnityLoader.instantiate("gameContainer", "Build/Desktop.json", { onProgress: UnityProgress });
+        </script>
+    </head>
+    <body>
+        <div class="webgl-content">
+            <div id="gameContainer" style="width: 1280px; height: 720px"></div>
+            <div class="footer">
+                <div class="fullscreen" onclick="gameInstance.SetFullscreen(1)"></div>
+                <div class="title">XPloria</div>
+            </div>
+        </div>
+    </body>
 </html>
