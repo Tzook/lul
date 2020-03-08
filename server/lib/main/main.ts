@@ -26,20 +26,12 @@ export default class Main {
         mongoose.connection.on("error", console.error.bind(console, "connection error:"));
     }
 
-    useDependencies() {
-        // Run all async - they don't need to run after each other.
-        // To add a dependency to run with them, simply push it to the dependencies array
-        this.app.dependencies = [compression({ level: 1 }), cookieParser(), bodyParser.json(), cors()];
-        this.app.use((req, res, next) => {
-            let count = this.app.dependencies.length;
-            for (let i in this.app.dependencies) {
-                this.app.dependencies[i](req, res, done);
-            }
-            function done(err) {
-                (err && next(err)) || (!--count && next()); // if had error - next will handle it. otherwise, when all finished, procceed.
-            }
-        });
-    }
+	useDependencies() {
+		this.app.use(compression({level: 1}));
+		this.app.use(cookieParser());
+		this.app.use(bodyParser.json());
+		this.app.use(cors());
+	}
 
     redirectIfNotSecure() {
         if (!isLocal()) {
