@@ -1,11 +1,10 @@
-
-import MasterModel from '../master/master.model';
-import * as _ from 'underscore';
+import * as _ from "underscore";
+import { PRIORITY_CHAR } from "../character/character.model";
 import { ITEM_INSTANCE_SCHEMA } from "../items/items.model";
-import SocketioRouter from '../socketio/socketio.router';
-import ItemsRouter from '../items/items.router';
-import { PRIORITY_CONFIG } from '../socketio/socketio.model';
-import { PRIORITY_CHAR } from '../character/character.model';
+import ItemsRouter from "../items/items.router";
+import MasterModel from "../master/master.model";
+import { PRIORITY_CONFIG } from "../socketio/socketio.model";
+import SocketioRouter from "../socketio/socketio.router";
 
 export const EQUIPS_SCHEMA = {
     head: ITEM_INSTANCE_SCHEMA,
@@ -22,15 +21,15 @@ export default class EquipsModel extends MasterModel {
     protected beginSchema;
     protected socketioRouter: SocketioRouter;
     protected itemsRouter: ItemsRouter;
-	
+
     init(files, app) {
-		this.socketioRouter = files.routers.socketio;
-		this.itemsRouter = files.routers.items;
+        this.socketioRouter = files.routers.socketio;
+        this.itemsRouter = files.routers.items;
         this.hasId = false;
         this.schema = _.clone(EQUIPS_SCHEMA);
         this.beginSchema = _.clone(EQUIPS_SCHEMA);
         for (let i in this.schema) {
-            this.schema[i] = this.mongoose.Schema.Types.Mixed;
+            this.schema[i] = {};
             this.beginSchema[i] = String;
         }
     }
@@ -41,15 +40,15 @@ export default class EquipsModel extends MasterModel {
 
     createModel() {
         this.setModel("Equip");
-        
+
         this.addToSchema("Character", { equips: this.getModel().schema });
         this.addToSchema("Config", { beginEquips: this.beginSchema });
-        
+
         this.listenForFieldAddition("Character", "equips");
-        
+
         return Promise.resolve();
     }
-    
+
     protected addFieldToModel(field, data, obj: Char, reqBody) {
         let equips = _.clone(EQUIPS_SCHEMA);
         let ItemModel = this.getModel("ItemInstance");
@@ -59,6 +58,6 @@ export default class EquipsModel extends MasterModel {
             equips[type] = new ItemModel(itemInstance);
         }
         obj[field] = equips;
-		this.addFields(obj, reqBody);
+        this.addFields(obj, reqBody);
     }
-};
+}

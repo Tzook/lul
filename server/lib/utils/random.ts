@@ -1,4 +1,4 @@
-import * as _ from 'underscore';
+import * as _ from "underscore";
 
 export function pickRandomIndex(list: any[]): number {
     return _.random(list.length - 1);
@@ -8,7 +8,7 @@ export function pickRandomIndexes(list: any[], count: number): number[] {
     if (count > list.length) {
         throw new Error(`pickRandomIndexes had count bigger than the list! list: [${list.join(",")}], count: ${count}`);
     }
-    const result = new Set();
+    const result = new Set<number>();
     let itemsNeeded = count;
     while (itemsNeeded > 0) {
         const randomIndex = pickRandomIndex(list);

@@ -1,26 +1,22 @@
-import * as winston from 'winston';
-require('winston-mongodb');
+import * as winston from "winston";
+require("winston-mongodb");
 
 const consoleTransport = new winston.transports.Console({
-    colorize: true,
-    prettyPrint: true,
+    format: winston.format.combine(winston.format.colorize(), winston.format.json()),
 });
-const loggerInstance = new winston.Logger({
-    transports: [
-        consoleTransport,
-    ],
-    exceptionHandlers: [
-        consoleTransport
-    ]
+const loggerInstance = winston.createLogger({
+    transports: [consoleTransport],
+    exceptionHandlers: [consoleTransport],
 });
 
 export function setLogger(db) {
-    loggerInstance.add((<any>winston.transports).MongoDB, {
-        db,
-        collection: "logs",
-        handleExceptions: true,
-    });
+    winston.add(
+        new (<any>winston.transports).MongoDB({
+            db,
+            collection: "logs",
+            handleExceptions: true,
+        }),
+    );
 }
 
 export const logger = loggerInstance;
-

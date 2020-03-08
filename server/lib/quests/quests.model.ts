@@ -1,29 +1,27 @@
-
-import MasterModel from '../master/master.model';
-import QuestsController from './quests.controller';
-import * as mongoose from 'mongoose';
+import { PRIORITY_CHAR } from "../character/character.model";
+import MasterModel from "../master/master.model";
 import { BASE_STATS_SCHEMA } from "../stats/stats.model";
-import { PRIORITY_CHAR } from '../character/character.model';
+import QuestsController from "./quests.controller";
 
 const QUEST_SCHEMA = {
     key: String,
     cond: {
-        loot: mongoose.Schema.Types.Mixed,
-        hunt: mongoose.Schema.Types.Mixed,
-        ok: mongoose.Schema.Types.Mixed,
+        loot: {},
+        hunt: {},
+        ok: {},
         dmg: Number,
         heal: Number,
     },
     req: {
         lvl: Number,
-        quests: mongoose.Schema.Types.Mixed
+        quests: {},
     },
     reward: {
-        items: mongoose.Schema.Types.Mixed,
+        items: {},
         exp: Number,
         stats: BASE_STATS_SCHEMA,
-        ability: String
-    }
+        ability: String,
+    },
 };
 
 const CHAR_QUESTS = {
@@ -54,11 +52,11 @@ export default class QuestsModel extends MasterModel {
     createModel() {
         this.setModel("Quest");
 
-        let CharQuestModel = this.createNewModel("CharQuest", CHAR_QUESTS, {_id: false, strict: false, minimize: false});
-        this.addToSchema("Character", {quests: CharQuestModel.schema});
+        let CharQuestModel = this.createNewModel("CharQuest", CHAR_QUESTS, { _id: false, strict: false, minimize: false });
+        this.addToSchema("Character", { quests: CharQuestModel.schema });
         this.listenForFieldAddition("Character", "quests", CHAR_QUESTS);
 
         setTimeout(() => this.controller.warmQuestsInfo()); // timeout so the Model can be set
         return Promise.resolve();
     }
-};
+}
