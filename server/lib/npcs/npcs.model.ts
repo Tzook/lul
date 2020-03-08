@@ -1,4 +1,4 @@
-import MasterModel from '../master/master.model';
+import MasterModel from "../master/master.model";
 import NpcsController from "./npcs.controller";
 
 export const PRIORITY_NPCS = 10;
@@ -11,10 +11,10 @@ export default class NpcsModel extends MasterModel {
         this.schema = {
             key: String,
             room: String,
-            sell: this.mongoose.Schema.Types.Mixed,
-            givingQuests: this.mongoose.Schema.Types.Mixed,
-            endingQuests: this.mongoose.Schema.Types.Mixed,
-            teleportRooms: this.mongoose.Schema.Types.Mixed
+            sell: {},
+            givingQuests: {},
+            endingQuests: {},
+            teleportRooms: {},
         };
         this.hasId = false; // it actually has an id but saved only in the db
         this.strict = false;
@@ -25,8 +25,8 @@ export default class NpcsModel extends MasterModel {
     }
 
     createModel() {
-        this.setModel('Npcs');
+        this.setModel("Npcs");
         setTimeout(() => this.controller.warmNpcsInfo()); // timeout so the Model can be set
         return Promise.resolve();
     }
-};
+}

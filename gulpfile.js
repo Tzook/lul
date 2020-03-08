@@ -2,29 +2,34 @@ const gulp = require("gulp");
 const spawn = require("child_process").spawn;
 const server = require("gulp-develop-server");
 const ts = require("gulp-typescript");
-const sourcemaps = require('gulp-sourcemaps');
+const sourcemaps = require("gulp-sourcemaps");
 const tsProject = ts.createProject("tsconfig.json");
 
 function compile() {
-    return tsProject.src()
-        // .pipe(sourcemaps.init())
-        .pipe(tsProject())
-        .js
-        // .pipe(sourcemaps.write())
-        .pipe(gulp.dest(tsProject.options.outDir));
+    return (
+        tsProject
+            .src()
+            // .pipe(sourcemaps.init())
+            .pipe(tsProject())
+            .js // .pipe(sourcemaps.write())
+            .pipe(gulp.dest(tsProject.options.outDir))
+    );
 }
 
 gulp.task("compile", compile);
 gulp.task("restart", server.restart);
 
-gulp.task("watch", ["compile"], () => {
-    server.listen({path: "output/main.js"});
-    gulp.watch(["server/**/*"], ["compile"]);
-    gulp.watch(["output/**/*"], ["restart"])
-});
+gulp.task(
+    "watch",
+    gulp.series("compile", () => {
+        server.listen({ path: "output/main.js" });
+        gulp.watch("server/**/*", gulp.task("compile"));
+        gulp.watch("output/**/*", gulp.task("restart"));
+    }),
+);
 
 gulp.task("default", () => {
-    let app = spawn("npm", ["start", "--color"], {detached: true});
+    let app = spawn("npm", ["start", "--color"], { detached: true });
     app.stdout.pipe(process.stdout);
     app.stderr.pipe(process.stderr);
 
