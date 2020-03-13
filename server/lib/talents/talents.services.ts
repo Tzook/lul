@@ -647,3 +647,7 @@ export function isSocketInBuff(socket: GameSocket, perkName: string): boolean {
     const hasBuff = socket.buffs.has(perkName);
     return hasBuff;
 }
+
+export function applySelfBuffPerks(attacker: PLAYER) {
+    getTalentsController().applySelfBuffPerks(attacker);
+}

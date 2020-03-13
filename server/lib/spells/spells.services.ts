@@ -1,21 +1,20 @@
-import MasterServices from "../master/master.services";
-import { getServices } from "../main/bootstrap";
-import spellsConfig from "./spells.config";
-import { isMobInBuff } from '../talents/talents.services';
-import talentsConfig from "../talents/talents.config";
-import * as _ from 'underscore';
-import { pickRandomly } from "../drops/drops.services";
-import { spawnMob } from "../mobs/mobs.services";
-import { joinObjects } from "../utils/objects";
-import { markAbilityModified, getSpellCooldown, getId, hasAnyBuff } from "../talents/talents.services";
+import * as _ from "underscore";
 import { tweakPerks } from "../bonusPerks/bonusPerks.services";
+import { pickRandomly } from "../drops/drops.services";
+import { getServices } from "../main/bootstrap";
+import MasterServices from "../master/master.services";
+import { spawnMob } from "../mobs/mobs.services";
+import talentsConfig from "../talents/talents.config";
+import { applySelfBuffPerks, getId, getSpellCooldown, hasAnyBuff, isMobInBuff, markAbilityModified } from "../talents/talents.services";
 import { getMapOfMap } from "../utils/maps";
+import { joinObjects } from "../utils/objects";
+import spellsConfig from "./spells.config";
 
 export default class SpellsServices extends MasterServices {
-	public mobsSpellsPickers: Map<string, NodeJS.Timer> = new Map();
-	// spell key => spell
+    public mobsSpellsPickers: Map<string, NodeJS.Timer> = new Map();
+    // spell key => spell
     public spellsInfo: Map<string, ABILITY_SPELL_MODEL> = new Map();
-    // char name => spell key => cooldown date 
+    // char name => spell key => cooldown date
     public spellsCooldowns: Map<string, Map<string, number>> = new Map();
 }
 
@@ -40,7 +39,7 @@ export function canUseSpell(socket: GameSocket, spell: ABILITY_SPELL_MODEL, abil
     return talent && talent.lvl >= spell.lvl;
 }
 
-export function getSpell(spellKey: string): ABILITY_SPELL_MODEL|undefined {
+export function getSpell(spellKey: string): ABILITY_SPELL_MODEL | undefined {
     return getSpellsServices().spellsInfo.get(spellKey);
 }
 
@@ -56,7 +55,7 @@ export function getTalentSpell(socket: GameSocket, spellModel: ABILITY_SPELL_MOD
 
     return {
         ...spellModel,
-        perks: joinObjects(talent.spells[spellModel.key].bonusPerks, spellModel.perks)
+        perks: joinObjects(talent.spells[spellModel.key].bonusPerks, spellModel.perks),
     };
 }
 
@@ -64,8 +63,8 @@ function getEmptySpell(): CHAR_TALENT_SPELL {
     return {
         lvl: 1,
         exp: 0,
-        bonusPerks: {}
-    }
+        bonusPerks: {},
+    };
 }
 
 export function upgradeSpellPerks(spellModel: ABILITY_SPELL_MODEL, talentSpell: CHAR_TALENT_SPELL) {
@@ -108,7 +107,7 @@ function getSpellsInCooldown(socket: GameSocket): Map<string, number> {
 function updateAboutCooldown(socket: GameSocket, key: string, cd: number) {
     socket.emit(spellsConfig.CLIENT_GETS.SPELL_COOLDOWN.name, {
         spell_key: key,
-        cooldown: cd
+        cooldown: cd,
     });
 }
 
@@ -151,13 +150,20 @@ function getMobSpellRestTime(min: number, max: number): number {
 }
 
 export function mobUsesSpell(mob: MOB_INSTANCE, spell: MOB_SPELL_BASE, spellKey: string) {
-    getSpellsServices().io.to(mob.room).emit(spellsConfig.CLIENT_GETS.MOB_USE_SPELL.name, {
-        mob_id: mob.id,
-        spell_key: spellKey,
-    });
+    mob.currentSpell = spell;
+
+    getSpellsServices()
+        .io.to(mob.room)
+        .emit(spellsConfig.CLIENT_GETS.MOB_USE_SPELL.name, {
+            mob_id: mob.id,
+            spell_key: spellKey,
+        });
     (spell.spawn || []).forEach(mobKey => {
         spawnMob(mobKey, mob.x, mob.y, mob.room, spell.perks);
     });
+    applySelfBuffPerks(mob);
+
+    mob.currentSpell = null;
 }
 
 export function hasMobSpellsPicker(mob: MOB_INSTANCE): boolean {
@@ -188,5 +194,5 @@ export function getTargetIdsHurtBySpell(spell: SPELL_BASE, targets: PLAYER[]): s
         }
     }
 
-    return resultTargetIds
+    return resultTargetIds;
 }
